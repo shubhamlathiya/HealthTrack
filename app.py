@@ -9,6 +9,7 @@ from api.auth_routes import auth
 from api.chat_routes.chat_routes import chat_routes
 from api.chat_routes.chat_sockets import init_socket_events
 from api.doctor_routes import doctors
+from api.laboratory_routes import laboratory
 from api.patients import patients
 from config import mongo, init_app
 
@@ -31,7 +32,7 @@ app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(patients, url_prefix='/patients')
 app.register_blueprint(doctors, url_prefix='/doctors')
-
+app.register_blueprint(laboratory, url_prefix='/laboratory')
 # Register Routes
 app.register_blueprint(chat_routes)
 
