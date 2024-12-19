@@ -1,0 +1,5 @@
+# Ignore .idea directory (used by JetBrains IDEs like PyCharm, IntelliJ)
+.idea/
+
+# Ignore virtual environment directory
+.venv/
