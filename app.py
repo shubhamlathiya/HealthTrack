@@ -11,6 +11,7 @@ from api.chat_routes.chat_sockets import init_socket_events
 from api.doctor_routes import doctors
 from api.laboratory_routes import laboratory
 from api.patients import patients
+from api.rooms_routes import rooms
 from config import mongo, init_app
 
 app = Flask(__name__)
@@ -33,6 +34,7 @@ app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(patients, url_prefix='/patients')
 app.register_blueprint(doctors, url_prefix='/doctors')
 app.register_blueprint(laboratory, url_prefix='/laboratory')
+app.register_blueprint(rooms, url_prefix='/rooms')
 # Register Routes
 app.register_blueprint(chat_routes)
 
