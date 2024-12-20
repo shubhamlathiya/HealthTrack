@@ -6,7 +6,7 @@ from api.laboratory_routes import laboratory
 from config import mongo
 
 
-@laboratory.route('/lab/reports', methods=['POST'])
+@laboratory.route('/lab/add-reports', methods=['POST'])
 def add_report():
     data = request.get_json()
     report_name = data.get('report_name')
@@ -29,7 +29,7 @@ def add_report():
     return jsonify({"message": "Report added successfully", "report_id": str(report_id)}), 201
 
 
-@laboratory.route('/lab/reports', methods=['GET'])
+@laboratory.route('/lab/get-reports', methods=['GET'])
 def get_all_reports():
     reports = list(mongo.db.lab_reports.find({}, {"_id": 0}))
     return jsonify(reports), 200

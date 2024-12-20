@@ -9,6 +9,7 @@ from api.auth_routes import auth
 from api.chat_routes.chat_routes import chat_routes
 from api.chat_routes.chat_sockets import init_socket_events
 from api.doctor_routes import doctors
+from api.every_one import idCard
 from api.laboratory_routes import laboratory
 from api.nurse_routes import nurses
 from api.patients import patients
@@ -37,6 +38,7 @@ app.register_blueprint(doctors, url_prefix='/doctors')
 app.register_blueprint(laboratory, url_prefix='/laboratory')
 app.register_blueprint(rooms, url_prefix='/rooms')
 app.register_blueprint(nurses, url_prefix='/nurses')
+app.register_blueprint(idCard, url_prefix='/idCard')
 # Register Routes
 app.register_blueprint(chat_routes)
 
