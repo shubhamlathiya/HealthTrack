@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from bson import ObjectId
 from flask import jsonify
@@ -101,3 +102,92 @@ def cancel_appointment():
     )
 
     return jsonify({"message": "Appointment cancelled successfully"}), 200
+
+
+@patients.route('/feedback/submit', methods=['POST'])
+def submit_patient_feedback():
+    data = request.get_json()
+    patient_id = data.get('patient_id')
+    doctor_id = data.get('doctor_id')
+    appointment_id = data.get('appointment_id')
+    survey_responses = data.get('survey_responses')  # Dict of responses like doctor_communication, etc.
+
+    # Validate required fields
+    if not all([patient_id, doctor_id, appointment_id, survey_responses]):
+        return jsonify({"error": "Patient ID, Doctor ID, Appointment ID, and Survey Responses are required"}), 400
+
+    # Create feedback document
+    feedback = {
+        "patient_id": ObjectId(patient_id),
+        "doctor_id": ObjectId(doctor_id),
+        "appointment_id": appointment_id,
+        "survey_responses": survey_responses,
+        "feedback_timestamp": datetime.utcnow()
+    }
+
+    # Insert feedback into the database
+    mongo.db.patient_feedback.insert_one(feedback)
+
+    # Update doctor performance
+    update_doctor_performance(doctor_id, survey_responses)
+
+    return jsonify({"message": "Feedback submitted successfully"}), 201
+
+def update_doctor_performance(doctor_id, survey_responses):
+    # Retrieve current doctor performance data
+    performance_data = mongo.db.doctor_performance.find_one({"doctor_id": ObjectId(doctor_id)})
+
+    if performance_data:
+        updated_performance = {}
+        for key, value in survey_responses.items():
+            # Adjust existing rating based on the feedback count
+            current_avg = performance_data['average_ratings'].get(key, 0)
+            current_count = performance_data['feedback_count']
+            new_avg = ((current_avg * current_count) + value) / (current_count + 1)
+            updated_performance[key] = new_avg
+
+        # Update doctor performance
+        mongo.db.doctor_performance.update_one(
+            {"doctor_id": ObjectId(doctor_id)},
+            {"$set": {
+                "average_ratings": updated_performance,
+                "feedback_count": performance_data['feedback_count'] + 1
+            }}
+        )
+    else:
+        # Create initial performance data if none exists
+        new_performance = {
+            "doctor_id": ObjectId(doctor_id),
+            "average_ratings": survey_responses,
+            "feedback_count": 1
+        }
+        mongo.db.doctor_performance.insert_one(new_performance)
+
+@patients.route('/feedback/appointment', methods=['GET'])
+def get_appointment_feedback():
+    appointment_id = request.args.get('appointment_id')
+
+    if not appointment_id:
+        return jsonify({"error": "Appointment ID is required"}), 400
+
+    feedback_data = mongo.db.patient_feedback.find_one({"appointment_id": appointment_id})
+
+    if not feedback_data:
+        return jsonify({"error": "No feedback found for this appointment"}), 404
+
+    return jsonify(str(feedback_data)), 200
+
+
+@patients.route('/feedback/doctor-performance', methods=['GET'])
+def get_doctor_performance():
+    doctor_id = request.args.get('doctor_id')
+
+    if not doctor_id:
+        return jsonify({"error": "Doctor ID is required"}), 400
+
+    performance_data = mongo.db.doctor_performance.find_one({"doctor_id": ObjectId(doctor_id)})
+
+    if not performance_data:
+        return jsonify({"error": "No performance data found for this doctor"}), 404
+
+    return jsonify(str(performance_data)), 200

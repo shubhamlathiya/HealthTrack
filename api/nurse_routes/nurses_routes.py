@@ -7,7 +7,7 @@ from api.nurse_routes import nurses
 from config import mongo
 
 
-@nurses.route('/add', methods=['POST'])
+@nurses.route('/add-nurses', methods=['POST'])
 def add_nurse():
     data = request.get_json()
     nurse_id = data.get('nurse_id')
