@@ -1,0 +1,12 @@
+[
+    {
+        "intent": "greet",
+        "examples": ["Hello", "Hi", "નમસ્તે", "नमस्ते"],
+        "response": "Hello! How can I assist you today?"
+    },
+    {
+        "intent": "appointment",
+        "examples": ["When is my next appointment?", "Check my appointment"],
+        "response": "Your next appointment is on {date}."
+    }
+]
