@@ -28,7 +28,7 @@ def forgot_password():
     )
 
     # Send reset email
-    reset_link = f"http://localhost:5000/reset-password/{reset_token}"
+    reset_link = f"http://localhost:5000/auth/reset-password/{reset_token}"
     send_email("Password Reset Request", email, reset_link)
 
     return jsonify({"message": "Password reset link sent to your email"}), 200
