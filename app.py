@@ -1,7 +1,7 @@
 from flask_socketio import SocketIO
 
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_mail import Mail
 
 from api.admin_routes import admin
@@ -47,7 +47,7 @@ init_socket_events(socketio, mongo)
 
 @app.route('/')
 def hello_world():  # put application's code here
-    return 'Hello World!'
+    return render_template('doctor_templates/Generate_prescriptions_templates.html')
 
 
 if __name__ == '__main__':

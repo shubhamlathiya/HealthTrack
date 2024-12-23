@@ -2,7 +2,7 @@ import datetime
 
 import jwt
 from bson import ObjectId
-from flask import jsonify
+from flask import jsonify,request
 from werkzeug.security import generate_password_hash
 
 from api.auth_routes import auth
@@ -12,7 +12,7 @@ from email_utils import send_email
 
 @auth.route('/forgot-password', methods=['POST'])
 def forgot_password():
-    data = request.json
+    data = request.get_json()
     email = data.get('email')
 
     # Check if email exists
@@ -28,7 +28,7 @@ def forgot_password():
     )
 
     # Send reset email
-    reset_link = f"http://localhost:5000/auth/reset-password/{reset_token}"
+    reset_link = f"http://127.0.0.1:5000/auth/reset-password/{reset_token}"
     send_email("Password Reset Request", email, reset_link)
 
     return jsonify({"message": "Password reset link sent to your email"}), 200
@@ -46,7 +46,7 @@ def reset_password(token):
         return jsonify({"error": "Invalid reset token"}), 400
 
     # Get new password
-    data = request.json
+    data = request.get_json()
     new_password = data.get('password')
     if not new_password:
         return jsonify({"error": "Password is required"}), 400

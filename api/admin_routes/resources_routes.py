@@ -1,6 +1,6 @@
 # 1. Add a new resource - POST /resources/add
 from bson import ObjectId
-from flask import jsonify
+from flask import jsonify,request
 
 from api.admin_routes import admin
 from config import mongo
@@ -14,6 +14,7 @@ def add_resource():
     quantity = data.get('quantity', 0)
     department = data.get('department', None)  # Optional: Department where the resource is allocated.
 
+    print(data)
     if not resource_name or not resource_type or quantity < 0:
         return jsonify({"error": "Resource name, type, and valid quantity are required"}), 400
 

@@ -27,4 +27,5 @@ def login_patient():
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     }, 'your_secret_key', algorithm='HS256')
 
+    # print(token)
     return jsonify({'token': token})
