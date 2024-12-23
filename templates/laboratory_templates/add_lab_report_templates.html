@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Lab Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, textarea, select, button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Lab Report</h1>
+        <form id="labReportForm">
+            <label for="reportName">Report Name</label>
+            <input type="text" id="reportName" name="report_name" placeholder="Enter report name" required>
+
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Enter report description" rows="5"></textarea>
+
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+
+            <button type="submit">Add Report</button>
+        </form>
+
+        <div id="message" class="message" style="display: none;"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById("labReportForm");
+        const messageDiv = document.getElementById("message");
+        const apiBaseUrl = "http://localhost:5000"; // Replace with your backend URL
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const formData = {
+                report_name: form.reportName.value.trim(),
+                description: form.description.value.trim(),
+                status: form.status.value
+            };
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/laboratory/lab/add-reports`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    messageDiv.textContent = result.message;
+                    messageDiv.className = "message success";
+                    form.reset(); // Reset form fields
+                } else {
+                    messageDiv.textContent = result.error || "Failed to add report.";
+                    messageDiv.className = "message error";
+                }
+
+                messageDiv.style.display = "block";
+            } catch (error) {
+                console.error("Error:", error);
+                messageDiv.textContent = "An error occurred. Please try again.";
+                messageDiv.className = "message error";
+                messageDiv.style.display = "block";
+            }
+        });
+    </script>
+</body>
+</html>

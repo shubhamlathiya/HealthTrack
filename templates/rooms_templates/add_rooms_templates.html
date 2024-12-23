@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, button {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Room</h1>
+        <form id="addRoomForm">
+            <label for="room_number">Room Number</label>
+            <input type="text" id="room_number" name="room_number" placeholder="Enter room number" required>
+
+            <label for="type">Room Type</label>
+            <input type="text" id="type" name="type" placeholder="Enter room type" required>
+
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" placeholder="Additional notes (optional)"></textarea>
+
+            <button type="submit">Add Room</button>
+        </form>
+        <div id="responseMessage" style="margin-top: 20px; color: green; font-weight: bold;"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('addRoomForm');
+        const responseMessage = document.getElementById('responseMessage');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const roomData = {
+                room_number: form.room_number.value,
+                type: form.type.value,
+                notes: form.notes.value,
+            };
+
+            try {
+                const response = await fetch('/add-rooms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(roomData),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    responseMessage.textContent = result.message;
+                    responseMessage.style.color = 'green';
+                    form.reset();
+                } else {
+                    responseMessage.textContent = result.error;
+                    responseMessage.style.color = 'red';
+                }
+            } catch (error) {
+                responseMessage.textContent = 'An error occurred while adding the room.';
+                responseMessage.style.color = 'red';
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

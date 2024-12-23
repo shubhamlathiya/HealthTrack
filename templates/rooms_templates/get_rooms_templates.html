@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Rooms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .loading {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Room Details</h1>
+    <button onclick="fetchRooms()">Get Rooms</button>
+    <div id="loading" class="loading" style="display: none;">Loading...</div>
+    <table id="roomsTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Room Number</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Current Patient ID</th>
+                <th>Notes</th>
+                <th>Last Cleaned</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script>
+        async function fetchRooms() {
+            const loadingDiv = document.getElementById('loading');
+            const table = document.getElementById('roomsTable');
+            const tbody = table.querySelector('tbody');
+
+            loadingDiv.style.display = 'block';
+            table.style.display = 'none';
+            tbody.innerHTML = '';
+
+            try {
+                const response = await fetch('/get-rooms', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                loadingDiv.style.display = 'none';
+
+                if (data.rooms.length === 0) {
+                    alert('No rooms found.');
+                    return;
+                }
+
+                data.rooms.forEach(room => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${room.room_number}</td>
+                        <td>${room.type}</td>
+                        <td>${room.status}</td>
+                        <td>${room.current_patient_id || 'N/A'}</td>
+                        <td>${room.notes || 'N/A'}</td>
+                        <td>${room.last_cleaned_at || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                table.style.display = 'table';
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                alert(`Failed to fetch rooms: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

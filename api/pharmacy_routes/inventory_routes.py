@@ -5,7 +5,7 @@ from api.pharmacy_routes import pharmacy
 from config import mongo
 
 
-@pharmacy.route('/inventory', methods=['POST'])
+@pharmacy.route('/add-inventory', methods=['POST'])
 def add_inventory():
     data = request.get_json()
     medication_name = data.get('medication_name')

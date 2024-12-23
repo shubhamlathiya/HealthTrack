@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Department</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Department</h1>
+    <form id="addDepartmentForm">
+        <label for="name">Department Name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4" required></textarea>
+
+        <label for="head_of_department">Head of Department</label>
+        <input type="text" id="head_of_department" name="head_of_department" required>
+
+        <button type="submit">Add Department</button>
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <script>
+        document.getElementById('addDepartmentForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            const headOfDepartment = document.getElementById('head_of_department').value;
+
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = '';
+            messageDiv.className = 'message';
+
+            try {
+                const response = await fetch('/add-department', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        description: description,
+                        head_of_department: headOfDepartment
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.textContent = data.message;
+                    messageDiv.classList.add('success');
+                    document.getElementById('addDepartmentForm').reset();
+                } else {
+                    throw new Error(data.error || 'Failed to add department');
+                }
+            } catch (error) {
+                messageDiv.textContent = error.message;
+                messageDiv.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Nurse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="my-4">Add New Nurse</h1>
+
+    <!-- Add Nurse Form -->
+    <form id="addNurseForm">
+        <div class="mb-3">
+            <label for="nurse_id" class="form-label">Nurse ID</label>
+            <input type="text" id="nurse_id" class="form-control" placeholder="Enter Nurse ID" required>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" class="form-control" placeholder="Enter Nurse's Name" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" placeholder="Enter Nurse's Email" required>
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input type="text" id="phone" class="form-control" placeholder="Enter Nurse's Phone" required>
+        </div>
+        <div class="mb-3">
+            <label for="shift_timings" class="form-label">Shift Timings</label>
+            <input type="text" id="shift_timings" class="form-control" placeholder="Enter Shift Timings" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Nurse</button>
+    </form>
+
+    <!-- Message Display -->
+    <div id="message" class="mt-3"></div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#addNurseForm').on('submit', function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const nurseData = {
+                nurse_id: $('#nurse_id').val(),
+                name: $('#name').val(),
+                email: $('#email').val(),
+                phone: $('#phone').val(),
+                shift_timings: $('#shift_timings').val()
+            };
+
+            // Make POST request to add the nurse
+            $.ajax({
+                url: '/add-nurses',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(nurseData),
+                success: function(response) {
+                    $('#message').html(`<div class="alert alert-success">${response.message}</div>`);
+                    $('#addNurseForm')[0].reset();  // Reset the form after success
+                },
+                error: function(xhr) {
+                    const errorResponse = xhr.responseJSON;
+                    $('#message').html(`<div class="alert alert-danger">${errorResponse.error}</div>`);
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            height: 300px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .message.sender {
+            background-color: #d1e7ff;
+            align-self: flex-start;
+        }
+        .message.receiver {
+            background-color: #ffc107;
+            align-self: flex-end;
+        }
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Chat Interface</div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type your message here">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const senderId = "12345"; // Replace with dynamic sender ID
+        const receiverId = "67890"; // Replace with dynamic receiver ID
+        const role = "user"; // Replace with dynamic role if necessary
+        const apiBaseUrl = "http://localhost:5000"; // Update with actual backend URL
+
+        const chatMessages = document.getElementById("chatMessages");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+
+        // Function to load messages
+        async function loadMessages() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/chat_routes/get_messages/${receiverId}?role=${role}`);
+                const messages = await response.json();
+
+                chatMessages.innerHTML = ""; // Clear previous messages
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.classList.add("message", msg.sender_id === senderId ? "sender" : "receiver");
+                    messageDiv.textContent = msg.message;
+                    chatMessages.appendChild(messageDiv);
+                });
+
+                // Scroll to the latest message
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } catch (error) {
+                console.error("Error loading messages:", error);
+            }
+        }
+
+        // Function to send a message
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            const messageData = {
+                sender_id: senderId,
+                receiver_id: receiverId,
+                message,
+                role,
+            };
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/chat_routes/send_message`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(messageData),
+                });
+
+                if (response.ok) {
+                    messageInput.value = ""; // Clear input field
+                    await loadMessages(); // Reload messages
+                } else {
+                    console.error("Error sending message:", await response.text());
+                }
+            } catch (error) {
+                console.error("Error sending message:", error);
+            }
+        }
+
+        // Event listener for send button
+        sendButton.addEventListener("click", sendMessage);
+
+        // Event listener for Enter key
+        messageInput.addEventListener("keypress", event => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Initial load of messages
+        loadMessages();
+    </script>
+</body>
+</html>

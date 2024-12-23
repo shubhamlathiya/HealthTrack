@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Usage History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .loading {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Room Usage History</h1>
+    <button onclick="fetchRoomUsageHistory()">Get Room Usage History</button>
+    <div id="loading" class="loading" style="display: none;">Loading...</div>
+    <table id="historyTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Room Number</th>
+                <th>Patient ID</th>
+                <th>Type</th>
+                <th>Assigned At</th>
+                <th>Released At</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script>
+        async function fetchRoomUsageHistory() {
+            const loadingDiv = document.getElementById('loading');
+            const table = document.getElementById('historyTable');
+            const tbody = table.querySelector('tbody');
+
+            loadingDiv.style.display = 'block';
+            table.style.display = 'none';
+            tbody.innerHTML = '';
+
+            try {
+                const response = await fetch('/room-usage-history', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                loadingDiv.style.display = 'none';
+
+                if (data.room_usage_history.length === 0) {
+                    alert('No room usage history found.');
+                    return;
+                }
+
+                data.room_usage_history.forEach(entry => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${entry.room_number}</td>
+                        <td>${entry.patient_id}</td>
+                        <td>${entry.type}</td>
+                        <td>${entry.assigned_at ? new Date(entry.assigned_at).toLocaleString() : 'N/A'}</td>
+                        <td>${entry.released_at ? new Date(entry.released_at).toLocaleString() : 'N/A'}</td>
+                        <td>${entry.notes || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                table.style.display = 'table';
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                alert(`Failed to fetch room usage history: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

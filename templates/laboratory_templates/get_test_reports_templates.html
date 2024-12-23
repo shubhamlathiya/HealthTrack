@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Reports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="my-4">Test Reports</h1>
+
+    <!-- Filter Form -->
+    <form id="filterForm" class="mb-4">
+        <div class="row">
+            <div class="col">
+                <label for="patient_id">Patient ID:</label>
+                <input type="text" id="patient_id" class="form-control" placeholder="Patient ID">
+            </div>
+            <div class="col">
+                <label for="doctor_id">Doctor ID:</label>
+                <input type="text" id="doctor_id" class="form-control" placeholder="Doctor ID">
+            </div>
+            <div class="col">
+                <label for="status">Status:</label>
+                <input type="text" id="status" class="form-control" placeholder="Status">
+            </div>
+            <div class="col">
+                <label for="report_name">Report Name:</label>
+                <input type="text" id="report_name" class="form-control" placeholder="Report Name">
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary mt-4">Get Reports</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Results Table -->
+    <table class="table table-bordered" id="reportsTable">
+        <thead>
+            <tr>
+                <th>Prescription ID</th>
+                <th>Patient ID</th>
+                <th>Doctor ID</th>
+                <th>Date</th>
+                <th>Report Name</th>
+                <th>Result Time</th>
+                <th>Status</th>
+                <th>Additional Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Results will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#filterForm').on('submit', function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const patientId = $('#patient_id').val();
+            const doctorId = $('#doctor_id').val();
+            const status = $('#status').val();
+            const reportName = $('#report_name').val();
+
+            // Construct API URL with query parameters
+            let apiUrl = '/get-test-reports?';
+            if (patientId) apiUrl += `patient_id=${patientId}&`;
+            if (doctorId) apiUrl += `doctor_id=${doctorId}&`;
+            if (status) apiUrl += `status=${status}&`;
+            if (reportName) apiUrl += `report_name=${reportName}&`;
+
+            // Remove last '&' if exists
+            apiUrl = apiUrl.endsWith('&') ? apiUrl.slice(0, -1) : apiUrl;
+
+            // Make API request
+            $.ajax({
+                url: apiUrl,
+                method: 'GET',
+                success: function(response) {
+                    // Clear the table
+                    $('#reportsTable tbody').empty();
+
+                    // Loop through the results and display them in the table
+                    response.test_reports.forEach(report => {
+                        report.test_reports.forEach(test => {
+                            $('#reportsTable tbody').append(`
+                                <tr>
+                                    <td>${report.prescription_id}</td>
+                                    <td>${report.patient_id}</td>
+                                    <td>${report.doctor_id}</td>
+                                    <td>${report.date}</td>
+                                    <td>${test.report_name}</td>
+                                    <td>${test.result_time}</td>
+                                    <td>${test.status}</td>
+                                    <td>${test.additional_details}</td>
+                                </tr>
+                            `);
+                        });
+                    });
+                },
+                error: function() {
+                    alert('Failed to fetch test reports');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

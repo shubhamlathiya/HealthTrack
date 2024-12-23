@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lab Reports</h1>
+        <table id="reportsTable">
+            <thead>
+                <tr>
+                    <th>Report Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Report rows will be inserted here -->
+            </tbody>
+        </table>
+        <div id="message" class="message error" style="display: none;"></div>
+    </div>
+
+    <script>
+        const apiBaseUrl = "http://localhost:5000"; // Replace with your backend URL
+        const tableBody = document.querySelector("#reportsTable tbody");
+        const messageDiv = document.getElementById("message");
+
+        // Fetch reports from the API
+        async function fetchReports() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/laboratory/lab/get-reports`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch reports");
+                }
+
+                const reports = await response.json();
+
+                // Populate table with reports
+                reports.forEach(report => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${report.report_name}</td>
+                        <td>${report.description || "N/A"}</td>
+                        <td>${report.status}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error:", error);
+                messageDiv.textContent = "An error occurred while fetching reports.";
+                messageDiv.style.display = "block";
+            }
+        }
+
+        // Load reports on page load
+        window.onload = fetchReports;
+    </script>
+</body>
+</html>

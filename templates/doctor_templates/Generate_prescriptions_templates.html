@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Prescription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            resize: vertical;
+        }
+        .form-group button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        .medication {
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            float: right;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Generate Prescription</h2>
+        <form id="prescriptionForm">
+            <div class="form-group">
+                <label for="doctor_id">Doctor ID</label>
+                <input type="text" id="doctor_id" name="doctor_id" required>
+            </div>
+
+            <div class="form-group">
+                <label for="patient_id">Patient ID</label>
+                <input type="text" id="patient_id" name="patient_id" required>
+            </div>
+
+            <div class="form-group">
+                <label for="referred_appointment_id">Referred Appointment ID</label>
+                <input type="text" id="referred_appointment_id" name="referred_appointment_id" required>
+            </div>
+
+            <div id="medicationsContainer">
+                <h3>Medications</h3>
+                <div class="medication">
+                    <div class="form-group">
+                        <label>Medication Name</label>
+                        <input type="text" name="medication_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Dosage</label>
+                        <input type="text" name="dosage" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Timing</label>
+                        <input type="checkbox" name="timing" value="Morning"> Morning
+                        <input type="checkbox" name="timing" value="Afternoon"> Afternoon
+                        <input type="checkbox" name="timing" value="Evening"> Evening
+                        <input type="checkbox" name="timing" value="Night"> Night
+                    </div>
+                    <div class="form-group">
+                        <label>Meal Instructions</label>
+                        <input type="radio" name="meal_instructions" value="Before Meal" required> Before Meal
+                        <input type="radio" name="meal_instructions" value="After Meal"> After Meal
+                    </div>
+                    <button type="button" class="remove-btn" onclick="removeMedication(this)">Remove</button>
+                </div>
+            </div>
+
+            <button type="button" onclick="addMedication()">Add More Medication</button>
+
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="test_report">Test Reports (JSON Format)</label>
+                <textarea id="test_report" name="test_report"></textarea>
+            </div>
+
+            <div class="form-group">
+                <button type="button" onclick="submitPrescription()">Submit Prescription</button>
+            </div>
+
+            <div id="responseMessage"></div>
+        </form>
+    </div>
+
+    <script>
+        function addMedication() {
+            const container = document.getElementById('medicationsContainer');
+            const medicationDiv = document.createElement('div');
+            medicationDiv.className = 'medication';
+            medicationDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Medication Name</label>
+                    <input type="text" name="medication_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Dosage</label>
+                    <input type="text" name="dosage" required>
+                </div>
+                <div class="form-group">
+                    <label>Timing</label>
+                    <input type="checkbox" name="timing" value="Morning"> Morning
+                    <input type="checkbox" name="timing" value="Afternoon"> Afternoon
+                    <input type="checkbox" name="timing" value="Evening"> Evening
+                    <input type="checkbox" name="timing" value="Night"> Night
+                </div>
+                <div class="form-group">
+                    <label>Meal Instructions</label>
+                    <input type="radio" name="meal_instructions" value="Before Meal" required> Before Meal
+                    <input type="radio" name="meal_instructions" value="After Meal"> After Meal
+                </div>
+                <button type="button" class="remove-btn" onclick="removeMedication(this)">Remove</button>
+            `;
+            container.appendChild(medicationDiv);
+        }
+
+        function removeMedication(button) {
+            const medicationDiv = button.parentElement;
+            medicationDiv.remove();
+        }
+
+        async function submitPrescription() {
+            const form = document.getElementById('prescriptionForm');
+            const formData = new FormData(form);
+
+            const medications = [];
+            const medicationElements = document.querySelectorAll('.medication');
+
+            medicationElements.forEach(medication => {
+                const name = medication.querySelector('input[name="medication_name"]').value;
+                const dosage = medication.querySelector('input[name="dosage"]').value;
+                const timing = Array.from(medication.querySelectorAll('input[name="timing"]:checked')).map(el => el.value);
+                const mealInstructions = medication.querySelector('input[name="meal_instructions"]:checked').value;
+
+                medications.push({ name, dosage, timing, meal_instructions: mealInstructions });
+            });
+
+            const payload = {
+                doctor_id: formData.get('doctor_id'),
+                patient_id: formData.get('patient_id'),
+                referred_appointment_id: formData.get('referred_appointment_id'),
+                medications: medications,
+                notes: formData.get('notes'),
+                test_report: JSON.parse(formData.get('test_report') || '[]')
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/doctors/prescriptions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                document.getElementById('responseMessage').textContent = result.message || result.error;
+            } catch (error) {
+                document.getElementById('responseMessage').textContent = 'Error submitting prescription.';
+            }
+        }
+    </script>
+</body>
+</html>
