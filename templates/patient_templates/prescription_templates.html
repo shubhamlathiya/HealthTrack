@@ -63,10 +63,11 @@
             const prescriptionId = "676451b21abf691a71a516fc"; // Replace with actual ID
 
             try {
-                const response = await fetch(`http://localhost:5000/patients/get_prescription/${prescriptionId}`);
+                const response = await fetch(`/patients/get_prescription/${prescriptionId}`);
                 const data = await response.json();
 
                 if (response.ok) {
+                    console.log(data)
                     displayPrescription(data);
                 } else {
                     document.getElementById('prescriptionDetails').innerHTML = `<p style="color: red;">${data.error}</p>`;

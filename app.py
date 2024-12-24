@@ -47,7 +47,7 @@ init_socket_events(socketio, mongo)
 
 @app.route('/')
 def hello_world():  # put application's code here
-    return render_template('doctor_templates/Generate_prescriptions_templates.html')
+    return render_template('patient_templates/prescription_templates.html')
 
 
 if __name__ == '__main__':

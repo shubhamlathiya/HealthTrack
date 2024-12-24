@@ -7,3 +7,5 @@ patients = Blueprint('patients', __name__)
 from .visitors_routes import *
 from .appointments_routes import *
 from .medical_records_routes import *
+from .prescription_routes import *
+from .dashboard_routes import *
