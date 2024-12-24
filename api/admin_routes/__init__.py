@@ -7,3 +7,5 @@ admin = Blueprint('admin', __name__)
 from .doctor_routes import *
 from .department_routes import *
 from .resources_routes import *
+from .staff_routes import *
+from .leave_management_routes import *

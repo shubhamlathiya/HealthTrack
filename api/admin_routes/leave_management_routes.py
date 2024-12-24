@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from bson import ObjectId
-from flask import jsonify
+from flask import jsonify,request
 
 from api.admin_routes import admin
 from config import mongo
@@ -44,7 +44,7 @@ def apply_leave():
     return jsonify({"message": "Leave application submitted successfully"}), 201
 
 
-@admin.route('/admin/leave/review', methods=['PATCH'])
+@admin.route('/staff/leave/review', methods=['PATCH'])
 def review_leave():
     data = request.get_json()
     leave_id = data.get("leave_id")

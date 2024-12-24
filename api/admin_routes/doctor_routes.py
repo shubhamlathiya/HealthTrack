@@ -63,3 +63,25 @@ def get_doctors():
     doctors_list = list(doctors)  # Convert cursor to list
 
     return jsonify({'doctors': doctors_list}), 200
+
+@admin.route('/doctor/<doctor_id>/unique-patients', methods=['GET'])
+def count_unique_patients(doctor_id):
+    try:
+        # Find the doctor by doctor_id
+        doctor = mongo.db.doctors.find_one({"doctor_id": doctor_id})
+        if not doctor:
+            return jsonify({"error": "Doctor not found"}), 404
+
+        # Extract patient IDs from the appointments
+        appointments = doctor.get("appointments", [])
+        patient_ids = {str(appointment["patient_id"]) for appointment in appointments}
+
+        # Count unique patient IDs
+        unique_patient_count = len(patient_ids)
+
+        return jsonify({
+            "doctor_id": doctor_id,
+            "unique_patient_count": unique_patient_count
+        }), 200
+    except Exception as e:
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
