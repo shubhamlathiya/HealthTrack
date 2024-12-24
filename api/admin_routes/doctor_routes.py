@@ -55,3 +55,11 @@ def add_doctor():
     doctor_id = mongo.db.doctors.insert_one(doctor).inserted_id
 
     return jsonify({'message': 'Doctor added successfully', 'doctor_id': str(doctor_id)}), 201
+
+
+@admin.route('/get-doctors', methods=['GET'])
+def get_doctors():
+    doctors = mongo.db.doctors.find({}, {'name': 1, 'specialization': 1, '_id': 0})  # Only retrieve name and specialization
+    doctors_list = list(doctors)  # Convert cursor to list
+
+    return jsonify({'doctors': doctors_list}), 200

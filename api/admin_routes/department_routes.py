@@ -32,3 +32,27 @@ def add_department():
     department_id = str(result.inserted_id)
 
     return jsonify({'message': 'Department created successfully', 'department_id': department_id}), 201
+
+
+@admin.route('/get-departments', methods=['GET'])
+def get_departments():
+    name = request.args.get('name')  # Retrieve query parameter 'name' if provided
+
+    if name:
+        # Fetch the department by name
+        department = mongo.db.departments.find_one({"name": name})
+        if not department:
+            return jsonify({'error': 'Department not found'}), 404
+
+        # Convert ObjectId and format response
+        department['_id'] = str(department['_id'])
+        return jsonify({'department': department}), 200
+
+    # Fetch all departments
+    departments = mongo.db.departments.find()
+    departments_list = []
+    for department in departments:
+        department['_id'] = str(department['_id'])  # Convert ObjectId to string
+        departments_list.append(department)
+
+    return jsonify({'departments': departments_list}), 200
