@@ -11,20 +11,20 @@ def patient_dashboard(patient_id):
     try:
         # Fetch the patient's document
         patient_document = mongo.db.patients.find_one({"_id": ObjectId(patient_id)})
-        print(1)
+
         if not patient_document:
             return jsonify({"error": "Patient not found"}), 404
 
         # Appointments Count
         appointments_count = len(patient_document.get("appointments", []))
-        print(2)
+
         # Calculate the total pending amount
         pending_total_amount = mongo.db.bills.aggregate([
             {"$match": {"patient_id": patient_id, "status": "Pending"}},
             {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
         ])
         pending_total_amount = next(pending_total_amount, {}).get("total", 0)
-        print(3)
+
         # Number of reports
         reports_count = mongo.db.prescriptions.aggregate([
             {"$match": {"patient_id": ObjectId(patient_id)}},
@@ -32,7 +32,7 @@ def patient_dashboard(patient_id):
             {"$group": {"_id": None, "total_reports": {"$sum": "$test_report_count"}}}
         ])
         reports_count = next(reports_count, {}).get("total_reports", 0)
-        print(4)
+
         # Number of pending reports
         pending_reports_count = mongo.db.prescriptions.aggregate([
             {"$match": {"patient_id": ObjectId(patient_id)}},
@@ -41,7 +41,7 @@ def patient_dashboard(patient_id):
             {"$group": {"_id": None, "total_pending": {"$sum": 1}}}
         ])
         pending_reports_count = next(pending_reports_count, {}).get("total_pending", 0)
-        print(5)
+
         # Last appointment details
         last_appointment = max(
             patient_document.get("appointments", []),
@@ -50,7 +50,7 @@ def patient_dashboard(patient_id):
         )
         if last_appointment and "_id" in last_appointment:
             last_appointment["_id"] = str(last_appointment["_id"])
-        print(6)
+
         # Fetch the last report details
         last_report = mongo.db.prescriptions.find(
             {"patient_id": patient_id, "test_report": {"$exists": True, "$not": {"$size": 0}}}
@@ -62,7 +62,7 @@ def patient_dashboard(patient_id):
             for report in last_report.get("test_report", []):
                 if "report_id" in report:
                     report["report_id"] = str(report["report_id"])
-        print(7)
+
         # Prepare the response
         response = {
             "appointments_count": appointments_count,
@@ -76,7 +76,7 @@ def patient_dashboard(patient_id):
                 "date": last_report["date"].strftime("%Y-%m-%d %H:%M:%S") if last_report else None
             }
         }
-        print(8)
+
         return jsonify(str(response)), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
