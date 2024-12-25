@@ -64,3 +64,39 @@ def generate_prescription():
 
     return jsonify(
         {"message": "Prescription generated and sent successfully", "prescription_id": str(prescription_id)}), 201
+
+
+# @doctors.route('/send-prescription-for-verification', methods=['POST'])
+# def send_prescription_for_verification():
+#     data = request.get_json()
+#     doctor_id = data.get('doctor_id')
+#     patient_id = data.get('patient_id')
+#     medications = data.get('medications')  # List of medications in the prescription
+#
+#     # Validate required fields
+#     if not all([doctor_id, patient_id, medications]):
+#         return jsonify({"error": "Doctor ID, Patient ID, and Medications are required"}), 400
+#
+#     # Check if the doctor exists (this could be done by fetching from the database)
+#     doctor = mongo.db.staff.find_one({"_id": ObjectId(doctor_id), "role": "Doctor"})
+#     if not doctor:
+#         return jsonify({"error": "Doctor not found"}), 404
+#
+#     # Create the prescription data to send
+#     prescription_data = {
+#         "doctor_id": doctor_id,
+#         "patient_id": patient_id,
+#         "medications": medications,
+#         "status": "Pending Verification",  # Initial status for the prescription
+#         "sent_to_pharmacist": datetime.utcnow()
+#     }
+#
+#     # Send prescription data to the pharmacist (you can create a queue or directly insert into a pharmacist collection)
+#     pharmacist = mongo.db.staff.find_one({"role": "Pharmacist"})
+#     if not pharmacist:
+#         return jsonify({"error": "Pharmacist not found"}), 404
+#
+#     # Assuming you have a pharmacist verification collection
+#     mongo.db.pharmacist_verifications.insert_one(prescription_data)
+#
+#     return jsonify({"message": "Prescription sent to pharmacist for verification"}), 200
