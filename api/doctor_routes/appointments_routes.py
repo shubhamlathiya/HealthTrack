@@ -5,6 +5,29 @@ from api.doctor_routes import doctors
 from config import mongo
 
 
+@doctors.route('/get-all-appointments/<doctor_id>', methods=['GET'])
+def get_all_appointments(doctor_id):
+    # Find the doctor by ID
+    doctor = mongo.db.doctors.find_one({"_id": ObjectId(doctor_id)})
+
+    if not doctor:
+        return jsonify({"error": "Doctor not found"}), 404
+
+    # Get all the appointments associated with the doctor
+    all_appointments = doctor.get('appointments', [])
+
+    # Convert ObjectId to string in all appointments
+    for appointment in all_appointments:
+        # appointment['_id'] = str(appointment['_id'])  # Convert ObjectId to string
+        if 'doctor_id' in appointment:
+            appointment['doctor_id'] = str(appointment['doctor_id'])
+        if 'patient_id' in appointment:
+            appointment['patient_id'] = str(appointment['patient_id'])
+
+    # Return the list of all appointments
+    return jsonify({"all_appointments": all_appointments}), 200
+
+
 @doctors.route('/forward-appointment', methods=['POST'])
 def forward_appointment():
     data = request.get_json()
