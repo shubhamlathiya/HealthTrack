@@ -17,5 +17,5 @@ def get_prescription(prescription_id):
     prescription["patient_id"] = str(prescription["patient_id"])
     prescription["referred_appointment_id"] = str(prescription["referred_appointment_id"])
 
-    print(prescription)
+    # print(prescription)
     return jsonify(prescription), 200

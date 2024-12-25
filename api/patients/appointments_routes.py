@@ -72,13 +72,26 @@ def book_appointment():
     return jsonify({"message": "Appointment booked successfully", "appointment_id": appointment_id}), 200
 
 
+
 @patients.route('/view-appointments/<patient_id>', methods=['GET'])
 def view_appointments(patient_id):
-    patient = mongo.db.patients.find_one({"_id": ObjectId(patient_id)})
-    if not patient:
-        return jsonify({"error": "Patient not found"}), 404
+    try:
+        # Fetch the patient by their ObjectId
+        patient = mongo.db.patients.find_one({"_id": ObjectId(patient_id)})
+        if not patient:
+            return jsonify({"error": "Patient not found"}), 404
 
-    return jsonify({"appointments": patient.get('appointments', [])}), 200
+        # Process appointments to ensure ObjectId fields are converted to strings
+        appointments = patient.get('appointments', [])
+        for appointment in appointments:
+            if "doctor" in appointment and isinstance(appointment["doctor"], ObjectId):
+                appointment["doctor"] = str(appointment["doctor"])
+
+        # Return the JSON response
+        return jsonify({"appointments": appointments}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @patients.route('/cancel-appointment', methods=['POST'])
