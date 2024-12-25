@@ -50,12 +50,18 @@
             padding: 10px;
             border-radius: 5px;
         }
+        .report-file {
+            margin-top: 10px;
+            padding: 10px;
+            background: #d3ffd3;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Prescription Details</h2>
-        <div id="prescriptionDetails"></div>
+        <div id="prescriptionDetails">Loading...</div>
     </div>
 
     <script>
@@ -67,7 +73,7 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    console.log(data)
+                    console.log(data);
                     displayPrescription(data);
                 } else {
                     document.getElementById('prescriptionDetails').innerHTML = `<p style="color: red;">${data.error}</p>`;
@@ -79,47 +85,59 @@
 
         function displayPrescription(prescription) {
             const container = document.getElementById('prescriptionDetails');
+
+            // Check if essential fields are missing, handle them gracefully
+            const date = prescription.date ? new Date(prescription.date.$date).toLocaleString() : 'N/A';
+            const doctorId = prescription.doctor_id ? prescription.doctor_id.$oid : 'N/A';
+            const patientId = prescription.patient_id ? prescription.patient_id.$oid : 'N/A';
+
             container.innerHTML = `
                 <div class="section">
                     <h3>General Information</h3>
                     <p><strong>Prescription ID:</strong> ${prescription._id}</p>
-                    <p><strong>Doctor ID:</strong> ${prescription.doctor_id.$oid}</p>
-                    <p><strong>Patient ID:</strong> ${prescription.patient_id.$oid}</p>
-                    <p><strong>Referred Appointment ID:</strong> ${prescription.referred_appointment_id}</p>
-                    <p><strong>Date:</strong> ${new Date(prescription.date.$date).toLocaleString()}</p>
-                    <p><strong>Status:</strong> ${prescription.status}</p>
+                    <p><strong>Doctor ID:</strong> ${doctorId}</p>
+                    <p><strong>Patient ID:</strong> ${patientId}</p>
+                    <p><strong>Referred Appointment ID:</strong> ${prescription.referred_appointment_id || 'N/A'}</p>
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Status:</strong> ${prescription.status || 'N/A'}</p>
                 </div>
                 <div class="section">
                     <h3>Medications</h3>
                     <ul class="medications">
-                        ${prescription.medications.map(med => `
+                        ${prescription.medications && prescription.medications.length ? prescription.medications.map(med => `
                             <li>
                                 <strong>Name:</strong> ${med.name}<br>
                                 <strong>Dosage:</strong> ${med.dosage}<br>
                                 <strong>Timing:</strong> ${med.timing.join(', ')}<br>
-                                <strong>Meal Instructions:</strong> ${med.meal_instructions}
+                                <strong>Meal Instructions:</strong> ${med.meal_instructions || 'N/A'}
                             </li>
-                        `).join('')}
+                        `).join('') : '<li>No medications found.</li>'}
                     </ul>
                 </div>
                 <div class="section">
                     <h3>Test Reports</h3>
                     <ul class="test-reports">
-                        ${prescription.test_report.map(report => `
+                        ${prescription.test_report && prescription.test_report.length ? prescription.test_report.map(report => `
                             <li>
-                                <strong>Report Name:</strong> ${report.report_name}<br>
-                                <strong>Result Time:</strong> ${new Date(report.result_time).toLocaleString()}<br>
-                                <strong>Additional Details:</strong> ${report.additional_details}<br>
-                                <strong>Status:</strong> ${report.status}<br>
-                                <strong>Notes:</strong> ${report.notes}
+                                <strong>Report Name:</strong> ${report.report_name || 'N/A'}<br>
+                                <strong>Result Time:</strong> ${report.result_time ? new Date(report.result_time).toLocaleString() : 'N/A'}<br>
+                                <strong>Additional Details:</strong> ${report.additional_details || 'N/A'}<br>
+                                <strong>Status:</strong> ${report.status || 'N/A'}<br>
+                                <strong>Notes:</strong> ${report.notes || 'N/A'}<br>
+                                ${report.status === 'Completed' ? `
+                                    <div class="report-file">
+                                        <strong>Download Report:</strong>
+                                        <a href="${report.file_path}" target="_blank">Download</a>
+                                    </div>
+                                ` : ''}
                             </li>
-                        `).join('')}
+                        `).join('') : '<li>No test reports found.</li>'}
                     </ul>
                 </div>
                 <div class="section">
                     <h3>Doctor's Notes</h3>
                     <div class="notes">
-                        ${prescription.notes}
+                        ${prescription.notes || 'No notes provided.'}
                     </div>
                 </div>
             `;
