@@ -1,6 +1,5 @@
 from flask_socketio import SocketIO
 
-
 from flask import Flask, render_template, send_from_directory
 from flask_mail import Mail
 
@@ -15,6 +14,7 @@ from api.nurse_routes import nurses
 from api.patients import patients
 from api.rooms_routes import rooms
 from config import mongo, init_app
+from flask_cors import CORS
 
 app = Flask(__name__)
 
@@ -44,6 +44,8 @@ app.register_blueprint(chat_routes)
 
 init_socket_events(socketio, mongo)
 
+CORS(app)
+
 
 @app.route('/')
 def hello_world():  # put application's code here
@@ -53,6 +55,7 @@ def hello_world():  # put application's code here
 @app.route('/uploads/reports/<filename>')
 def download_file(filename):
     return send_from_directory('uploads/reports', filename)
+
 
 if __name__ == '__main__':
     app.run()

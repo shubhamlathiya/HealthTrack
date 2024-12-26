@@ -4,186 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Appointment Management</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
-        }
-        .container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .form-group button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .form-group button:hover {
-            background-color: #0056b3;
-        }
-        .message {
-            margin-top: 15px;
-            text-align: center;
-            color: red;
-        }
-        .appointments {
-            margin-top: 20px;
-            background-color: #eef;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .appointments h3 {
-            margin: 0;
-            margin-bottom: 10px;
-        }
-        .appointments ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .appointments li {
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-        }
-        .appointments .cancel-button {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            margin-left: 10px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-        .appointments .cancel-button:hover {
-            background-color: #c82333;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>View Appointments</h2>
-        <form id="viewAppointmentsForm">
-            <div class="form-group">
-                <label for="view_patient_id">Patient ID</label>
-                <input type="text" id="view_patient_id" name="view_patient_id" required>
-            </div>
-            <div class="form-group">
-                <button type="button" onclick="viewAppointments()">View Appointments</button>
-            </div>
-            <div class="message" id="viewMessage"></div>
-        </form>
-        <div class="appointments" id="appointments" style="display:none;">
-            <h3>Appointments</h3>
-            <ul id="appointmentsList"></ul>
-        </div>
-    </div>
+<h2>View Appointments</h2>
+<div id="viewMessage"></div>
+<div id="appointments">
+    <h3>Appointments</h3>
+    <ul id="appointmentsList"></ul>
+</div>
 
-    <script>
-        async function viewAppointments() {
-            const patient_id = document.getElementById('view_patient_id').value;
-            const viewMessageElement = document.getElementById('viewMessage');
-            const appointmentsElement = document.getElementById('appointments');
-            const appointmentsList = document.getElementById('appointmentsList');
+<script>
+    // Fetch patientId from localStorage
+    const patientId = localStorage.getItem('patientId');
 
-            viewMessageElement.textContent = '';
-            appointmentsElement.style.display = 'none';
-            appointmentsList.innerHTML = '';
+    // Check if patientId exists in localStorage
+    if (!patientId) {
+        alert('Patient ID not found. Please log in.');
+        window.location.href = '/login'; // Redirect to login page
+    }
 
-            try {
-                const response = await fetch(`http://localhost:5000/patients/view-appointments/${patient_id}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+    // Automatically fetch and display appointments
+    async function viewAppointments() {
+        const viewMessageElement = document.getElementById('viewMessage');
+        const appointmentsElement = document.getElementById('appointments');
+        const appointmentsList = document.getElementById('appointmentsList');
 
-                const data = await response.json();
+        viewMessageElement.textContent = '';
+        appointmentsList.innerHTML = '';
 
-                if (response.ok) {
-                    if (data.appointments && data.appointments.length > 0) {
-                        appointmentsElement.style.display = 'block';
-                        data.appointments.forEach(appointment => {
-                            const li = document.createElement('li');
-                            li.innerHTML = `Date: ${appointment.date}, Time: ${appointment.time}, Reason: ${appointment.reason}, Status: ${appointment.status}`;
-                            if (appointment.status === "Scheduled") {
-                                const cancelButton = document.createElement('button');
-                                cancelButton.textContent = 'Cancel';
-                                cancelButton.className = 'cancel-button';
-                                cancelButton.onclick = () => cancelAppointment(patient_id, appointment.appointment_id);
-                                li.appendChild(cancelButton);
-                            }
-                            appointmentsList.appendChild(li);
-                        });
-                    } else {
-                        viewMessageElement.style.color = 'red';
-                        viewMessageElement.textContent = 'No appointments found.';
-                    }
+        const url = 'http://localhost:5000/patients/view-appointments/' + patientId;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (data.appointments && data.appointments.length > 0) {
+                    data.appointments.forEach(appointment => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                                <strong>Appointment ID:</strong> ${appointment.appointment_id}<br>
+                                <strong>Date:</strong> ${appointment.date}<br>
+                                <strong>Time:</strong> ${appointment.time}<br>
+                                <strong>Reason:</strong> ${appointment.reason}<br>
+                                <strong>Status:</strong> ${appointment.status}<br>
+                                <strong>Doctor ID:</strong> ${appointment.doctor}<br>
+                            `;
+                        if (appointment.status === "Scheduled") {
+                            const cancelButton = document.createElement('button');
+                            cancelButton.textContent = 'Cancel';
+                            cancelButton.onclick = () => cancelAppointment(patientId, appointment.appointment_id);
+                            li.appendChild(cancelButton);
+                        }
+                        appointmentsList.appendChild(li);
+                    });
                 } else {
                     viewMessageElement.style.color = 'red';
-                    viewMessageElement.textContent = data.error || 'Failed to retrieve appointments.';
+                    viewMessageElement.textContent = 'No appointments found.';
                 }
-            } catch (error) {
+            } else {
                 viewMessageElement.style.color = 'red';
-                viewMessageElement.textContent = 'An error occurred. Please try again.';
+                viewMessageElement.textContent = data.error || 'Failed to retrieve appointments.';
             }
+        } catch (error) {
+            viewMessageElement.style.color = 'red';
+            viewMessageElement.textContent = 'An error occurred. Please try again.';
         }
+    }
 
-        async function cancelAppointment(patient_id, appointment_id) {
-            const viewMessageElement = document.getElementById('viewMessage');
-            viewMessageElement.textContent = '';
+    async function cancelAppointment(patientId, appointmentId) {
+        const viewMessageElement = document.getElementById('viewMessage');
+        viewMessageElement.textContent = '';
 
-            try {
-                const response = await fetch('http://localhost:5000/patients/cancel-appointment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ patient_id, appointment_id })
-                });
+        try {
+            const response = await fetch('http://localhost:5000/patients/cancel-appointment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({patient_id: patientId, appointment_id: appointmentId})
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (response.ok) {
-                    viewMessageElement.style.color = 'green';
-                    viewMessageElement.textContent = data.message || 'Appointment cancelled successfully.';
-                    viewAppointments(); // Refresh the appointments list
-                } else {
-                    viewMessageElement.style.color = 'red';
-                    viewMessageElement.textContent = data.error || 'Failed to cancel appointment.';
-                }
-            } catch (error) {
+            if (response.ok) {
+                viewMessageElement.style.color = 'green';
+                viewMessageElement.textContent = data.message || 'Appointment cancelled successfully.';
+                viewAppointments(); // Refresh the appointments list
+            } else {
                 viewMessageElement.style.color = 'red';
-                viewMessageElement.textContent = 'An error occurred. Please try again.';
+                viewMessageElement.textContent = data.error || 'Failed to cancel appointment.';
             }
+        } catch (error) {
+            viewMessageElement.style.color = 'red';
+            viewMessageElement.textContent = 'An error occurred. Please try again.';
         }
-    </script>
+    }
+
+    // Call viewAppointments on page load to fetch and display the appointments
+    viewAppointments();
+</script>
 </body>
 </html>

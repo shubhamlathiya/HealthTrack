@@ -13,6 +13,7 @@ def add_visitor():
     relationship = data.get('relationship')
     contact = data.get('contact')
 
+    print(data)
     if not all([patient_id, visitor_name, relationship, contact]):
         return jsonify({"error": "All fields are required"}), 400
 

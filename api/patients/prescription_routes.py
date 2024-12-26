@@ -19,3 +19,5 @@ def get_prescription(prescription_id):
 
     # print(prescription)
     return jsonify(prescription), 200
+
+

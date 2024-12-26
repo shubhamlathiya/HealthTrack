@@ -2,7 +2,7 @@ import datetime
 
 import jwt
 from bson import ObjectId
-from flask import jsonify,request
+from flask import jsonify, request, render_template
 from werkzeug.security import generate_password_hash
 
 from api.auth_routes import auth
@@ -10,28 +10,31 @@ from config import mongo
 from email_utils import send_email
 
 
-@auth.route('/forgot-password', methods=['POST'])
+@auth.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    data = request.get_json()
-    email = data.get('email')
+    if request.method == 'POST':
+        data = request.get_json()
+        email = data.get('email')
 
-    # Check if email exists
-    user = mongo.db.patients.find_one({"email": email})
-    if not user:
-        return jsonify({"error": "Email not found"}), 404
+        # Check if email exists
+        user = mongo.db.patients.find_one({"email": email})
+        if not user:
+            return jsonify({"error": "Email not found"}), 404
 
-    # Generate a reset token
-    reset_token = jwt.encode(
-        {"user_id": str(user['_id']), "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
-        "your_secret_key",  # Replace with your secret key
-        algorithm="HS256"
-    )
+        # Generate a reset token
+        reset_token = jwt.encode(
+            {"user_id": str(user['_id']), "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+            "your_secret_key",  # Replace with your secret key
+            algorithm="HS256"
+        )
 
-    # Send reset email
-    reset_link = f"http://127.0.0.1:5000/auth/reset-password/{reset_token}"
-    send_email("Password Reset Request", email, reset_link)
+        # Send reset email
+        reset_link = f"http://127.0.0.1:5000/auth/reset-password/{reset_token}"
+        send_email("Password Reset Request", email, reset_link)
 
-    return jsonify({"message": "Password reset link sent to your email"}), 200
+        return jsonify({"message": "Password reset link sent to your email"}), 200
+    elif request.method == 'GET':
+        return render_template('auth_templates/forgot_password_templates.html')
 
 
 @auth.route('/reset-password/<token>', methods=['POST'])

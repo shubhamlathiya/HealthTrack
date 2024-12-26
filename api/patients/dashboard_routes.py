@@ -6,11 +6,23 @@ from datetime import datetime
 from api.patients import patients
 from config import mongo
 
+def convert_objectid_to_str(obj):
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    elif isinstance(obj, list):
+        return [convert_objectid_to_str(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: convert_objectid_to_str(value) for key, value in obj.items()}
+    return obj
+
 @patients.route('/dashboard/<patient_id>', methods=['GET'])
 def patient_dashboard(patient_id):
     try:
+        # Convert patient_id to ObjectId
+        patient_id_obj = ObjectId(patient_id)
+
         # Fetch the patient's document
-        patient_document = mongo.db.patients.find_one({"_id": ObjectId(patient_id)})
+        patient_document = mongo.db.patients.find_one({"_id": patient_id_obj})
 
         if not patient_document:
             return jsonify({"error": "Patient not found"}), 404
@@ -20,14 +32,14 @@ def patient_dashboard(patient_id):
 
         # Calculate the total pending amount
         pending_total_amount = mongo.db.bills.aggregate([
-            {"$match": {"patient_id": patient_id, "status": "Pending"}},
+            {"$match": {"patient_id": patient_id_obj, "status": "Pending"}},
             {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
         ])
         pending_total_amount = next(pending_total_amount, {}).get("total", 0)
 
         # Number of reports
         reports_count = mongo.db.prescriptions.aggregate([
-            {"$match": {"patient_id": ObjectId(patient_id)}},
+            {"$match": {"patient_id": patient_id_obj}},
             {"$project": {"test_report_count": {"$size": "$test_report"}}},
             {"$group": {"_id": None, "total_reports": {"$sum": "$test_report_count"}}}
         ])
@@ -35,7 +47,7 @@ def patient_dashboard(patient_id):
 
         # Number of pending reports
         pending_reports_count = mongo.db.prescriptions.aggregate([
-            {"$match": {"patient_id": ObjectId(patient_id)}},
+            {"$match": {"patient_id": patient_id_obj}},
             {"$unwind": "$test_report"},
             {"$match": {"test_report.status": "Pending"}},
             {"$group": {"_id": None, "total_pending": {"$sum": 1}}}
@@ -53,7 +65,7 @@ def patient_dashboard(patient_id):
 
         # Fetch the last report details
         last_report = mongo.db.prescriptions.find(
-            {"patient_id": patient_id, "test_report": {"$exists": True, "$not": {"$size": 0}}}
+            {"patient_id": patient_id_obj, "test_report": {"$exists": True, "$not": {"$size": 0}}}
         ).sort("date", -1).limit(1)
         last_report = next(last_report, None)
 
@@ -77,6 +89,9 @@ def patient_dashboard(patient_id):
             }
         }
 
-        return jsonify(str(response)), 200
+
+        response = convert_objectid_to_str(response)
+
+        return jsonify(response), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
