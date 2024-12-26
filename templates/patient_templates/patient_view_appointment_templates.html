@@ -13,6 +13,11 @@
     <ul id="appointmentsList"></ul>
 </div>
 
+<div id="prescriptionDetails" style="display: none;">
+    <h3>Prescription Details</h3>
+    <div id="prescriptionContent"></div>
+</div>
+
 <script>
     // Fetch patientId from localStorage
     const patientId = localStorage.getItem('patientId');
@@ -28,9 +33,11 @@
         const viewMessageElement = document.getElementById('viewMessage');
         const appointmentsElement = document.getElementById('appointments');
         const appointmentsList = document.getElementById('appointmentsList');
+        const prescriptionDetails = document.getElementById('prescriptionDetails');
 
         viewMessageElement.textContent = '';
         appointmentsList.innerHTML = '';
+        prescriptionDetails.style.display = 'none';
 
         const url = 'http://localhost:5000/patients/view-appointments/' + patientId;
 
@@ -56,11 +63,17 @@
                                 <strong>Status:</strong> ${appointment.status}<br>
                                 <strong>Doctor ID:</strong> ${appointment.doctor}<br>
                             `;
+
                         if (appointment.status === "Scheduled") {
                             const cancelButton = document.createElement('button');
                             cancelButton.textContent = 'Cancel';
                             cancelButton.onclick = () => cancelAppointment(patientId, appointment.appointment_id);
                             li.appendChild(cancelButton);
+                        } else if (appointment.status === "Completed") {
+                            const viewPrescriptionButton = document.createElement('button');
+                            viewPrescriptionButton.textContent = 'View Prescription';
+                            viewPrescriptionButton.onclick = () => fetchPrescriptionDetails(appointment.appointment_id);
+                            li.appendChild(viewPrescriptionButton);
                         }
                         appointmentsList.appendChild(li);
                     });
@@ -100,6 +113,45 @@
             } else {
                 viewMessageElement.style.color = 'red';
                 viewMessageElement.textContent = data.error || 'Failed to cancel appointment.';
+            }
+        } catch (error) {
+            viewMessageElement.style.color = 'red';
+            viewMessageElement.textContent = 'An error occurred. Please try again.';
+        }
+    }
+
+    async function fetchPrescriptionDetails(appointmentId) {
+        const prescriptionContent = document.getElementById('prescriptionContent');
+        const prescriptionDetails = document.getElementById('prescriptionDetails');
+        const viewMessageElement = document.getElementById('viewMessage');
+
+        prescriptionContent.innerHTML = '';
+        prescriptionDetails.style.display = 'none';
+        viewMessageElement.textContent = '';
+
+        const url = 'http://localhost:5000/patients/get_prescriptions_with_appointments/' + appointmentId;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                prescriptionContent.innerHTML = `
+                    <strong>Prescription ID:</strong> ${data.prescription._id}<br>
+                    <strong>Doctor:</strong> ${data.doctor.name} (${data.doctor.specialization})<br>
+                    <strong>Medications:</strong> ${data.prescription.medications.join(', ')}<br>
+                    <strong>Notes:</strong> ${data.prescription.notes}<br>
+                `;
+                prescriptionDetails.style.display = 'block';
+            } else {
+                viewMessageElement.style.color = 'red';
+                viewMessageElement.textContent = data.error || 'Failed to retrieve prescription details.';
             }
         } catch (error) {
             viewMessageElement.style.color = 'red';
