@@ -28,4 +28,4 @@ def login_patient():
     }, 'your_secret_key', algorithm='HS256')
 
     # print(token)
-    return jsonify({'token': token})
+    return jsonify({'token': token , "patient" : str(patient['_id'])}), 200

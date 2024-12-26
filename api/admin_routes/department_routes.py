@@ -56,3 +56,30 @@ def get_departments():
         departments_list.append(department)
 
     return jsonify({'departments': departments_list}), 200
+
+
+@admin.route('/department-doctors/<department>', methods=['GET'])
+def get_doctors_by_department(department):
+    """
+    Fetch all doctors available in a specific department.
+    """
+    try:
+        # Query the doctors collection to find doctors in the specified department
+        doctors = list(mongo.db.doctors.find({"department": department}, {
+            "name": 1,
+            "email": 1,
+            "contact_number": 1,
+            "specialization": 1
+        }))
+
+        if not doctors:
+            return jsonify({"message": "No doctors available in this department."}), 404
+
+        # Convert the ObjectId to string for JSON serialization
+        for doctor in doctors:
+            doctor["_id"] = str(doctor["_id"])
+
+        return jsonify({"doctors": doctors}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

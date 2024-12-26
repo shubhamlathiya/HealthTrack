@@ -59,10 +59,17 @@ def add_doctor():
 
 @admin.route('/get-doctors', methods=['GET'])
 def get_doctors():
-    doctors = mongo.db.doctors.find({}, {'name': 1, 'specialization': 1, '_id': 0})  # Only retrieve name and specialization
-    doctors_list = list(doctors)  # Convert cursor to list
+    doctors = mongo.db.doctors.find({},
+                                    {'name': 1, 'specialization': 1, '_id': 1})  # Only retrieve name and specialization
+    doctors_list = []
+
+    for doctor in doctors:
+        # Convert _id to string
+        doctor['_id'] = str(doctor['_id'])
+        doctors_list.append(doctor)
 
     return jsonify({'doctors': doctors_list}), 200
+
 
 @admin.route('/doctor/<doctor_id>/unique-patients', methods=['GET'])
 def count_unique_patients(doctor_id):
