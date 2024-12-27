@@ -4,161 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Prescription</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .form-group textarea {
-            resize: vertical;
-        }
-        .form-group button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .form-group button:hover {
-            background-color: #0056b3;
-        }
-        .medication {
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .remove-btn {
-            background-color: #dc3545;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 3px;
-            float: right;
-        }
-        .remove-btn:hover {
-            background-color: #c82333;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
+<body class="bg-light">
+    <div class="container mt-5">
         <h2>Generate Prescription</h2>
         <form id="prescriptionForm">
-            <div class="form-group">
-                <label for="doctor_id">Doctor ID</label>
-                <input type="text" id="doctor_id" name="doctor_id" required>
+            <div class="mb-3">
+                <label for="doctor_id" class="form-label">Doctor ID</label>
+                <input type="text" id="doctor_id" name="doctor_id" class="form-control" required>
             </div>
 
-            <div class="form-group">
-                <label for="patient_id">Patient ID</label>
-                <input type="text" id="patient_id" name="patient_id" required>
+            <div class="mb-3">
+                <label for="patient_id" class="form-label">Patient ID</label>
+                <input type="text" id="patient_id" name="patient_id" class="form-control" required>
             </div>
 
-            <div class="form-group">
-                <label for="referred_appointment_id">Referred Appointment ID</label>
-                <input type="text" id="referred_appointment_id" name="referred_appointment_id" required>
+            <div class="mb-3">
+                <label for="referred_appointment_id" class="form-label">Referred Appointment ID</label>
+                <input type="text" id="referred_appointment_id" name="referred_appointment_id" class="form-control" required>
             </div>
 
             <div id="medicationsContainer">
                 <h3>Medications</h3>
-                <div class="medication">
-                    <div class="form-group">
-                        <label>Medication Name</label>
-                        <input type="text" name="medication_name" required>
+                <div class="medication mb-3 p-3 border rounded">
+                    <div class="mb-3">
+                        <label class="form-label">Medication Name</label>
+                        <input type="text" name="medication_name" class="form-control" required>
                     </div>
-                    <div class="form-group">
-                        <label>Dosage</label>
-                        <input type="text" name="dosage" required>
+                    <div class="mb-3">
+                        <label class="form-label">Dosage</label>
+                        <input type="text" name="dosage" class="form-control" required>
                     </div>
-                    <div class="form-group">
-                        <label>Timing</label>
+                    <div class="mb-3">
+                        <label class="form-label">Timing</label><br>
                         <input type="checkbox" name="timing" value="Morning"> Morning
                         <input type="checkbox" name="timing" value="Afternoon"> Afternoon
                         <input type="checkbox" name="timing" value="Evening"> Evening
                         <input type="checkbox" name="timing" value="Night"> Night
                     </div>
-                    <div class="form-group">
-                        <label>Meal Instructions</label>
+                    <div class="mb-3">
+                        <label class="form-label">Meal Instructions</label><br>
                         <input type="radio" name="meal_instructions" value="Before Meal" required> Before Meal
                         <input type="radio" name="meal_instructions" value="After Meal"> After Meal
                     </div>
-                    <button type="button" class="remove-btn" onclick="removeMedication(this)">Remove</button>
+                    <button type="button" class="btn btn-danger" onclick="removeMedication(this)">Remove</button>
                 </div>
             </div>
 
-            <button type="button" onclick="addMedication()">Add More Medication</button>
+            <button type="button" class="btn btn-primary mb-3" onclick="addMedication()">Add More Medication</button>
 
-            <div class="form-group">
-                <label for="notes">Notes</label>
-                <textarea id="notes" name="notes"></textarea>
+            <div class="mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea id="notes" name="notes" class="form-control"></textarea>
             </div>
 
-            <div class="form-group">
-                <label for="test_report">Test Reports (JSON Format)</label>
-                <textarea id="test_report" name="test_report"></textarea>
+            <div class="mb-3">
+                <label for="test_report" class="form-label">Test Reports (JSON Format)</label>
+                <textarea id="test_report" name="test_report" class="form-control"></textarea>
             </div>
 
-            <div class="form-group">
-                <button type="button" onclick="submitPrescription()">Submit Prescription</button>
+            <div class="mb-3">
+                <button type="button" class="btn btn-success" onclick="submitPrescription()">Submit Prescription</button>
             </div>
 
-            <div id="responseMessage"></div>
+            <div id="responseMessage" class="alert alert-info" role="alert"></div>
         </form>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         function addMedication() {
             const container = document.getElementById('medicationsContainer');
             const medicationDiv = document.createElement('div');
-            medicationDiv.className = 'medication';
+            medicationDiv.className = 'medication mb-3 p-3 border rounded';
             medicationDiv.innerHTML = `
-                <div class="form-group">
-                    <label>Medication Name</label>
-                    <input type="text" name="medication_name" required>
+                <div class="mb-3">
+                    <label class="form-label">Medication Name</label>
+                    <input type="text" name="medication_name" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label>Dosage</label>
-                    <input type="text" name="dosage" required>
+                <div class="mb-3">
+                    <label class="form-label">Dosage</label>
+                    <input type="text" name="dosage" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label>Timing</label>
+                <div class="mb-3">
+                    <label class="form-label">Timing</label><br>
                     <input type="checkbox" name="timing" value="Morning"> Morning
                     <input type="checkbox" name="timing" value="Afternoon"> Afternoon
                     <input type="checkbox" name="timing" value="Evening"> Evening
                     <input type="checkbox" name="timing" value="Night"> Night
                 </div>
-                <div class="form-group">
-                    <label>Meal Instructions</label>
+                <div class="mb-3">
+                    <label class="form-label">Meal Instructions</label><br>
                     <input type="radio" name="meal_instructions" value="Before Meal" required> Before Meal
                     <input type="radio" name="meal_instructions" value="After Meal"> After Meal
                 </div>
-                <button type="button" class="remove-btn" onclick="removeMedication(this)">Remove</button>
+                <button type="button" class="btn btn-danger" onclick="removeMedication(this)">Remove</button>
             `;
             container.appendChild(medicationDiv);
         }
@@ -204,8 +147,12 @@
 
                 const result = await response.json();
                 document.getElementById('responseMessage').textContent = result.message || result.error;
+                document.getElementById('responseMessage').classList.remove('alert-info');
+                document.getElementById('responseMessage').classList.add('alert-success');
             } catch (error) {
                 document.getElementById('responseMessage').textContent = 'Error submitting prescription.';
+                document.getElementById('responseMessage').classList.remove('alert-info');
+                document.getElementById('responseMessage').classList.add('alert-danger');
             }
         }
     </script>

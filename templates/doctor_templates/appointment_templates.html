@@ -128,7 +128,7 @@
             messageElement.textContent = '';
 
             try {
-                const response = await fetch('http://localhost:5000/doctors/forward-appointment', {
+                const response = await fetch('/doctors/forward-appointment', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -163,7 +163,7 @@
             appointmentList.innerHTML = '';
 
             try {
-                const response = await fetch(`http://localhost:5000/doctors/get-forwarded-appointments/${doctor_id}`, {
+                const response = await fetch(`/doctors/get-forwarded-appointments/${doctor_id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -196,7 +196,7 @@
             appointmentList.innerHTML = '';
 
             try {
-                const response = await fetch(`http://localhost:5000/doctors/get-referring-appointments/${doctor_id}`, {
+                const response = await fetch(`/doctors/get-referring-appointments/${doctor_id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
