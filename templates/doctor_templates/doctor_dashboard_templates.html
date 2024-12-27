@@ -5,123 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            min-height: 100vh;
-        }
-        .container-fluid {
-            padding-left: 0;
-        }
-        .sidebar {
-            height: 100vh;
-            background-color: #f8f9fa;
-            padding-top: 20px;
-        }
-        .sidebar a {
-            display: block;
-            color: #000;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-bottom: 5px;
-        }
-        .sidebar a:hover {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .content-area {
-            padding: 20px;
-        }
-    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 sidebar">
-                <h4 class="text-center">Doctor Dashboard</h4>
-                <div class="d-flex flex-column">
-                    <a href="#" id="viewAppointments" class="active">View Appointments</a>
-                    <a href="#" id="searchPatientData">Search Patient Data</a>
-                    <a href="#" id="viewProfile">Profile</a>
-                </div>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h2>Doctor Dashboard</h2>
+
+    <!-- Sidebar or Menu -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="/doctors/appointments" class="list-group-item list-group-item-action">View Appointments</a>
+                <a href="/doctors/add-prescription" class="list-group-item list-group-item-action">Add Prescription</a>
+                <a href="/doctors/patients" class="list-group-item list-group-item-action">View Patients</a>
+                <a href="/doctors/prescriptions" class="list-group-item list-group-item-action">View Prescriptions</a>
+                <a href="/doctors/profile" class="list-group-item list-group-item-action">View Profile</a>
+                <a href="/logout" id="logoutLink" class="list-group-item list-group-item-action">Logout</a>
             </div>
+        </div>
 
-            <!-- Main Content Area -->
-            <div class="col-md-9 col-lg-10 content-area">
-                <div id="appointments" class="content-section">
-                    <h3>Appointments</h3>
-                    <p>Here you can view your upcoming appointments.</p>
-                </div>
+        <!-- Dashboard Content -->
+        <div class="col-md-9">
+            <div id="dashboard" class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Doctor Overview</h5>
 
-                <div id="searchPatient" class="content-section" style="display: none;">
-                    <h3>Search Patient Data</h3>
-                    <form>
-                        <div class="mb-3">
-                            <label for="patientId" class="form-label">Enter Patient ID</label>
-                            <input type="text" id="patientId" class="form-control">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </form>
-                    <div id="patientInfo" style="margin-top: 20px;">
-                        <!-- Patient info will appear here after search -->
+                    <div id="appointments-section">
+                        <p><strong>Total Appointments:</strong> <span id="total-appointments">Loading...</span></p>
+                        <p><strong>Upcoming Appointments:</strong> <span id="upcoming-appointments">Loading...</span></p>
                     </div>
-                </div>
 
-                <div id="profile" class="content-section" style="display: none;">
-                    <h3>Doctor Profile</h3>
-                    <p>Here you can view and update your profile information.</p>
-                    <form>
-                        <div class="mb-3">
-                            <label for="doctorName" class="form-label">Name</label>
-                            <input type="text" id="doctorName" class="form-control" value="Dr. John Doe" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="doctorEmail" class="form-label">Email</label>
-                            <input type="email" id="doctorEmail" class="form-control" value="dr.johndoe@example.com" readonly>
-                        </div>
-                        <button type="button" class="btn btn-warning">Edit Profile</button>
-                    </form>
+                    <h5 class="mt-4">Recent Patient</h5>
+                    <div id="recent-patient-section">
+                        <p><strong>Name:</strong> <span id="recent-patient-name">Loading...</span></p>
+                        <p><strong>Last Visit:</strong> <span id="recent-patient-visit">Loading...</span></p>
+                        <p><strong>Reason:</strong> <span id="recent-patient-reason">Loading...</span></p>
+                    </div>
+
+                    <h5 class="mt-4">Recent Prescription</h5>
+                    <div id="recent-prescription-section">
+                        <p><strong>Patient:</strong> <span id="recent-prescription-patient">Loading...</span></p>
+                        <p><strong>Date:</strong> <span id="recent-prescription-date">Loading...</span></p>
+                        <p><strong>Medications:</strong> <span id="recent-prescription-meds">Loading...</span></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Menu navigation functionality
-        $(document).ready(function() {
-            // Show appointments by default
-            $("#viewAppointments").click(function() {
-                $(".content-section").hide();
-                $("#appointments").show();
-                setActiveMenuItem($(this));
+<script>
+    const doctorId = localStorage.getItem('doctorId'); // Retrieve doctorId from localStorage
+
+    if (!doctorId) {
+        window.location.href = '/doctors/'; // Redirect to login if doctorId is missing
+    } else {
+        const apiUrl = `/doctors/dashboard/${doctorId}`; // Replace with your actual API endpoint
+
+        function fetchDoctorData() {
+            $.get(apiUrl, function (data) {
+                const response = data;
+
+                if (response.error) {
+                    alert(response.error);
+                    return;
+                }
+
+                // Update Dashboard Information
+                $('#total-appointments').text(response.total_appointments || 0);
+                $('#upcoming-appointments').text(response.upcoming_appointments || 0);
+
+                if (response.recent_patient) {
+                    $('#recent-patient-name').text(response.recent_patient.name || 'N/A');
+                    $('#recent-patient-visit').text(response.recent_patient.last_visit || 'N/A');
+                    $('#recent-patient-reason').text(response.recent_patient.reason || 'N/A');
+                }
+
+                if (response.recent_prescription) {
+                    $('#recent-prescription-patient').text(response.recent_prescription.patient || 'N/A');
+                    $('#recent-prescription-date').text(response.recent_prescription.date || 'N/A');
+                    const medications = response.recent_prescription.medications ?
+                        response.recent_prescription.medications.join(', ') : 'N/A';
+                    $('#recent-prescription-meds').text(medications);
+                }
+            }).fail(function () {
+                alert("Error fetching doctor data.");
             });
+        }
 
-            // Show search patient data section
-            $("#searchPatientData").click(function() {
-                $(".content-section").hide();
-                $("#searchPatient").show();
-                setActiveMenuItem($(this));
-            });
-
-            // Show profile section
-            $("#viewProfile").click(function() {
-                $(".content-section").hide();
-                $("#profile").show();
-                setActiveMenuItem($(this));
-            });
-
-            // Set the active class for the menu items
-            function setActiveMenuItem(element) {
-                $(".sidebar a").removeClass("active");
-                element.addClass("active");
-            }
-
-            // Default to "View Appointments"
-            setActiveMenuItem($("#viewAppointments"));
+        $(document).ready(function () {
+            fetchDoctorData();
         });
-    </script>
+    }
+</script>
+<script>
+    document.getElementById('logoutLink').addEventListener('click', async function (event) {
+        event.preventDefault(); // Prevent the default anchor action
+
+        try {
+            const response = await fetch('/logout', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Clear client-side storage
+                localStorage.clear();
+                sessionStorage.clear();
+
+                // Redirect to login page
+                window.location.href = '/doctors/';
+            } else {
+                alert(data.error || 'Failed to log out.');
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    });
+</script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

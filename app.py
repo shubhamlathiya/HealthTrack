@@ -47,11 +47,6 @@ init_socket_events(socketio, mongo)
 CORS(app)
 
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return render_template('patient_templates/prescription_templates.html')
-
-
 @app.route('/uploads/reports/<filename>')
 def download_file(filename):
     return send_from_directory('uploads/reports', filename)

@@ -7,3 +7,5 @@ doctors = Blueprint('doctor', __name__)
 from .medical_record_routes import *
 from .appointments_routes import *
 from .prescription_routes import *
+
+from .web_routes import *
