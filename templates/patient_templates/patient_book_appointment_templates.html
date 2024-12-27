@@ -145,7 +145,7 @@
         messageElement.textContent = '';
 
         try {
-            const response = await fetch('http://localhost:5000/patients/book-appointment', {
+            const response = await fetch('/patients/book-appointment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -16,8 +16,7 @@
 </div>
 
 <!-- Modal for Prescription Details -->
-<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -26,6 +25,52 @@
             </div>
             <div class="modal-body" id="prescriptionDetails">
                 Loading...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Feedback Submission -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel">Submit Feedback</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="feedbackForm">
+                    <div class="mb-3">
+                        <label for="doctorCommunication" class="form-label">Doctor Communication</label>
+                        <select class="form-select" id="doctorCommunication" required>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Average">Average</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="doctorProfessionalism" class="form-label">Doctor Professionalism</label>
+                        <select class="form-select" id="doctorProfessionalism" required>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Average">Average</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="overallSatisfaction" class="form-label">Overall Satisfaction</label>
+                        <select class="form-select" id="overallSatisfaction" required>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Average">Average</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="appointmentId">
+                    <input type="hidden" id="doctorId">
+                    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                </form>
             </div>
         </div>
     </div>
@@ -64,17 +109,20 @@
                                 <p class="card-text"><strong>Reason:</strong> ${appointment.reason}</p>
                                 <p class="card-text"><strong>Status:</strong> ${appointment.status}</p>
 
-                                 ${appointment.status === 'Completed' ? `
-            <button class="btn btn-primary" onclick="showPrescription('${appointment.appointment_id}')" data-bs-toggle="modal" data-bs-target="#prescriptionModal">
-                View Prescription
-            </button>
-        ` : ''}
+                                ${appointment.status === 'Completed' ? `
+                                    <button class="btn btn-primary" onclick="showPrescription('${appointment.appointment_id}')" data-bs-toggle="modal" data-bs-target="#prescriptionModal">
+                                        View Prescription
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="openFeedbackModal('${appointment.appointment_id}', '${appointment.doctor_id}')">
+                                        Provide Feedback
+                                    </button>
+                                ` : ''}
 
-   ${appointment.status === 'Scheduled' ? `
-            <button class="btn btn-danger" onclick="askCancelConfirmation('${appointment.appointment_id}')">
-                Cancel Appointment
-            </button>
-        ` : ''}
+                                ${appointment.status === 'Scheduled' ? `
+                                    <button class="btn btn-danger" onclick="askCancelConfirmation('${appointment.appointment_id}')">
+                                        Cancel Appointment
+                                    </button>
+                                ` : ''}
                             </div>
                         `;
                     appointmentContainer.appendChild(card);
@@ -160,6 +208,59 @@
         }
     }
 
+    // Open the feedback modal
+    function openFeedbackModal(appointmentId, doctorId) {
+        // Set the hidden inputs for appointment and doctor ID
+        document.getElementById('appointmentId').value = appointmentId;
+        document.getElementById('doctorId').value = doctorId;
+
+        // Open the modal
+        $('#feedbackModal').modal('show');
+    }
+
+    // Handle feedback form submission
+    document.getElementById('feedbackForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const appointmentId = document.getElementById('appointmentId').value;
+        const doctorId = document.getElementById('doctorId').value;
+        const doctorCommunication = document.getElementById('doctorCommunication').value;
+        const doctorProfessionalism = document.getElementById('doctorProfessionalism').value;
+        const overallSatisfaction = document.getElementById('overallSatisfaction').value;
+
+        const feedbackData = {
+            patient_id: localStorage.getItem('patientId'), // Assuming patient ID is stored in localStorage
+            doctor_id: doctorId,
+            appointment_id: appointmentId,
+            survey_responses: {
+                doctor_communication: doctorCommunication,
+                doctor_professionalism: doctorProfessionalism,
+                overall_satisfaction: overallSatisfaction
+            }
+        };
+
+        try {
+            const response = await fetch('/patients/feedback/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(feedbackData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Feedback submitted successfully!');
+                $('#feedbackModal').modal('hide');
+            } else {
+                alert(data.error || 'Error submitting feedback');
+            }
+        } catch (error) {
+            alert('An error occurred while submitting the feedback.');
+        }
+    });
+
     // Initialize the page
     document.addEventListener('DOMContentLoaded', fetchAppointments);
 
@@ -185,10 +286,7 @@
 
             if (response.ok) {
                 alert('Appointment canceled successfully.');
-
                 window.location.href = `/patients/appointments`;
-
-                // Optionally, refresh the list of appointments or update the UI here
             } else {
                 alert(data.error || 'Failed to cancel appointment.');
             }
@@ -197,7 +295,6 @@
             alert('An error occurred while canceling the appointment.');
         }
     }
-
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
