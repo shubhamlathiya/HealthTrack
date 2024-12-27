@@ -44,9 +44,10 @@
                 }
 
                 appointments.forEach(appointment => {
+                    const isScheduled = appointment.status === 'Scheduled';
                     const card = `
                         <div class="col">
-                            <div class="card h-100">
+                            <div class="card h-100 ${isScheduled ? 'clickable-card' : ''}" data-id="${appointment.appointment_id}">
                                 <div class="card-body">
                                     <h5 class="card-title">Appointment with ${appointment.patient_name || 'Unknown'}</h5>
                                     <p class="card-text"><strong>Date:</strong> ${appointment.date || 'N/A'}</p>
@@ -61,6 +62,12 @@
                         </div>
                     `;
                     appointmentsContainer.append(card);
+                });
+
+                // Add click event listener for scheduled appointments
+                $('.clickable-card').click(function () {
+                    const appointmentId = $(this).data('id');
+                    window.location.href = `/appointments/details/${appointmentId}`; // Redirect to details page
                 });
             }).fail(function () {
                 alert("Error fetching appointments.");

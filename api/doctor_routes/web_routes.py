@@ -42,3 +42,9 @@ def doctors_dashboard():  # put application's code here
 @doctors.route('/appointments')
 def doctors_appointments():  # put application's code here
     return render_template('doctor_templates/doctor_view_appointments_templates.html')
+
+@doctors.route('/profile')
+def doctors_profile():  # put application's code here
+    return render_template('doctor_templates/doctor_profile_templates.html')
+
+# appointments/details/96c32e10-862e-4d3d-8444-6514dc7fb5d0
