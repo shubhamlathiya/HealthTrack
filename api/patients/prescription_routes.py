@@ -5,9 +5,9 @@ from api.patients import patients
 from config import mongo
 
 
-@patients.route("/get_prescription/<prescription_id>", methods=["GET"])
-def get_prescription(prescription_id):
-    prescription = mongo.db.prescriptions.find_one({"_id": ObjectId(prescription_id)})
+@patients.route("/get_prescription_all/<patient_id>", methods=["GET"])
+def get_prescription_all(patient_id):
+    prescription = mongo.db.prescriptions.find_one({"patient_id": ObjectId(patient_id)})
     if not prescription:
         return jsonify({"error": "Prescription not found"}), 404
 
@@ -20,6 +20,21 @@ def get_prescription(prescription_id):
     # print(prescription)
     return jsonify(prescription), 200
 
+
+@patients.route("/get_prescription/<referred_appointment_id>", methods=["GET"])
+def referred_appointment_id(referred_appointment_id):
+    prescription = mongo.db.prescriptions.find_one({"referred_appointment_id": referred_appointment_id})
+    if not prescription:
+        return jsonify({"error": "Prescription not found"}), 404
+
+    # Convert ObjectId to string for JSON serialization
+    prescription["_id"] = str(prescription["_id"])
+    prescription["doctor_id"] = str(prescription["doctor_id"])
+    prescription["patient_id"] = str(prescription["patient_id"])
+    prescription["referred_appointment_id"] = str(prescription["referred_appointment_id"])
+
+    # print(prescription)
+    return jsonify(prescription), 200
 
 
 @patients.route("/get_prescriptions_with_appointments/<appointment_id>", methods=["GET"])

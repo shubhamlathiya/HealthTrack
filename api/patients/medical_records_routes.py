@@ -110,3 +110,42 @@ def upload_patient_report():
         }
         mongo.db.audit_logs.insert_one(audit_log)
         return jsonify({"error": str(e)}), 500
+
+
+@patients.route('/get-reports/<patient_id>', methods=['GET'])
+def get_patient_reports(patient_id):
+    try:
+        # Ensure patient_id is valid (ObjectId format)
+        if not ObjectId.is_valid(patient_id):
+            return jsonify({"error": "Invalid patient ID"}), 400
+
+        # Query the patient document from MongoDB
+        patient = mongo.db.patients.find_one({"_id": ObjectId(patient_id)})
+
+        if not patient:
+            return jsonify({"error": "Patient not found"}), 404
+
+        # Extract reports from the patient's document
+        reports = patient.get('upload_test_reports', [])
+
+        # If no reports are found
+        if not reports:
+            return jsonify({"message": "No reports found for this patient"}), 200
+
+        # Structure the report data to return
+        formatted_reports = []
+        for report in reports:
+            formatted_reports.append({
+                "report_name": report.get("report_name"),
+                "status": report.get("status"),
+                "additional_details": report.get("additional_details"),
+                "notes": report.get("notes"),
+                "file_path": report.get("file_path"),
+                "result_time": report.get("result_time")
+            })
+
+        return jsonify({"reports": formatted_reports}), 200
+
+    except Exception as e:
+        # Handle any unexpected errors
+        return jsonify({"error": str(e)}), 500

@@ -97,15 +97,15 @@ def view_appointments(patient_id):
 @patients.route('/cancel-appointment', methods=['POST'])
 def cancel_appointment():
     data = request.json
-    patient_id = data.get('patient_id')
+
     appointment_id = data.get('appointment_id')
 
-    if not all([patient_id, appointment_id]):
+    if not all([appointment_id]):
         return jsonify({"error": "All fields are required"}), 400
 
     # Update the appointment status in both patient and doctor records
     mongo.db.patients.update_one(
-        {"_id": ObjectId(patient_id), "appointments.appointment_id": appointment_id},
+        {"appointments.appointment_id": appointment_id},
         {"$set": {"appointments.$.status": "Cancelled"}}
     )
 

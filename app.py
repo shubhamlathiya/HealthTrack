@@ -1,6 +1,6 @@
 from flask_socketio import SocketIO
 
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, jsonify, make_response
 from flask_mail import Mail
 
 from api.admin_routes import admin
@@ -56,6 +56,27 @@ def hello_world():  # put application's code here
 def download_file(filename):
     return send_from_directory('uploads/reports', filename)
 
+@app.route('/uploads/patient_reports/<filename>')
+def download_file_patient_reports(filename):
+    return send_from_directory('uploads/patient_reports', filename)
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    try:
+        # Clear cookies (e.g., for authentication token or session)
+        response = make_response(jsonify({"message": "Logged out successfully"}), 200)
+
+        # Example of clearing a cookie (e.g., 'auth_token')
+        response.delete_cookie('token')  # Adjust this based on the name of your auth token cookie
+        response.delete_cookie('session_id')  # If you have other cookies to delete
+
+        # Optionally, clear other session data on the server-side if needed
+        # For example, using Flask sessions (if used):
+        # session.clear()
+
+        return response
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run()

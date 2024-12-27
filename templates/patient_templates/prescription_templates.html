@@ -4,96 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prescription Details</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 500px;
-            overflow-y: auto;
-            max-height: 90vh;
-        }
-        .container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .section {
-            margin-bottom: 20px;
-        }
-        .section h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        .medications, .test-reports {
-            list-style-type: none;
-            padding: 0;
-        }
-        .medications li, .test-reports li {
-            background: #eef;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .notes {
-            background: #ffe;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .report-file {
-            margin-top: 10px;
-            padding: 10px;
-            background: #d3ffd3;
-            border-radius: 5px;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h2>Prescription Details</h2>
-        <div id="prescriptionDetails">Loading...</div>
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+<div class="container">
+    <div class="card shadow">
+        <div class="card-header text-center">
+            <h2>Prescription Details</h2>
+        </div>
+        <div class="card-body" id="prescriptionDetails">
+            Loading...
+        </div>
     </div>
+</div>
 
-    <script>
-        async function fetchPrescription() {
-            const prescriptionId = "676451b21abf691a71a516fc"; // Replace with actual ID
+<script>
+    async function fetchPrescription() {
+        {#const prescriptionId = "676451b21abf691a71a516fc"; // Replace with actual ID#}
+        const patientId = localStorage.getItem('patientId'); // Retrieve patientId from localStorage
+
+        if (!patientId) {
+            alert('Patient ID is not available. Please log in.');
+        } else {
+            {#const apiUrl = `/patients/dashboard/${patientId}`;#}
 
             try {
-                const response = await fetch(`/patients/get_prescription/${prescriptionId}`);
+                const response = await fetch(`/patients/get_prescription_all/${patientId}`);
                 const data = await response.json();
 
                 if (response.ok) {
-                    console.log(data);
                     displayPrescription(data);
                 } else {
-                    document.getElementById('prescriptionDetails').innerHTML = `<p style="color: red;">${data.error}</p>`;
+                    document.getElementById('prescriptionDetails').innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            ${data.error}
+                        </div>
+                    `;
                 }
             } catch (error) {
-                document.getElementById('prescriptionDetails').innerHTML = `<p style="color: red;">An error occurred while fetching the prescription.</p>`;
+                document.getElementById('prescriptionDetails').innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        An error occurred while fetching the prescription.
+                    </div>
+                `;
             }
         }
 
-        function displayPrescription(prescription) {
-            const container = document.getElementById('prescriptionDetails');
+    }
 
-            // Check if essential fields are missing, handle them gracefully
-            const date = prescription.date ? new Date(prescription.date.$date).toLocaleString() : 'N/A';
-            const doctorId = prescription.doctor_id ? prescription.doctor_id.$oid : 'N/A';
-            const patientId = prescription.patient_id ? prescription.patient_id.$oid : 'N/A';
+    function displayPrescription(prescription) {
+        const container = document.getElementById('prescriptionDetails');
 
-            container.innerHTML = `
-                <div class="section">
-                    <h3>General Information</h3>
+        const date = prescription.date ? new Date(prescription.date.$date).toLocaleString() : 'N/A';
+        const doctorId = prescription.doctor_id ? prescription.doctor_id.$oid : 'N/A';
+        const patientId = prescription.patient_id ? prescription.patient_id.$oid : 'N/A';
+
+        container.innerHTML = `
+                <div class="mb-4">
+                    <h5 class="text-primary">General Information</h5>
                     <p><strong>Prescription ID:</strong> ${prescription._id}</p>
                     <p><strong>Doctor ID:</strong> ${doctorId}</p>
                     <p><strong>Patient ID:</strong> ${patientId}</p>
@@ -101,49 +69,51 @@
                     <p><strong>Date:</strong> ${date}</p>
                     <p><strong>Status:</strong> ${prescription.status || 'N/A'}</p>
                 </div>
-                <div class="section">
-                    <h3>Medications</h3>
-                    <ul class="medications">
+
+                <div class="mb-4">
+                    <h5 class="text-primary">Medications</h5>
+                    <ul class="list-group">
                         ${prescription.medications && prescription.medications.length ? prescription.medications.map(med => `
-                            <li>
+                            <li class="list-group-item">
                                 <strong>Name:</strong> ${med.name}<br>
                                 <strong>Dosage:</strong> ${med.dosage}<br>
                                 <strong>Timing:</strong> ${med.timing.join(', ')}<br>
                                 <strong>Meal Instructions:</strong> ${med.meal_instructions || 'N/A'}
                             </li>
-                        `).join('') : '<li>No medications found.</li>'}
+                        `).join('') : '<li class="list-group-item">No medications found.</li>'}
                     </ul>
                 </div>
-                <div class="section">
-                    <h3>Test Reports</h3>
-                    <ul class="test-reports">
+
+                <div class="mb-4">
+                    <h5 class="text-primary">Test Reports</h5>
+                    <ul class="list-group">
                         ${prescription.test_report && prescription.test_report.length ? prescription.test_report.map(report => `
-                            <li>
+                            <li class="list-group-item">
                                 <strong>Report Name:</strong> ${report.report_name || 'N/A'}<br>
                                 <strong>Result Time:</strong> ${report.result_time ? new Date(report.result_time).toLocaleString() : 'N/A'}<br>
                                 <strong>Additional Details:</strong> ${report.additional_details || 'N/A'}<br>
                                 <strong>Status:</strong> ${report.status || 'N/A'}<br>
                                 <strong>Notes:</strong> ${report.notes || 'N/A'}<br>
                                 ${report.status === 'Completed' ? `
-                                    <div class="report-file">
-                                        <strong>Download Report:</strong>
-                                        <a href="${report.file_path}" target="_blank">Download</a>
-                                    </div>
+                                    <a href="/${report.file_path}" class="btn btn-link" target="_blank">Download Report</a>
                                 ` : ''}
                             </li>
-                        `).join('') : '<li>No test reports found.</li>'}
+                        `).join('') : '<li class="list-group-item">No test reports found.</li>'}
                     </ul>
                 </div>
-                <div class="section">
-                    <h3>Doctor's Notes</h3>
-                    <div class="notes">
+
+                <div>
+                    <h5 class="text-primary">Doctor's Notes</h5>
+                    <div class="card bg-light p-3">
                         ${prescription.notes || 'No notes provided.'}
                     </div>
                 </div>
             `;
-        }
+    }
 
-        fetchPrescription();
-    </script>
+    fetchPrescription();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

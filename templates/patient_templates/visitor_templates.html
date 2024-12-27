@@ -4,31 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Visitor Management</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body>
-    <div>
-        <h2>Visitor Management</h2>
-        <form id="addVisitorForm">
-            <br>
-            <label for="name">Visitor Name</label>
-            <input type="text" id="name" name="name" required>
-            <br>
-            <label for="relationship">Relationship</label>
-            <input type="text" id="relationship" name="relationship" required>
-            <br>
-            <label for="contact">Contact</label>
-            <input type="text" id="contact" name="contact" required>
-            <br>
-            <button type="button" onclick="addVisitor()">Add Visitor</button>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="mb-4">Visitor Management</h2>
+        <form id="addVisitorForm" class="mb-4">
+            <div class="mb-3">
+                <label for="name" class="form-label">Visitor Name</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="relationship" class="form-label">Relationship</label>
+                <input type="text" id="relationship" name="relationship" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="contact" class="form-label">Contact</label>
+                <input type="text" id="contact" name="contact" class="form-control" required>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addVisitor()">Add Visitor</button>
         </form>
 
-        <div id="message" style="color: red;"></div>
+        <div id="message" class="text-danger mb-4"></div>
 
         <h3>Visitors</h3>
-        <table id="visitorTable" border="1" style="width: 100%; display: none;">
-            <thead>
+        <table id="visitorTable" class="table table-bordered table-hover mt-3" style="display: none;">
+            <thead class="thead-light">
                 <tr>
                     <th>Name</th>
                     <th>Relationship</th>
@@ -59,32 +61,29 @@
             messageElement.textContent = '';
 
             if (!name || !relationship || !contact) {
-                messageElement.style.color = 'red';
                 messageElement.textContent = 'Please fill all fields.';
                 return;
             }
 
             try {
-                const response = await fetch('http://localhost:5000/patients/add-visitor', {
+                const response = await fetch('/patients/add-visitor', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ "patient_id" : patientId, name, relationship, contact })
+                    body: JSON.stringify({ "patient_id": patientId, name, relationship, contact })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    messageElement.style.color = 'green';
                     messageElement.textContent = data.message || 'Visitor added successfully.';
+                    messageElement.className = 'text-success';
                     getVisitors(patientId); // Refresh visitor list
                 } else {
-                    messageElement.style.color = 'red';
                     messageElement.textContent = data.error || 'Failed to add visitor.';
                 }
             } catch (error) {
-                messageElement.style.color = 'red';
                 messageElement.textContent = 'An error occurred. Please try again.';
             }
         }
@@ -98,7 +97,7 @@
             visitorList.innerHTML = '';
 
             try {
-                const response = await fetch(`http://localhost:5000/patients/get-visitors/${patient_id}`, {
+                const response = await fetch(`/patients/get-visitors/${patient_id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -109,27 +108,24 @@
 
                 if (response.ok) {
                     if (data.visitors && data.visitors.length > 0) {
-                        visitorsElement.style.display = 'table';
+                        visitorsElement.style.display = '';
                         data.visitors.forEach(visitor => {
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
                                 <td>${visitor.name}</td>
                                 <td>${visitor.relationship}</td>
                                 <td>${visitor.contact}</td>
-                                <td><button onclick="removeVisitor('${patient_id}', '${visitor.name}')">Remove</button></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="removeVisitor('${patient_id}', '${visitor.name}')">Remove</button></td>
                             `;
                             visitorList.appendChild(tr);
                         });
                     } else {
-                        messageElement.style.color = 'red';
                         messageElement.textContent = 'No visitors found.';
                     }
                 } else {
-                    messageElement.style.color = 'red';
                     messageElement.textContent = data.error || 'Failed to retrieve visitors.';
                 }
             } catch (error) {
-                messageElement.style.color = 'red';
                 messageElement.textContent = 'An error occurred. Please try again.';
             }
         }
@@ -140,7 +136,7 @@
             messageElement.textContent = '';
 
             try {
-                const response = await fetch('http://localhost:5000/patients/remove-visitor', {
+                const response = await fetch('/patients/remove-visitor', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -151,18 +147,19 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    messageElement.style.color = 'green';
                     messageElement.textContent = data.message || 'Visitor removed successfully.';
+                    messageElement.className = 'text-success';
                     getVisitors(patient_id); // Refresh visitor list
                 } else {
-                    messageElement.style.color = 'red';
                     messageElement.textContent = data.error || 'Failed to remove visitor.';
                 }
             } catch (error) {
-                messageElement.style.color = 'red';
                 messageElement.textContent = 'An error occurred. Please try again.';
             }
         }
     </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

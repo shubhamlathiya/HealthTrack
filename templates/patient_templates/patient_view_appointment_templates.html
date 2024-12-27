@@ -3,164 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Appointment Management</title>
+    <title>Patient Appointments</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body>
-<h2>View Appointments</h2>
-<div id="viewMessage"></div>
-<div id="appointments">
-    <h3>Appointments</h3>
-    <ul id="appointmentsList"></ul>
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="text-center">Appointment Details</h2>
+    <div id="appointmentContainer" class="mt-4">
+        <!-- Appointment Cards will be dynamically inserted here -->
+    </div>
 </div>
 
-<div id="prescriptionDetails" style="display: none;">
-    <h3>Prescription Details</h3>
-    <div id="prescriptionContent"></div>
+<!-- Modal for Prescription Details -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="prescriptionModalLabel">Prescription Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="prescriptionDetails">
+                Loading...
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    // Fetch patientId from localStorage
-    const patientId = localStorage.getItem('patientId');
+    // Fetch and display appointments
+    async function fetchAppointments() {
+        const patientId = localStorage.getItem('patientId'); // Retrieve patient ID from localStorage
+        const appointmentContainer = document.getElementById('appointmentContainer');
 
-    // Check if patientId exists in localStorage
-    if (!patientId) {
-        alert('Patient ID not found. Please log in.');
-        window.location.href = '/login'; // Redirect to login page
-    }
-
-    // Automatically fetch and display appointments
-    async function viewAppointments() {
-        const viewMessageElement = document.getElementById('viewMessage');
-        const appointmentsElement = document.getElementById('appointments');
-        const appointmentsList = document.getElementById('appointmentsList');
-        const prescriptionDetails = document.getElementById('prescriptionDetails');
-
-        viewMessageElement.textContent = '';
-        appointmentsList.innerHTML = '';
-        prescriptionDetails.style.display = 'none';
-
-        const url = 'http://localhost:5000/patients/view-appointments/' + patientId;
+        if (!patientId) {
+            appointmentContainer.innerHTML = `
+                    <div class="alert alert-warning text-center" role="alert">
+                        Patient ID not found. Please log in.
+                    </div>
+                `;
+            return;
+        }
 
         try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
+            const response = await fetch(`/patients/view-appointments/${patientId}`, {method: 'GET'});
             const data = await response.json();
 
-            if (response.ok) {
-                if (data.appointments && data.appointments.length > 0) {
-                    data.appointments.forEach(appointment => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `
-                                <strong>Appointment ID:</strong> ${appointment.appointment_id}<br>
-                                <strong>Date:</strong> ${appointment.date}<br>
-                                <strong>Time:</strong> ${appointment.time}<br>
-                                <strong>Reason:</strong> ${appointment.reason}<br>
-                                <strong>Status:</strong> ${appointment.status}<br>
-                                <strong>Doctor ID:</strong> ${appointment.doctor}<br>
-                            `;
+            if (response.ok && data.appointments && data.appointments.length > 0) {
+                appointmentContainer.innerHTML = ''; // Clear existing content
 
-                        if (appointment.status === "Scheduled") {
-                            const cancelButton = document.createElement('button');
-                            cancelButton.textContent = 'Cancel';
-                            cancelButton.onclick = () => cancelAppointment(patientId, appointment.appointment_id);
-                            li.appendChild(cancelButton);
-                        } else if (appointment.status === "Completed") {
-                            const viewPrescriptionButton = document.createElement('button');
-                            viewPrescriptionButton.textContent = 'View Prescription';
-                            viewPrescriptionButton.onclick = () => fetchPrescriptionDetails(appointment.appointment_id);
-                            li.appendChild(viewPrescriptionButton);
-                        }
-                        appointmentsList.appendChild(li);
-                    });
-                } else {
-                    viewMessageElement.style.color = 'red';
-                    viewMessageElement.textContent = 'No appointments found.';
-                }
+                data.appointments.forEach(appointment => {
+                    const card = document.createElement('div');
+                    card.className = 'card mb-3';
+                    card.innerHTML = `
+                            <div class="card-body">
+                                <h5 class="card-title">Doctor: ${appointment.doctor}</h5>
+                                <p class="card-text"><strong>Date:</strong> ${appointment.date}</p>
+                                <p class="card-text"><strong>Time:</strong> ${appointment.time}</p>
+                                <p class="card-text"><strong>Reason:</strong> ${appointment.reason}</p>
+                                <p class="card-text"><strong>Status:</strong> ${appointment.status}</p>
+
+                                 ${appointment.status === 'Completed' ? `
+            <button class="btn btn-primary" onclick="showPrescription('${appointment.appointment_id}')" data-bs-toggle="modal" data-bs-target="#prescriptionModal">
+                View Prescription
+            </button>
+        ` : ''}
+
+   ${appointment.status === 'Scheduled' ? `
+            <button class="btn btn-danger" onclick="askCancelConfirmation('${appointment.appointment_id}')">
+                Cancel Appointment
+            </button>
+        ` : ''}
+                            </div>
+                        `;
+                    appointmentContainer.appendChild(card);
+                });
             } else {
-                viewMessageElement.style.color = 'red';
-                viewMessageElement.textContent = data.error || 'Failed to retrieve appointments.';
+                appointmentContainer.innerHTML = `
+                        <div class="alert alert-info text-center" role="alert">
+                            No appointments found.
+                        </div>
+                    `;
             }
         } catch (error) {
-            viewMessageElement.style.color = 'red';
-            viewMessageElement.textContent = 'An error occurred. Please try again.';
+            appointmentContainer.innerHTML = `
+                    <div class="alert alert-danger text-center" role="alert">
+                        An error occurred while fetching appointments. Please try again.
+                    </div>
+                `;
         }
     }
 
-    async function cancelAppointment(patientId, appointmentId) {
-        const viewMessageElement = document.getElementById('viewMessage');
-        viewMessageElement.textContent = '';
+    // Fetch and display prescription details
+    async function showPrescription(appointmentId) {
+        const prescriptionDetails = document.getElementById('prescriptionDetails');
+        prescriptionDetails.innerHTML = 'Loading...';
 
         try {
-            const response = await fetch('http://localhost:5000/patients/cancel-appointment', {
+            const response = await fetch(`/patients/get_prescription/${appointmentId}`);
+            const prescription = await response.json();
+
+            if (response.ok) {
+                // Dynamically generate the prescription details
+                const date = prescription.date ? new Date(prescription.date).toLocaleString() : 'N/A';
+                prescriptionDetails.innerHTML = `
+                        <div class="mb-3">
+                            <h6>General Information</h6>
+                            <p><strong>Prescription ID:</strong> ${prescription._id}</p>
+                            <p><strong>Date:</strong> ${date}</p>
+                            <p><strong>Status:</strong> ${prescription.status || 'N/A'}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Medications</h6>
+                            <ul class="list-group">
+                                ${prescription.medications && prescription.medications.length
+                    ? prescription.medications.map(med => `
+                                        <li class="list-group-item">
+                                            <strong>Name:</strong> ${med.name}<br>
+                                            <strong>Dosage:</strong> ${med.dosage}<br>
+                                            <strong>Timing:</strong> ${med.timing.join(', ')}<br>
+                                            <strong>Meal Instructions:</strong> ${med.meal_instructions || 'N/A'}
+                                        </li>
+                                    `).join('')
+                    : '<li class="list-group-item">No medications found.</li>'}
+                            </ul>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Test Reports</h6>
+                            <ul class="list-group">
+                                ${prescription.test_report && prescription.test_report.length
+                    ? prescription.test_report.map(report => `
+                                        <li class="list-group-item">
+                                            <strong>Report Name:</strong> ${report.report_name || 'N/A'}<br>
+                                            <strong>Status:</strong> ${report.status || 'N/A'}<br>
+                                            ${report.status === 'Completed' ? `
+                                                <a href="${report.file_path}" class="btn btn-link" target="_blank">Download Report</a>
+                                            ` : ''}
+                                        </li>
+                                    `).join('')
+                    : '<li class="list-group-item">No test reports found.</li>'}
+                            </ul>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Doctor's Notes</h6>
+                            <p>${prescription.notes || 'No notes provided.'}</p>
+                        </div>
+                    `;
+            } else {
+                prescriptionDetails.innerHTML = `<p class="text-danger">${prescription.error}</p>`;
+            }
+        } catch (error) {
+            prescriptionDetails.innerHTML = `
+                    <p class="text-danger">An error occurred while fetching prescription details.</p>
+                `;
+        }
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', fetchAppointments);
+
+    function askCancelConfirmation(appointmentId) {
+        // Display confirmation dialog
+        if (confirm('Are you sure you want to cancel this appointment?')) {
+            // If the user confirms, proceed with the cancellation
+            cancelAppointment(appointmentId);
+        }
+    }
+
+    async function cancelAppointment(appointmentId) {
+        try {
+            const response = await fetch(`/patients/cancel-appointment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({patient_id: patientId, appointment_id: appointmentId})
+                body: JSON.stringify({appointment_id: appointmentId})
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                viewMessageElement.style.color = 'green';
-                viewMessageElement.textContent = data.message || 'Appointment cancelled successfully.';
-                viewAppointments(); // Refresh the appointments list
+                alert('Appointment canceled successfully.');
+
+                window.location.href = `/patients/appointments`;
+
+                // Optionally, refresh the list of appointments or update the UI here
             } else {
-                viewMessageElement.style.color = 'red';
-                viewMessageElement.textContent = data.error || 'Failed to cancel appointment.';
+                alert(data.error || 'Failed to cancel appointment.');
             }
         } catch (error) {
-            viewMessageElement.style.color = 'red';
-            viewMessageElement.textContent = 'An error occurred. Please try again.';
+            console.error('Error canceling appointment:', error);
+            alert('An error occurred while canceling the appointment.');
         }
     }
 
-    async function fetchPrescriptionDetails(appointmentId) {
-        const prescriptionContent = document.getElementById('prescriptionContent');
-        const prescriptionDetails = document.getElementById('prescriptionDetails');
-        const viewMessageElement = document.getElementById('viewMessage');
-
-        prescriptionContent.innerHTML = '';
-        prescriptionDetails.style.display = 'none';
-        viewMessageElement.textContent = '';
-
-        const url = 'http://localhost:5000/patients/get_prescriptions_with_appointments/' + appointmentId;
-
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                prescriptionContent.innerHTML = `
-                    <strong>Prescription ID:</strong> ${data.prescription._id}<br>
-                    <strong>Doctor:</strong> ${data.doctor.name} (${data.doctor.specialization})<br>
-                    <strong>Medications:</strong> ${data.prescription.medications.join(', ')}<br>
-                    <strong>Notes:</strong> ${data.prescription.notes}<br>
-                `;
-                prescriptionDetails.style.display = 'block';
-            } else {
-                viewMessageElement.style.color = 'red';
-                viewMessageElement.textContent = data.error || 'Failed to retrieve prescription details.';
-            }
-        } catch (error) {
-            viewMessageElement.style.color = 'red';
-            viewMessageElement.textContent = 'An error occurred. Please try again.';
-        }
-    }
-
-    // Call viewAppointments on page load to fetch and display the appointments
-    viewAppointments();
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
