@@ -54,14 +54,14 @@
 
             <button type="button" class="btn btn-primary mb-3" onclick="addMedication()">Add More Medication</button>
 
-            <div class="mb-3">
-                <label for="notes" class="form-label">Notes</label>
-                <textarea id="notes" name="notes" class="form-control"></textarea>
+            <div id="testReportsContainer">
+                <h3>Test Reports</h3>
+                <!-- Test report elements will be dynamically added here -->
             </div>
 
             <div class="mb-3">
-                <label for="test_report" class="form-label">Test Reports (JSON Format)</label>
-                <textarea id="test_report" name="test_report" class="form-control"></textarea>
+                <label for="notes" class="form-label">Notes</label>
+                <textarea id="notes" name="notes" class="form-control"></textarea>
             </div>
 
             <div class="mb-3">
@@ -76,6 +76,50 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const doctorId = localStorage.getItem('doctorId');
+            const urlParams = new URLSearchParams(window.location.search);
+            const patientId = urlParams.get('patient_id');
+            const referredAppointmentId = urlParams.get('referred_appointment_id');
+
+            if (doctorId) {
+                document.getElementById('doctor_id').value = doctorId;
+            }
+
+            if (patientId) {
+                document.getElementById('patient_id').value = patientId;
+            }
+
+            if (referredAppointmentId) {
+                document.getElementById('referred_appointment_id').value = referredAppointmentId;
+            }
+
+            // Fetch and populate test reports
+            fetchReports();
+        });
+
+        function fetchReports() {
+            fetch('http://localhost:5000/lab/get-reports')
+                .then(response => response.json())
+                .then(reports => {
+                    const container = document.getElementById('testReportsContainer');
+                    reports.forEach(report => {
+                        const reportDiv = document.createElement('div');
+                        reportDiv.className = 'report mb-3 p-3 border rounded';
+                        reportDiv.innerHTML = `
+                            <div class="mb-3">
+                                <label class="form-label">Test Report: ${report.name}</label>
+                                <input type="checkbox" name="test_reports" value="${report.name}" class="form-check-input">
+                            </div>
+                        `;
+                        container.appendChild(reportDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching reports:', error);
+                });
+        }
+
         function addMedication() {
             const container = document.getElementById('medicationsContainer');
             const medicationDiv = document.createElement('div');
@@ -127,13 +171,15 @@
                 medications.push({ name, dosage, timing, meal_instructions: mealInstructions });
             });
 
+            const testReports = Array.from(document.querySelectorAll('input[name="test_reports"]:checked')).map(el => el.value);
+
             const payload = {
                 doctor_id: formData.get('doctor_id'),
                 patient_id: formData.get('patient_id'),
                 referred_appointment_id: formData.get('referred_appointment_id'),
                 medications: medications,
                 notes: formData.get('notes'),
-                test_report: JSON.parse(formData.get('test_report') || '[]')
+                test_reports: testReports
             };
 
             try {
