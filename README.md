@@ -78,55 +78,92 @@ The **HMS** automates **all aspects** of hospital operations, including:
 - **Emergency Assistance** 🚨: Helps patients take immediate action during emergencies.
 - **Secure Communication** 🔐: All conversations are encrypted for confidentiality.
 
----
+[//]: # ()
+[//]: # (---)
 
-## 🚀 **Installation & Setup**
+[//]: # ()
+[//]: # (## 🚀 **Installation & Setup**)
 
-### Prerequisites:
-- **Node.js** (v14 or later)
-- **MongoDB** (for database)
-- **Express.js** (backend framework)
-- **React.js** (frontend framework)
+[//]: # ()
+[//]: # (### Prerequisites:)
 
-### Steps:
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/yourusername/Hospital-Management-System.git
-   ```
+[//]: # (- **Node.js** &#40;v14 or later&#41;)
 
-2. **Install dependencies**:
-   ```bash
-   cd Hospital-Management-System
-   npm install
-   ```
+[//]: # (- **MongoDB** &#40;for database&#41;)
 
-3. **Configure MongoDB** and set environment variables for database connection.
+[//]: # (- **Express.js** &#40;backend framework&#41;)
 
-4. **Start the server**:
-   ```bash
-   npm start
-   ```
+[//]: # (- **React.js** &#40;frontend framework&#41;)
 
-5. For the frontend:
-   ```bash
-   cd client
-   npm start
-   ```
+[//]: # ()
+[//]: # (### Steps:)
 
----
+[//]: # (1. **Clone the repository**:)
 
-## 🤝 **Contributing**
+[//]: # (   ```bash)
 
-We ❤️ contributions! Whether it’s bug fixes, new features, or improving documentation, your help is always welcome. To contribute:
+[//]: # (   git clone https://github.com/shubhamlathiya/HealthTrack.git)
 
-1. Fork this repo.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes.
-4. Commit your changes (`git commit -am 'Add new feature'`).
-5. Push your branch (`git push origin feature-branch`).
-6. Open a pull request.
+[//]: # (   ```)
 
----
+[//]: # ()
+[//]: # (2. **Install dependencies**:)
+
+[//]: # (   ```bash)
+
+[//]: # (   cd Hospital-Management-System)
+
+[//]: # (   npm install)
+
+[//]: # (   ```)
+
+[//]: # ()
+[//]: # (3. **Configure MongoDB** and set environment variables for database connection.)
+
+[//]: # ()
+[//]: # (4. **Start the server**:)
+
+[//]: # (   ```bash)
+
+[//]: # (   npm start)
+
+[//]: # (   ```)
+
+[//]: # ()
+[//]: # (5. For the frontend:)
+
+[//]: # (   ```bash)
+
+[//]: # (   cd client)
+
+[//]: # (   npm start)
+
+[//]: # (   ```)
+
+[//]: # ()
+[//]: # (---)
+
+[//]: # ()
+[//]: # (## 🤝 **Contributing**)
+
+[//]: # ()
+[//]: # (We ❤️ contributions! Whether it’s bug fixes, new features, or improving documentation, your help is always welcome. To contribute:)
+
+[//]: # ()
+[//]: # (1. Fork this repo.)
+
+[//]: # (2. Create a new branch &#40;`git checkout -b feature-branch`&#41;.)
+
+[//]: # (3. Make your changes.)
+
+[//]: # (4. Commit your changes &#40;`git commit -am 'Add new feature'`&#41;.)
+
+[//]: # (5. Push your branch &#40;`git push origin feature-branch`&#41;.)
+
+[//]: # (6. Open a pull request.)
+
+[//]: # ()
+[//]: # (---)
 
 ## 📚 **License**
 
