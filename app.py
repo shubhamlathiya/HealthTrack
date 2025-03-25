@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, session, jsonify, redirect
 from flask_mail import Mail
 
 from utils.config import init_app
@@ -22,8 +22,16 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 @app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+def index():  # put application's code here
+    return render_template('auth_templates/login_templates.html')
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    session.clear()
+    response = jsonify({'message': 'Logged out successfully!'})
+    response.set_cookie('token', '', expires=0)
+    response = redirect('/')# Clear the cookie
+    return response
 
 
 if __name__ == '__main__':
