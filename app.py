@@ -1,6 +1,7 @@
 from flask import Flask, render_template, session, jsonify, redirect
 from flask_mail import Mail
 
+from controllers.auth_controllers import auth
 from utils.config import init_app
 
 app = Flask(__name__)
@@ -20,6 +21,8 @@ app.config['MAIL_USE_SSL'] = True
 
 # Initialize the mail object
 mail = Mail(app)
+
+app.register_blueprint(auth, url_prefix='/auth')
 
 @app.route('/')
 def index():  # put application's code here
