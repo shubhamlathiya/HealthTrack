@@ -25,6 +25,14 @@ mail = Mail(app)
 def index():  # put application's code here
     return render_template('auth_templates/login_templates.html')
 
+@app.errorhandler(404)
+def handle_404_error(e):
+    return render_template('error_handler/error_404.html')
+
+@app.errorhandler(500)
+def handle_500_error(e):
+    return render_template('error_handler/error_500.html')
+
 @app.route('/logout', methods=['GET'])
 def logout():
     session.clear()
