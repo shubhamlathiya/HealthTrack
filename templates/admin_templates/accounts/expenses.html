@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock title %}
+
+{% block body %}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Expenses by Month</h5>
+                </div>
+                <div class="card-body">
+
+                    <div class="chart-height-lg">
+                        <div id="expenses"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row start -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <!-- Card start -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Summary</h5>
+                </div>
+                <div class="card-body">
+
+                    <!-- Table start -->
+                    <div class="table-responsive">
+                        <table id="customButtons" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>Dealer</th>
+                                <th>Department</th>
+                                <th>Purchase Date</th>
+                                <th>Payment</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>PicoPlus</td>
+                                <td>Jamaal Calhoun</td>
+                                <td>Anatomy</td>
+                                <td>08/05/2024</td>
+                                <td>PayPal</td>
+                                <td>$9980.00</td>
+                                <td><span class="badge bg-success">Approved</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Excel V</td>
+                                <td>Holly Brock</td>
+                                <td>Neurology</td>
+                                <td>12/05/2024</td>
+                                <td>Credit Card</td>
+                                <td>$4678.00</td>
+                                <td><span class="badge bg-warning">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Plasmage</td>
+                                <td>Leona Francis</td>
+                                <td>Orthopedics</td>
+                                <td>17/05/2024</td>
+                                <td>Cheque</td>
+                                <td>$5690.00</td>
+                                <td><span class="badge bg-danger">Rejected</span></td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Spectra</td>
+                                <td>Noah Terrell</td>
+                                <td>Cardiology</td>
+                                <td>23/05/2024</td>
+                                <td>PayPal</td>
+                                <td>$7690.00</td>
+                                <td><span class="badge bg-dark">New</span></td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Ultherapy</td>
+                                <td>Tisha Lin</td>
+                                <td>Neurology</td>
+                                <td>19/05/2024</td>
+                                <td>Cheque</td>
+                                <td>$3470.00</td>
+                                <td><span class="badge bg-success">Approved</span></td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>Ballancer</td>
+                                <td>Vance Schultz</td>
+                                <td>Anatomy</td>
+                                <td>30/05/2024</td>
+                                <td>Debit Card</td>
+                                <td>$8789.00</td>
+                                <td><span class="badge bg-warning">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>Plasmage</td>
+                                <td>Millard Perkins</td>
+                                <td>Gastroenterology</td>
+                                <td>29/05/2024</td>
+                                <td>Credit Card</td>
+                                <td>$3490.00</td>
+                                <td><span class="badge bg-success">Approved</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table end -->
+
+                </div>
+            </div>
+            <!-- Card end -->
+
+        </div>
+    </div>
+    <!-- Row end -->
+{% endblock body %}
+

@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock title %}
+
+{% block body %}
+
+   <!-- Row start -->
+            <div class="row">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <div class="d-flex align-items-end justify-content-between">
+                      <small>Select all checkboxes to send an update.</small>
+                      <button class="btn btn-secondary" disabled>Send to everyone</button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="table-outer">
+                      <div class="table-responsive">
+                        <table class="table align-middle m-0">
+                          <thead>
+                            <tr>
+                              <th>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="checkAll">
+                                </div>
+                              </th>
+                              <th>Invoice No.</th>
+                              <th>Patient</th>
+                              <th>Created Date</th>
+                              <th>Due Date</th>
+                              <th>Status</th>
+                              <th>Money Spent</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check1">
+                                </div>
+                              </td>
+                              <td>#00001</td>
+                              <td>
+                                <div class="fw-semibold">Elisa Shah</div>
+                              </td>
+                              <td>20/04/2024</td>
+                              <td>24/04/2024</td>
+                              <td>$9830.00</td>
+                              <td>
+                                <span class="badge bg-success">Paid</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check2">
+                                </div>
+                              </td>
+                              <td>#00002</td>
+                              <td>
+                                <div class="fw-semibold">Ladonna Jones</div>
+                              </td>
+                              <td>12/04/2024</td>
+                              <td>19/04/2024</td>
+                              <td>$4567.60</td>
+                              <td>
+                                <span class="badge bg-warning">Pending</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check3">
+                                </div>
+                              </td>
+                              <td>#00003</td>
+                              <td>
+                                <div class="fw-semibold">Shelly Daniel</div>
+                              </td>
+                              <td>11/04/2024</td>
+                              <td>18/04/2024</td>
+                              <td>$2908.00</td>
+                              <td>
+                                <span class="badge bg-success">Paid</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check4">
+                                </div>
+                              </td>
+                              <td>#00004</td>
+                              <td>
+                                <div class="fw-semibold">Rich Spears</div>
+                              </td>
+                              <td>19/04/2024</td>
+                              <td>21/04/2024</td>
+                              <td>$3985.00</td>
+                              <td>
+                                <span class="badge bg-danger">Overdue</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check5">
+                                </div>
+                              </td>
+                              <td>#00005</td>
+                              <td>
+                                <div class="fw-semibold">Carey Russo</div>
+                              </td>
+                              <td>20/04/2024</td>
+                              <td>25/04/2024</td>
+                              <td>$8908.00</td>
+                              <td>
+                                <span class="badge bg-success">Paid</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check6">
+                                </div>
+                              </td>
+                              <td>#00006</td>
+                              <td>
+                                <div class="fw-semibold">Emmett Montes</div>
+                              </td>
+                              <td>19/04/2024</td>
+                              <td>22/04/2024</td>
+                              <td>$3452.00</td>
+                              <td>
+                                <span class="badge bg-warning">Pending</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check7">
+                                </div>
+                              </td>
+                              <td>#00007</td>
+                              <td>
+                                <div class="fw-semibold">Cheri Trujillo</div>
+                              </td>
+                              <td>28/04/2024</td>
+                              <td>30/05/2024</td>
+                              <td>$6530.00</td>
+                              <td>
+                                <span class="badge bg-success">Paid</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check8">
+                                </div>
+                              </td>
+                              <td>#00008</td>
+                              <td>
+                                <div class="fw-semibold">Hans Hayes</div>
+                              </td>
+                              <td>12/05/2024</td>
+                              <td>27/05/2024</td>
+                              <td>$6750.00</td>
+                              <td>
+                                <span class="badge bg-warning">Pending</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check9">
+                                </div>
+                              </td>
+                              <td>#00009</td>
+                              <td>
+                                <div class="fw-semibold">Dena Ramsey</div>
+                              </td>
+                              <td>13/06/2024</td>
+                              <td>26/06/2024</td>
+                              <td>$5490.00</td>
+                              <td>
+                                <span class="badge bg-warning">Pending</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="form-check m-0">
+                                  <input class="form-check-input" type="checkbox" value="" id="check10">
+                                </div>
+                              </td>
+                              <td>#000010</td>
+                              <td>
+                                <div class="fw-semibold">Reed Case</div>
+                              </td>
+                              <td>02/06/2024</td>
+                              <td>24/06/2024</td>
+                              <td>$3379.00</td>
+                              <td>
+                                <span class="badge bg-success">Paid</span>
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-sm">
+                                  Send Mail
+                                </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Row end -->
+{% endblock body %}
+

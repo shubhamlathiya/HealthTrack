@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock title %}
+
+{% block body %}
+
+  <!-- Row starts -->
+            <div class="row gx-4">
+              <div class="col-sm-12">
+                <div class="card">
+                  <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                      <table id="scrollVertical2" class="table m-0 align-middle">
+                        <thead>
+                          <tr>
+                            <th>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="">
+                              </div>
+                            </th>
+                            <th>Driver Name</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                            <th>Location</th>
+                            <th>Driver ID</th>
+                            <th>Vehicle No</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check1">
+                              </div>
+                            </td>
+                            <td>Deena Cooley</td>
+                            <td>
+                              <span class="badge bg-warning-subtle text-warning">Female</span>
+                            </td>
+                            <td>24/06/1985</td>
+                            <td>Glucksman</td>
+                            <td>DRV-24</td>
+                            <td>AMB-67CG</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check2">
+                              </div>
+                            </td>
+                            <td>Cara Fowler</td>
+                            <td>
+                              <span class="badge bg-warning-subtle text-warning">Female</span>
+                            </td>
+                            <td>24/06/1992</td>
+                            <td>Kaufman</td>
+                            <td>DRV-31</td>
+                            <td>AMB-334X</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check3">
+                              </div>
+                            </td>
+                            <td>Helene Stone</td>
+                            <td>
+                              <span class="badge bg-info-subtle text-info">Male</span>
+                            </td>
+                            <td>24/06/1976</td>
+                            <td>Palladium</td>
+                            <td>DRV-42</td>
+                            <td>AMB-BV56</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check4">
+                              </div>
+                            </td>
+                            <td>Royce Joseph</td>
+                            <td>
+                              <span class="badge bg-warning-subtle text-warning">Female</span>
+                            </td>
+                            <td>24/06/1988</td>
+                            <td>Rufus</td>
+                            <td>DRV-39</td>
+                            <td>AMB-YT50</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check5">
+                              </div>
+                            </td>
+                            <td>Betty Knapp</td>
+                            <td>
+                              <span class="badge bg-info-subtle text-info">Male</span>
+                            </td>
+                            <td>24/06/1992</td>
+                            <td>Tikvah</td>
+                            <td>DRV-10</td>
+                            <td>AMB-MN68</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check6">
+                              </div>
+                            </td>
+                            <td>Ingrid Andersen</td>
+                            <td>
+                              <span class="badge bg-warning-subtle text-warning">Female</span>
+                            </td>
+                            <td>24/06/1984</td>
+                            <td>Weinstein</td>
+                            <td>DRV-24</td>
+                            <td>AMB-67CG</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check7">
+                              </div>
+                            </td>
+                            <td>Alfreda Crosby</td>
+                            <td>
+                              <span class="badge bg-warning-subtle text-warning">Female</span>
+                            </td>
+                            <td>24/06/1988</td>
+                            <td>Lafayette</td>
+                            <td>DRV-08</td>
+                            <td>AMB-CDG5</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check8">
+                              </div>
+                            </td>
+                            <td>Whitney Riley</td>
+                            <td>
+                              <span class="badge bg-info-subtle text-info">Male</span>
+                            </td>
+                            <td>24/06/1967</td>
+                            <td>Kevorkian</td>
+                            <td>DRV-03</td>
+                            <td>AMB-MRS5</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check9">
+                              </div>
+                            </td>
+                            <td>Nadia Pierce</td>
+                            <td>
+                              <span class="badge bg-info-subtle text-info">Male</span>
+                            </td>
+                            <td>24/06/1978</td>
+                            <td>Steinhardt</td>
+                            <td>DRV-33</td>
+                            <td>AMB-VC83</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" value="" id="check10">
+                              </div>
+                            </td>
+                            <td>Elvis Morales</td>
+                            <td>
+                              <span class="badge bg-info-subtle text-info">Male</span>
+                            </td>
+                            <td>24/06/1980</td>
+                            <td>Kimmel</td>
+                            <td>DRV-17</td>
+                            <td>AMB-67DG</td>
+                            <td>
+                              <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-hover btn-sm rounded-5" data-bs-toggle="modal"
+                                  data-bs-target="#delRow">
+                                  <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                    data-bs-title="Delete Driver Details">
+                                    <i class="ri-delete-bin-line"></i>
+                                  </span>
+                                </button>
+                                <a href="edit-driver.html" class="btn btn-hover btn-sm rounded-5"
+                                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Driver Details">
+                                  <i class="ri-edit-box-line"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- Modal Delete Row -->
+                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="delRowLabel">
+                              Confirm
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            Are you sure you want to delete the patient details?
+                          </div>
+                          <div class="modal-footer">
+                            <div class="d-flex justify-content-end gap-2">
+                              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                aria-label="Close">No</button>
+                              <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                                aria-label="Close">Yes</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Row ends -->
+
+{% endblock body %}
+

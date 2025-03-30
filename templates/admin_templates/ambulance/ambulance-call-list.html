@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock title %}
+
+{% block body %}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="basicExample" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="checkAll">
+                                    </div>
+                                </th>
+                                <th>Case No.</th>
+                                <th>Patient Name</th>
+                                <th>Gender</th>
+                                <th>Age</th>
+                                <th>Date & Time</th>
+                                <th>Location</th>
+                                <th>Driver ID</th>
+                                <th>Vehicle No</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check1">
+                                    </div>
+                                </td>
+                                <td>#89990</td>
+                                <td>Deena Cooley</td>
+                                <td>
+                                    <span class="badge bg-warning-subtle text-warning">Female</span>
+                                </td>
+                                <td>35</td>
+                                <td>24/06/2024 - 2:30PM</td>
+                                <td>Glucksman</td>
+                                <td>DRV-24</td>
+                                <td>AMB-67CG</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-primary">Paid</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check2">
+                                    </div>
+                                </td>
+                                <td>#89991</td>
+                                <td>Cara Fowler</td>
+                                <td>
+                                    <span class="badge bg-warning-subtle text-warning">Female</span>
+                                </td>
+                                <td>56</td>
+                                <td>24/06/2024 - 2:32PM</td>
+                                <td>Kaufman</td>
+                                <td>DRV-31</td>
+                                <td>AMB-334X</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-primary">Paid</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check3">
+                                    </div>
+                                </td>
+                                <td>#89992</td>
+                                <td>Helene Stone</td>
+                                <td>
+                                    <span class="badge bg-info-subtle text-info">Male</span>
+                                </td>
+                                <td>67</td>
+                                <td>24/06/2024 - 2:35PM</td>
+                                <td>Palladium</td>
+                                <td>DRV-42</td>
+                                <td>AMB-BV56</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-info">Free</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check4">
+                                    </div>
+                                </td>
+                                <td>#89995</td>
+                                <td>Royce Joseph</td>
+                                <td>
+                                    <span class="badge bg-warning-subtle text-warning">Female</span>
+                                </td>
+                                <td>35</td>
+                                <td>24/06/2024 - 2:40PM</td>
+                                <td>Rufus</td>
+                                <td>DRV-39</td>
+                                <td>AMB-YT50</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-primary">Paid</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check5">
+                                    </div>
+                                </td>
+                                <td>#89996</td>
+                                <td>Betty Knapp</td>
+                                <td>
+                                    <span class="badge bg-info-subtle text-info">Male</span>
+                                </td>
+                                <td>22</td>
+                                <td>24/06/2024 - 2:48PM</td>
+                                <td>Tikvah</td>
+                                <td>DRV-10</td>
+                                <td>AMB-MN68</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-primary">Paid</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check6">
+                                    </div>
+                                </td>
+                                <td>#89996</td>
+                                <td>Ingrid Andersen</td>
+                                <td>
+                                    <span class="badge bg-warning-subtle text-warning">Female</span>
+                                </td>
+                                <td>95</td>
+                                <td>24/06/2024 - 2:51PM</td>
+                                <td>Weinstein</td>
+                                <td>DRV-24</td>
+                                <td>AMB-67CG</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-info">Free</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check7">
+                                    </div>
+                                </td>
+                                <td>#89998</td>
+                                <td>Alfreda Crosby</td>
+                                <td>
+                                    <span class="badge bg-warning-subtle text-warning">Female</span>
+                                </td>
+                                <td>49</td>
+                                <td>24/06/2024 - 2:58PM</td>
+                                <td>Lafayette</td>
+                                <td>DRV-08</td>
+                                <td>AMB-CDG5</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-primary">Paid</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check8">
+                                    </div>
+                                </td>
+                                <td>#89999</td>
+                                <td>Whitney Riley</td>
+                                <td>
+                                    <span class="badge bg-info-subtle text-info">Male</span>
+                                </td>
+                                <td>75</td>
+                                <td>24/06/2024 - 3:31PM</td>
+                                <td>Kevorkian</td>
+                                <td>DRV-03</td>
+                                <td>AMB-MRS5</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-primary">Paid</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check9">
+                                    </div>
+                                </td>
+                                <td>#89978</td>
+                                <td>Nadia Pierce</td>
+                                <td>
+                                    <span class="badge bg-info-subtle text-info">Male</span>
+                                </td>
+                                <td>86</td>
+                                <td>24/06/2024 - 3:47PM</td>
+                                <td>Steinhardt</td>
+                                <td>DRV-33</td>
+                                <td>AMB-VC83</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-primary">Paid</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" value="" id="check10">
+                                    </div>
+                                </td>
+                                <td>#89934</td>
+                                <td>Elvis Morales</td>
+                                <td>
+                                    <span class="badge bg-info-subtle text-info">Male</span>
+                                </td>
+                                <td>86</td>
+                                <td>24/06/2024 - 3:52PM</td>
+                                <td>Kimmel</td>
+                                <td>DRV-17</td>
+                                <td>AMB-67DG</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-secondary text-body">Cancelled</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+{% endblock body %}
+
