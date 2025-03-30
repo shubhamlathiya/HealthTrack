@@ -12,6 +12,7 @@ from utils.config import mongo
 def login_patient():
     if request.method == 'POST':
         data = request.get_json()
+        print(data)
         email = data.get('email')
         password = data.get('password')
 

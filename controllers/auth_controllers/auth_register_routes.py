@@ -14,6 +14,7 @@ from utils.email_utils import send_email
 def register_patient():
     if request.method == 'POST':
         data = request.get_json()
+        print(data)
         existing_patient = mongo.db.users.find_one({'email': data['email']})
         if existing_patient:
             return jsonify({'error': 'Email already registered'}), 400
