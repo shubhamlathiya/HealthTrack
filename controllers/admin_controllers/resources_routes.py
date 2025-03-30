@@ -3,9 +3,8 @@ from datetime import datetime
 
 from bson import ObjectId
 from flask import jsonify, request, render_template, redirect
-
-from api.admin import admin
-from config import mongo
+from controllers.admin_controllers import admin
+from utils.config import mongo
 
 
 @admin.route('/add-resources', methods=['GET', 'POST'])

@@ -1,8 +1,8 @@
 from bson import ObjectId
 from flask import render_template, jsonify, request
 
-from api.admin import admin
-from config import mongo
+from controllers.admin_controllers import admin
+from utils.config import mongo
 from middleware.auth_middleware import token_required
 
 

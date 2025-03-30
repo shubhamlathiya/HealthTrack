@@ -2,8 +2,8 @@ from datetime import datetime
 from bson import ObjectId
 from flask import jsonify, request, render_template
 
-from api.admin import admin
-from config import mongo
+from controllers.admin_controllers import admin
+from utils.config import mongo
 from middleware.auth_middleware import token_required
 
 

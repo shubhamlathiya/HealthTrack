@@ -2,8 +2,8 @@ from datetime import datetime
 
 from flask import jsonify, request, render_template
 
-from api.admin import admin
-from config import mongo
+from controllers.admin_controllers import admin
+from utils.config import mongo
 
 
 @admin.route('/add-operation', methods=['GET','POST'])

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, session, jsonify, redirect
 from flask_mail import Mail
 
+from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
 from utils.config import init_app
 
@@ -23,7 +24,7 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 app.register_blueprint(auth, url_prefix='/auth')
-
+app.register_blueprint(admin, url_prefix='/admin')
 @app.route('/')
 def index():  # put application's code here
     return render_template('auth_templates/login_templates.html')

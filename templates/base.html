@@ -1,219 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthTrack - {% block title %}{% endblock title %}</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clove Dental Care Admin Template</title>
+
+    <!-- Meta -->
+    <meta name="description" content="Marketplace for Bootstrap Admin Dashboards">
+    <meta property="og:title" content="Admin Templates - Dashboard Templates">
+    <meta property="og:description" content="Marketplace for Bootstrap Admin Dashboards">
+    <meta property="og:type" content="Website">
+    <link rel="shortcut icon" href="../static/assets/images/favicon.svg">
+
+    <!-- *************
+		************ CSS Files *************
+	  ************* -->
+    <link rel="stylesheet" href="../static/assets/fonts/remix/remixicon.css">
+    <link rel="stylesheet" href="../static/assets/css/main.min.css">
+
+    <!-- *************
+		************ Vendor Css Files *************
+	  ************ -->
+
+    <!-- Scrollbar CSS -->
+    <link rel="stylesheet" href="../static/assets/vendor/overlay-scroll/OverlayScrollbars.min.css">
+
+    <!-- Date Range CSS -->
+    <link rel="stylesheet" href="../static/assets/vendor/daterange/daterange.css">
 
 </head>
+
 <body>
 
-<div class="container-fluid">
-    <div class="row">
+{% include './layout/loading.html' %}
+<!-- Page wrapper starts -->
+<div class="page-wrapper">
 
-        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-            <div class="position-sticky">
-                {% if  session['role'] == 'patient' %}
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/patient/dashboard">
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/patient/book-Appointment">
-                                book-Appointment
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/patient/upload-patient-reports">
-                                View reports
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/chat/chat">
-                                Chat
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/patient/get-visitors">
-                                Visitor
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/patient/get-appointments">
-                                view Appointments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/patient/operation-request">
-                                Operation Request
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/patient/get-profile">
-                                Profile
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/logout">
-                                Logout
-                            </a>
-                        </li>
-                    </ul>
-                {% elif session['role'] == 'admin' %}
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/dashboard">
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/search">
-                                User Search
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/admin/view-departments">
-                                Department
-                            </a>
+    <!-- Main container starts -->
+    <div class="main-container">
 
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/admin/get-resources">
-                                Resources
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/view-doctors">
-                                View Doctor
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/view-staff">
-                                View Staff
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/get-operations">
-                                View Operation
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/view-patients">
-                                View patients
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/admin/leave/applications">
-                                View leave
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/logout">
-                                Logout
-                            </a>
-                        </li>
-                    </ul>
-                {% elif session['role'] == 'doctor' %}
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/doctor/dashboard">
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/search">
-                                User Search
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/doctor/get-all-appointments">
-                                today's Appointments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/doctor/get-all-booked-appointments">
-                                view all Appointments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/doctor/get-referring-appointments">
-                                Referred Appointments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/doctor/get-forward-appointment">
-                                Forwarded Appointments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/doctor/get-all-operation-request">
-                                Generate Operation Request
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/doctor/get-teams">
-                                Team creation
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/chat/chat">
-                                Chat
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/admin/staff/leave/apply">
-                                Apply leave
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/logout">
-                                Logout
-                            </a>
-                        </li>
-                    </ul>
-                {% elif session['role'] == 'laboratory' %}
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/doctor/dashboard">
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/search">
-                                User Search
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/laboratory/prescriptions-pending-test-reports">
-                                laboratory
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/logout">
-                                Logout
-                            </a>
-                        </li>
-                    </ul>
-                {% endif %}
+        <!-- Sidebar wrapper starts -->
+        {% include './layout/sidebar_menu.html' %}
+
+        <!-- App container starts -->
+        <div class="app-container">
+
+            <!-- App header starts -->
+            <div class="app-header d-flex align-items-center">
+
+                <!-- Brand container sm starts -->
+                <div class="brand-container-sm d-xl-none d-flex align-items-center">
+
+                    <!-- App brand starts -->
+                    <div class="app-brand">
+                        <a href="index.html">
+                            <img src="../static/assets/images/logo.svg" class="logo" alt="Dental Care Admin Template">
+                        </a>
+                    </div>
+                    <!-- App brand ends -->
+
+                    <!-- Toggle sidebar starts -->
+                    <button type="button" class="toggle-sidebar">
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <!-- Toggle sidebar ends -->
+
+                </div>
+                <!-- Brand container sm ends -->
+
+                <!-- Search container starts -->
+                <div class="search-container d-xl-block d-none">
+                    <input type="text" class="form-control" id="searchId" placeholder="Search">
+                    <i class="ri-search-line"></i>
+                </div>
+                <!-- Search container ends -->
+
+                <!-- App header actions starts -->
+                {% include './layout/header.html' %}
+                <!-- App header actions ends -->
+
             </div>
-        </nav>
+            <!-- App header ends -->
 
-        {% block body %} {% endblock body %}
+            <!-- App hero header starts -->
+            <div class="app-hero-header d-flex align-items-center">
+
+                <!-- Breadcrumb starts -->
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="index.html">
+                            <i class="ri-home-3-line"></i>
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item text-primary" aria-current="page">
+                        Default Page
+                    </li>
+                </ol>
+                <!-- Breadcrumb ends -->
+
+                <!-- Sales stats starts -->
+                <div class="ms-auto d-lg-flex d-none flex-row">
+                    <div class="input-group">
+                <span class="input-group-text bg-primary-lighten">
+                  <i class="ri-calendar-2-line text-primary"></i>
+                </span>
+                        <input type="text" id="abc" class="form-control custom-daterange">
+                    </div>
+                </div>
+                <!-- Sales stats ends -->
+
+            </div>
+            <!-- App Hero header ends -->
+
+            <!-- App body starts -->
+            <div class="app-body">
+                {% block body %} {% endblock body %}
+
+            </div>
+            <!-- App body ends -->
+
+            <!-- App footer starts -->
+            {% include './layout/footer.html' %}
+            <!-- App footer ends -->
+
+        </div>
+        <!-- App container ends -->
 
     </div>
-</div>
+    <!-- Main container ends -->
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</div>
+<!-- Page wrapper ends -->
+
+<!-- *************
+        ************ JavaScript Files *************
+    ************* -->
+<!-- Required jQuery first, then Bootstrap Bundle JS -->
+<script src="../static/assets/js/jquery.min.js"></script>
+<script src="../static/assets/js/bootstrap.bundle.min.js"></script>
+<script src="../static/assets/js/moment.min.js"></script>
+
+<!-- *************
+        ************ Vendor Js Files *************
+    ************* -->
+
+<!-- Overlay Scroll JS -->
+<script src="../static/assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js"></script>
+<script src="../static/assets/vendor/overlay-scroll/custom-scrollbar.js"></script>
+
+<!-- Date Range JS -->
+<script src="../static/assets/vendor/daterange/daterange.js"></script>
+<script src="../static/assets/vendor/daterange/custom-daterange.js"></script>
+
+<!-- Custom JS files -->
+<script src="../static/assets/js/custom.js"></script>
 </body>
 </html>

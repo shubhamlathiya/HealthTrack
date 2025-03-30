@@ -1,7 +1,7 @@
 from flask import jsonify,request
 
-from api.admin import admin
-from config import mongo
+from controllers.admin_controllers import admin
+from utils.config import mongo
 
 
 @admin.route('/add-room', methods=['POST'])

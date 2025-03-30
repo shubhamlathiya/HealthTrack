@@ -5,9 +5,9 @@ from bson import ObjectId
 from flask import redirect, jsonify, render_template, request
 from werkzeug.security import generate_password_hash
 
-from api.admin import admin
-from config import mongo
-from email_utils import send_email
+from controllers.admin_controllers import admin
+from utils.config import mongo
+from utils.email_utils import send_email
 from middleware.auth_middleware import token_required
 
 

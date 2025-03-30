@@ -1,5 +1,7 @@
 from flask import Blueprint
 
+from utils.config import mongo
+
 # Initialize the 'client' blueprint
 admin = Blueprint('admin', __name__)
 
