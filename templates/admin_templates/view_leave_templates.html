@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin View Docotr{% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <!-- Button to Add New Department -->
+
+
+            <!-- Departments Table -->
+            <table id="departmentsTable" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Leave Type</th>
+                    <th>Reason</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Created At</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="departmentsBody">
+                {% for application in applications %}
+                    <tr>
+                        <td>{{ application.user_name }}</td>
+                        <td>{{ application.user_email }}</td>
+                        <td>{{ application.status }}</td>
+                        <td>{{ application.leave_type }}</td>
+                        <td>{{ application.reason }}</td>
+                        <td>{{ application.start_date }}</td>
+                        <td>{{ application.end_date }}</td>
+                        <td>
+                            <!-- Toggle the checkbox based on the department's status -->
+                            <input type="checkbox" class="js-switch" {% if application.status %}checked{% endif %}
+                                   onchange="toggleStatus('{{ application._id }}', this.checked)">
+                        </td>
+                        <td>{{ application.created_at }}</td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <script>
+            function toggleStatus(userId, isChecked) {
+                // Prepare the data to send
+                const status = isChecked ? 'true' : 'false';
+
+                // Send an AJAX POST request to the Flask route
+                fetch('/admin/user_status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({user_id: userId, status: status})
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Status updated successfully!');
+                        } else {
+                            alert('Error updating status.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        </script>
+    </main>
+{% endblock body %}
+

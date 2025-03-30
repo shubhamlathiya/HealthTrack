@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Add Department{% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <h1 class="text-center">Add Department</h1>
+            <form id="addDepartmentForm" method="post" action="/admin/add-department">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Department Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Add Department</button>
+            </form>
+
+        </div>
+    </main>
+{% endblock body %}
+

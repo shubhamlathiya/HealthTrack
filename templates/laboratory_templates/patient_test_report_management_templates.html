@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Prescription and Test Report Management{% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <h1 class="text-center">Prescription and Test Report Management</h1>
+
+            <!-- Section to view pending prescriptions -->
+            <h2 class="mt-5">Pending Prescriptions</h2>
+            {% if error %}
+                <h3>{{ error }}</h3>
+            {% else %}
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Test Report Name</th>
+                        <th>Test Report Price</th>
+                        <th>Test Report Status</th>
+                        <th>Patient Name</th>
+                        <th>Patient Email</th>
+                        <th>Patient Contact</th>
+                        <th>Doctor Name</th>
+                        <th>Doctor Email</th>
+                        <th>Doctor Contact</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for prescription in prescriptions %}
+                        <tr>
+                            <td>{{ prescription.test_reports[0].test_reports_report_name }}</td>
+                            <td>{{ prescription.test_reports[0].test_reports_price }}</td>
+                            <td>{{ prescription.test_reports[0].status_reports }}</td>
+                            <td>{{ prescription.patient_name }}</td>
+                            <td>{{ prescription.patient_email }}</td>
+                            <td>{{ prescription.patient_contact }}</td>
+                            <td>{{ prescription.doctor_name }}</td>
+                            <td>{{ prescription.doctor_email }}</td>
+                            <td>{{ prescription.doctor_contact }}</td>
+                            <td>
+                                <!-- Button to trigger file upload modal -->
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal"
+                                        onclick="setPrescriptionId('{{ prescription._id }}', '{{ prescription.test_reports[0].report_id }}')">
+                                    Add Report File
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+
+        <!-- File Upload Modal -->
+        <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="uploadModalLabel">Upload Test Report</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- File upload form -->
+                        <form id="uploadReportForm" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="reportFile">Select Test Report File</label>
+                                <input type="file" class="form-control" id="reportFile" name="file" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Report Status</label>
+                                <select class="form-control" id="status" name="status">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                            </div>
+                            <input type="hidden" id="prescriptionId" name="prescription_id">
+                            <input type="hidden" id="reportId" name="report_id">
+                            <button type="submit" class="btn btn-primary">Upload Report</button>
+                        </form>
+                        <div id="error-message" class="error mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Set prescription ID and report ID in hidden inputs when "Add Report File" button is clicked
+            function setPrescriptionId(prescriptionId, reportId) {
+                document.getElementById('prescriptionId').value = prescriptionId;
+                document.getElementById('reportId').value = reportId;
+            }
+
+            // Handle the file upload form submission
+            $(document).ready(function () {
+                $('#uploadReportForm').on('submit', function (e) {
+                    e.preventDefault(); // Prevent default form submission
+
+                    let formData = new FormData(this); // Create a FormData object to send the file and other form data
+
+                    // Make sure prescription_id and report_id are both included in the request
+                    if (!formData.get('prescription_id') || !formData.get('report_id')) {
+                        $('#error-message').text('Prescription ID and Report ID are required').show();
+                        return;
+                    }
+
+                    // Make an AJAX request to upload the file
+                    $.ajax({
+                        url: '/laboratory/upload-test-report', // API endpoint for file upload
+                        type: 'POST',
+                        data: formData,
+                        contentType: false, // Important for file upload
+                        processData: false, // Important for file upload
+                        success: function (response) {
+                            alert(response.message); // Display success message
+                            window.location.href = "/laboratory/prescriptions-pending-test-reports";
+                            $('#uploadModal').modal('hide'); // Close the modal
+                        },
+                        error: function (error) {
+                            // Display error message if there's an issue
+                            $('#error-message').text(error.responseJSON.error || 'An error occurred').show();
+                        }
+                    });
+                });
+            });
+        </script>
+
+    </main>
+
+{% endblock body %}
+

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Resource{% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <h2>Add Resource</h2>
+            <form id="addResourceForm" method="post" action="/admin/add-resources">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Resource Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter resource name"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="department_id" class="form-label">Department</label>
+                    <select class="form-control" id="department_id" name="department_id" required>
+                        <option value="">Select Department</option>
+                        {% for department in departments %}
+                            <option value="{{ department._id }}">{{ department.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="maintenance" class="form-label">Maintenance</label>
+                    <input type="text" class="form-control" id="maintenance" name="maintenance"
+                           placeholder="Enter maintenance information">
+                </div>
+
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <textarea class="form-control" id="notes" rows="3" name="notes"
+                              placeholder="Additional notes about the resource"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Resource</button>
+            </form>
+
+        </div>
+
+    </main>
+{% endblock body %}

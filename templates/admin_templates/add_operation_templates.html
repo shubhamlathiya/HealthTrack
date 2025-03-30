@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Operation added{% endblock title %}
+
+{% block body %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <h2>Add Operation to Hospital</h2>
+            <form id="addOperationForm">
+                <div class="mb-3">
+                    <label for="operationType" class="form-label">Operation Type</label>
+                    <input type="text" class="form-control" id="operationType" required>
+                </div>
+                <div class="mb-3">
+                    <label for="operationPrice" class="form-label">Price</label>
+                    <input type="number" class="form-control" id="operationPrice" required>
+                </div>
+                <div class="mb-3">
+                    <label for="operationBenefits" class="form-label">Benefits</label>
+                    <textarea class="form-control" id="operationBenefits" rows="3" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success mt-3">Add Operation</button>
+            </form>
+            <div id="statusMessage" class="mt-3"></div>
+        </div>
+
+        <script>
+            // Handle form submission
+            document.getElementById('addOperationForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Get form data
+                const operationType = document.getElementById('operationType').value;
+                const operationPrice = document.getElementById('operationPrice').value;
+                const operationBenefits = document.getElementById('operationBenefits').value;
+
+                // Prepare data to send to the backend
+                const operationData = {
+                    operation_type: operationType,
+                    price: operationPrice,
+                    benefits: operationBenefits,
+                };
+
+                // Send data to Flask backend (POST request)
+                fetch('/admin/add-operation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(operationData),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display success message
+                        document.getElementById('statusMessage').innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                        // Reset form after submission
+                        document.getElementById('addOperationForm').reset();
+                    })
+                    .catch(error => {
+                        // Display error message
+                        document.getElementById('statusMessage').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+                    });
+            });
+        </script>
+
+    </main>
+{% endblock body %}
+
+

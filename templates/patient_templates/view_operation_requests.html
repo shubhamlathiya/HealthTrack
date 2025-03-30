@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient View Operation Requests{% endblock title %}
+
+{% block body %}
+<main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Loop through each operation request -->
+            {% for request in operation_requests %}
+                <div class="col-md-4 mb-4">
+                    <!-- Card for displaying each operation request -->
+                    <div class="card shadow-sm border-light">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title">Operation Request for Doctor: {{ request.doctor_details.name }}</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <h5>Status: {{ request.status }}</h5>
+                            <!-- Operation Time -->
+                            <p><strong>Operation Time:</strong> {{ request.operation_time }}</p>
+                            <!-- Doctor Details -->
+                            <h6 class="font-weight-bold">Doctor Information:</h6>
+                            <p><strong>Name:</strong> {{ request.doctor_details.name }}</p>
+                            <p><strong>Email:</strong> {{ request.doctor_details.email }}</p>
+                            <p><strong>Phone:</strong> {{ request.doctor_details.mobile_number }}</p>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Operation Details -->
+                            <h6 class="font-weight-bold">Operation Details:</h6>
+                            <p><strong>Operation Type:</strong> {{ request.operation_details.operation_type }}</p>
+                            <p><strong>Price:</strong> ₹{{ request.operation_details.price }}</p>
+                            <p><strong>Benefits:</strong> {{ request.operation_details.benefits }}</p>
+                        </div>
+
+                        <div class="card-footer">
+                            <!-- Team Details -->
+                            <h6 class="font-weight-bold">Team Details:</h6>
+                            <p><strong>Team Name:</strong> {{ request.team_details.team_name }}</p>
+                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#teamModal{{ loop.index }}">View Team Details</button>
+
+                            <!-- Buttons to Accept or Reject (only for pending requests) -->
+                            {% if request.status == 'pending' %}
+                            <div class="d-flex justify-content-between mt-3">
+                                <button class="btn btn-success" onclick="window.location.href='/patient/accept-operation/{{ request._id }}'">Accept</button>
+                                <button class="btn btn-danger" onclick="window.location.href='/patient/reject-operation/{{ request._id }}'">Reject</button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Modal -->
+                <div class="modal fade" id="teamModal{{ loop.index }}" tabindex="-1" aria-labelledby="teamModalLabel{{ loop.index }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="teamModalLabel{{ loop.index }}">Team Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Team Name:</strong> {{ request.team_details.team_name }}</p>
+                                <h6>Members:</h6>
+                                <ul class="list-unstyled">
+                                    {% for member in request.team_details.members %}
+                                        <li class="mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <strong>{{ member.role }}:</strong> {{ member.user_id }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+{% endblock body %}

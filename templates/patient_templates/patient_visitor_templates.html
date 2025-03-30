@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Visitor Management{% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <h2 class="mb-4">Visitor Management</h2>
+            <form id="addVisitorForm" class="mb-4" method="post" action="/patient/add-visitor">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Visitor Name</label>
+                    <input type="text" id="name" name="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="relationship" class="form-label">Relationship</label>
+                    <input type="text" id="relationship" name="relationship" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="contact" class="form-label">Contact</label>
+                    <input type="text" id="contact" name="contact" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Visitor</button>
+            </form>
+
+            <div id="message" class="text-danger mb-4"></div>
+
+            <h3>Visitors</h3>
+            {% if error %}
+                {{ error }}
+            {% endif %}
+            <table id="visitorTable" class="table table-bordered table-hover mt-3">
+                <thead class="thead-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Relationship</th>
+                    <th>Contact</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="visitorList">
+                {% for visitor in visitors %}
+                    <tr>
+                        <th>{{ visitor.name }}</th>
+                        <th>{{ visitor.relationship }}</th>
+                        <th>{{ visitor.contact }}</th>
+                        <th><a href="/patient/remove-visitor/{{ visitor._id }}" onclick="alert('can you deleted this one')">Deleted</a></th>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+{% endblock body %}
+
+
+
+
+

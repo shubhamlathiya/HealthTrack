@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient view Appointment {% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <h2 class="text-center mb-4">Appointment Details</h2>
+            {% if error %}
+                {{ error }}
+            {% endif %}
+            <div id="appointmentContainer" class="row">
+                <!-- Loop through appointments and display each in a card -->
+                {% for appointment in appointments %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title">Doctor: {{ appointment.doctor_name }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"><strong>Date:</strong> {{ appointment.appointment_date }}</p>
+                                <p class="card-text"><strong>Time:</strong> {{ appointment.appointment_time }}</p>
+                                <p class="card-text"><strong>Reason:</strong> {{ appointment.reason }}</p>
+                                <p class="card-text"><strong>Status:</strong> {{ appointment.status }}</p>
+
+                                <div class="d-grid gap-2">
+                                    {% if appointment.status == 'Completed' %}
+                                        <button class="btn btn-primary"
+                                                onclick="showPrescription('{{ appointment.appointment_id }}')"
+                                                data-bs-toggle="modal" data-bs-target="#prescriptionModal">
+                                            View Prescription
+                                        </button>
+                                        <button class="btn btn-secondary"
+                                                onclick="openFeedbackModal('{{ appointment.appointment_id }}', '{{ appointment.doctor_id }}')">
+                                            Provide Feedback
+                                        </button>
+                                    {% elif appointment.status != 'Cancelled' %}
+                                        <button class="btn btn-danger"
+                                                onclick="askCancelConfirmation('{{ appointment.appointment_id }}')">
+                                            Cancel Appointment
+                                        </button>
+                                    {% endif %}
+                                    <a href="/chat/start_conversation/{{ appointment.doctor_id }}">Conversation Chat</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Modal for Prescription Details -->
+        <div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="prescriptionModalLabel">Prescription Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="prescriptionDetails">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Feedback Submission -->
+        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="feedbackModalLabel">Submit Feedback</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="feedbackForm">
+                            <div class="mb-3">
+                                <label for="doctorCommunication" class="form-label">Doctor Communication</label>
+                                <select class="form-select" id="doctorCommunication" required>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Average">Average</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="doctorProfessionalism" class="form-label">Doctor Professionalism</label>
+                                <select class="form-select" id="doctorProfessionalism" required>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Average">Average</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="overallSatisfaction" class="form-label">Overall Satisfaction</label>
+                                <select class="form-select" id="overallSatisfaction" required>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Average">Average</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <input type="hidden" id="appointmentId">
+                            <input type="hidden" id="doctorId">
+                            <button type="submit" class="btn btn-primary w-100">Submit Feedback</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            // Fetch and display prescription details
+            async function showPrescription(appointmentId) {
+                const prescriptionDetails = document.getElementById('prescriptionDetails');
+                prescriptionDetails.innerHTML = 'Loading...';
+
+                try {
+                    const response = await fetch(`/patient/get-prescription/${appointmentId}`);
+                    const prescription = await response.json();
+
+                    if (response.ok) {
+                        // Dynamically generate the prescription details
+                        const date = prescription.date ? new Date(prescription.date).toLocaleString() : 'N/A';
+                        prescriptionDetails.innerHTML = `
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6>General Information</h6>
+        </div>
+        <div class="card-body">
+            <p><strong>Date:</strong> ${new Date(prescription.created_at).toLocaleString() || 'N/A'}</p>
+            <p><strong>Status:</strong> ${prescription.status || 'N/A'}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6>Medications</h6>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                ${prescription.medications && prescription.medications.length
+                            ? prescription.medications.map(med => `
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>Name:</strong> ${med.name || 'N/A'}<br>
+                                    <strong>Dosage:</strong> ${med.dosage || 'N/A'}<br>
+                                    <strong>Timing:</strong> ${med.timing.join(', ') || 'N/A'}<br>
+                                    <strong>Meal Instructions:</strong> ${med.meal_instructions || 'N/A'}
+                                </div>
+                            </div>
+                        </li>
+                    `).join('')
+                            : '<li class="list-group-item">No medications found.</li>'
+                        }
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6>Test Reports</h6>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                ${prescription.test_reports && prescription.test_reports.length
+                            ? prescription.test_reports.map(report => `
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>Report ID:</strong> ${report.report_id || 'N/A'}<br>
+                                    <strong>Status:</strong> ${report.status_reports || 'N/A'}<br>
+                                </div>
+                                ${report.status_reports === 'Completed' ? `
+                                    <a href="/${report.file_path || '#'}" class="btn btn-link" target="_blank">Download Report</a>
+                                ` : ''}
+                            </div>
+                        </li>
+                    `).join('')
+                            : '<li class="list-group-item">No test reports found.</li>'
+                        }
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h6>Doctor's Notes</h6>
+        </div>
+        <div class="card-body">
+            <p>${prescription.notes || 'No notes provided.'}</p>
+        </div>
+    </div>
+`;
+
+                    } else {
+                        prescriptionDetails.innerHTML = `<p class="text-danger">${prescription.error}</p>`;
+                    }
+                } catch (error) {
+                    prescriptionDetails.innerHTML = `
+                    <p class="text-danger">An error occurred while fetching prescription details.</p>
+                `;
+                }
+            }
+
+            // Ask for cancel confirmation
+            function askCancelConfirmation(appointmentId) {
+                if (confirm('Are you sure you want to cancel this appointment?')) {
+                    cancelAppointment(appointmentId);
+                }
+            }
+
+            // Cancel appointment logic
+            async function cancelAppointment(appointmentId) {
+                try {
+                    const response = await fetch(`/patient/cancel-appointment`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({appointment_id: appointmentId})
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert('Appointment canceled successfully.');
+                        window.location.href = `/patient/get-appointments`;
+                    } else {
+                        alert(data.error || 'Failed to cancel appointment.');
+                    }
+                } catch (error) {
+                    alert('An error occurred while canceling the appointment.');
+                }
+            }
+
+            function openFeedbackModal(appointmentId, doctorId) {
+                // Set the hidden fields with the appointment and doctor IDs
+                document.getElementById('appointmentId').value = appointmentId;
+                document.getElementById('doctorId').value = doctorId;
+
+                // Use Bootstrap's modal method to show the feedback modal
+                var feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+                feedbackModal.show();
+            }
+
+        </script>
+
+
+    </main>
+{% endblock body %}
+
+
+

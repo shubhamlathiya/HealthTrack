@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #25D366;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            overflow-y: auto;
+            transition: width 0.3s;
+        }
+
+        .sidebar .user-list {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 0;
+        }
+
+        .sidebar .user-item {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            color: white;
+        }
+
+        .sidebar .user-item:hover {
+            background-color: #128C7E;
+        }
+
+        .sidebar .user-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .sidebar .user-item .user-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sidebar .user-item .last-message {
+            font-size: 12px;
+            color: #f0f0f0;
+        }
+
+        .chat-container {
+            margin-left: 250px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background-color: #25D366;
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .chat-body {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #EDEDED;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.sent {
+            align-items: flex-end;
+        }
+
+        .message.sent .msg {
+            background-color: #dcf8c6;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.received .msg {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-footer {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .chat-footer input {
+            width: 100%;
+            border: none;
+            padding: 10px;
+            border-radius: 30px;
+            margin-right: 10px;
+            background-color: #f1f1f1;
+        }
+
+        .chat-footer button {
+            background-color: #25D366;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .chat-footer button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .chat-container {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .chat-container {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+
+            .chat-header {
+                padding: 15px;
+            }
+
+            .chat-footer input {
+                margin-right: 5px;
+            }
+
+            .chat-footer button {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Left side: List of users -->
+<div class="sidebar">
+    <div class="user-list" id="user-list">
+        <ul id="user-list-ul" class="list-group">
+            <!-- List of users will be populated here -->
+        </ul>
+    </div>
+</div>
+
+<!-- Right side: Chat window -->
+<div class="chat-container">
+    <div class="chat-header">
+        <h3>Chat</h3>
+        <div id="chat-header-user">
+            <!-- Chat header with user's details will be displayed here -->
+        </div>
+    </div>
+    <div id="chat-box" class="chat-body">
+        <!-- Default hospital message when no user is selected -->
+        <div id="default-message" class="text-center" style="font-size: 18px; color: #555;">
+            Welcome to the hospital chat system. Please select a user to start the conversation.
+        </div>
+    </div>
+    <div class="chat-footer">
+        <input type="text" id="message-input" class="input-message" placeholder="Type a message...">
+        <button id="send-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/63/Send_message_icon.svg" alt="Send">
+        </button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        fetchUsers();
+
+        // Fetch the list of users that the current user has communicated with
+        function fetchUsers() {
+            $.ajax({
+                url: '/chat/get-users-for-communication',
+                type: 'GET',
+                success: function (response) {
+                    // Populate the user list
+                    const userList = $('#user-list-ul');
+                    userList.empty();  // Clear existing list
+                    response.forEach(user => {
+                        const userItem = `
+                            <li class="user-item" data-user-id="${user._id}">
+                                <img src="https://via.placeholder.com/40" alt="User Image">
+                                <div>
+                                    <div class="user-name">${user.name}</div>
+                                    <div class="last-message">${user.lastMessage || 'No messages yet'}</div>
+                                </div>
+                            </li>
+                        `;
+                        userList.append(userItem);
+                    });
+                },
+                error: function () {
+                    alert('Error fetching users');
+                }
+            });
+        }
+
+        // When a user is clicked, fetch the conversation
+        $(document).on('click', '.user-item', function () {
+            // Remove active class from all users and add it to the clicked one
+            $('#user-list-ul .active').removeClass('active');
+            $(this).addClass('active');
+
+            const receiverId = $(this).data('user-id');
+            const senderId = '{{ current_user }}';  // Inject the current user ID via Flask template engine
+            fetchConversation(senderId, receiverId);
+        });
+
+        function fetchConversation(senderId, receiverId) {
+            $.ajax({
+                url: `/chat/get-conversation?sender_id=${senderId}&receiver_id=${receiverId}`,
+                type: 'GET',
+                success: function (response) {
+                    // Clear default message
+                    $('#default-message').hide();
+
+                    // Populate the chat box with messages
+                    const chatBox = $('#chat-box');
+                    chatBox.empty();  // Clear existing messages
+
+                    response.forEach(msg => {
+                        const messageClass = msg.sender_id === senderId ? 'sent' : 'received';
+                        const messageItem = `
+                            <div class="message ${messageClass}">
+                                <div class="msg">${msg.message}</div>
+                              <span class="text-muted">${new Date(msg.sent_at).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}</span>
+
+
+                            </div>
+                        `;
+                        chatBox.append(messageItem);
+                    });
+
+                    // Scroll to the latest message
+                    chatBox.scrollTop(chatBox[0].scrollHeight);
+
+                    // Update the chat header
+                    $('#chat-header-user').html(`
+                        <img src="https://via.placeholder.com/40" alt="User Image">
+                        <div class="user-name">${response[0].sender_id === senderId ? 'You' : 'User'}:</div>
+                    `);
+                },
+                error: function () {
+                    alert('Error fetching conversation');
+                }
+            });
+        }
+
+        // Handle sending a message
+        $('#send-btn').on('click', function () {
+            const message = $('#message-input').val();
+            const receiverId = $('#user-list-ul .active').data('user-id');
+            const senderId = '{{ current_user }}';  // Inject the current user ID via Flask template engine
+
+            if (message.trim() === '' || !receiverId) {
+                alert('Please select a user and enter a message.');
+                return;
+            }
+
+            // Send message via AJAX
+            $.ajax({
+                url: '/chat/send-message',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    sender_id: senderId,
+                    receiver_id: receiverId,
+                    message: message
+                }),
+                success: function (response) {
+                    // Update the chat with the new message
+                    fetchConversation(senderId, receiverId);
+                    $('#message-input').val('');  // Clear input field
+                },
+                error: function () {
+                    alert('Error sending message');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

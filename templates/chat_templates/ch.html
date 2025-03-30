@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat UI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #25D366;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            overflow-y: auto;
+            transition: width 0.3s;
+        }
+
+        .sidebar .user-list {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 0;
+        }
+
+        .sidebar .user-item {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            color: white;
+        }
+
+        .sidebar .user-item:hover {
+            background-color: #128C7E;
+        }
+
+        .sidebar .user-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .sidebar .user-item .user-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sidebar .user-item .last-message {
+            font-size: 12px;
+            color: #f0f0f0;
+        }
+
+        .chat-container {
+            margin-left: 250px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background-color: #25D366;
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .chat-body {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #EDEDED;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.sent {
+            align-items: flex-end;
+        }
+
+        .message.sent .msg {
+            background-color: #dcf8c6;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.received .msg {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-footer {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .chat-footer input {
+            width: 100%;
+            border: none;
+            padding: 10px;
+            border-radius: 30px;
+            margin-right: 10px;
+            background-color: #f1f1f1;
+        }
+
+        .chat-footer button {
+            background-color: #25D366;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .chat-footer button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .chat-container {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .chat-container {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+
+            .chat-header {
+                padding: 15px;
+            }
+
+            .chat-footer input {
+                margin-right: 5px;
+            }
+
+            .chat-footer button {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul class="user-list">
+            <li class="user-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div>
+                    <div class="user-name">John Doe</div>
+                    <div class="last-message">Hey! How are you doing?</div>
+                </div>
+            </li>
+            <li class="user-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div>
+                    <div class="user-name">Jane Smith</div>
+                    <div class="last-message">I'm doing great, thanks!</div>
+                </div>
+            </li>
+            <li class="user-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div>
+                    <div class="user-name">Bob Marley</div>
+                    <div class="last-message">What have you been up to lately?</div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <img src="https://via.placeholder.com/40" alt="Contact Image">
+            <h4>John Doe</h4>
+        </div>
+
+        <!-- Chat Body -->
+        <div class="chat-body">
+            <div class="message received">
+                <p class="msg">Hey! How are you doing?</p>
+            </div>
+            <div class="message sent">
+                <p class="msg">I'm good, thanks! How about you?</p>
+            </div>
+            <div class="message received">
+                <p class="msg">I'm doing great, thanks for asking!</p>
+            </div>
+            <div class="message sent">
+                <p class="msg">Awesome! What have you been up to lately?</p>
+            </div>
+        </div>
+
+        <!-- Chat Footer -->
+        <div class="chat-footer">
+            <input type="text" placeholder="Type a message...">
+            <button><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png"
+                    alt="Send" /></button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</body>
+
+</html>

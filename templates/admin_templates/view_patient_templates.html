@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin View patients{% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+
+            <!-- Departments Table -->
+            <table id="departmentsTable" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>User id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile Number</th>
+                    <th>Gender</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                </tr>
+                </thead>
+                <tbody id="departmentsBody">
+                {% for patient in patients %}
+                    <tr>
+                        <td>{{ patient.user_id }}</td>
+                        <td>{{ patient.name }}</td>
+                        <td>{{ patient.email }}</td>
+                        <td>{{ patient.mobile_number }}</td>
+                        <td>{{ patient.gender }}</td>
+                        <td>
+                            <!-- Toggle the checkbox based on the department's status -->
+                            <input type="checkbox" class="js-switch" {% if patient.status %}checked{% endif %}
+                                   onchange="toggleStatus('{{ patient._id }}', this.checked)">
+                        </td>
+
+                        <td>{{ patient.created_at }}</td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <script>
+            function toggleStatus(userId, isChecked) {
+                // Prepare the data to send
+                const status = isChecked ? 'true' : 'false';
+
+                // Send an AJAX POST request to the Flask route
+                fetch('/admin/user-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({user_id: userId, status: status})
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Status updated successfully!');
+                        } else {
+                            alert('Error updating status.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        </script>
+    </main>
+{% endblock body %}
+

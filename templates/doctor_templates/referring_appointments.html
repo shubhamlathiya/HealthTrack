@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <h1 class="mb-4">Referred Appointments</h1>
+
+            {% if appointments %}
+                <div class="accordion" id="appointmentsAccordion">
+                    {% for appointment in appointments %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ appointment['appointment_id'] }}">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{ appointment['appointment_id'] }}"
+                                        aria-expanded="true"
+                                        aria-controls="collapse{{ appointment['appointment_id'] }}">
+                                    Appointment : <strong>  {{ appointment.patient_name }}</strong>
+                                </button>
+                            </h2>
+                            <div id="collapse{{ appointment['appointment_id'] }}" class="accordion-collapse collapse"
+                                 aria-labelledby="heading{{ appointment['appointment_id'] }}"
+                                 data-bs-parent="#appointmentsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5>Patient Information</h5>
+                                            <ul class="list-unstyled">
+                                                <li><strong>Patient Name:</strong> {{ appointment['patient_name'] }}
+                                                </li>
+                                                <li><strong>Patient Email:</strong> {{ appointment['patient_email'] }}
+                                                </li>
+                                                <li><strong>Patient
+                                                    Contact:</strong> {{ appointment.get('patient_contact', 'Not Available') }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Referred Doctor Information</h5>
+                                            <ul class="list-unstyled">
+                                                <li><strong>Status:</strong> {{ appointment['status'] }}</li>
+                                                <li><strong>Doctor
+                                                    Name:</strong> {{ appointment['referred_to_doctor'].get('name', 'Not Available') }}
+                                                </li>
+                                                <li><strong>Doctor
+                                                    Email:</strong> {{ appointment['referred_to_doctor'].get('email', 'Not Available') }}
+                                                </li>
+                                                <li><strong>Doctor
+                                                    Role:</strong> {{ appointment['referred_to_doctor'].get('role', 'Not Available') }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5>Appointment Details</h5>
+                                            <ul class="list-unstyled">
+                                                <li><strong>New Date:</strong> {{ appointment['new_date'] }}</li>
+                                                <li><strong>New Time:</strong> {{ appointment['new_time'] }}</li>
+                                                <li><strong>New Reason:</strong> {{ appointment['new_reason'] }}</li>
+                                                <li><strong>Referred
+                                                    At:</strong> {{ appointment.get('referred_at', 'Not Available') }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        {% if appointment.status == 'Scheduled' or appointment.status == 'Forwarded' %}
+                                            <div class="card-footer text-muted text-center">
+                                                <a class="btn btn-outline-primary"
+                                                   href="/doctor/generate-prescriptions/{{ appointment['appointment_id'] }}"><small>Generate
+                                                    Prescription</small></a>
+
+                                                <button class="btn btn-outline-primary" id="forwardAppointmentBtn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#forwardingModal"
+                                                        data-appointment-id="{{ appointment['appointment_id'] }}">
+                                                    Forward Appointment
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="alert alert-info">No referred appointments found.</p>
+            {% endif %}
+        </div>
+
+        <div class="modal fade" id="forwardingModal" tabindex="-1" aria-labelledby="forwardingModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="forwardingModalLabel">Forward Appointment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="forwardingForm">
+                            <div class="mb-3">
+                                <label for="doctorSelect" class="form-label">Select New Doctor</label>
+                                <select id="doctorSelect" class="form-control" required>
+                                    <!-- Dynamic doctor options will be populated here -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newDate" class="form-label">New Date</label>
+                                <input type="date" class="form-control" id="newDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newTime" class="form-label">New Time</label>
+                                <input type="time" class="form-control" id="newTime" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newReason" class="form-label">Reason for Forwarding</label>
+                                <input type="text" class="form-control" id="newReason" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="submitForwardingBtn">Forward Appointment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            // Handle forwarding button click
+            $(document).on('click', '#forwardAppointmentBtn', async function () {
+                const appointmentId = $(this).data('appointment-id');
+
+                try {
+                    // Fetch doctors dynamically from the Flask backend
+                    const response = await fetch('/admin/get-doctors');
+                    const doctors = await response.json();
+
+                    // Check if we get the correct data
+                    console.log(doctors);  // Log doctors to check the response
+
+                    if (doctors && doctors.length > 0) {
+                        const doctorSelect = $('#doctorSelect');
+                        doctorSelect.empty();  // Clear previous options
+
+                        // Populate the dropdown with fetched doctors
+                        doctors.forEach(doctor => {
+                            doctorSelect.append(`
+                    <option value="${doctor._id}">${doctor.name} - ${doctor.specialization}</option>
+                `);
+                        });
+
+                        // Store the appointment ID for later submission
+                        $('#submitForwardingBtn').data('appointment-id', appointmentId);
+                    } else {
+                        console.log("No doctors found in response.");
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching doctors:", error);
+                }
+            });
+
+            // Handle forwarding form submission
+            $('#submitForwardingBtn').click(async function () {
+                const appointmentId = $(this).data('appointment-id');
+                const doctorId = $('#doctorSelect').val();
+                const newDate = $('#newDate').val();
+                const newTime = $('#newTime').val();
+                const newReason = $('#newReason').val();
+
+                const forwardingData = {
+                    appointmentId: appointmentId,
+                    doctorId: doctorId,
+                    newDate: newDate,
+                    newTime: newTime,
+                    newReason: newReason
+                };
+
+                try {
+                    const response = await fetch('/doctor/add-forward-appointment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(forwardingData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert("Appointment forwarded successfully!");
+                        window.location.href = "/doctor/dashboard"; // Redirect or refresh
+                    } else {
+                        alert("An error occurred while forwarding the appointment.");
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert("Failed to forward appointment. Please try again.");
+                }
+            });
+        </script>
+    </main>
+{% endblock body %}
+

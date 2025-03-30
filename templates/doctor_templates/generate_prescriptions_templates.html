@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate Prescription{% endblock title %}
+
+{% block body %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+        <div class="container mt-5">
+            <h2>Generate Prescription</h2>
+            <form id="prescriptionForm">
+                <div class="mb-3">
+                    <input type="hidden" id="appointment_id" name="appointment_id" class="form-control"
+                           value="{{ appointments_id }}">
+                </div>
+
+                <div id="medicationsContainer">
+                    <h3>Medications</h3>
+                    <div class="medication mb-3 p-3 border rounded">
+                        <div class="mb-3">
+                            <label class="form-label">Medication Name</label>
+                            <input type="text" name="medication_name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dosage</label>
+                            <input type="text" name="dosage" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Timing</label><br>
+                            <input type="checkbox" name="timing" value="Morning"> Morning
+                            <input type="checkbox" name="timing" value="Afternoon"> Afternoon
+                            <input type="checkbox" name="timing" value="Evening"> Evening
+                            <input type="checkbox" name="timing" value="Night"> Night
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Meal Instructions</label><br>
+                            <input type="radio" name="meal_instructions" value="Before Meal" required> Before Meal
+                            <input type="radio" name="meal_instructions" value="After Meal"> After Meal
+                        </div>
+                        <button type="button" class="btn btn-danger" onclick="removeMedication(this)">Remove</button>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary mb-3" onclick="addMedication()">Add More Medication
+                </button>
+
+                <div id="testReportsContainer">
+                    <h3>Test Reports</h3>
+
+                    <!-- Test Report Card -->
+                    <div class="test-report mb-3 p-3 border rounded">
+                        <div class="mb-3">
+                            <label class="form-label">Test Name</label>
+                            <select name="test_name" class="form-control" required>
+                                <option value="">Select a Test</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Test Notes</label>
+                            <textarea name="test_result" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="button" class="btn btn-danger" onclick="removeTestReport(this)">Remove</button>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary mb-3" onclick="addTestReport()">Add More Test Report
+                </button>
+
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <textarea id="notes" name="notes" class="form-control"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <button type="button" class="btn btn-success" onclick="submitPrescription()">Submit Prescription
+                    </button>
+                </div>
+            </form>
+        </div>
+
+
+        <script>
+            fetchReports();
+
+            // Fetch reports from the server and populate the test report dropdown
+            function fetchReports() {
+                fetch('/laboratory/get-reports')
+                    .then(response => response.json())
+                    .then(data => {
+                        const container = document.getElementById('testReportsContainer');
+
+                        // Select the dropdown element to populate
+                        const selectElement = container.querySelector('select[name="test_name"]');
+
+                        // Add a default option if it's not already present
+                        const defaultOption = selectElement.querySelector('option[value=""]');
+                        if (!defaultOption) {
+                            const defaultOption = document.createElement('option');
+                            defaultOption.value = '';
+                            defaultOption.textContent = 'Select a Test';
+                            selectElement.appendChild(defaultOption);
+                        }
+
+                        // Clear any previous options
+                        selectElement.innerHTML = '';
+                        selectElement.appendChild(defaultOption); // Re-add the default option
+
+                        // Assuming the report data is inside `data.reports` (an array of reports)
+                        const reports = data.reports;
+
+                        // Populate the dropdown with the reports
+                        reports.forEach(report => {
+                            const option = document.createElement('option');
+                            option.value = report._id; // Use the `_id` field as the value
+                            option.textContent = report.report_name; // Show the `report_name`
+                            selectElement.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching reports:', error);
+                    });
+            }
+
+
+            let medicationCounter = 0;
+
+            // Add a new medication field
+            function addMedication() {
+                const container = document.getElementById('medicationsContainer');
+                const medicationDiv = document.createElement('div');
+                medicationCounter++;
+
+                medicationDiv.className = 'medication mb-3 p-3 border rounded';
+                medicationDiv.innerHTML = `
+            <div class="mb-3">
+                <label class="form-label">Medication Name</label>
+                <input type="text" name="medication_name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Dosage</label>
+                <input type="text" name="dosage" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Timing</label><br>
+                <input type="checkbox" name="timing_${medicationCounter}" value="Morning"> Morning
+                <input type="checkbox" name="timing_${medicationCounter}" value="Afternoon"> Afternoon
+                <input type="checkbox" name="timing_${medicationCounter}" value="Evening"> Evening
+                <input type="checkbox" name="timing_${medicationCounter}" value="Night"> Night
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Meal Instructions</label><br>
+                <input type="radio" name="meal_instructions_${medicationCounter}" value="Before Meal" required> Before Meal
+                <input type="radio" name="meal_instructions_${medicationCounter}" value="After Meal"> After Meal
+            </div>
+            <button type="button" class="btn btn-danger" onclick="removeMedication(this)">Remove</button>
+        `;
+                container.appendChild(medicationDiv);
+            }
+
+            // Add a new test report field
+            function addTestReport() {
+                const testReportsContainer = document.getElementById("testReportsContainer");
+                const newTestReport = document.createElement("div");
+                newTestReport.classList.add("test-report", "mb-3", "p-3", "border", "rounded");
+                newTestReport.innerHTML = `
+            <div class="mb-3">
+                <label class="form-label">Test Name</label>
+                <select name="test_name" class="form-control" required>
+                    <option value="">Select a Test</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Test Notes</label>
+                <textarea name="test_result" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="button" class="btn btn-danger" onclick="removeTestReport(this)">Remove</button>
+        `;
+                testReportsContainer.appendChild(newTestReport);
+            }
+
+            // Remove a medication field
+            function removeMedication(button) {
+                const medicationDiv = button.parentElement;
+                medicationDiv.remove();
+            }
+
+            // Remove a test report field
+            function removeTestReport(button) {
+                const testReport = button.closest('.test-report');
+                testReport.remove();
+            }
+
+            // Submit prescription
+            async function submitPrescription() {
+                const form = document.getElementById('prescriptionForm');
+                const formData = new FormData(form);
+
+                const medications = [];
+                const medicationElements = document.querySelectorAll('.medication');
+
+                medicationElements.forEach(medication => {
+                    const name = medication.querySelector('input[name="medication_name"]').value;
+                    const dosage = medication.querySelector('input[name="dosage"]').value;
+                    const timing = Array.from(medication.querySelectorAll('input[name^="timing"]:checked')).map(el => el.value);
+                    const mealInstructions = medication.querySelector('input[name^="meal_instructions"]:checked')?.value;
+
+                    medications.push({name, dosage, timing, meal_instructions: mealInstructions || 'Not Specified'});
+                });
+
+                const reportIds = [];
+                const testReportsElements = document.querySelectorAll('.test-report');
+                testReportsElements.forEach(testReport => {
+                    const report_id = testReport.querySelector('select[name="test_name"]')?.value;
+                    const report_notes = testReport.querySelector('textarea[name="test_result"]')?.value;
+
+                    if (report_id) {
+                        // Push both reportId and test_result as an object
+                        reportIds.push({report_id, report_notes});
+                    }
+                });
+
+                const payload = {
+                    appointment_id: formData.get('appointment_id'),
+                    medications: medications,
+                    notes: formData.get('notes'),
+                    test_reports: reportIds
+                };
+
+                console.log(payload);
+                try {
+                    const response = await fetch('/doctor/add-generate-prescriptions', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    alert(result.message || 'Prescription submitted successfully');
+                    window.location.href = result.redirect_url;
+                } catch (error) {
+                    alert('Error submitting prescription: ' + error.message);
+                }
+            }
+        </script>
+
+    </main>
+{% endblock body %}
+
