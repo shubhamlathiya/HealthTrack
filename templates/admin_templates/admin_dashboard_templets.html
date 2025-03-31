@@ -2,6 +2,16 @@
 
 {% block title %}Admin Dashboard{% endblock title %}
 
+{% block heardLink %}
+    <!-- jquert UI -->
+    <link rel="stylesheet" href="../../static/assets/vendor/jquery-ui/jquery-ui.min.css"/>
+
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+
+{% endblock heardLink %}
 {% block body %}
 
     <!-- Row starts -->
@@ -604,8 +614,10 @@
         </div>
     </div>
     <!-- Row ends -->
-{#    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/home/income.js') }}"></script>#}
- <!-- jquert UI -->
+
+{% endblock body %}
+{% block footerLink %}
+    <!-- jquert UI -->
     <script src="../../static/assets/vendor/jquery-ui/jquery-ui.min.js"></script>
     <script src="../../static/assets/vendor/jquery-ui/custom.js"></script>
 
@@ -616,12 +628,12 @@
     <script src="../../static/assets/vendor/apex/custom/home/income.js"></script>
     <script src="../../static/assets/vendor/apex/custom/home/appointments-overview.js"></script>
     <script src="../../static/assets/vendor/apex/custom/home/sparklines.js"></script>
-
     <!-- Data Tables -->
     <script src="../../static/assets/vendor/datatables/dataTables.min.js"></script>
     <script src="../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
     <script src="../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
 
-{#     <script src="../../static/assets/vendor/apex/custom/home/income.js"></script>#}
-{% endblock body %}
+
+{% endblock footerLink %}
+
 

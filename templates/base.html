@@ -20,6 +20,9 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='assets/vendor/overlay-scroll/OverlayScrollbars.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/daterange/daterange.css') }}">
+
+    {% block heardLink %}{% endblock heardLink %}
+
 </head>
 
 
@@ -139,6 +142,7 @@
 <script src="{{ url_for('static', filename='assets/vendor/daterange/daterange.js') }}"></script>
 <script src="{{ url_for('static', filename='assets/vendor/daterange/custom-daterange.js') }}"></script>
 
+{% block footerLink %}{% endblock footerLink %}
 <!-- Custom JS files -->
 <script src="{{ url_for('static', filename='assets/js/custom.js') }}"></script>
 
