@@ -16,6 +16,8 @@ from .operation_routes import *
 from .staff_routes import *
 from .rooom_routes import *
 from .ambulance_routes import *
+from .human_resources_routes import *
+from .accounts_routes import *
 
 
 @admin.route('/user-status', methods=['POST'],endpoint='userStatus')

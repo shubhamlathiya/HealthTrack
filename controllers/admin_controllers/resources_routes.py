@@ -11,7 +11,7 @@ from utils.config import mongo
 def add_resource():
     if request.method == 'GET':
         departments = list(mongo.db.departments.find())
-        return render_template("admin/add_resource_templates.html", departments=departments)
+        return render_template("admin_templates/add_resource_templates.html", departments=departments)
     elif request.method == 'POST':
 
         # Extract fields
@@ -81,7 +81,7 @@ def get_resources():
     resources = mongo.db.resources.aggregate(pipeline)
 
     # Return the rendered template with resources
-    return render_template("admin/view_resources_templates.html", resources=resources)
+    return render_template("admin_templates/view_resources_templates.html", resources=resources)
 
 # # 2. Update resource details - PUT /resources/<resource_id>
 # @admin.route('/resources/<resource_id>', methods=['PUT'])

@@ -185,7 +185,7 @@ def view_all_staffs():
 
         # print(staffs)
 
-        return render_template("admin/view_staff_templates.html", staffs=staffs)
+        return render_template("admin_templates/view_staff_templates.html", staffs=staffs)
 
     except Exception as e:
         print(f"Error fetching doctors: {e}")

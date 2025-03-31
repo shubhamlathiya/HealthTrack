@@ -89,7 +89,7 @@ def add_doctor():
 
         departments = list(mongo.db.departments.find())
 
-        return render_template('admin/add_doctor_templates.html', departments=departments)
+        return render_template('admin_templates/add_doctor_templates.html', departments=departments)
 
 
 @admin.route('/get-doctors', methods=['GET'])
@@ -186,7 +186,7 @@ def view_all_doctors():
 
         # print(doctors)
 
-        return render_template("admin/view_doctor_templates.html", doctors=doctors)
+        return render_template("admin_templates/view_doctor_templates.html", doctors=doctors)
 
     except Exception as e:
         print(f"Error fetching doctors: {e}")

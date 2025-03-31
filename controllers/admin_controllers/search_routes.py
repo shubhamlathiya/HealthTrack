@@ -58,11 +58,11 @@ def search(current_user):
 
             # print(patient_data)
             # Return the search result in the template
-            return render_template('admin/search_page.html', patient_data=patient_data)
+            return render_template('admin_templates/search_page.html', patient_data=patient_data)
         except Exception as e:
             print(f"Error: {e}")
             return jsonify({"error": "Internal server error"}), 500
-    return render_template('admin/search_page.html')
+    return render_template('admin_templates/search_page.html')
 
 
 # @admin.route('/get-patient-details/<patient_id>', methods=['GET'])

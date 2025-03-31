@@ -23,7 +23,7 @@ from middleware.auth_middleware import token_required
 @token_required
 def apply_leave(current_user):
     if request.method == 'GET':
-        return render_template("admin/apply_for_leave.html")
+        return render_template("admin_templates/apply_for_leave.html")
     elif request.method == 'POST':
 
         data = request.get_json()
@@ -133,4 +133,4 @@ def get_leave_applications():
         app["user_id"] = str(app["user_id"])
 
     # return jsonify(applications_list), 200
-    return render_template("admin/view_leave_templates.html", applications=applications_list)
+    return render_template("admin_templates/view_leave_templates.html", applications=applications_list)

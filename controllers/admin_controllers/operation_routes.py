@@ -9,7 +9,7 @@ from utils.config import mongo
 @admin.route('/add-operation', methods=['GET','POST'])
 def add_operation():
     if request.method == 'GET':
-        return render_template("admin/add_operation_templates.html")
+        return render_template("admin_templates/add_operation_templates.html")
     elif request.method == 'POST':
         data = request.get_json()
 
@@ -52,4 +52,4 @@ def get_operations():
     operations = mongo.db.operations.find()  # Fetch all operations from the MongoDB
 
     # print(list(operations))
-    return render_template("admin/view_operations_templates.html", operations=operations)
+    return render_template("admin_templates/view_operations_templates.html", operations=operations)
