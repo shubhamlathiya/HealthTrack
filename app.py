@@ -5,12 +5,9 @@ from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
 from utils.config import init_app
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 
 init_app(app)
-
-
-app.config['SECRET_KEY'] = 'your_secure_random_key'
 
 # Flask-Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -23,26 +20,32 @@ app.config['MAIL_USE_SSL'] = True
 # Initialize the mail object
 mail = Mail(app)
 
+app.config['SECRET_KEY'] = 'your_secure_random_key'
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(admin, url_prefix='/admin')
+
+
 @app.route('/')
 def index():  # put application's code here
     return render_template('auth_templates/login_templates.html')
+
 
 @app.errorhandler(404)
 def handle_404_error(e):
     return render_template('error_handler/error_404.html')
 
+
 @app.errorhandler(500)
 def handle_500_error(e):
     return render_template('error_handler/error_500.html')
+
 
 @app.route('/logout', methods=['GET'])
 def logout():
     session.clear()
     response = jsonify({'message': 'Logged out successfully!'})
     response.set_cookie('token', '', expires=0)
-    response = redirect('/')# Clear the cookie
+    response = redirect('/')  # Clear the cookie
     return response
 
 

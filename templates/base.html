@@ -3,36 +3,30 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Clove Dental Care Admin Template</title>
+    <title>HealthTrack - {% block title %}{% endblock title %}</title>
 
     <!-- Meta -->
     <meta name="description" content="Marketplace for Bootstrap Admin Dashboards">
     <meta property="og:title" content="Admin Templates - Dashboard Templates">
     <meta property="og:description" content="Marketplace for Bootstrap Admin Dashboards">
     <meta property="og:type" content="Website">
-    <link rel="shortcut icon" href="../static/assets/images/favicon.svg">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}">
 
-    <!-- *************
-		************ CSS Files *************
-	  ************* -->
-    <link rel="stylesheet" href="../static/assets/fonts/remix/remixicon.css">
-    <link rel="stylesheet" href="../static/assets/css/main.min.css">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/fonts/remix/remixicon.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.min.css') }}">
 
-    <!-- *************
-		************ Vendor Css Files *************
-	  ************ -->
-
-    <!-- Scrollbar CSS -->
-    <link rel="stylesheet" href="../static/assets/vendor/overlay-scroll/OverlayScrollbars.min.css">
-
-    <!-- Date Range CSS -->
-    <link rel="stylesheet" href="../static/assets/vendor/daterange/daterange.css">
-
+    <!-- Vendor CSS Files -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/overlay-scroll/OverlayScrollbars.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/daterange/daterange.css') }}">
 </head>
+
 
 <body>
 
-{% include './layout/loading.html' %}
+{% include 'layout/loading.html' %}
+
 <!-- Page wrapper starts -->
 <div class="page-wrapper">
 
@@ -40,7 +34,8 @@
     <div class="main-container">
 
         <!-- Sidebar wrapper starts -->
-        {% include './layout/sidebar_menu.html' %}
+        {% include 'layout/sidebar_menu.html' %}
+
 
         <!-- App container starts -->
         <div class="app-container">
@@ -76,7 +71,7 @@
                 <!-- Search container ends -->
 
                 <!-- App header actions starts -->
-                {% include './layout/header.html' %}
+                {% include 'layout/header.html' %}
                 <!-- App header actions ends -->
 
             </div>
@@ -115,12 +110,12 @@
             <!-- App body starts -->
             <div class="app-body">
                 {% block body %} {% endblock body %}
-
             </div>
             <!-- App body ends -->
 
             <!-- App footer starts -->
-            {% include './layout/footer.html' %}
+            {% include 'layout/footer.html' %}
+
             <!-- App footer ends -->
 
         </div>
@@ -131,28 +126,21 @@
 
 </div>
 <!-- Page wrapper ends -->
-
-<!-- *************
-        ************ JavaScript Files *************
-    ************* -->
 <!-- Required jQuery first, then Bootstrap Bundle JS -->
-<script src="../static/assets/js/jquery.min.js"></script>
-<script src="../static/assets/js/bootstrap.bundle.min.js"></script>
-<script src="../static/assets/js/moment.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/moment.min.js') }}"></script>
 
-<!-- *************
-        ************ Vendor Js Files *************
-    ************* -->
-
-<!-- Overlay Scroll JS -->
-<script src="../static/assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js"></script>
-<script src="../static/assets/vendor/overlay-scroll/custom-scrollbar.js"></script>
+<!-- Vendor JS Files -->
+<script src="{{ url_for('static', filename='assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/vendor/overlay-scroll/custom-scrollbar.js') }}"></script>
 
 <!-- Date Range JS -->
-<script src="../static/assets/vendor/daterange/daterange.js"></script>
-<script src="../static/assets/vendor/daterange/custom-daterange.js"></script>
+<script src="{{ url_for('static', filename='assets/vendor/daterange/daterange.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/vendor/daterange/custom-daterange.js') }}"></script>
 
 <!-- Custom JS files -->
-<script src="../static/assets/js/custom.js"></script>
+<script src="{{ url_for('static', filename='assets/js/custom.js') }}"></script>
+
 </body>
 </html>
