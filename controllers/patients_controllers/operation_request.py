@@ -76,7 +76,7 @@ def operation_request(current_user):
 
     # print(operation_requests)
     # Return the aggregated result
-    return render_template("patient/view_operation_requests.html", operation_requests=operation_requests)
+    return render_template("patient_templates/view_operation_requests.html", operation_requests=operation_requests)
 
 
 @patients.route('/accept-operation/<operation_id>', methods=['GET'], endpoint='accept-operation')

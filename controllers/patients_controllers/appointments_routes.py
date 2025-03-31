@@ -44,7 +44,7 @@ def book_appointment(current_user):
         doctors = list(mongo.db.users.aggregate(pipeline))
         # print(doctors)
         # return jsonify(doctor_data)
-        return render_template('patient/patient_book_appointment_templates.html', doctors=doctors,
+        return render_template('patient_templates/patient_book_appointment_templates.html', doctors=doctors,
                                patientId=current_user)
     elif request.method == 'POST':
         data = request.get_json()
@@ -147,11 +147,11 @@ def get_appointments_for_patient(current_user):
     # print(appointments)
     # If no appointments found, return an error message
     if not appointments:
-        return render_template("patient/patient_view_appointment_templates.html" , error = "No appointments found for this patient")
+        return render_template("patient_templates/patient_view_appointment_templates.html" , error = "No appointments found for this patient")
         # return jsonify({"error": "No appointments found for this patient"}), 404
 
     # Render the template with appointments and doctor details
-    return render_template('patient/patient_view_appointment_templates.html', appointments=appointments,
+    return render_template('patient_templates/patient_view_appointment_templates.html', appointments=appointments,
                            patientId=current_user)
 
 @patients.route('/cancel-appointment', methods=['POST'],endpoint='cancel_appointment')

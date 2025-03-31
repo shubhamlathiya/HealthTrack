@@ -184,7 +184,7 @@ def view_all_doctors():
         # Execute the aggregation query
         doctors = list(mongo.db.users.aggregate(pipeline))
 
-        # print(doctors)
+        print(doctors)
 
         return render_template("admin_templates/view_doctor_templates.html", doctors=doctors)
 

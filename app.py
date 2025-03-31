@@ -3,6 +3,7 @@ from flask_mail import Mail
 
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
+from controllers.patients_controllers import patients
 from utils.config import init_app
 
 app = Flask(__name__, static_folder="static")
@@ -23,7 +24,7 @@ mail = Mail(app)
 app.config['SECRET_KEY'] = 'your_secure_random_key'
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(admin, url_prefix='/admin')
-
+app.register_blueprint(patients, url_prefix='/patients')
 
 @app.route('/')
 def index():  # put application's code here

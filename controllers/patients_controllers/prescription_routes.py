@@ -38,7 +38,7 @@ def referred_appointment_id(appointment_id):
 
 @patients.route('/upload-patient-reports')
 def upload_patient_reports():  # put application's code here
-    return render_template('patient/upload_view_patient_reports_templates.html')
+    return render_template('patient_templates/upload_view_patient_reports_templates.html')
 
 
 UPLOAD_FOLDER = 'uploads/patient_reports'

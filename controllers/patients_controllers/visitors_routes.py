@@ -43,11 +43,11 @@ def get_visitors(current_user):
     visitor = list(mongo.db.visitor.find({"user_id": ObjectId(current_user)}))
     # print(visitor)
     if not visitor:
-        return render_template("patient/patient_visitor_templates.html", error="visitor not found"), 200
+        return render_template("patient_templates/patient_visitor_templates.html", error="visitor not found"), 200
 
         # return jsonify({"error": "visitor not found"}), 404
 
-    return render_template("patient/patient_visitor_templates.html", visitors=visitor), 200
+    return render_template("patient_templates/patient_visitor_templates.html", visitors=visitor), 200
 
 
 @patients.route('/remove-visitor/<visitor_id>', methods=['GET'])

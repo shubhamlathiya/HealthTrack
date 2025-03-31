@@ -36,7 +36,7 @@ def login_patient():
             session['name'] = user['name']
 
             if user['role'] == 'patient':
-                redirect_url = '/patient/dashboard'  # Define client dashboard URL
+                redirect_url = '/patients/dashboard'  # Define client dashboard URL
             elif user['role'] == 'admin':
                 redirect_url = '/admin/dashboard'
             elif user['role'] == 'doctor':

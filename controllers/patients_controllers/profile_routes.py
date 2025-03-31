@@ -31,7 +31,7 @@ def get_profile(current_user):
         #     "gender": patient.get("gender", "Not Provided")
         # }
         # return jsonify(profile_data), 200
-        return render_template("patient/patient_profile_templates.html", patient=patient)
+        return render_template("patient_templates/patient_profile_templates.html", patient=patient)
 
 
     except Exception as e:

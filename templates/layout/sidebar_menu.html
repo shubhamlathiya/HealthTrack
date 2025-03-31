@@ -32,228 +32,286 @@
     <div class="sidebarMenuScroll">
         <ul class="sidebar-menu">
             {% if session['role'] == 'patient' %}
-                <li class="{{ 'active current-page' if request.path == '/patient/dashboard' }}">
-                    <a href="/patient/dashboard">
+                <li class="{% if request.path == '/patients/dashboard' %}active current-page{% endif %}">
+                    <a href="/patients/dashboard">
                         <i class="ri-home-6-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/patient/book-Appointment' }}">
-                    <a href="/patient/book-Appointment">
+                <li class="{% if request.path == '/patients/book-Appointment' %}active current-page{% endif %}">
+                    <a href="/patients/book-Appointment">
                         <i class="ri-calendar-2-line"></i>
                         <span class="menu-text">Book Appointment</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/patient/upload-patient-reports' }}">
-                    <a href="/patient/upload-patient-reports">
+                <li class="{% if request.path == '/patients/upload-patient-reports' or request.path.startswith('/patients/reports') %}active current-page{% endif %}">
+                    <a href="/patients/upload-patient-reports">
                         <i class="ri-file-text-line"></i>
                         <span class="menu-text">View Reports</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/chat/chat' }}">
+                <li class="{% if request.path == '/chat/chat' %}active current-page{% endif %}">
                     <a href="/chat/chat">
                         <i class="ri-chat-1-line"></i>
                         <span class="menu-text">Chat</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/patient/get-visitors' }}">
-                    <a href="/patient/get-visitors">
+                <li class="{% if request.path == '/patients/get-visitors' %}active current-page{% endif %}">
+                    <a href="/patients/get-visitors">
                         <i class="ri-user-line"></i>
                         <span class="menu-text">Visitors</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/patient/get-appointments' }}">
-                    <a href="/patient/get-appointments">
+                <li class="{% if request.path == '/patients/get-appointments' or request.path.startswith('/patients/appointment') %}active current-page{% endif %}">
+                    <a href="/patients/get-appointments">
                         <i class="ri-list-check-2"></i>
                         <span class="menu-text">View Appointments</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/patient/operation-request' }}">
-                    <a href="/patient/operation-request">
+                <li class="{% if request.path == '/patients/operation-request' %}active current-page{% endif %}">
+                    <a href="/patients/operation-request">
                         <i class="ri-scissors-line"></i>
                         <span class="menu-text">Operation Request</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/patient/get-profile' }}">
-                    <a href="/patient/get-profile">
+                <li class="{% if request.path == '/patients/get-profile' or request.path.startswith('/patients/profile') %}active current-page{% endif %}">
+                    <a href="/patients/get-profile">
                         <i class="ri-user-settings-line"></i>
                         <span class="menu-text">Profile</span>
                     </a>
                 </li>
 
             {% elif session['role'] == 'admin' %}
-                <li class="{{ 'active current-page' if request.path == '/admin/dashboard' }}">
+                <li class="{% if request.path == '/admin/dashboard' %}active current-page{% endif %}">
                     <a href="/admin/dashboard">
                         <i class="ri-home-6-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/search' }}">
+                <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">
                     <a href="/admin/search">
                         <i class="ri-search-line"></i>
                         <span class="menu-text">User Search</span>
                     </a>
                 </li>
-                <li class=" treeview {{ 'active current-page' if request.path == '/admin/view-departments' }}">
+                <li class="treeview {% if request.path.startswith('/admin/view-departments') or request.path.startswith('/admin/add-department') or request.path.startswith('/admin/edit-department') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-building-2-line"></i>
                         <span class="menu-text">Departments</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
+                        <li class="{% if request.path == '/admin/view-departments' %}active{% endif %}">
                             <a href="/admin/view-departments">Departments List</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/add-department' %}active{% endif %}">
                             <a href="/admin/add-department">Add Department</a>
                         </li>
                     </ul>
                 </li>
-                <li class="treeview">
+                <li class="treeview {% if request.path.startswith('/admin/room') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-hotel-bed-line"></i>
                         <span class="menu-text">Rooms</span>
+
                     </a>
                     <ul class="treeview-menu">
-                        <li>
+                        <li class="{% if request.path == '/admin/room/room-statistics' %}active{% endif %}">
                             <a href="/admin/room/room-statistics">Statistics</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/room/rooms-allotted' %}active{% endif %}">
                             <a href="/admin/room/rooms-allotted">Rooms Allotted</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/room/rooms-by-dept' %}active{% endif %}">
                             <a href="/admin/room/rooms-by-dept">Rooms By Department</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/room/available-room' %}active{% endif %}">
                             <a href="/admin/room/available-room">Available Rooms</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/room/book-room' %}active{% endif %}">
                             <a href="/admin/room/book-room">Book Room</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/room/add-room' %}active{% endif %}">
                             <a href="/admin/room/add-room">Add Room</a>
                         </li>
-{#                        <li>#}
-{#                            <a href="edit-room.html">Edit Room</a>#}
-{#                        </li>#}
                     </ul>
                 </li>
-                <li class="treeview">
+                <li class="treeview {% if request.path.startswith('/admin/ambulance') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-car-washing-line"></i>
                         <span class="menu-text">Ambulance</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
+                        <li class="{% if request.path == '/admin/ambulance/ambulance-list' %}active{% endif %}">
                             <a href="/admin/ambulance/ambulance-list">Ambulance List</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/ambulance/add-ambulance' %}active{% endif %}">
                             <a href="/admin/ambulance/add-ambulance">Add Ambulance</a>
                         </li>
-                        <li>
-                            <a href="edit-ambulance.html">Edit Ambulance</a>
-                        </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/ambulance/ambulance-call-list' %}active{% endif %}">
                             <a href="/admin/ambulance/ambulance-call-list">Ambulance Call List</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/ambulance/add-driver' %}active{% endif %}">
                             <a href="/admin/ambulance/add-driver">Add Driver</a>
                         </li>
-                        <li>
-                            <a href="edit-driver.html">Edit Driver</a>
-                        </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/ambulance/driver-list' %}active{% endif %}">
                             <a href="/admin/ambulance/driver-list">Driver List</a>
                         </li>
                     </ul>
                 </li>
-                <li class="treeview">
+                <li class="treeview {% if request.path.startswith('/admin/accounts') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-secure-payment-line"></i>
                         <span class="menu-text">Accounts</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
+                        <li class="{% if request.path == '/admin/accounts/income' %}active{% endif %}">
                             <a href="/admin/accounts/income">Income</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/accounts/payments' %}active{% endif %}">
                             <a href="/admin/accounts/payments">Payments</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/accounts/invoices' %}active{% endif %}">
                             <a href="/admin/accounts/invoices">Invoices</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/accounts/invoice-details' %}active{% endif %}">
                             <a href="/admin/accounts/invoice-details">Invoice Details</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/accounts/create-invoice' %}active{% endif %}">
                             <a href="/admin/accounts/create-invoice">Create Invoice</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/accounts/expenses' %}active{% endif %}">
                             <a href="/admin/accounts/expenses">Expenses</a>
                         </li>
                     </ul>
                 </li>
-                <li class="treeview">
+                <li class="treeview {% if request.path.startswith('/admin/human-resources') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-group-2-line"></i>
                         <span class="menu-text">Human Resources</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
+                        <li class="{% if request.path == '/admin/human-resources/hr-approvals' %}active{% endif %}">
                             <a href="/admin/human-resources/hr-approvals">HR Approvals</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/human-resources/staff-attendance' %}active{% endif %}">
                             <a href="/admin/human-resources/staff-attendance">Attendance</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/human-resources/staff-leaves' %}active{% endif %}">
                             <a href="/admin/human-resources/staff-leaves">Staff Leaves</a>
                         </li>
-                        <li>
+                        <li class="{% if request.path == '/admin/human-resources/staff-holidays' %}active{% endif %}">
                             <a href="/admin/human-resources/staff-holidays">Holidays</a>
                         </li>
                     </ul>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/get-resources' }}">
+                <!-- Add this after the Human Resources menu item in the admin section -->
+                <li class="treeview {% if request.path.startswith('/admin/blood-bank') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-drop-line"></i>
+                        <span class="menu-text">Blood Bank</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="{% if request.path == '/admin/blood-bank/stock' %}active{% endif %}">
+                            <a href="/admin/blood-bank/stock">Blood Stock</a>
+                        </li>
+                        <li class="{% if request.path == '/admin/blood-bank/donor' %}active{% endif %}">
+                            <a href="/admin/blood-bank/donor">Blood Donor</a>
+                        </li>
+                        <li class="{% if request.path == '/admin/blood-bank/issued' %}active{% endif %}">
+                            <a href="/admin/blood-bank/issued">Blood Issued</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="treeview {% if request.path.startswith('/admin/inventory') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-shopping-bag-line"></i>
+                        <span class="menu-text">Inventory</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="{% if request.path == '/admin/inventory/stock' %}active{% endif %}">
+                            <a href="/admin/inventory/stock">Item Stock List</a>
+                        </li>
+                        <li class="{% if request.path == '/admin/inventory/issued' %}active{% endif %}">
+                            <a href="/admin/inventory/issued">Issued Items</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="treeview {% if request.path.startswith('/admin/insurance') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-shield-check-line"></i>
+                        <span class="menu-text">Insurance</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="{% if request.path == '/admin/insurance/patient' %}active{% endif %}">
+                            <a href="/admin/insurance/patient">Patient Insurance</a>
+                        </li>
+                        <li class="{% if request.path == '/admin/insurance/new-claim' %}active{% endif %}">
+                            <a href="/admin/insurance/new-claim">New Claim</a>
+                        </li>
+                        <li class="{% if request.path == '/admin/insurance/claim-status' %}active{% endif %}">
+                            <a href="/admin/insurance/claim-status">Claim Status</a>
+                        </li>
+                        <li class="{% if request.path == '/admin/insurance/provider' %}active{% endif %}">
+                            <a href="/admin/insurance/provider">Insurance Provider</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="treeview {% if request.path.startswith('/admin/pharmacy') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-medicine-bottle-line"></i>
+                        <span class="menu-text">Pharmacy</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="{% if request.path == '/admin/pharmacy/medicine-list' %}active{% endif %}">
+                            <a href="/admin/pharmacy/medicine-list">Medicine List</a>
+                        </li>
+                        <li class="{% if request.path == '/admin/pharmacy/add-medicine' %}active{% endif %}">
+                            <a href="/admin/pharmacy/add-medicine">Add Medicine</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="{% if request.path == '/admin/get-resources' %}active current-page{% endif %}">
                     <a href="/admin/get-resources">
                         <i class="ri-database-line"></i>
                         <span class="menu-text">Resources</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/view-doctors' }}">
+                <li class="{% if request.path == '/admin/view-doctors' %}active current-page{% endif %}">
                     <a href="/admin/view-doctors">
                         <i class="ri-stethoscope-line"></i>
                         <span class="menu-text">Doctors</span>
                     </a>
                 </li>
-                <li class="treeview {{ 'active current-page' if request.path == '/admin/view-staff' }}">
+                <li class="treeview {% if request.path.startswith('/admin/view-staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-nurse-line"></i>
                         <span class="menu-text">Staff</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
+                        <li class="{% if request.path == '/admin/view-staff' %}active{% endif %}">
                             <a href="/admin/view-staff">Staff List</a>
                         </li>
-                        <li>
-                            <a href="add-staff.html">Add Staff</a>
-                        </li>
-                        <li>
-                            <a href="edit-staff.html">Edit Staff Details</a>
+                        <li class="{% if request.path == '/admin/add-staff' %}active{% endif %}">
+                            <a href="/admin/add-staff">Add Staff</a>
                         </li>
                     </ul>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/get-operations' }}">
+                <li class="{% if request.path == '/admin/get-operations' %}active current-page{% endif %}">
                     <a href="/admin/get-operations">
                         <i class="ri-scissors-line"></i>
                         <span class="menu-text">Operations</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/view-patients' }}">
+                <li class="{% if request.path == '/admin/view-patients' %}active current-page{% endif %}">
                     <a href="/admin/view-patients">
                         <i class="ri-heart-pulse-line"></i>
                         <span class="menu-text">Patients</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/leave/applications' }}">
+                <li class="{% if request.path == '/admin/leave/applications' %}active current-page{% endif %}">
                     <a href="/admin/leave/applications">
                         <i class="ri-calendar-todo-line"></i>
                         <span class="menu-text">Leave Applications</span>
@@ -261,61 +319,61 @@
                 </li>
 
             {% elif session['role'] == 'doctor' %}
-                <li class="{{ 'active current-page' if request.path == '/doctor/dashboard' }}">
+                <li class="{% if request.path == '/doctor/dashboard' %}active current-page{% endif %}">
                     <a href="/doctor/dashboard">
                         <i class="ri-home-6-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/search' }}">
+                <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">
                     <a href="/admin/search">
                         <i class="ri-search-line"></i>
                         <span class="menu-text">User Search</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/doctor/get-all-appointments' }}">
+                <li class="{% if request.path == '/doctor/get-all-appointments' %}active current-page{% endif %}">
                     <a href="/doctor/get-all-appointments">
                         <i class="ri-calendar-check-line"></i>
                         <span class="menu-text">Today's Appointments</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/doctor/get-all-booked-appointments' }}">
+                <li class="{% if request.path == '/doctor/get-all-booked-appointments' %}active current-page{% endif %}">
                     <a href="/doctor/get-all-booked-appointments">
                         <i class="ri-calendar-line"></i>
                         <span class="menu-text">All Appointments</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/doctor/get-referring-appointments' }}">
+                <li class="{% if request.path == '/doctor/get-referring-appointments' %}active current-page{% endif %}">
                     <a href="/doctor/get-referring-appointments">
                         <i class="ri-share-forward-line"></i>
                         <span class="menu-text">Referred Appointments</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/doctor/get-forward-appointment' }}">
+                <li class="{% if request.path == '/doctor/get-forward-appointment' %}active current-page{% endif %}">
                     <a href="/doctor/get-forward-appointment">
                         <i class="ri-send-plane-line"></i>
                         <span class="menu-text">Forwarded Appointments</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/doctor/get-all-operation-request' }}">
+                <li class="{% if request.path == '/doctor/get-all-operation-request' %}active current-page{% endif %}">
                     <a href="/doctor/get-all-operation-request">
                         <i class="ri-scissors-line"></i>
                         <span class="menu-text">Operation Requests</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/doctor/get-teams' }}">
+                <li class="{% if request.path == '/doctor/get-teams' %}active current-page{% endif %}">
                     <a href="/doctor/get-teams">
                         <i class="ri-team-line"></i>
                         <span class="menu-text">Team Creation</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/chat/chat' }}">
+                <li class="{% if request.path == '/chat/chat' %}active current-page{% endif %}">
                     <a href="/chat/chat">
                         <i class="ri-chat-1-line"></i>
                         <span class="menu-text">Chat</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/staff/leave/apply' }}">
+                <li class="{% if request.path == '/admin/staff/leave/apply' %}active current-page{% endif %}">
                     <a href="/admin/staff/leave/apply">
                         <i class="ri-calendar-todo-line"></i>
                         <span class="menu-text">Apply Leave</span>
@@ -323,19 +381,19 @@
                 </li>
 
             {% elif session['role'] == 'laboratory' %}
-                <li class="{{ 'active current-page' if request.path == '/doctor/dashboard' }}">
+                <li class="{% if request.path == '/doctor/dashboard' %}active current-page{% endif %}">
                     <a href="/doctor/dashboard">
                         <i class="ri-home-6-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/admin/search' }}">
+                <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">
                     <a href="/admin/search">
                         <i class="ri-search-line"></i>
                         <span class="menu-text">User Search</span>
                     </a>
                 </li>
-                <li class="{{ 'active current-page' if request.path == '/laboratory/prescriptions-pending-test-reports' }}">
+                <li class="{% if request.path == '/laboratory/prescriptions-pending-test-reports' %}active current-page{% endif %}">
                     <a href="/laboratory/prescriptions-pending-test-reports">
                         <i class="ri-flask-line"></i>
                         <span class="menu-text">Laboratory</span>
