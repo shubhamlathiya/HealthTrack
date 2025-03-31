@@ -2,8 +2,8 @@ from datetime import datetime
 
 from flask import jsonify, request, render_template
 
-from api.laboratory import laboratory
-from config import mongo
+from controllers.laboratory_controllers import laboratory
+from utils.config import mongo
 
 
 @laboratory.route('/add-reports', methods=['GET', 'POST'])
@@ -42,7 +42,7 @@ def add_report():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
     elif request.method == 'GET':
-        return render_template('laboratory/add_test_report_templates.html')
+        return render_template('laboratory_templates/add_test_report_templates.html')
 
 
 @laboratory.route('/get-reports', methods=['GET'])

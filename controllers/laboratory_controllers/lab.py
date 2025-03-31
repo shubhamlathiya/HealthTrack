@@ -5,8 +5,8 @@ from bson import ObjectId
 from flask import jsonify, render_template, request
 from werkzeug.utils import secure_filename
 
-from api.laboratory import laboratory
-from config import mongo
+from controllers.laboratory_controllers import laboratory
+from utils.config import mongo
 
 
 def serialize_objectid(obj):
@@ -113,11 +113,11 @@ def get_prescriptions():
         # print("After For Loop:")
         # print(prescriptions)
         if not prescriptions:
-            return render_template('laboratory/patient_test_report_management_templates.html',
+            return render_template('laboratory_templates/patient_test_report_management_templates.html',
                                    error="No found Reports")
 
         # Return the prescriptions with matching appointment, patient, doctor, and test report details
-        return render_template("laboratory/patient_test_report_management_templates.html",
+        return render_template("laboratory_templates/patient_test_report_management_templates.html",
                                prescriptions=prescriptions), 200
 
     except Exception as e:
