@@ -3,16 +3,15 @@ from datetime import datetime
 from bson import ObjectId
 from flask import jsonify, request, render_template
 
-from api.doctor import doctors
-from config import mongo
+from controllers.doctor_controllers import doctors
+from utils.config import mongo
 from middleware.auth_middleware import token_required
-
 
 @doctors.route('/generate-operation-request', methods=['GET', 'POST'], endpoint='generate_operation_request')
 @token_required
 def generate_operation_request(current_user):
     if request.method == 'GET':
-        return render_template("doctor/generate_operation_request.html")
+        return render_template("doctor_templates/generate_operation_request.html")
     elif request.method == 'POST':
         data = request.get_json()
 
@@ -159,5 +158,5 @@ def get_all_operation_request(current_user):
     print(operation_requests)
 
     # Return the results in JSON format
-    return render_template("doctor/view_operation_request_templates.html", operation_requests=operation_requests)
+    return render_template("doctor_templates/view_operation_request_templates.html", operation_requests=operation_requests)
 

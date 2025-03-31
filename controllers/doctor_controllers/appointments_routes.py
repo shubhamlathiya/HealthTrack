@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 from bson import ObjectId
 from flask import jsonify, request, render_template, redirect
 
-from api.doctor import doctors
-from config import mongo
+from controllers.doctor_controllers import doctors
+from utils.config import mongo
 from middleware.auth_middleware import token_required
 
 
@@ -56,7 +56,7 @@ def get_all_appointments(current_user):
     # print(appointments)
     # If no appointments found, return an error
     if not appointments:
-        return render_template('doctor/doctor_view_appointments_templates.html',
+        return render_template('doctor_templates/doctor_view_appointments_templates.html',
                                error="No appointments found for today")
         # return jsonify({}), 404
     #
@@ -70,7 +70,7 @@ def get_all_appointments(current_user):
     # Return the list of appointments
 
     # return jsonify({"appointments": appointments}), 200
-    return render_template('doctor/doctor_view_appointments_templates.html', appointments=appointments)
+    return render_template('doctor_templates/doctor_view_appointments_templates.html', appointments=appointments)
 
 
 @doctors.route('/get-all-booked-appointments', methods=['GET'],endpoint="get_all_booked_appointments")
@@ -110,7 +110,7 @@ def get_all_booked_appointments(current_user):
     # print(appointments)
     # If no appointments found, return an error
     if not appointments:
-        return render_template('doctor/doctor_view_appointments_templates.html',
+        return render_template('doctor_templates/doctor_view_appointments_templates.html',
                                error="No appointments found for today")
         # return jsonify({}), 404
     #
@@ -124,12 +124,12 @@ def get_all_booked_appointments(current_user):
     # Return the list of appointments
 
     # return jsonify({"appointments": appointments}), 200
-    return render_template('doctor/doctor_view_appointments_templates.html', appointments=appointments)
+    return render_template('doctor_templates/doctor_view_appointments_templates.html', appointments=appointments)
 
 
 @doctors.route('/generate-prescriptions/<appointments_id>', methods=['GET', 'POST'])
 def generate_prescription(appointments_id):
-    return render_template('doctor/generate_prescriptions_templates.html', appointments_id=appointments_id)
+    return render_template('doctor_templates/generate_prescriptions_templates.html', appointments_id=appointments_id)
 
 
 @doctors.route('/add-generate-prescriptions/', methods=['POST'])
@@ -251,7 +251,7 @@ def get_forward_appointment(current_user):
 
         # If no forwarded appointments are found
         if not forwarded_appointments_list:
-            return render_template('doctor/forward_appointments.html', appointments=[])
+            return render_template('doctor_templates/forward_appointments.html', appointments=[])
 
         # Prepare the response data with forwarding details
         appointments_data = []
@@ -299,7 +299,7 @@ def get_forward_appointment(current_user):
                 appointments_data.append(appointment_data)
 
         # Render the Jinja template and pass the data
-        return render_template('doctor/forward_appointments.html', appointments=appointments_data)
+        return render_template('doctor_templates/forward_appointments.html', appointments=appointments_data)
 
     except Exception as e:
         print(f"Error retrieving forwarded appointments: {e}")
@@ -327,7 +327,7 @@ def get_referring_appointments(current_user):
 
         # If no referred appointments are found, return a JSON response or a rendered template with no appointments
         if not referred_appointments_list:
-            return render_template('doctor/referring_appointments.html', appointments=[])
+            return render_template('doctor_templates/referring_appointments.html', appointments=[])
 
         # Prepare the response data with forwarding details
         appointments_data = []
@@ -383,11 +383,11 @@ def get_referring_appointments(current_user):
 
         # If we have no data to return, render the template with an empty list
         if not appointments_data:
-            return render_template('doctor/referring_appointments.html', appointments=[])
+            return render_template('doctor_templates/referring_appointments.html', appointments=[])
 
         print(appointments_data)
         # Pass the populated appointments data to the template
-        return render_template('doctor/referring_appointments.html', appointments=appointments_data)
+        return render_template('doctor_templates/referring_appointments.html', appointments=appointments_data)
 
     except Exception as e:
         # Log error for debugging purposes

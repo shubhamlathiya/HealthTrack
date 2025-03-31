@@ -1,12 +1,9 @@
-
 from bson import ObjectId
 from flask import Flask, request, jsonify, render_template
-from flask_pymongo import PyMongo
 from datetime import datetime
 import json
-
-from api.doctor import doctors
-from config import mongo
+from controllers.doctor_controllers import doctors
+from utils.config import mongo
 from middleware.auth_middleware import token_required
 
 
@@ -15,7 +12,7 @@ from middleware.auth_middleware import token_required
 @token_required
 def create_team(current_user):
     if request.method == "GET":
-        return render_template("doctor/creation_team_management.html")
+        return render_template("doctor_templates/creation_team_management.html")
 
     elif request.method == "POST":
 
@@ -43,10 +40,10 @@ def create_team(current_user):
         return jsonify({"message": "Team created successfully", "team_id": str(team_id)}), 201
 
 
-@doctors.route('/get-all-teams' , methods=['GET'], endpoint='get_all_teams')
+@doctors.route('/get-all-teams', methods=['GET'], endpoint='get_all_teams')
 @token_required
 def get_all_teams(current_user):
-    teams = list(mongo.db.teams.find({"doctor_id" : ObjectId(current_user)}))
+    teams = list(mongo.db.teams.find({"doctor_id": ObjectId(current_user)}))
     print(teams)
 
     for doctor in teams:
@@ -117,7 +114,7 @@ def get_teams(current_user):
 
     # print(teams)
     # Return the result to the template
-    return render_template("doctor/view_team_templates.html", teams=teams)
+    return render_template("doctor_templates/view_team_templates.html", teams=teams)
 
 
 # Route to get real-time updates on the team

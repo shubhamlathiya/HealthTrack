@@ -10,7 +10,7 @@ def token_required(f):
             return redirect('/')
 
         try:
-            data = jwt.decode(token, 'shubhamlathiya18032004', algorithms=['HS256'])
+            data = jwt.decode(token, 'your_secret_key', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             return redirect('/')
         except jwt.InvalidTokenError:

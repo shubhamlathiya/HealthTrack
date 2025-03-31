@@ -1,9 +1,8 @@
 from bson import ObjectId
 from flask import render_template, jsonify
 
-from api.admin import admin
-from api.doctor import doctors
-from config import mongo
+from controllers.doctor_controllers import doctors
+from utils.config import mongo
 from middleware.auth_middleware import token_required
 
 def objectid_to_str(obj):
@@ -18,7 +17,7 @@ def objectid_to_str(obj):
 
 @doctors.route('/dashboard' , methods=['GET'])
 def dashboard():
-    return render_template("doctor/doctor_dashboard_templets.html")
+    return render_template("doctor_templates/doctor_dashboard_templets.html")
 
 @doctors.route('/get-patient-details/<patient_id>', methods=['GET'] , endpoint='get_patient_details')
 @token_required
