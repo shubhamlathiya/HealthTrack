@@ -259,7 +259,8 @@
                     <div class="available-doc">
                         <a href="doctors-profile.html">
                             <div class="d-flex align-items-center gap-3 text-white">
-                                <img src="../../static/assets/images/doctor4.png" class="img-3x rounded-5" alt="Doctor Dashboard">
+                                <img src="../../static/assets/images/doctor4.png" class="img-3x rounded-5"
+                                     alt="Doctor Dashboard">
                                 <div class="d-flex flex-column flex-fill">
                                     <div class="fw-semibold">Dr. Tobias Wong</div>
                                     <div class="small">Dentist</div>
@@ -603,5 +604,24 @@
         </div>
     </div>
     <!-- Row ends -->
+{#    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/home/income.js') }}"></script>#}
+ <!-- jquert UI -->
+    <script src="../../static/assets/vendor/jquery-ui/jquery-ui.min.js"></script>
+    <script src="../../static/assets/vendor/jquery-ui/custom.js"></script>
+
+    <!-- Apex Charts -->
+    <script src="../../static/assets/vendor/apex/apexcharts.min.js"></script>
+    <script src="../../static/assets/vendor/apex/custom/home/patients.js"></script>
+    <script src="../../static/assets/vendor/apex/custom/home/department-income.js"></script>
+    <script src="../../static/assets/vendor/apex/custom/home/income.js"></script>
+    <script src="../../static/assets/vendor/apex/custom/home/appointments-overview.js"></script>
+    <script src="../../static/assets/vendor/apex/custom/home/sparklines.js"></script>
+
+    <!-- Data Tables -->
+    <script src="../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+{#     <script src="../../static/assets/vendor/apex/custom/home/income.js"></script>#}
 {% endblock body %}
 

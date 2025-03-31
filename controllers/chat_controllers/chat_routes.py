@@ -1,7 +1,7 @@
 from bson import ObjectId
 from flask import Blueprint, request, jsonify, render_template, redirect
 from datetime import datetime
-from config import mongo
+from utils.config import mongo
 from middleware.auth_middleware import token_required
 
 # Create a blueprint for chat routes
