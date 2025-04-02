@@ -4,150 +4,149 @@
 
 {% block body %}
 
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
-        <div class="container mt-5">
-            <h1 class="text-center">Search for User</h1>
+    <div class="container mt-5">
+        <h1 class="text-center">Search for User</h1>
 
-            <!-- Search Form -->
-            <form method="POST" action="/admin/search">
-                <div class="form-group">
-                    <label for="user_id">Enter User ID:</label>
-                    <input type="text" class="form-control" id="user_id" name="user_id" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Search</button>
-            </form>
+        <!-- Search Form -->
+        <form method="POST" action="/admin/search">
+            <div class="form-group">
+                <label for="user_id">Enter User ID:</label>
+                <input type="text" class="form-control" id="user_id" name="user_id" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Search</button>
+        </form>
 
-            <!-- Displaying Search Results -->
-            {% if patient_data %}
-                <div class="mt-5">
-                    <h2>User Search Results</h2>
+        <!-- Displaying Search Results -->
+        {% if patient_data %}
+            <div class="mt-5">
+                <h2>User Search Results</h2>
 
-                    <!-- User Info Section -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h4>User Information</h4>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>Name:</strong> {{ patient_data['user']['name'] }}</p>
-                            <p><strong>Email:</strong> {{ patient_data['user']['email'] }}</p>
-                            <p><strong>Address:</strong> {{ patient_data['user']['address'] }}</p>
-                        </div>
+                <!-- User Info Section -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4>User Information</h4>
                     </div>
+                    <div class="card-body">
+                        <p><strong>Name:</strong> {{ patient_data['user']['name'] }}</p>
+                        <p><strong>Email:</strong> {{ patient_data['user']['email'] }}</p>
+                        <p><strong>Address:</strong> {{ patient_data['user']['address'] }}</p>
+                    </div>
+                </div>
 
-                    <!-- Appointments Section -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
-                            <h4>Appointments</h4>
-                        </div>
-                        <div class="card-body">
-                            {% if patient_data['appointments'] %}
-                                <table class="table table-striped">
-                                    <thead>
+                <!-- Appointments Section -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h4>Appointments</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if patient_data['appointments'] %}
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for appointment in patient_data['appointments'] %}
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Time</th>
-                                        <th>Reason</th>
-                                        <th>Status</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for appointment in patient_data['appointments'] %}
-                                        <tr>
-                                            <td>{{ appointment.date.strftime('%Y-%m-%d') }}</td>
-                                            <td>{{ appointment.time }}</td>
-                                            <td>{{ appointment.reason }}</td>
-                                            <td>
+                                        <td>{{ appointment.date.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ appointment.time }}</td>
+                                        <td>{{ appointment.reason }}</td>
+                                        <td>
                                             <span class="badge
                                                 {% if appointment.status == 'Completed' %}badge-success
                                                 {% elif appointment.status == 'Cancelled' %}badge-danger
                                                 {% else %}badge-warning{% endif %}">
                                                 {{ appointment.status }}
                                             </span>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-                                <p>No appointments found.</p>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Prescriptions Section -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-warning text-white">
-                            <h4>Prescriptions</h4>
-                        </div>
-                        <div class="card-body">
-                            {% if patient_data['prescriptions'] %}
-                                <table class="table table-striped">
-                                    <thead>
-                                    <tr>
-                                        <th>Medication</th>
-                                        <th>Dosage</th>
-                                        <th>Timing</th>
-                                        <th>Meal Instructions</th>
-                                        <th>Notes</th>
+                                        </td>
                                     </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for prescription in patient_data['prescriptions'] %}
-                                        <tr>
-                                            <td>{{ prescription.medications[0].name }}</td>
-                                            <td>{{ prescription.medications[0].dosage }}</td>
-                                            <td>{{ prescription.medications[0].timing | join(', ') }}</td>
-                                            <td>{{ prescription.medications[0].meal_instructions }}</td>
-                                            <td>{{ prescription.notes }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-                                <p>No prescriptions found.</p>
-                            {% endif %}
-                        </div>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>No appointments found.</p>
+                        {% endif %}
                     </div>
+                </div>
 
-                    <!-- Uploaded Test Reports Section -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-info text-white">
-                            <h4>Uploaded Test Reports</h4>
-                        </div>
-                        <div class="card-body">
-                            {% if patient_data['uploadedTestReports'] %}
-                                <table class="table table-striped">
-                                    <thead>
+                <!-- Prescriptions Section -->
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-white">
+                        <h4>Prescriptions</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if patient_data['prescriptions'] %}
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Medication</th>
+                                    <th>Dosage</th>
+                                    <th>Timing</th>
+                                    <th>Meal Instructions</th>
+                                    <th>Notes</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for prescription in patient_data['prescriptions'] %}
                                     <tr>
-                                        <th>Report Name</th>
-                                        <th>File Path</th>
-                                        <th>Status</th>
+                                        <td>{{ prescription.medications[0].name }}</td>
+                                        <td>{{ prescription.medications[0].dosage }}</td>
+                                        <td>{{ prescription.medications[0].timing | join(', ') }}</td>
+                                        <td>{{ prescription.medications[0].meal_instructions }}</td>
+                                        <td>{{ prescription.notes }}</td>
                                     </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for report in patient_data['uploadedTestReports'] %}
-                                        <tr>
-                                            <td>{{ report.report_name }}</td>
-                                            <td><a href="/{{ report.file_path }}" target="_blank">View</a></td>
-                                            <td>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>No prescriptions found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Uploaded Test Reports Section -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h4>Uploaded Test Reports</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if patient_data['uploadedTestReports'] %}
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Report Name</th>
+                                    <th>File Path</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for report in patient_data['uploadedTestReports'] %}
+                                    <tr>
+                                        <td>{{ report.report_name }}</td>
+                                        <td><a href="/{{ report.file_path }}" target="_blank">View</a></td>
+                                        <td>
                                             <span class="badge
                                                 {% if report.status == 'active' %}badge-success
                                                 {% else %}badge-secondary{% endif %}">
                                                 {{ report.status }}
                                             </span>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-                                <p>No uploaded test reports found.</p>
-                            {% endif %}
-                        </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>No uploaded test reports found.</p>
+                        {% endif %}
                     </div>
                 </div>
-            {% endif %}
-        </div>
-    </main>
+            </div>
+        {% endif %}
+    </div>
+
 {% endblock body %}
 
