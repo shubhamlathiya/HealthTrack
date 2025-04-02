@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock title %}
+
+{% block body %}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Blood Donor List</h5>
+                    <a href="add-donor.html" class="btn btn-primary ms-auto">Add New Donor</a>
+                </div>
+                <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Donor Name</th>
+                                <th>Blood Type</th>
+                                <th>Gender</th>
+                                <th>Date of Birth</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Last Donation</th>
+                                <th>Next Eligible</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>D001</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor.png" class="img-2x rounded-5 me-1" alt="Donor Image">
+                                    John Smith
+                                </td>
+                                <td>A+</td>
+                                <td>Male</td>
+                                <td>15/05/1985</td>
+                                <td>0987654321</td>
+                                <td>john.smith@example.com</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>20/10/2023</td>
+                                <td>20/01/2024</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-donor.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Donor">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>D002</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor1.png" class="img-2x rounded-5 me-1"
+                                         alt="Donor Image">
+                                    Sarah Johnson
+                                </td>
+                                <td>O-</td>
+                                <td>Female</td>
+                                <td>22/08/1990</td>
+                                <td>0987654321</td>
+                                <td>sarah.j@example.com</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>15/09/2023</td>
+                                <td>15/12/2023</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-donor.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Donor">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>D003</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor2.png" class="img-2x rounded-5 me-1"
+                                         alt="Donor Image">
+                                    Michael Brown
+                                </td>
+                                <td>B+</td>
+                                <td>Male</td>
+                                <td>03/12/1978</td>
+                                <td>0987654321</td>
+                                <td>michael.b@example.com</td>
+                                <td><span class="badge bg-warning">Temporary Deferral</span></td>
+                                <td>10/08/2023</td>
+                                <td>10/02/2024</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-donor.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Donor">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>D004</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor3.png" class="img-2x rounded-5 me-1"
+                                         alt="Donor Image">
+                                    Emily Davis
+                                </td>
+                                <td>AB+</td>
+                                <td>Female</td>
+                                <td>29/04/1995</td>
+                                <td>0987654321</td>
+                                <td>emily.d@example.com</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>05/11/2023</td>
+                                <td>05/02/2024</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-donor.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Donor">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>D005</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor4.png" class="img-2x rounded-5 me-1"
+                                         alt="Donor Image">
+                                    Robert Wilson
+                                </td>
+                                <td>O+</td>
+                                <td>Male</td>
+                                <td>17/07/1982</td>
+                                <td>0987654321</td>
+                                <td>robert.w@example.com</td>
+                                <td><span class="badge bg-danger">Inactive</span></td>
+                                <td>12/06/2022</td>
+                                <td>N/A</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-donor.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Donor">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- Modal Delete Row -->
+                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delRowLabel">
+                                        Confirm
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this donor record?
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                                aria-label="Close">No
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Yes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Details Modal -->
+                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewDetailsLabel">Donor Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Donor ID:</strong> D001</p>
+                                            <p><strong>Name:</strong> John Smith</p>
+                                            <p><strong>Date of Birth:</strong> 15/05/1985</p>
+                                            <p><strong>Gender:</strong> Male</p>
+                                            <p><strong>Blood Type:</strong> A+</p>
+                                            <p><strong>Address:</strong> 123 Main St, City, Country</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Phone:</strong> 0987654321</p>
+                                            <p><strong>Email:</strong> john.smith@example.com</p>
+                                            <p><strong>Status:</strong> Active</p>
+                                            <p><strong>Last Donation:</strong> 20/10/2023</p>
+                                            <p><strong>Next Eligible:</strong> 20/01/2024</p>
+                                            <p><strong>Registration Date:</strong> 15/03/2020</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Medical History</h6>
+                                            <p>No significant medical history. Regular donor with no complications.</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Emergency Contact</h6>
+                                            <p>Jane Smith (Spouse) - 0987654322</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+{% endblock body %}
+{% block heardLink %}
+
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+{% endblock footerLink %}

@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock title %}
+
+{% block body %}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Blood Product Inventory</h5>
+                    <a href="add-blood-product.html" class="btn btn-primary ms-auto">Add Blood Product</a>
+                </div>
+                <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Blood Type</th>
+                                <th>Component</th>
+                                <th>Quantity</th>
+                                <th>Collection Date</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Quality</th>
+                                <th>Storage</th>
+                                <th>Batch #</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>BP001</td>
+                                <td>O+</td>
+                                <td>Red Blood Cells</td>
+                                <td>25 units</td>
+                                <td>2024-11-01</td>
+                                <td>2024-12-15</td>
+                                <td><span class="badge bg-success">Fresh</span></td>
+                                <td><span class="badge bg-success">Good</span></td>
+                                <td>Blood Bank Freezer</td>
+                                <td>BATCH12345</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-blood-product.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Product">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails" data-bs-placement="top"
+                                                data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BP002</td>
+                                <td>A-</td>
+                                <td>Plasma</td>
+                                <td>15 units</td>
+                                <td>2024-10-28</td>
+                                <td>2025-04-28</td>
+                                <td><span class="badge bg-success">Fresh</span></td>
+                                <td><span class="badge bg-success">Good</span></td>
+                                <td>Plasma Freezer</td>
+                                <td>BATCH12346</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-blood-product.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Product">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails" data-bs-placement="top"
+                                                data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BP003</td>
+                                <td>B+</td>
+                                <td>Platelets</td>
+                                <td>8 units</td>
+                                <td>2024-11-05</td>
+                                <td>2024-11-12</td>
+                                <td><span class="badge bg-warning">Near Expiry</span></td>
+                                <td><span class="badge bg-success">Good</span></td>
+                                <td>Platelet Agitator</td>
+                                <td>BATCH12347</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-blood-product.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Product">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails" data-bs-placement="top"
+                                                data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BP004</td>
+                                <td>AB+</td>
+                                <td>Cryoprecipitate</td>
+                                <td>12 units</td>
+                                <td>2024-10-15</td>
+                                <td>2025-10-15</td>
+                                <td><span class="badge bg-success">Fresh</span></td>
+                                <td><span class="badge bg-success">Good</span></td>
+                                <td>Deep Freezer</td>
+                                <td>BATCH12348</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-blood-product.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Product">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails" data-bs-placement="top"
+                                                data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BP005</td>
+                                <td>O-</td>
+                                <td>Whole Blood</td>
+                                <td>5 units</td>
+                                <td>2024-11-08</td>
+                                <td>2024-12-08</td>
+                                <td><span class="badge bg-success">Fresh</span></td>
+                                <td><span class="badge bg-success">Good</span></td>
+                                <td>Blood Bank Refrigerator</td>
+                                <td>BATCH12349</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-blood-product.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Product">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails" data-bs-placement="top"
+                                                data-bs-title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- Modal Delete Row -->
+                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delRowLabel">
+                                        Confirm Deletion
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this blood product record?
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                                aria-label="Close">Cancel
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Details Modal -->
+                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewDetailsLabel">Blood Product Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Product ID:</strong> BP001</p>
+                                            <p><strong>Blood Type:</strong> O+</p>
+                                            <p><strong>Component Type:</strong> Red Blood Cells</p>
+                                            <p><strong>Quantity:</strong> 25 units</p>
+                                            <p><strong>Batch Number:</strong> BATCH12345</p>
+                                            <p><strong>Collection Date:</strong> 2024-11-01</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Expiry Date:</strong> 2024-12-15</p>
+                                            <p><strong>Storage Location:</strong> Blood Bank Freezer</p>
+                                            <p><strong>Temperature Range:</strong> 2-6°C</p>
+                                            <p><strong>Status:</strong> Fresh</p>
+                                            <p><strong>Quality Status:</strong> Good</p>
+                                            <p><strong>Last Updated:</strong> 2024-11-10</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Additional Information</h6>
+                                            <p>This batch passed all quality control tests and is suitable for
+                                                transfusion.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="button" class="btn btn-primary">Print Label</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+{% endblock body %}
+{% block heardLink %}
+
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+{% endblock footerLink %}

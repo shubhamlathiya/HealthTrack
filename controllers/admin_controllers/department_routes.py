@@ -5,7 +5,6 @@ from flask import jsonify, request, render_template
 from controllers.admin_controllers import admin
 from utils.config import mongo
 
-
 @admin.route('/add-department', methods=['GET','POST'])
 def add_department():
     if request.method == "POST":

@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+{% block title %}Insurance Records{% endblock title %}
+
+{% block body %}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Insurance Records</h5>
+                    <a href="add-insurance.html" class="btn btn-primary ms-auto">Add Insurance</a>
+                </div>
+                <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>Insurance ID</th>
+                                <th>Patient</th>
+                                <th>Insurance Company</th>
+                                <th>Policy Number</th>
+                                <th>Policy Type</th>
+                                <th>Coverage Period</th>
+                                <th>Coverage Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>INS123456</td>
+                                <td>
+                                    <strong>John Doe</strong><br>
+                                    <small>PAT987654</small>
+                                </td>
+                                <td>HealthCare Insurance Co.</td>
+                                <td>HCI123456789</td>
+                                <td>Individual</td>
+                                <td>
+                                    2024-01-01 to<br>
+                                    2025-01-01
+                                </td>
+                                <td>$500,000</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="View Claims">
+                                            <i class="ri-file-list-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>INS789012</td>
+                                <td>
+                                    <strong>Sarah Johnson</strong><br>
+                                    <small>PAT654321</small>
+                                </td>
+                                <td>Wellness Assurance</td>
+                                <td>WA987654321</td>
+                                <td>Family</td>
+                                <td>
+                                    2024-03-15 to<br>
+                                    2025-03-15
+                                </td>
+                                <td>$750,000</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="View Claims">
+                                            <i class="ri-file-list-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>INS345678</td>
+                                <td>
+                                    <strong>Michael Brown</strong><br>
+                                    <small>PAT321654</small>
+                                </td>
+                                <td>MediCare Solutions</td>
+                                <td>MS456789123</td>
+                                <td>Corporate</td>
+                                <td>
+                                    2023-11-01 to<br>
+                                    2024-11-01
+                                </td>
+                                <td>$1,000,000</td>
+                                <td><span class="badge bg-warning">Expiring Soon</span></td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="View Claims">
+                                            <i class="ri-file-list-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- Modal Delete Row -->
+                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delRowLabel">
+                                        Confirm Deletion
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this insurance record?
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                                aria-label="Close">Cancel
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Details Modal -->
+                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewDetailsLabel">Insurance Policy Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Policy Information</h6>
+                                            <p><strong>Insurance ID:</strong> INS123456</p>
+                                            <p><strong>Insurance Company:</strong> HealthCare Insurance Co.</p>
+                                            <p><strong>Policy Number:</strong> HCI123456789</p>
+                                            <p><strong>Policy Type:</strong> Individual</p>
+                                            <p><strong>Plan Type:</strong> Premium</p>
+                                            <p><strong>Coverage Period:</strong> 2024-01-01 to 2025-01-01</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Financial Details</h6>
+                                            <p><strong>Coverage Amount:</strong> $500,000</p>
+                                            <p><strong>Co-payment:</strong> 15%</p>
+                                            <p><strong>Claim Limit:</strong> $1,000,000</p>
+                                            <p><strong>Status:</strong> Active</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <h6>Patient Information</h6>
+                                            <p><strong>Patient ID:</strong> PAT987654</p>
+                                            <p><strong>Policy Holder:</strong> John Doe</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Benefits</h6>
+                                            <ul class="list-unstyled">
+                                                <li><i class="ri-check-line text-success"></i> Maternity</li>
+                                                <li><i class="ri-check-line text-success"></i> Surgery</li>
+                                                <li><i class="ri-check-line text-success"></i> Outpatient visits</li>
+                                                <li><i class="ri-check-line text-success"></i> Emergency care</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Remarks</h6>
+                                            <p>Policy upgraded for additional coverage</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="button" class="btn btn-primary">Print Policy</button>
+                                    <button type="button" class="btn btn-success">Renew Policy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+{% endblock body %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+    <!-- Initialize Bootstrap components -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Initialize modals
+            var modalEl = document.getElementById('viewDetails');
+            var modal = new bootstrap.Modal(modalEl);
+        });
+    </script>
+{% endblock footerLink %}
