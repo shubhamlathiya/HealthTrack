@@ -4,32 +4,32 @@ from controllers.admin_controllers import admin
 
 
 @admin.route('/room/add-room', methods=['GET'], endpoint='add-room')
-def dashboard():
+def room_add_room():
     return render_template("admin_templates/room/add-room.html")
 
 
 @admin.route('/room/available-room', methods=['GET'], endpoint='available-room')
-def dashboard():
+def room_available_room():
     return render_template("admin_templates/room/available-rooms.html")
 
 
 @admin.route('/room/book-room', methods=['GET'], endpoint='book-room')
-def dashboard():
+def room_book_room():
     return render_template("admin_templates/room/book-room.html")
 
 
 @admin.route('/room/room-statistics', methods=['GET'], endpoint='room-statistics')
-def dashboard():
+def room_room_statistics():
     return render_template("admin_templates/room/room-statistics.html")
 
 
 @admin.route('/room/rooms-allotted', methods=['GET'], endpoint='rooms-allotted')
-def dashboard():
+def room_rooms_allotted():
     return render_template("admin_templates/room/rooms-allotted.html")
 
 
 @admin.route('/room/rooms-by-dept', methods=['GET'], endpoint='rooms-by-dept')
-def dashboard():
+def room_room_by_dept():
     return render_template("admin_templates/room/rooms-by-dept.html")
 
 # @admin.route('/add-room', methods=['POST'])
