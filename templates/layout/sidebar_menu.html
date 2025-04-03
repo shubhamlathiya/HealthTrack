@@ -238,6 +238,21 @@
                     </ul>
                 </li>
 
+                <li class="treeview {% if request.path.startswith('/admin/records') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-shopping-bag-line"></i>
+                        <span class="menu-text">Records</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="{% if request.path == '/admin/records/death' %}active{% endif %}">
+                            <a href="/admin/records/death">Death Records</a>
+                        </li>
+                        <li class="{% if request.path == '/admin/inventory/issued' %}active{% endif %}">
+                            <a href="/admin/records/birth">Birth Records</a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="treeview {% if request.path.startswith('/admin/insurance') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-shield-check-line"></i>

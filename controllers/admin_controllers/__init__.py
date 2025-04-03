@@ -21,6 +21,7 @@ from .accounts_routes import *
 from .blood_bank_routes import *
 from .insurance_routes import *
 from .pharmacy_routes import *
+from .records_routes import *
 
 @admin.route('/user-status', methods=['POST'],endpoint='userStatus')
 @token_required

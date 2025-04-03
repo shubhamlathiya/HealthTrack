@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}Death Records{% endblock title %}
+
+{% block body %}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Death Records</h5>
+                    <a href="add-death-record.html" class="btn btn-primary ms-auto">Add Record</a>
+                </div>
+                <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>Case #</th>
+                                <th>Deceased</th>
+                                <th>Gender</th>
+                                <th>Death Date</th>
+                                <th>Guardian</th>
+                                <th>Contact</th>
+                                <th>Cause</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>3453</td>
+                                <td>
+                                    <strong>Eva Willis</strong>
+                                    <div class="text-muted small">76 E. Lower River St.</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-pink bg-opacity-10 text-pink">Female</span>
+                                </td>
+                                <td>
+                                    02/25/2021<br>
+                                    <span class="text-muted small">3 years ago</span>
+                                </td>
+                                <td>Laurel Maxwell</td>
+                                <td>
+                                    <i class="ri-phone-line align-middle"></i> 123-456-7890
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger">Heart Attack</span>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="Print Certificate">
+                                            <i class="ri-printer-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3454</td>
+                                <td>
+                                    <strong>Michael Johnson</strong>
+                                    <div class="text-muted small">123 Main St.</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">Male</span>
+                                </td>
+                                <td>
+                                    05/15/2022<br>
+                                    <span class="text-muted small">2 years ago</span>
+                                </td>
+                                <td>Sarah Johnson</td>
+                                <td>
+                                    <i class="ri-phone-line align-middle"></i> 234-567-8901
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger">Cancer</span>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="Print Certificate">
+                                            <i class="ri-printer-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3455</td>
+                                <td>
+                                    <strong>Emily Davis</strong>
+                                    <div class="text-muted small">456 Oak Ave.</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-pink bg-opacity-10 text-pink">Female</span>
+                                </td>
+                                <td>
+                                    11/30/2020<br>
+                                    <span class="text-muted small">3 years ago</span>
+                                </td>
+                                <td>Thomas Brown</td>
+                                <td>
+                                    <i class="ri-phone-line align-middle"></i> 345-678-9012
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger">Accident</span>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="Print Certificate">
+                                            <i class="ri-printer-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- Modal Delete Row -->
+                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delRowLabel">
+                                        Confirm Deletion
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this death record? This action cannot be undone.
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                                aria-label="Close">Cancel
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Details Modal -->
+                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewDetailsLabel">Death Record Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Deceased Information</h6>
+                                            <p><strong>Case Number:</strong> 3453</p>
+                                            <p><strong>Name:</strong> Eva Willis</p>
+                                            <p><strong>Gender:</strong> Female</p>
+                                            <p><strong>Death Date:</strong> February 25, 2021 (3 years ago)</p>
+                                            <p><strong>Address:</strong> 76 E. Lower River St.</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Next of Kin</h6>
+                                            <p><strong>Guardian Name:</strong> Laurel Maxwell</p>
+                                            <p><strong>Contact Number:</strong> 123-456-7890</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <h6>Death Details</h6>
+                                            <p><strong>Cause of Death:</strong> Heart Attack</p>
+                                            <p><strong>Time of Death:</strong> 14:30</p>
+                                            <p><strong>Pronounced By:</strong> Dr. James Wilson</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Administrative</h6>
+                                            <p><strong>Record Created:</strong> February 26, 2021</p>
+                                            <p><strong>Created By:</strong> Admin User</p>
+                                            <p><strong>Last Updated:</strong> February 26, 2021</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Additional Notes</h6>
+                                            <div class="card bg-light">
+                                                <div class="card-body">
+                                                    <p class="mb-0">Patient had a history of cardiovascular disease. Pronounced dead at General Hospital after failed resuscitation attempts.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="button" class="btn btn-primary">Print Death Certificate</button>
+                                    <button type="button" class="btn btn-success">Notify Authorities</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+{% endblock body %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+    
+    <!-- Initialize Bootstrap components -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Initialize modals
+            var modalEl = document.getElementById('viewDetails');
+            var modal = new bootstrap.Modal(modalEl);
+        });
+    </script>
+{% endblock footerLink %}

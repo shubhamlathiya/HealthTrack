@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block title %}Child Case Records{% endblock title %}
+
+{% block body %}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Child Case Records</h5>
+                    <a href="add-child-case.html" class="btn btn-primary ms-auto">Add New Case</a>
+                </div>
+                <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>Case #</th>
+                                <th>Child Name</th>
+                                <th>Gender</th>
+                                <th>Birth Date</th>
+                                <th>Parents</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>3453</td>
+                                <td>
+                                    <strong>Jenson</strong>
+                                    <div class="text-muted small">76 E. Lower River St.</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-pink bg-opacity-10 text-bg-success">Female</span>
+                                </td>
+                                <td>02/25/2021<br><span class="text-muted small">2 years</span></td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span>Eva Willis</span>
+                                        <span class="text-muted small">Laurel Maxwell</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="ri-phone-line align-middle"></i> 123-456-7890
+                                </td>
+                                <td>
+                                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-child-case.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Case">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3454</td>
+                                <td>
+                                    <strong>Michael</strong>
+                                    <div class="text-muted small">123 Main St.</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">Male</span>
+                                </td>
+                                <td>05/15/2022<br><span class="text-muted small">1 year</span></td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span>Sarah Johnson</span>
+                                        <span class="text-muted small">Robert Wilson</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="ri-phone-line align-middle"></i> 234-567-8901
+                                </td>
+                                <td>
+                                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-child-case.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Case">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3455</td>
+                                <td>
+                                    <strong>Emily</strong>
+                                    <div class="text-muted small">456 Oak Ave.</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-pink bg-opacity-10 text-pink">Female</span>
+                                </td>
+                                <td>11/30/2020<br><span class="text-muted small">3 years</span></td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span>Jennifer Davis</span>
+                                        <span class="text-muted small">Thomas Brown</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="ri-phone-line align-middle"></i> 345-678-9012
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning">Follow-up Needed</span>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-child-case.html" class="btn btn-outline-success btn-sm"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" data-bs-title="Edit Case">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- Modal Delete Row -->
+                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delRowLabel">
+                                        Confirm Deletion
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this child case record?
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                                aria-label="Close">Cancel
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Details Modal -->
+                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewDetailsLabel">Child Case Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Child Information</h6>
+                                            <p><strong>Case Number:</strong> 3453</p>
+                                            <p><strong>Child Name:</strong> Jenson</p>
+                                            <p><strong>Gender:</strong> Female</p>
+                                            <p><strong>Birth Date:</strong> 02/25/2021 (2 years old)</p>
+                                            <p><strong>Address:</strong> 76 E. Lower River St.</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Parent Information</h6>
+                                            <p><strong>Mother's Name:</strong> Eva Willis</p>
+                                            <p><strong>Father's Name:</strong> Laurel Maxwell</p>
+                                            <p><strong>Contact Number:</strong> 123-456-7890</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Case Notes</h6>
+                                            <div class="card bg-light">
+                                                <div class="card-body">
+                                                    <p class="mb-0">Normal Delivery. No complications during birth. Regular checkups show normal development milestones.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Medical History</h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Visit Type</th>
+                                                            <th>Height</th>
+                                                            <th>Weight</th>
+                                                            <th>Notes</th>
+                                                            <th>Doctor</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>2023-05-15</td>
+                                                            <td>Well-child</td>
+                                                            <td>85 cm</td>
+                                                            <td>12.5 kg</td>
+                                                            <td>Normal development</td>
+                                                            <td>Dr. Smith</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>2023-02-20</td>
+                                                            <td>Vaccination</td>
+                                                            <td>82 cm</td>
+                                                            <td>11.8 kg</td>
+                                                            <td>MMR vaccine administered</td>
+                                                            <td>Dr. Johnson</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>2022-11-10</td>
+                                                            <td>Well-child</td>
+                                                            <td>78 cm</td>
+                                                            <td>10.5 kg</td>
+                                                            <td>Meeting milestones</td>
+                                                            <td>Dr. Smith</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="button" class="btn btn-primary">Print Record</button>
+                                    <button type="button" class="btn btn-success">Schedule Follow-up</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+{% endblock body %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+    
+    <!-- Initialize Bootstrap components -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Initialize modals
+            var modalEl = document.getElementById('viewDetails');
+            var modal = new bootstrap.Modal(modalEl);
+        });
+    </script>
+{% endblock footerLink %}
