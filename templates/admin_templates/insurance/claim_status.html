@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Insurance Claims{% endblock title %}
+
+{% block body %}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Insurance Claims</h5>
+                    <a href="add-claim.html" class="btn btn-primary ms-auto">New Claim</a>
+                </div>
+                <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Patient</th>
+                                <th>Claim Type</th>
+                                <th>Doctor</th>
+                                <th>Claim Amount</th>
+                                <th>Approved</th>
+                                <th>Status</th>
+                                <th>Claim Date</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>CLAIM1006</td>
+                                <td>Michael Harris</td>
+                                <td>Surgery</td>
+                                <td>Dr. Linda Wilson</td>
+                                <td>
+                                    <span class="text-primary">$1,800</span>
+                                </td>
+                                <td>
+                                    <span class="text-success">$1,750</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">Approved</span>
+                                </td>
+                                <td>2024-11-13</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="Print Claim">
+                                            <i class="ri-printer-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CLAIM1007</td>
+                                <td>Sarah Johnson</td>
+                                <td>Hospitalization</td>
+                                <td>Dr. Robert Chen</td>
+                                <td>
+                                    <span class="text-primary">$3,200</span>
+                                </td>
+                                <td>
+                                    <span class="text-success">$3,200</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">Approved</span>
+                                </td>
+                                <td>2024-11-10</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="Print Claim">
+                                            <i class="ri-printer-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CLAIM1008</td>
+                                <td>David Miller</td>
+                                <td>Diagnostic</td>
+                                <td>Dr. Emily Park</td>
+                                <td>
+                                    <span class="text-primary">$450</span>
+                                </td>
+                                <td>
+                                    <span class="text-danger">$0</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger">Rejected</span>
+                                </td>
+                                <td>2024-11-05</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewDetails">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-title="Print Claim">
+                                            <i class="ri-printer-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- View Details Modal -->
+                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewDetailsLabel">Claim Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Claim Information</h6>
+                                            <p><strong>Claim ID:</strong> CLAIM1006</p>
+                                            <p><strong>Patient Name:</strong> Michael Harris</p>
+                                            <p><strong>Claim Type:</strong> Surgery</p>
+                                            <p><strong>Claim Date:</strong> November 13, 2024</p>
+                                            <p><strong>Status:</strong> <span class="badge bg-success">Approved</span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Medical Information</h6>
+                                            <p><strong>Doctor Name:</strong> Dr. Linda Wilson</p>
+                                            <p><strong>Hospital Name:</strong> Eastside Medical Group</p>
+                                            <p><strong>Procedure Code:</strong> CPT-49560</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <h6>Financial Details</h6>
+                                            <p><strong>Claim Amount:</strong> $1,800.00</p>
+                                            <p><strong>Approved Amount:</strong> $1,750.00</p>
+                                            <p><strong>Deductible Applied:</strong> $50.00</p>
+                                            <p><strong>Patient Responsibility:</strong> $50.00</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Approval Details</h6>
+                                            <p><strong>Approved Date:</strong> November 15, 2024</p>
+                                            <p><strong>Approved By:</strong> Insurance Processor #421</p>
+                                            <p><strong>Payment Date:</strong> November 20, 2024</p>
+                                            <p><strong>Payment Method:</strong> EFT to Provider</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Rejection Reason</h6>
+                                            <div class="card bg-light">
+                                                <div class="card-body">
+                                                    <p class="mb-0">N/A (Claim Approved)</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="button" class="btn btn-primary">Print Full Claim</button>
+                                    <button type="button" class="btn btn-success">Appeal Claim</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+{% endblock body %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+    
+    <!-- Initialize Bootstrap components -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Initialize modals
+            var modalEl = document.getElementById('viewDetails');
+            var modal = new bootstrap.Modal(modalEl);
+        });
+    </script>
+{% endblock footerLink %}

@@ -11,3 +11,7 @@ def insurance_patient():
 @admin.route('/insurance/provider', methods=['GET'], endpoint='insurance_provider')
 def insurance_provider():
     return render_template("admin_templates/insurance/insurance_providers.html")
+
+@admin.route('/insurance/claim-status', methods=['GET'], endpoint='insurance_claim_status')
+def insurance_claim_status():
+    return render_template("admin_templates/insurance/claim_status.html")
