@@ -36,7 +36,7 @@ def add_department():
 
         return jsonify({'message': 'Department created successfully', 'department_id': department_id}), 201
     elif request.method == "GET":
-        return render_template('admin_templates/add_department_templates.html')
+        return render_template('admin_templates/department/add_department_templates.html')
 
 
 @admin.route('/get-departments', methods=['GET'])
@@ -57,7 +57,7 @@ def view_departments():
         # Fetch the department by name
     departments = list(mongo.db.departments.find())
     # print(departments)
-    return render_template("admin_templates/view_department_templates.html" , departments=departments)
+    return render_template("admin_templates/department/view_department_templates.html", departments=departments)
 
 # @admin.route('/department-doctors/<department>', methods=['GET'])
 # def get_doctors_by_department(department):

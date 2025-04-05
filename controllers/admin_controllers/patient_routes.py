@@ -39,7 +39,7 @@ def view_all_patients():
 
         # print(doctors)
 
-        return render_template("admin_templates/view_patient_templates.html", patients=patient)
+        return render_template("admin_templates/patients/view_patient_templates.html", patients=patient)
 
     except Exception as e:
         print(f"Error fetching doctors: {e}")
