@@ -1,9 +1,10 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
+from controllers.constant.PathConstant import *
 
 
-@admin.route('/blood-bank/donor', methods=['GET'], endpoint='blood_bank_donor')
+@admin.route(BLOOD_BANK_DONOR, methods=['GET'], endpoint='blood_bank_donor')
 def blood_bank_donor():
     return render_template("admin_templates/blood_bank/blood_donor.html")
 

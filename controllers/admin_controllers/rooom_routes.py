@@ -1,34 +1,36 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
+from controllers.constant.PathConstant import ROOM_ADD_ROOM, ROOM_AVAILABLE_ROOM, ROOM_BOOK_ROOM, ROOM_ROOM_STATISTICS, \
+    ROOM_ROOM_ALLOTTED, ROOM_ROOM_BY_DEPT
 
 
-@admin.route('/room/add-room', methods=['GET'], endpoint='add-room')
+@admin.route(ROOM_ADD_ROOM, methods=['GET'], endpoint='add-room')
 def room_add_room():
     return render_template("admin_templates/room/add-room.html")
 
 
-@admin.route('/room/available-room', methods=['GET'], endpoint='available-room')
+@admin.route(ROOM_AVAILABLE_ROOM, methods=['GET'], endpoint='available-room')
 def room_available_room():
     return render_template("admin_templates/room/available-rooms.html")
 
 
-@admin.route('/room/book-room', methods=['GET'], endpoint='book-room')
+@admin.route(ROOM_BOOK_ROOM, methods=['GET'], endpoint='book-room')
 def room_book_room():
     return render_template("admin_templates/room/book-room.html")
 
 
-@admin.route('/room/room-statistics', methods=['GET'], endpoint='room-statistics')
+@admin.route(ROOM_ROOM_STATISTICS, methods=['GET'], endpoint='room-statistics')
 def room_room_statistics():
     return render_template("admin_templates/room/room-statistics.html")
 
 
-@admin.route('/room/rooms-allotted', methods=['GET'], endpoint='rooms-allotted')
+@admin.route(ROOM_ROOM_ALLOTTED, methods=['GET'], endpoint='rooms-allotted')
 def room_rooms_allotted():
     return render_template("admin_templates/room/rooms-allotted.html")
 
 
-@admin.route('/room/rooms-by-dept', methods=['GET'], endpoint='rooms-by-dept')
+@admin.route(ROOM_ROOM_BY_DEPT, methods=['GET'], endpoint='rooms-by-dept')
 def room_room_by_dept():
     return render_template("admin_templates/room/rooms-by-dept.html")
 

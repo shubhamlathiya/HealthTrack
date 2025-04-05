@@ -1,33 +1,35 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
+from controllers.constant.PathConstant import ACCOUNTS_INCOME, ACCOUNTS_EXPENSES, ACCOUNTS_INVOICES, ACCOUNTS_PAYMENTS, \
+    ACCOUNTS_CREATE_INVOICE, ACCOUNTS_INVOICES_DETAILS
 
 
-@admin.route('/accounts/income', methods=['GET'], endpoint='income')
+@admin.route(ACCOUNTS_INCOME, methods=['GET'], endpoint='income')
 def accountIncoms():
     return render_template("admin_templates/accounts/income.html")
 
 
-@admin.route('/accounts/expenses', methods=['GET'], endpoint='expenses')
+@admin.route(ACCOUNTS_EXPENSES, methods=['GET'], endpoint='expenses')
 def accountExpenss():
     return render_template("admin_templates/accounts/expenses.html")
 
 
-@admin.route('/accounts/invoices', methods=['GET'], endpoint='invoices')
+@admin.route(ACCOUNTS_INVOICES, methods=['GET'], endpoint='invoices')
 def accountInvoices():
     return render_template("admin_templates/accounts/invoices.html")
 
 
-@admin.route('/accounts/payments', methods=['GET'], endpoint='payments')
+@admin.route(ACCOUNTS_PAYMENTS, methods=['GET'], endpoint='payments')
 def accountsPayments():
     return render_template("admin_templates/accounts/payments.html")
 
 
-@admin.route('/accounts/create-invoice', methods=['GET'], endpoint='create-invoice')
+@admin.route(ACCOUNTS_CREATE_INVOICE, methods=['GET'], endpoint='create-invoice')
 def accounts_create_invoice():
     return render_template("admin_templates/accounts/create-invoice.html")
 
 
-@admin.route('/accounts/invoice-details', methods=['GET'], endpoint='invoice-details')
+@admin.route(ACCOUNTS_INVOICES_DETAILS, methods=['GET'], endpoint='invoice-details')
 def accoutsInvoiceDetails():
     return render_template("admin_templates/accounts/invoice-details.html")
