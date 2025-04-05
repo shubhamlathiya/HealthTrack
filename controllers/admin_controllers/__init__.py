@@ -1,7 +1,9 @@
 from flask import Blueprint
 
+from ..constant.PathConstant import ADMIN
+
 # Initialize the 'client' blueprint
-admin = Blueprint('admin', __name__)
+admin = Blueprint(ADMIN, __name__)
 
 from .department_routes import *
 from .doctor_routes import *

@@ -1,8 +1,11 @@
-
+# admin
+ADMIN = "admin"
 
 # blood-bank
 BLOOD_BANK = "/blood-bank"
 BLOOD_BANK_DONOR = f"{BLOOD_BANK}/donor"
+BLOOD_BANK_STOCK = f"{BLOOD_BANK}/stock"
+BLOOD_BANK_ISSUED = f"{BLOOD_BANK}/issued"
 
 # accounts
 ACCOUNTS =  "/accounts"
