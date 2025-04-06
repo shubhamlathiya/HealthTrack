@@ -1,7 +1,7 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
-from controllers.constant.PathConstant import INSURANCE_PATIENT, INSURANCE_PROVIDER, INSURANCE_CLAIM_STATUS
+from controllers.constant.adminPathConstant import INSURANCE_PATIENT, INSURANCE_PROVIDER, INSURANCE_CLAIM_STATUS
 
 
 @admin.route(INSURANCE_PATIENT, methods=['GET'], endpoint='insurance_patient')

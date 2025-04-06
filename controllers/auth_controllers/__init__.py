@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from ..constant.PathConstant import AUTH
+from ..constant.adminPathConstant import AUTH
 
 # Initialize the 'client' blueprint
 auth = Blueprint(AUTH, __name__)

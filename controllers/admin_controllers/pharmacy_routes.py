@@ -1,7 +1,7 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
-from controllers.constant.PathConstant import PHARMACY_MEDICINE_LIST
+from controllers.constant.adminPathConstant import PHARMACY_MEDICINE_LIST
 
 
 @admin.route(PHARMACY_MEDICINE_LIST, methods=['GET'], endpoint='medicine-list')

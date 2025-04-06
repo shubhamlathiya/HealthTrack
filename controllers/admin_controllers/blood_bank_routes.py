@@ -1,7 +1,7 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
-from controllers.constant.PathConstant import BLOOD_BANK_DONOR, BLOOD_BANK_STOCK, BLOOD_BANK_ISSUED
+from controllers.constant.adminPathConstant import BLOOD_BANK_DONOR, BLOOD_BANK_STOCK, BLOOD_BANK_ISSUED
 
 
 @admin.route(BLOOD_BANK_DONOR, methods=['GET'], endpoint='blood_bank_donor')

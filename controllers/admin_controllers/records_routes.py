@@ -1,7 +1,7 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
-from controllers.constant.PathConstant import RECORDS_DEATH, RECORDS_BIRTH
+from controllers.constant.adminPathConstant import RECORDS_DEATH, RECORDS_BIRTH
 
 
 @admin.route(RECORDS_DEATH, methods=['GET'], endpoint='records_death')

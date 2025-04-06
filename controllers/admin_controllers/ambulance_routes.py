@@ -1,7 +1,7 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
-from controllers.constant.PathConstant import AMBULANCE_ADD_AMBULANCE, AMBULANCE_AMBULANCE_LIST, \
+from controllers.constant.adminPathConstant import AMBULANCE_ADD_AMBULANCE, AMBULANCE_AMBULANCE_LIST, \
     AMBULANCE_AMBULANCE_CALL_LIST, AMBULANCE_ADD_DRIVER, AMBULANCE_DRIVER_LIST
 
 

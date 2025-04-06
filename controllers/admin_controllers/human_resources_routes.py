@@ -1,7 +1,7 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
-from controllers.constant.PathConstant import HUMAN_RESOURCES_HR_APPROVALS, HUMAN_RESOURCES_STAFF_LEAVES, \
+from controllers.constant.adminPathConstant import HUMAN_RESOURCES_HR_APPROVALS, HUMAN_RESOURCES_STAFF_LEAVES, \
     HUMAN_RESOURCES_STAFF_HOLIDAY, HUMAN_RESOURCES_STAFF_ATTENDANCE
 
 

@@ -1,7 +1,7 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
-from controllers.constant.PathConstant import ROOM_ADD_ROOM, ROOM_AVAILABLE_ROOM, ROOM_BOOK_ROOM, ROOM_ROOM_STATISTICS, \
+from controllers.constant.adminPathConstant import ROOM_ADD_ROOM, ROOM_AVAILABLE_ROOM, ROOM_BOOK_ROOM, ROOM_ROOM_STATISTICS, \
     ROOM_ROOM_ALLOTTED, ROOM_ROOM_BY_DEPT
 
 

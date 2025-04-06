@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash
 import jwt
 
 from controllers.auth_controllers import auth
-from controllers.constant.PathConstant import LOGIN
+from controllers.constant.adminPathConstant import LOGIN
 from utils.config import mongo
 
 

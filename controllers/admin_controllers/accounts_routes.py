@@ -1,7 +1,7 @@
 from flask import render_template
 
 from controllers.admin_controllers import admin
-from controllers.constant.PathConstant import ACCOUNTS_INCOME, ACCOUNTS_EXPENSES, ACCOUNTS_INVOICES, ACCOUNTS_PAYMENTS, \
+from controllers.constant.adminPathConstant import ACCOUNTS_INCOME, ACCOUNTS_EXPENSES, ACCOUNTS_INVOICES, ACCOUNTS_PAYMENTS, \
     ACCOUNTS_CREATE_INVOICE, ACCOUNTS_INVOICES_DETAILS
 
 
