@@ -100,11 +100,15 @@
                         <span class="menu-text">Departments</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/view-departments' %}active{% endif %}">
-                            <a href="/admin/view-departments">Departments List</a>
+                        <li>
+                            <a href="/admin/view-departments"
+                               class="{% if request.path == '/admin/view-departments' %}active-sub{% endif %}">Departments
+                                List</a>
                         </li>
-                        <li class="{% if request.path == '/admin/add-department' %}active{% endif %}">
-                            <a href="/admin/add-department">Add Department</a>
+                        <li>
+                            <a href="/admin/add-department"
+                               class="{% if request.path == '/admin/add-department' %}active-sub{% endif %}">Add
+                                Department</a>
                         </li>
                     </ul>
                 </li>
@@ -115,23 +119,33 @@
 
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/room/room-statistics' %}active{% endif %}">
-                            <a href="/admin/room/room-statistics">Statistics</a>
+                        <li>
+                            <a href="/admin/room/room-statistics"
+                               class="{% if request.path == '/admin/room/room-statistics' %}active-sub{% endif %}">Statistics</a>
                         </li>
-                        <li class="{% if request.path == '/admin/room/rooms-allotted' %}active{% endif %}">
-                            <a href="/admin/room/rooms-allotted">Rooms Allotted</a>
+                        <li>
+                            <a href="/admin/room/rooms-allotted"
+                               class="{% if request.path == '/admin/room/rooms-allotted' %}active-sub{% endif %}">Rooms
+                                Allotted</a>
                         </li>
-                        <li class="{% if request.path == '/admin/room/rooms-by-dept' %}active{% endif %}">
-                            <a href="/admin/room/rooms-by-dept">Rooms By Department</a>
+                        <li>
+                            <a href="/admin/room/rooms-by-dept"
+                               class="{% if request.path == '/admin/room/rooms-by-dept' %}active-sub{% endif %}">Rooms
+                                By Department</a>
                         </li>
-                        <li class="{% if request.path == '/admin/room/available-room' %}active{% endif %}">
-                            <a href="/admin/room/available-room">Available Rooms</a>
+                        <li>
+                            <a href="/admin/room/available-room"
+                               class="{% if request.path == '/admin/room/available-room' %}active-sub{% endif %}">Available
+                                Rooms</a>
                         </li>
-                        <li class="{% if request.path == '/admin/room/book-room' %}active{% endif %}">
-                            <a href="/admin/room/book-room">Book Room</a>
+                        <li>
+                            <a href="/admin/room/book-room"
+                               class="{% if request.path == '/admin/room/book-room' %}active-sub{% endif %}">Book
+                                Room</a>
                         </li>
-                        <li class="{% if request.path == '/admin/room/add-room' %}active{% endif %}">
-                            <a href="/admin/room/add-room">Add Room</a>
+                        <li>
+                            <a href="/admin/room/add-room"
+                               class="{% if request.path == '/admin/room/add-room' %}active-sub{% endif %}">Add Room</a>
                         </li>
                     </ul>
                 </li>
@@ -141,20 +155,30 @@
                         <span class="menu-text">Ambulance</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/ambulance/ambulance-list' %}active{% endif %}">
-                            <a href="/admin/ambulance/ambulance-list">Ambulance List</a>
+                        <li>
+                            <a href="/admin/ambulance/ambulance-list"
+                               class="{% if request.path == '/admin/ambulance/ambulance-list' %}active-sub{% endif %}">Ambulance
+                                List</a>
                         </li>
-                        <li class="{% if request.path == '/admin/ambulance/add-ambulance' %}active{% endif %}">
-                            <a href="/admin/ambulance/add-ambulance">Add Ambulance</a>
+                        <li>
+                            <a href="/admin/ambulance/add-ambulance"
+                               class="{% if request.path == '/admin/ambulance/add-ambulance' %}active-sub{% endif %}">Add
+                                Ambulance</a>
                         </li>
-                        <li class="{% if request.path == '/admin/ambulance/ambulance-call-list' %}active{% endif %}">
-                            <a href="/admin/ambulance/ambulance-call-list">Ambulance Call List</a>
+                        <li>
+                            <a href="/admin/ambulance/ambulance-call-list"
+                               class="{% if request.path == '/admin/ambulance/ambulance-call-list' %}active-sub{% endif %}">Ambulance
+                                Call List</a>
                         </li>
-                        <li class="{% if request.path == '/admin/ambulance/add-driver' %}active{% endif %}">
-                            <a href="/admin/ambulance/add-driver">Add Driver</a>
+                        <li>
+                            <a href="/admin/ambulance/add-driver"
+                               class="{% if request.path == '/admin/ambulance/add-driver' %}active-sub{% endif %}">Add
+                                Driver</a>
                         </li>
-                        <li class="{% if request.path == '/admin/ambulance/driver-list' %}active{% endif %}">
-                            <a href="/admin/ambulance/driver-list">Driver List</a>
+                        <li>
+                            <a href="/admin/ambulance/driver-list"
+                               class="{% if request.path == '/admin/ambulance/driver-list' %}active-sub{% endif %}">Driver
+                                List</a>
                         </li>
                     </ul>
                 </li>
@@ -164,23 +188,31 @@
                         <span class="menu-text">Accounts</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/accounts/income' %}active{% endif %}">
-                            <a href="/admin/accounts/income">Income</a>
+                        <li>
+                            <a href="/admin/accounts/income"
+                               class="{% if request.path == '/admin/accounts/income' %}active-sub{% endif %}">Income</a>
                         </li>
-                        <li class="{% if request.path == '/admin/accounts/payments' %}active{% endif %}">
-                            <a href="/admin/accounts/payments">Payments</a>
+                        <li>
+                            <a href="/admin/accounts/payments"
+                               class="{% if request.path == '/admin/accounts/payments' %}active-sub{% endif %}">Payments</a>
                         </li>
-                        <li class="{% if request.path == '/admin/accounts/invoices' %}active{% endif %}">
-                            <a href="/admin/accounts/invoices">Invoices</a>
+                        <li>
+                            <a href="/admin/accounts/invoices"
+                               class="{% if request.path == '/admin/accounts/invoices' %}active-sub{% endif %}">Invoices</a>
                         </li>
-                        <li class="{% if request.path == '/admin/accounts/invoice-details' %}active{% endif %}">
-                            <a href="/admin/accounts/invoice-details">Invoice Details</a>
+                        <li>
+                            <a href="/admin/accounts/invoice-details"
+                               class="{% if request.path == '/admin/accounts/invoice-details' %}active-sub{% endif %}">Invoice
+                                Details</a>
                         </li>
-                        <li class="{% if request.path == '/admin/accounts/create-invoice' %}active{% endif %}">
-                            <a href="/admin/accounts/create-invoice">Create Invoice</a>
+                        <li>
+                            <a href="/admin/accounts/create-invoice"
+                               class="{% if request.path == '/admin/accounts/create-invoice' %}active-sub{% endif %}">Create
+                                Invoice</a>
                         </li>
-                        <li class="{% if request.path == '/admin/accounts/expenses' %}active{% endif %}">
-                            <a href="/admin/accounts/expenses">Expenses</a>
+                        <li>
+                            <a href="/admin/accounts/expenses"
+                               class="{% if request.path == '/admin/accounts/expenses' %}active-sub{% endif %}">Expenses</a>
                         </li>
                     </ul>
                 </li>
@@ -190,17 +222,23 @@
                         <span class="menu-text">Human Resources</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/human-resources/hr-approvals' %}active{% endif %}">
-                            <a href="/admin/human-resources/hr-approvals">HR Approvals</a>
+                        <li>
+                            <a href="/admin/human-resources/hr-approvals"
+                               class="{% if request.path == '/admin/human-resources/hr-approvals' %}active-sub{% endif %}">HR
+                                Approvals</a>
                         </li>
-                        <li class="{% if request.path == '/admin/human-resources/staff-attendance' %}active{% endif %}">
-                            <a href="/admin/human-resources/staff-attendance">Attendance</a>
+                        <li>
+                            <a href="/admin/human-resources/staff-attendance"
+                               class="{% if request.path == '/admin/human-resources/staff-attendance' %}active-sub{% endif %}">Attendance</a>
                         </li>
-                        <li class="{% if request.path == '/admin/human-resources/staff-leaves' %}active{% endif %}">
-                            <a href="/admin/human-resources/staff-leaves">Staff Leaves</a>
+                        <li>
+                            <a href="/admin/human-resources/staff-leaves"
+                               class="{% if request.path == '/admin/human-resources/staff-leaves' %}active-sub{% endif %}">Staff
+                                Leaves</a>
                         </li>
-                        <li class="{% if request.path == '/admin/human-resources/staff-holidays' %}active{% endif %}">
-                            <a href="/admin/human-resources/staff-holidays">Holidays</a>
+                        <li>
+                            <a href="/admin/human-resources/staff-holidays"
+                               class="{% if request.path == '/admin/human-resources/staff-holidays' %}active-sub{% endif %}">Holidays</a>
                         </li>
                     </ul>
                 </li>
@@ -211,14 +249,20 @@
                         <span class="menu-text">Blood Bank</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/blood-bank/stock' %}active{% endif %}">
-                            <a href="/admin/blood-bank/stock">Blood Stock</a>
+                        <li>
+                            <a href="/admin/blood-bank/stock"
+                               class="{% if request.path == '/admin/blood-bank/stock' %}active-sub{% endif %}">Blood
+                                Stock</a>
                         </li>
-                        <li class="{% if request.path == '/admin/blood-bank/donor' %}active{% endif %}">
-                            <a href="/admin/blood-bank/donor">Blood Donor</a>
+                        <li>
+                            <a href="/admin/blood-bank/donor"
+                               class="{% if request.path == '/admin/blood-bank/donor' %}active-sub{% endif %}">Blood
+                                Donor</a>
                         </li>
-                        <li class="{% if request.path == '/admin/blood-bank/issued' %}active{% endif %}">
-                            <a href="/admin/blood-bank/issued">Blood Issued</a>
+                        <li>
+                            <a href="/admin/blood-bank/issued"
+                               class="{% if request.path == '/admin/blood-bank/issued' %}active-sub{% endif %}">Blood
+                                Issued</a>
                         </li>
                     </ul>
                 </li>
@@ -229,11 +273,15 @@
                         <span class="menu-text">Inventory</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/inventory/stock' %}active{% endif %}">
-                            <a href="/admin/inventory/stock">Item Stock List</a>
+                        <li>
+                            <a href="/admin/inventory/stock"
+                               class="{% if request.path == '/admin/inventory/stock' %}active-sub{% endif %}">Item Stock
+                                List</a>
                         </li>
-                        <li class="{% if request.path == '/admin/inventory/issued' %}active{% endif %}">
-                            <a href="/admin/inventory/issued">Issued Items</a>
+                        <li>
+                            <a href="/admin/inventory/issued"
+                               class="{% if request.path == '/admin/inventory/issued' %}active-sub{% endif %}">Issued
+                                Items</a>
                         </li>
                     </ul>
                 </li>
@@ -244,11 +292,15 @@
                         <span class="menu-text">Records</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/records/death' %}active{% endif %}">
-                            <a href="/admin/records/death">Death Records</a>
+                        <li>
+                            <a href="/admin/records/death"
+                               class="{% if request.path == '/admin/records/death' %}active-sub{% endif %}">Death
+                                Records</a>
                         </li>
-                        <li class="{% if request.path == '/admin/inventory/issued' %}active{% endif %}">
-                            <a href="/admin/records/birth">Birth Records</a>
+                        <li>
+                            <a href="/admin/records/birth"
+                               class="{% if request.path == '/admin/inventory/issued' %}active-sub{% endif %}">Birth
+                                Records</a>
                         </li>
                     </ul>
                 </li>
@@ -259,17 +311,25 @@
                         <span class="menu-text">Insurance</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/insurance/patient' %}active{% endif %}">
-                            <a href="/admin/insurance/patient">Patient Insurance</a>
+                        <li>
+                            <a href="/admin/insurance/patient"
+                               class="{% if request.path == '/admin/insurance/patient' %}active-sub{% endif %}">Patient
+                                Insurance</a>
                         </li>
-                        <li class="{% if request.path == '/admin/insurance/new-claim' %}active{% endif %}">
-                            <a href="/admin/insurance/new-claim">New Claim</a>
+                        <li>
+                            <a href="/admin/insurance/new-claim"
+                               class="{% if request.path == '/admin/insurance/new-claim' %}active-sub{% endif %}">New
+                                Claim</a>
                         </li>
-                        <li class="{% if request.path == '/admin/insurance/claim-status' %}active{% endif %}">
-                            <a href="/admin/insurance/claim-status">Claim Status</a>
+                        <li>
+                            <a href="/admin/insurance/claim-status"
+                               class="{% if request.path == '/admin/insurance/claim-status' %}active-sub{% endif %}">Claim
+                                Status</a>
                         </li>
-                        <li class="{% if request.path == '/admin/insurance/provider' %}active{% endif %}">
-                            <a href="/admin/insurance/provider">Insurance Provider</a>
+                        <li>
+                            <a href="/admin/insurance/provider"
+                               class="{% if request.path == '/admin/insurance/provider' %}active-sub{% endif %}">Insurance
+                                Provider</a>
                         </li>
                     </ul>
                 </li>
@@ -280,11 +340,15 @@
                         <span class="menu-text">Pharmacy</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/pharmacy/medicine-list' %}active{% endif %}">
-                            <a href="/admin/pharmacy/medicine-list">Medicine List</a>
+                        <li>
+                            <a href="/admin/pharmacy/medicine-list"
+                               class="{% if request.path == '/admin/pharmacy/medicine-list' %}active-sub{% endif %}">Medicine
+                                List</a>
                         </li>
-                        <li class="{% if request.path == '/admin/pharmacy/add-medicine' %}active{% endif %}">
-                            <a href="/admin/pharmacy/add-medicine">Add Medicine</a>
+                        <li>
+                            <a href="/admin/pharmacy/add-medicine"
+                               class="{% if request.path == '/admin/pharmacy/add-medicine' %}active-sub{% endif %}">Add
+                                Medicine</a>
                         </li>
                     </ul>
                 </li>
@@ -306,11 +370,13 @@
                         <span class="menu-text">Staff</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="{% if request.path == '/admin/view-staff' %}active{% endif %}">
-                            <a href="/admin/view-staff">Staff List</a>
+                        <li>
+                            <a href="/admin/view-staff"
+                               class="{% if request.path == '/admin/view-staff' %}active-sub{% endif %}">Staff List</a>
                         </li>
-                        <li class="{% if request.path == '/admin/add-staff' %}active{% endif %}">
-                            <a href="/admin/add-staff">Add Staff</a>
+                        <li>
+                            <a href="/admin/add-staff"
+                               class="{% if request.path == '/admin/add-staff' %}active-sub{% endif %}">Add Staff</a>
                         </li>
                     </ul>
                 </li>

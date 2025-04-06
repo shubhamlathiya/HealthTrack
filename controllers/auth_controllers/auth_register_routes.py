@@ -6,11 +6,12 @@ from flask import jsonify, request, render_template
 from werkzeug.security import generate_password_hash
 
 from controllers.auth_controllers import auth
+from controllers.constant.PathConstant import REGISTER
 from utils.config import mongo
 from utils.email_utils import send_email
 
 
-@auth.route('/register', methods=['GET', 'POST'])
+@auth.route(REGISTER, methods=['GET', 'POST'])
 def register_patient():
     if request.method == 'POST':
         data = request.get_json()

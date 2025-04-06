@@ -86,12 +86,12 @@
                 <!-- Breadcrumb starts -->
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="index.html">
+                        <a href="/admin/dashboard">
                             <i class="ri-home-3-line"></i>
                         </a>
                     </li>
                     <li class="breadcrumb-item text-primary" aria-current="page">
-                        Default Page
+                        {% block page %}{% endblock page %}
                     </li>
                 </ol>
                 <!-- Breadcrumb ends -->

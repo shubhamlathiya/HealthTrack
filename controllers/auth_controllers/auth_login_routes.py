@@ -5,10 +5,11 @@ from werkzeug.security import check_password_hash
 import jwt
 
 from controllers.auth_controllers import auth
+from controllers.constant.PathConstant import LOGIN
 from utils.config import mongo
 
 
-@auth.route('/login', methods=['POST'])
+@auth.route(LOGIN, methods=['POST'])
 def login_patient():
     if request.method == 'POST':
         data = request.get_json()

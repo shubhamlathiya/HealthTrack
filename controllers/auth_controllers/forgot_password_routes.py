@@ -7,13 +7,14 @@ from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import generate_password_hash
 
 from controllers.auth_controllers import auth
+from controllers.constant.PathConstant import FORGOT_PASSWORD, RESET_PASSWORD
 from utils.config import mongo
 from utils.email_utils import send_email
 
 s = URLSafeTimedSerializer("SECRET_KEY")
 
 
-@auth.route('/forgot-password', methods=['GET', 'POST'])
+@auth.route(FORGOT_PASSWORD, methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
         data = request.get_json()
@@ -35,7 +36,7 @@ def forgot_password():
         return render_template('auth_templates/forgot_password_templates.html')
 
 
-@auth.route('/reset-password/<token>', methods=['GET', 'POST'])
+@auth.route(RESET_PASSWORD + '/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     try:
         email = s.loads(token, salt='password-reset-salt', max_age=600)  # Token expires in 30 minutes

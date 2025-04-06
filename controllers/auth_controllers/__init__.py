@@ -1,7 +1,9 @@
 from flask import Blueprint
 
+from ..constant.PathConstant import AUTH
+
 # Initialize the 'client' blueprint
-auth = Blueprint('auth', __name__)
+auth = Blueprint(AUTH, __name__)
 
 # Import views from other modules (dashboard, orders)
 from .auth_login_routes import *
