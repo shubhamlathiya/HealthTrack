@@ -15,8 +15,8 @@ def objectid_to_str(obj):
     else:
         return obj
 
-@doctors.route('/dashboard' , methods=['GET'])
-def dashboard():
+@doctors.route('/dashboard' , methods=['GET'],endpoint='doctor_dashboard')
+def doctor_dashboard():
     return render_template("doctor_templates/doctor_dashboard_templets.html")
 
 @doctors.route('/get-patient-details/<patient_id>', methods=['GET'] , endpoint='get_patient_details')
