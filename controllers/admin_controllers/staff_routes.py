@@ -88,7 +88,7 @@ def add_staff():
 
         departments = list(mongo.db.departments.find())
 
-        return render_template('admin/add_staff_templates.html', departments=departments)
+        return render_template('admin_templates/staff/add_staff_templates.html', departments=departments)
 
 
 @admin.route('/get-all-staff', methods=['GET'],endpoint='get_staff')
@@ -190,4 +190,3 @@ def view_all_staffs():
     except Exception as e:
         print(f"Error fetching doctors: {e}")
         return jsonify({"error": "Unable to fetch doctors"}), 500
-
