@@ -1,16 +1,19 @@
-from flask import Flask, render_template, session, jsonify, redirect
+from flask import Flask, render_template, session, jsonify, redirect,request
 from flask_mail import Mail
-
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
-from controllers.doctor_controllers import doctors
-from controllers.laboratory_controllers import laboratory
-from controllers.patients_controllers import patients
-from utils.config import init_app
+from models.userModel import User
+# from controllers.doctor_controllers import doctors
+# from controllers.laboratory_controllers import laboratory
+# from controllers.patients_controllers import patients
+from utils.config import init_app, db
 
 app = Flask(__name__, static_folder="static")
 
 init_app(app)
+
+with app.app_context():
+    db.create_all()  # This will create the tables in the MySQL database
 
 # Flask-Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -26,9 +29,9 @@ mail = Mail(app)
 app.config['SECRET_KEY'] = 'your_secure_random_key'
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(admin, url_prefix='/admin')
-app.register_blueprint(patients, url_prefix='/patients')
-app.register_blueprint(doctors, url_prefix='/doctor')
-app.register_blueprint(laboratory, url_prefix='/laboratory')
+# app.register_blueprint(patients, url_prefix='/patients')
+# app.register_blueprint(doctors, url_prefix='/doctor')
+# app.register_blueprint(laboratory, url_prefix='/laboratory')
 @app.route('/')
 def index():  # put application's code here
     return render_template('auth_templates/login_templates.html')
@@ -54,4 +57,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

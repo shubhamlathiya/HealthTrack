@@ -23,23 +23,23 @@ from .insurance_routes import *
 from .pharmacy_routes import *
 from .records_routes import *
 
-@admin.route('/user-status', methods=['POST'],endpoint='userStatus')
-@token_required
-def user_status(current_user):
-    data = request.get_json()
-
-    user_id = data.get('user_id')  # User ID passed from the client-side
-    new_status = data.get('status')  # New status (true/false)
-
-    if user_id and new_status:
-        # Update the user's status in the database
-        result = mongo.db.users.update_one(
-            {'_id': ObjectId(user_id)},
-            {'$set': {'status': new_status}}
-        )
-
-        if result.modified_count > 0:
-            return jsonify({'success': True, 'message': 'Status updated successfully'})
-        else:
-            return jsonify({'success': False, 'message': 'Status update failed'})
-    return jsonify({'success': False, 'message': 'Invalid request'}), 400
+# @admin.route('/user-status', methods=['POST'],endpoint='userStatus')
+# @token_required
+# def user_status(current_user):
+#     data = request.get_json()
+#
+#     user_id = data.get('user_id')  # User ID passed from the client-side
+#     new_status = data.get('status')  # New status (true/false)
+#
+#     if user_id and new_status:
+#         # Update the user's status in the database
+#         result = mongo.db.users.update_one(
+#             {'_id': ObjectId(user_id)},
+#             {'$set': {'status': new_status}}
+#         )
+#
+#         if result.modified_count > 0:
+#             return jsonify({'success': True, 'message': 'Status updated successfully'})
+#         else:
+#             return jsonify({'success': False, 'message': 'Status update failed'})
+#     return jsonify({'success': False, 'message': 'Invalid request'}), 400

@@ -33,7 +33,15 @@ AMBULANCE_DRIVER_LIST = f"{AMBULANCE}/driver-list"
 
 
 DEPARTMENT ="/department"
+DEPARTMENT_LIST = f"{DEPARTMENT}/department-list"
+DEPARTMENT_ADD_DEPARTMENT = f"{DEPARTMENT}/add-department"
+
+
 DOCTOR = "/doctor"
+DOCTOR_LIST = f"{DOCTOR}/doctor-list"
+DOCTOR_ADD_DOCTOR = f"{DOCTOR}/add-doctor"
+DOCTOR_ASSIGN_DEPARTMENT = f"{DOCTOR}/assign-department"
+DOCTOR_SHIFT_MANAGEMENT = f"{DOCTOR}/shift-management"
 
 
 # human-resources

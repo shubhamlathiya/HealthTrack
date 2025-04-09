@@ -94,21 +94,49 @@
                         <span class="menu-text">User Search</span>
                     </a>
                 </li>
-                <li class="treeview {% if request.path.startswith('/admin/view-departments') or request.path.startswith('/admin/add-department') or request.path.startswith('/admin/edit-department') %}active current-page{% endif %}">
+                <li class="treeview {% if request.path.startswith('/admin/department') or request.path.startswith('/admin/department') or request.path.startswith('/admin/edit-department') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-building-2-line"></i>
                         <span class="menu-text">Departments</span>
                     </a>
                     <ul class="treeview-menu">
                         <li>
-                            <a href="/admin/view-departments"
-                               class="{% if request.path == '/admin/view-departments' %}active-sub{% endif %}">Departments
+                            <a href="/admin/department/department-list"
+                               class="{% if request.path == '/admin/department/department-list' %}active-sub{% endif %}">Departments
                                 List</a>
                         </li>
                         <li>
-                            <a href="/admin/add-department"
-                               class="{% if request.path == '/admin/add-department' %}active-sub{% endif %}">Add
+                            <a href="/admin/department/add-department"
+                               class="{% if request.path == '/admin/department/add-department' %}active-sub{% endif %}">Add
                                 Department</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="treeview {% if request.path.startswith('/admin/doctor') or request.path.startswith('/admin/doctor') or request.path.startswith('/admin/edit-department') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-building-2-line"></i>
+                        <span class="menu-text">Doctors</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/admin/doctor/doctor-list"
+                               class="{% if request.path == '/admin/doctor/doctor-list' %}active-sub{% endif %}">All
+                                Doctors</a>
+                        </li>
+                        <li>
+                            <a href="/admin/doctor/add-doctor"
+                               class="{% if request.path == '/admin/doctor/add-doctor' %}active-sub{% endif %}">Add
+                                Doctors</a>
+                        </li>
+                        <li>
+                            <a href="/admin/doctor/assign-department"
+                               class="{% if request.path == '/admin/doctor/assign-department' %}active-sub{% endif %}">Assign
+                                Department</a>
+                        </li>
+                        <li>
+                            <a href="/admin/doctor/shift-management"
+                               class="{% if request.path == '/admin/doctor/shift-management' %}active-sub{% endif %}">Shift
+                                Management</a>
                         </li>
                     </ul>
                 </li>

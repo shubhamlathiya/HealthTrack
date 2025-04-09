@@ -1,57 +1,57 @@
 import datetime
-
-from flask import Blueprint, jsonify, request, render_template, session
+from flask import Blueprint, jsonify, request, session
 from werkzeug.security import check_password_hash
 import jwt
-
 from controllers.auth_controllers import auth
 from controllers.constant.adminPathConstant import LOGIN
-from utils.config import mongo
+from models.userModel import User
 
 
-@auth.route(LOGIN, methods=['POST'])
-def login_patient():
+@auth.route(LOGIN, methods=['POST'] , endpoint='login')
+def login():
     if request.method == 'POST':
         data = request.get_json()
-        print(data)
         email = data.get('email')
         password = data.get('password')
 
-        user = mongo.db.users.find_one({'email': email})
-        if not user or not check_password_hash(user['password'], password):
+        # Query the database using SQLAlchemy to find the user by email
+        user = User.query.filter_by(email=email).first()
+
+        if not user or not check_password_hash(user.password, password):
             return jsonify({'error': 'Invalid email or password'}), 401
 
-        if not user.get('verified'):
+        if not user.verified:
             return jsonify({'message': 'Email not verified. Redirecting to verification page...'}), 403
 
-        if user['status'] == 'true':
-
+        if user.status:  # Assuming 'status' is a boolean or a 1/0 value (active/inactive)
+            # Generate a JWT token that expires in 1 hour
             token = jwt.encode({
-                'user_id': str(user['_id']),
+                'user_id': str(user.id),
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
             }, 'your_secret_key', algorithm='HS256')
 
-            session['user_id'] = str(user['_id'])
-            session['email'] = user['email']
-            session['role'] = user['role']
-            session['name'] = user['name']
+            # Store user data in session
+            session['user_id'] = str(user.id)
+            session['email'] = user.email
+            session['role'] = user.role
+            session['name'] = user.name
 
-            if user['role'] == 'patient':
-                redirect_url = '/patients/dashboard'  # Define client dashboard URL
-            elif user['role'] == 'admin':
+            # Redirect based on user role
+            if user.role == 'patient':
+                redirect_url = '/patients/dashboard'
+            elif user.role == 'admin':
                 redirect_url = '/admin/dashboard'
-            elif user['role'] == 'doctor':
+            elif user.role == 'doctor':
                 redirect_url = '/doctor/dashboard'
-            elif user['role'] == 'staff':
+            elif user.role == 'staff':
                 redirect_url = '/staff/dashboard'
-            elif user['role'] == 'nurse':
+            elif user.role == 'nurse':
                 redirect_url = '/nurse/dashboard'
-            elif user['role'] == 'laboratory':
+            elif user.role == 'laboratory':
                 redirect_url = '/laboratory/dashboard'
             else:
                 return jsonify({'message': 'Invalid role. Please contact dashboard.'}), 400
 
-            # print(token)
             return jsonify({'token': token, 'redirect_url': redirect_url}), 200
         else:
-            return jsonify({'message': 'Your are DeActive. Please contact Admin'}), 400
+            return jsonify({'message': 'Your account is inactive. Please contact Admin'}), 400

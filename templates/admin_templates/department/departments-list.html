@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Donor{% endblock title %}
+{% block page %}Blood Donor{% endblock page %}
+
+{% block body %}
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Departments</h5>
+                </div>
+                <div class="card-body">
+
+                    <div class="chart-height-lg">
+                        <div id="total-department" class="auto-align-graph"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Employees</h5>
+                </div>
+                <div class="card-body">
+
+                    <div class="chart-height-lg">
+                        <div id="employees" class="auto-align-graph"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Department List</h5>
+                    <a href="add-department.html" class="btn btn-primary ms-auto">Add Department</a>
+                </div>
+                <div class="card-body">
+
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="basicExample" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Department</th>
+                                <th>Department Head</th>
+                                <th>Doctors List</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>001</td>
+                                <td>Surgeon</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor.png" class="img-2x rounded-5 me-1"
+                                         alt="Doctors Admin Template">
+                                    Deena Cooley
+                                </td>
+                                <td>
+                                    <div class="stacked-images">
+                                        <img src="../../../static/assets/images/doctor.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor2.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor3.png" alt="Dentist Dashboard">
+                                        <span class="plus bg-primary">+5</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
+                                           data-bs-toggle="tooltip" data-bs-placement="top"
+                                           data-bs-title="Edit Department">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>002</td>
+                                <td>Gynecologist</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor2.png" class="img-2x rounded-5 me-1"
+                                         alt="Doctors Admin Template">
+                                    Hector Banks
+                                </td>
+                                <td>
+                                    <div class="stacked-images">
+                                        <img src="../../../static/assets/images/doctor3.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor4.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor5.png" alt="Dentist Dashboard">
+                                        <span class="plus bg-danger">+8</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
+                                           data-bs-toggle="tooltip" data-bs-placement="top"
+                                           data-bs-title="Edit Department">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>003</td>
+                                <td>Psychiatrists</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor3.png" class="img-2x rounded-5 me-1"
+                                         alt="Doctors Admin Template">
+                                    Owen Scott
+                                </td>
+                                <td>
+                                    <div class="stacked-images">
+                                        <img src="../../../static/assets/images/doctor.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor3.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor2.png" alt="Dentist Dashboard">
+                                        <span class="plus bg-success">+3</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
+                                           data-bs-toggle="tooltip" data-bs-placement="top"
+                                           data-bs-title="Edit Department">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>004</td>
+                                <td>Urologist</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor5.png" class="img-2x rounded-5 me-1"
+                                         alt="Doctors Admin Template">
+                                    Alison Estrada
+                                </td>
+                                <td>
+                                    <div class="stacked-images">
+                                        <img src="../../../static/assets/images/doctor4.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor2.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor1.png" alt="Dentist Dashboard">
+                                        <span class="plus bg-warning">+6</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
+                                           data-bs-toggle="tooltip" data-bs-placement="top"
+                                           data-bs-title="Edit Department">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>005</td>
+                                <td>Paediatrician</td>
+                                <td>
+                                    <img src="../../../static/assets/images/doctor4.png" class="img-2x rounded-5 me-1"
+                                         alt="Doctors Admin Template">
+                                    Mitchel Alvarez
+                                </td>
+                                <td>
+                                    <div class="stacked-images">
+                                        <img src="../../../static/assets/images/doctor1.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor4.png" alt="Dentist Dashboard">
+                                        <img src="../../../static/assets/images/doctor5.png" alt="Dentist Dashboard">
+                                        <span class="plus bg-info">+2</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
+                                                data-bs-target="#delRow">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
+                                           data-bs-toggle="tooltip" data-bs-placement="top"
+                                           data-bs-title="Edit Department">
+                                            <i class="ri-edit-box-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- Modal Delete Row -->
+                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delRowLabel">
+                                        Confirm
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete the department?
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="departments-list.html" class="btn btn-secondary"
+                                           data-bs-dismiss="modal"
+                                           aria-label="Close">No</a>
+                                        <a href="departments-list.html" class="btn btn-danger" data-bs-dismiss="modal"
+                                           aria-label="Close">Yes</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+
+{% endblock body %}
+{% block heardLink %}
+
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+{% block footerLink %}
+   <!-- Apex Charts -->
+    <script src="../../../static/assets/vendor/apex/apexcharts.min.js"></script>
+    <script src="../../../static/assets/vendor/apex/custom/department/department-list.js"></script>
+    <script src="../../../static/assets/vendor/apex/custom/department/employees.js"></script>
+
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+{% endblock footerLink %}
