@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, jsonify, redirect,request
+from flask import Flask, render_template, session, jsonify, redirect, request
 from flask_mail import Mail
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
@@ -29,6 +29,8 @@ mail = Mail(app)
 app.config['SECRET_KEY'] = 'your_secure_random_key'
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(admin, url_prefix='/admin')
+
+
 # app.register_blueprint(patients, url_prefix='/patients')
 # app.register_blueprint(doctors, url_prefix='/doctor')
 # app.register_blueprint(laboratory, url_prefix='/laboratory')
@@ -45,6 +47,12 @@ def handle_404_error(e):
 @app.errorhandler(500)
 def handle_500_error(e):
     return render_template('error_handler/error_500.html')
+
+
+# Configure upload folder for profile pictures
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @app.route('/logout', methods=['GET'])

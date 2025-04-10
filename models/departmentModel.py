@@ -8,8 +8,6 @@ class Department(db.Model):
     email = db.Column(db.String(100), nullable=False, unique=True)
     department_head = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
-    number_of_rooms = db.Column(db.Integer, nullable=False)
-    number_of_beds = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(10), nullable=False)
     message = db.Column(db.Text)
 

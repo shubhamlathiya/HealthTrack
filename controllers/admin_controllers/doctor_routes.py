@@ -1,14 +1,115 @@
-# from flask import render_template
-#
-# from controllers.admin_controllers import admin
-#
-#
-from flask import render_template
-
+from flask import render_template, request, jsonify, redirect
+from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
+import os
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DOCTOR_ADD_DOCTOR
+from models.doctorModel import Availability, Doctor
+from models.userModel import User
+from utils.config import db
+from utils.email_utils import send_email
 
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['GET'], endpoint='add_doctor')
 def department_list():
     return render_template("admin_templates/doctor/add-doctors.html")
+
+
+UPLOAD_FOLDER = 'uploads/profile_pictures'  # Base folder
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@admin.route(DOCTOR_ADD_DOCTOR, methods=['POST'])
+def register_doctor():
+    try:
+        data = request.form
+        print(data)
+        # 1. Create User
+        email = data.get('a5')
+        password = data.get('u2')
+        hashed_password = generate_password_hash(password)
+
+        new_user = User(
+            email=email,
+            password=hashed_password,
+            role='doctor',
+            status=True,
+            verified=False
+        )
+        db.session.add(new_user)
+        db.session.commit()
+
+        # 2. Create Doctor without profile_picture for now
+        new_doctor = Doctor(
+            user_id=new_user.id,
+            first_name=data.get('a1'),
+            last_name=data.get('a2'),
+            age=data.get('a3'),
+            gender=data.get('selectGenderOptions'),
+            phone=data.get('a6'),
+            qualification=data.get('a8'),
+            designation=data.get('a9'),
+            blood_group=data.get('a10'),
+            address=data.get('a11'),
+            bio=data.get('bio', ''),
+            profile_picture=None  # Temp placeholder
+        )
+        db.session.add(new_doctor)
+        db.session.commit()
+
+        # 3. Now that we have the doctor ID, handle profile picture upload
+        profile_pic = None
+        if 'profile_picture' in request.files:
+            file = request.files['profile_picture']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+
+                # Save the file
+                file_path = os.path.join(UPLOAD_FOLDER, filename)
+                file.save(file_path)
+                profile_pic = file_path
+
+                # Update doctor's profile_picture path
+                new_doctor.profile_picture = profile_pic
+                db.session.commit()
+
+        # 4. Add availability records
+        days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        for i, day in enumerate(days, start=1):
+            from_time = data.get(f'd{i}')
+            to_time = data.get(f'd{i}X')
+
+            if from_time != '0' and to_time != '0':
+                availability = Availability(
+                    day_of_week=day,
+                    from_time=from_time,
+                    to_time=to_time,
+                    doctor_id=new_doctor.id
+                )
+                db.session.add(availability)
+
+        db.session.commit()
+
+        print(1)
+        # Send a verification email (You should have your email setup)
+        verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
+        send_email('Verify Your Email', email, verification_link)
+        print(2)
+        # return jsonify({
+        #     'success': True,
+        #     'message': 'Doctor registered successfully',
+        #     'doctor_id': new_doctor.id
+        # }), 201
+
+        return redirect("/admin/" + DOCTOR_ADD_DOCTOR)
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 400

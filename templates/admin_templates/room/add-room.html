@@ -13,56 +13,68 @@
                     <h5 class="card-title">Add New Room</h5>
                 </div>
                 <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
 
-                    <!-- Row starts -->
-                    <div class="row gx-4 justify-content-center">
-                        <div class="col-sm-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="a1">Room Number</label>
-                                <input type="text" class="form-control" id="a1" placeholder="Enter Room Number">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="a2">Floor No</label>
-                                <input type="email" class="form-control" id="a2" placeholder="Enter Floor Number">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="a3">Room Type</label>
-                                <select class="form-select" id="a3">
-                                    <option value="0">Select</option>
-                                    <option value="1">Standard</option>
-                                    <option value="2">Deluxe</option>
-                                    <option value="3">Suite</option>
-                                    <option value="4">Private</option>
-                                    <option value="5">Ward</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="a4">Department</label>
-                                <select class="form-select" id="a4">
-                                    <option value="0">Select</option>
-                                    <option value="1">Surgeon</option>
-                                    <option value="2">Gynecologist</option>
-                                    <option value="3">Psychiatrists</option>
-                                    <option value="4">Urologist</option>
-                                    <option value="5">Paediatrician</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="a5">Enter Message</label>
-                                <textarea class="form-control" id="a5" placeholder="Enter message" rows="3"></textarea>
-                            </div>
-                            <div class="d-flex gap-2 justify-content-end">
-                                <a href="available-rooms.html" class="btn btn-outline-secondary">
-                                    Cancel
-                                </a>
-                                <a href="available-rooms.html" class="btn btn-primary">
-                                    Add New Room
-                                </a>
+                    <form method="POST" action="/admin/room/add-room">
+                        <!-- Row starts -->
+                        <div class="row gx-4 justify-content-center">
+                            <div class="col-sm-4">
+                                <div class="mb-3">
+                                    <label class="form-label" for="room_number">Room Number</label>
+                                    <input type="text" class="form-control" id="room_number" name="room_number"
+                                           placeholder="Enter Room Number" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="floor">Floor No</label>
+                                    <input type="number" class="form-control" id="floor" name="floor"
+                                           placeholder="Enter Floor Number" min="1" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="room_type">Room Type</label>
+                                    <select class="form-select" id="room_type" name="room_type" required>
+                                        <option value="">Select</option>
+                                        <option value="1">Standard</option>
+                                        <option value="2">Deluxe</option>
+                                        <option value="3">Suite</option>
+                                        <option value="4">Private</option>
+                                        <option value="5">Ward</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="department_id">Department</label>
+                                    <select class="form-select" id="department_id" name="department_id" required>
+                                        <option value="">Select</option>
+                                        {% for department in departments %}
+                                            <option value="{{ department.id }}">{{ department.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="message">Enter Message</label>
+                                    <textarea class="form-control" id="message" name="message"
+                                              placeholder="Enter message" rows="3"></textarea>
+                                </div>
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <a href="available-rooms.html" class="btn btn-outline-secondary">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        Add New Room
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Row ends -->
-
+                        <!-- Row ends -->
+                    </form>
                 </div>
             </div>
         </div>

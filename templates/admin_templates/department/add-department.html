@@ -12,97 +12,76 @@
                     <h5 class="card-title">Add Department</h5>
                 </div>
                 <div class="card-body">
+                    <form method="POST" action="/admin/department/add-department">
+                        <!-- Row starts -->
+                        <div class="row gx-4">
 
-                    <!-- Row starts -->
-                    <div class="row gx-4">
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="a1">Department Name</label>
-                                <input type="text" class="form-control" id="a1" placeholder="Enter Department Name">
+                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="name">Department Name</label>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           placeholder="Enter Department Name" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="a2">Department Email</label>
-                                <input type="email" class="form-control" id="a2" placeholder="Enter email address">
+                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="email">Department Email</label>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                           placeholder="Enter email address" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="a3">Department Head</label>
-                                <input type="text" class="form-control" id="a3" placeholder="Enter Department Name">
+                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="head">Department Head</label>
+                                    <input type="text" class="form-control" id="head" name="head"
+                                           placeholder="Enter Department Head" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="a4">Department Phone</label>
-                                <input type="text" class="form-control" id="a4" placeholder="Enter phone number">
+                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="phone">Department Phone</label>
+                                    <input type="text" class="form-control" id="phone" name="phone"
+                                           placeholder="Enter phone number" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="a5">Number of Rooms</label>
-                                <select class="form-select" id="a5">
-                                    <option value="0">Select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="a6">Number of Beds</label>
-                                <select class="form-select" id="a6">
-                                    <option value="0">Select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="inlineRadio1">Status</label>
-                                <div class="m-0">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               id="inlineRadio1"
-                                               value="option1">
-                                        <label class="form-check-label" for="inlineRadio1">Active</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               id="inlineRadio2"
-                                               value="option2">
-                                        <label class="form-check-label" for="inlineRadio2">Inactive</label>
+                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="inlineRadio1">Status</label>
+                                    <div class="m-0">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="status"
+                                                   id="active" value="active" checked>
+                                            <label class="form-check-label" for="active">Active</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="status"
+                                                   id="inactive" value="inactive">
+                                            <label class="form-check-label" for="inactive">Inactive</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="a7">Message</label>
-                                <textarea class="form-control" id="a7" placeholder="Enter message" rows="3"></textarea>
+                            <div class="col-sm-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="message">Message</label>
+                                    <textarea class="form-control" id="message" name="message"
+                                              placeholder="Enter message" rows="3"></textarea>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="d-flex gap-2 justify-content-end">
-                                <a href="departments-list.html" class="btn btn-outline-secondary">
-                                    Cancel
-                                </a>
-                                <a href="departments-list.html" class="btn btn-primary">
-                                    Add Department
-                                </a>
+                            <div class="col-sm-12">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <a href="departments-list.html" class="btn btn-outline-secondary">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        Add Department
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <!-- Row ends -->
 
+                        </div>
+                        <!-- Row ends -->
+                    </form>
                 </div>
             </div>
         </div>

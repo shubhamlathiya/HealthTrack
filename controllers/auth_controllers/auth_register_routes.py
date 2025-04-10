@@ -97,7 +97,7 @@ def verify_email(patient_id):
         try:
             # Commit the change to the database
             db.session.commit()
-            return jsonify({'message': 'Email verified successfully'}), 200
+            return  render_template('auth_templates/email_verified.html'), 200
         except Exception as e:
             db.session.rollback()  # Rollback in case of error
             return jsonify({'error': str(e)}), 500

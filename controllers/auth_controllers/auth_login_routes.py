@@ -34,7 +34,6 @@ def login():
             session['user_id'] = str(user.id)
             session['email'] = user.email
             session['role'] = user.role
-            session['name'] = user.name
 
             # Redirect based on user role
             if user.role == 'patient':
