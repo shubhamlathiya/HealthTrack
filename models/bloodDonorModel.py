@@ -31,6 +31,8 @@ class BloodDonor(db.Model):
     emergency_contact_relation = db.Column(db.String(50))
     notes = db.Column(db.Text)
     image_path = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 

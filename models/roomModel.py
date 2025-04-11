@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from utils.config import db
 
 
@@ -9,7 +11,8 @@ class Room(db.Model):
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
     message = db.Column(db.Text)
     is_available = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     ROOM_TYPES = {
         '1': 'Standard',

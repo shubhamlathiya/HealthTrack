@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from utils.config import db
 
 
@@ -10,6 +12,10 @@ class Department(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     status = db.Column(db.String(10), nullable=False)
     message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    assignments = db.relationship('DepartmentAssignment', back_populates='department')
 
     def __repr__(self):
         return f'<Department {self.name}>'

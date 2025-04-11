@@ -6,7 +6,7 @@ from ..constant.adminPathConstant import ADMIN
 admin = Blueprint(ADMIN, __name__)
 
 from .department_routes import *
-from .doctor_routes import *
+from controllers.admin_controllers.doctor.doctor_routes import *
 from .dashboard_routes import *
 from .resources_routes import *
 from .leave_management_routes import *
@@ -22,6 +22,8 @@ from .blood_bank_routes import *
 from .insurance_routes import *
 from .pharmacy_routes import *
 from .records_routes import *
+from controllers.admin_controllers.doctor.assign_department import *
+from controllers.admin_controllers.doctor.shift_management import *
 
 # @admin.route('/user-status', methods=['POST'],endpoint='userStatus')
 # @token_required

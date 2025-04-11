@@ -10,9 +10,10 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)  # Hash the password during registration
     role = db.Column(db.String(50), nullable=True)  # Could be 'doctor', 'patient', etc.
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Default to current timestamp
     status = db.Column(db.Boolean, nullable=True)  # Active or inactive
     verified = db.Column(db.Boolean, nullable=True)  # Email verification status
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Constructor to easily create a User object
     def __init__(self, email, password, role, status, verified):

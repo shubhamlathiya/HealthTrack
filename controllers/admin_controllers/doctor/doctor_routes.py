@@ -3,11 +3,26 @@ from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import os
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import DOCTOR_ADD_DOCTOR
+from controllers.constant.adminPathConstant import DOCTOR_ADD_DOCTOR, DOCTOR_LIST
 from models.doctorModel import Availability, Doctor
 from models.userModel import User
 from utils.config import db
 from utils.email_utils import send_email
+
+
+@admin.route(DOCTOR_LIST, methods=['GET'], endpoint='doctor_list')
+def doctor_list():
+    # Query all doctors ordered by most recent first
+    doctors = Doctor.query.order_by(Doctor.created_at.desc()).all()
+
+    # Preload department names for each doctor to avoid N+1 queries
+    for doctor in doctors:
+        doctor.department_names = [dept.department.name for dept in doctor.department_assignments]
+
+    return render_template(
+        "admin_templates/doctor/doctor_list.html",
+        doctors=doctors
+    )
 
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['GET'], endpoint='add_doctor')
@@ -71,8 +86,9 @@ def register_doctor():
 
                 # Save the file
                 file_path = os.path.join(UPLOAD_FOLDER, filename)
-                file.save(file_path)
-                profile_pic = file_path
+                web_path = file_path.replace('\\', '/')
+                file.save(web_path)
+                profile_pic = web_path
 
                 # Update doctor's profile_picture path
                 new_doctor.profile_picture = profile_pic
@@ -81,10 +97,11 @@ def register_doctor():
         # 4. Add availability records
         days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
         for i, day in enumerate(days, start=1):
-            from_time = data.get(f'd{i}')
-            to_time = data.get(f'd{i}X')
+            from_time = data.get(f'd{i}')  # e.g., "07:00 AM"
+            to_time = data.get(f'd{i}X')  # e.g., "03:00 PM"
 
-            if from_time != '0' and to_time != '0':
+            # Skip if "Not working" (i.e., "None" or missing value)
+            if from_time and to_time and from_time != 'None' and to_time != 'None':
                 availability = Availability(
                     day_of_week=day,
                     from_time=from_time,

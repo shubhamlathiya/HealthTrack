@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}All Doctors{% endblock title %}
+{% block page %}All Doctors{% endblock page %}
+
+{% block body %}
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Doctor List</h5>
+                    <a href="#" class="btn btn-primary ms-auto">Add New Doctor</a>
+                </div>
+                <div class="card-body">
+                    <!-- Table starts -->
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Doctor</th>
+                                <th>Contact</th>
+                                <th>Qualification</th>
+                                <th>Designation</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for doctor in doctors %}
+                                <tr data-bs-toggle="modal"
+                                    data-bs-target="#viewDetails{{ doctor.id }}"
+                                    data-bs-placement="top"
+                                    data-bs-title="View Details">
+                                    <td>DR{{ doctor.id }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/{% if doctor.profile_picture %}{{ doctor.profile_picture }}{% else %} ../../../static/assets/images/doctor.png  {% endif %}"
+                                                 class="rounded-circle me-2" width="40" height="40" alt="doctor">
+                                            <div>
+                                                <strong>{{ doctor.first_name }} {{ doctor.last_name }}</strong><br>
+                                                <small class="text-muted">{{ doctor.gender }}, {{ doctor.age }}
+                                                    yrs</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if doctor.phone %}{{ doctor.phone }}<br>{% endif %}
+                                        {% if doctor.email %}{{ doctor.email }}{% endif %}
+                                    </td>
+                                    <td>{{ doctor.qualification or 'N/A' }}</td>
+                                    <td>{{ doctor.designation or 'N/A' }}</td>
+                                    <td>
+                                        {% if doctor.department_assignments %}
+                                            {% for dept in doctor.department_assignments %}
+                                                <span class="badge border border-success bg-success-subtle text-success">{{ dept.department.name }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">Active</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#delRow{{ doctor.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <a href="/" class="btn btn-outline-success btn-sm"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top" data-bs-title="Edit Doctor">
+                                                <i class="ri-edit-box-line"></i>
+                                            </a>
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewDetails{{ doctor.id }}"
+                                                    data-bs-placement="top"
+                                                    data-bs-title="View Details">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table ends -->
+
+                    <!-- Modals for each doctor -->
+                    {% for doctor in doctors %}
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="delRow{{ doctor.id }}" tabindex="-1"
+                             aria-labelledby="delRowLabel{{ doctor.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-sm">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="delRowLabel{{ doctor.id }}">
+                                            Confirm Deletion
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete {{ doctor.first_name }} {{ doctor.last_name }}'s
+                                        record?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                                    aria-label="Close">Cancel
+                                            </button>
+                                            <form action="/" method="POST">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- View Details Modal -->
+                        <div class="modal fade" id="viewDetails{{ doctor.id }}" tabindex="-1"
+                             aria-labelledby="viewDetailsLabel{{ doctor.id }}"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="viewDetailsLabel{{ doctor.id }}">Doctor Details</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-4 text-center">
+                                                <img src="/{% if doctor.profile_picture %}{{ doctor.profile_picture }}{% else %}{{ url_for('static', filename='assets/images/doctor.png') }}{% endif %}"
+                                                     class="rounded-circle mb-3" width="150" height="150" alt="doctor">
+                                                <h4> {{ doctor.first_name }} {{ doctor.last_name }}</h4>
+                                                <p class="text-muted">{{ doctor.designation or 'N/A' }}</p>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p><strong>ID:</strong> DR{{ doctor.id }}</p>
+                                                        <p><strong>Gender:</strong> {{ doctor.gender }}</p>
+                                                        <p><strong>Age:</strong> {{ doctor.age }} years</p>
+                                                        <p><strong>Phone:</strong> {{ doctor.phone or 'N/A' }}</p>
+                                                        <p><strong>Blood
+                                                            Group:</strong> {{ doctor.blood_group or 'N/A' }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <strong>Qualification:</strong> {{ doctor.qualification or 'N/A' }}
+                                                        </p>
+                                                        <p><strong>Department:</strong>
+                                                            {% if doctor.department_assignments %}
+                                                                {% for dept in doctor.department_assignments %}
+                                                                    {{ dept.department.name }}{% if not loop.last %},
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                N/A
+                                                            {% endif %}
+                                                        </p>
+                                                        <p><strong>Address:</strong> {{ doctor.address or 'N/A' }}</p>
+                                                        <p><strong>Joined
+                                                            On:</strong> {{ doctor.created_at.strftime('%d-%m-%Y') }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col-12">
+                                                        <h6>Bio</h6>
+                                                        <p>{{ doctor.bio or 'No bio available' }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                        </button>
+                                        <button type="button" class="btn btn-primary">Print Profile</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+{% endblock body %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Delete confirmation - now handled by individual modals
+            // View details - now handled by individual modals
+        });
+    </script>
+{% endblock footerLink %}

@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Shift Management{% endblock %}
+{% block page %}Doctor Shift Management{% endblock %}
+
+{% block body %}
+<div class="row gx-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Doctor Shifts</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="scrollVertical">
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Monday</th>
+                                <th>Tuesday</th>
+                                <th>Wednesday</th>
+                                <th>Thursday</th>
+                                <th>Friday</th>
+                                <th>Saturday</th>
+                                <th>Sunday</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doctor in doctors %}
+                            <tr class="edit-shift"
+                             data-doctor-id="{{ doctor.id }}"
+                                            data-schedule='{{ doctor.temp_schedule|tojson }}'
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#shiftModal">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="../../../static/assets/images/doctor.png"
+                                             class="rounded-circle me-2" width="40" height="40" alt="doctor">
+                                        <div>
+                                            <strong>{{ doctor.first_name }}</strong><br>
+                                            <small class="text-muted">{{ doctor.designation }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                                {% set shift = doctor.temp_schedule.get(day) %}
+                                <td>
+                                    {% if shift %}
+                                        {{ shift.start }} - {{ shift.end }}
+                                    {% else %}
+                                        Not working
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                                <td>
+                                    <button
+                                    class="btn btn-outline-success btn-sm edit-shift"
+                                            data-doctor-id="{{ doctor.id }}"
+                                            data-schedule='{{ doctor.temp_schedule|tojson }}'
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#shiftModal">
+                                         <i class="ri-edit-box-line"></i> Edit
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shift Modal -->
+<div class="modal fade" id="shiftModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg model-dialog-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Shift Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="shiftForm" action="">
+                    <input type="hidden" id="doctorId" name="doctor_id">
+                    <div class="row">
+                        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-header"><h6>{{ day }}</h6></div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ day }} Start</label>
+                                            <select class="form-select shift-time" id="{{ day.lower() }}_start" name="{{ day.lower() }}_start">
+                                                <option value="None">Not working</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ day }} End</label>
+                                            <select class="form-select shift-time" id="{{ day.lower() }}_end" name="{{ day.lower() }}_end">
+                                                <option value="None">Not working</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveShifts">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block heardLink %}
+    <!-- Uploader CSS -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/dropzone/dropzone.min.css">
+    <!-- Quill Editor -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/quill/quill.core.css">
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Dropzone JS -->
+    <script src="../../../static/assets/vendor/dropzone/dropzone.min.js"></script>
+    <!-- Quill Editor JS -->
+    <script src="../../../static/assets/vendor/quill/quill.min.js"></script>
+    <script src="../../../static/assets/vendor/quill/custom.js"></script>
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+<script>
+$(document).ready(function() {
+    const timeSlots = [
+        '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM',
+        '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM',
+        '3:00 PM', '4:00 PM', '5:00 PM'
+    ];
+
+    // Function to safely parse JSON
+    function safeJsonParse(jsonString) {
+        try {
+            return JSON.parse(jsonString);
+        } catch (e) {
+            console.error("Error parsing JSON:", e);
+            return {};
+        }
+    }
+
+    // Populate time dropdowns
+    function populateTimeDropdowns() {
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+        days.forEach(day => {
+            const startSelector = `#${day}_start`;
+            const endSelector = `#${day}_end`;
+
+            // Clear and populate dropdowns
+            $(startSelector).empty().append('<option value="None">Not working</option>');
+            $(endSelector).empty().append('<option value="None">Not working</option>');
+
+            timeSlots.forEach(time => {
+                $(startSelector).append(`<option value="${time}">${time}</option>`);
+                $(endSelector).append(`<option value="${time}">${time}</option>`);
+            });
+        });
+    }
+
+    // Initialize dropdowns when modal opens
+    $('#shiftModal').on('show.bs.modal', function() {
+        populateTimeDropdowns();
+    });
+
+    // Edit button click handler
+    $(document).on('click', '.edit-shift', function() {
+        const doctorId = $(this).data('doctor-id');
+        const schedule = $(this).data('schedule');
+
+        // Convert schedule to proper JSON if it's not already an object
+        const scheduleData = typeof schedule === 'string' ? safeJsonParse(schedule) : schedule;
+
+        $('#doctorId').val(doctorId);
+
+        // Set timeout to ensure dropdowns are populated
+        setTimeout(() => {
+            if (scheduleData) {
+                console.log(scheduleData)
+                Object.entries(scheduleData).forEach(([day, shift]) => {
+                    const dayLower = day.toLowerCase();
+                    if (shift && shift.start) {
+                        $(`#${dayLower}_start`).val(shift.start);
+                    }
+                    if (shift && shift.end) {
+                        $(`#${dayLower}_end`).val(shift.end);
+                    }
+                });
+            }
+        }, 50);
+    });
+
+    // Save button click handler
+    $('#saveShifts').click(function() {
+        const doctorId = $('#doctorId').val();
+        const formData = $('#shiftForm').serialize();
+
+        $.post(`/admin/update-shifts/${doctorId}`, formData)
+            .done(function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + (response.error || 'Unknown error'));
+                }
+            })
+            .fail(function() {
+                alert('Failed to save shift data. Please try again.');
+            });
+    });
+});
+</script>
+{% endblock %}

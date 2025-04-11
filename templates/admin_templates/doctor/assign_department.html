@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block title %}Department Assignments{% endblock title %}
+{% block page %}Department Assignments{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Current Assignments</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignModal">
+                        <i class="fas fa-plus me-1"></i> New Assignment
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="scrollVertical">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Department</th>
+                                <th>Specialty</th>
+                                <th>Assigned Date</th>
+                                <th>Experience</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for doctor in doctors %}
+                                {% for assignment in doctor.assignments %}
+                                    <tr data-bs-toggle="modal"
+                                        data-bs-target="#editModal{{ assignment.id }}">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="../../../static/assets/images/doctor.png"
+                                                     class="rounded-circle me-2" width="40" height="40">
+                                                <div>
+                                                    <strong>{{ doctor.first_name }}</strong><br>
+                                                    <small class="text-muted">{{ doctor.designation }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ assignment.department.name }}</td>
+                                        <td>{{ assignment.specialty or '-' }}</td>
+                                        <td>{{ assignment.assigned_date.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                        <span class="badge 
+                                            {% if assignment.experience_level == 'Junior' %}bg-info
+                                            {% elif assignment.experience_level == 'Mid-level' %}bg-primary
+                                            {% else %}bg-success{% endif %}">
+                                            {{ assignment.experience_level }}
+                                        </span>
+                                        </td>
+                                        <td>
+                                        <span class="badge 
+                                            {% if assignment.current_status == 'Active' %}bg-success
+                                            {% elif assignment.current_status == 'On Leave' %}bg-warning
+                                            {% elif assignment.current_status == 'Pending' %}bg-secondary
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ assignment.current_status }}
+                                        </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-outline-success btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editModal{{ assignment.id }}">
+                                                    <i class="ri-edit-box-line"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Edit Assignment Modal -->
+                                            <div class="modal fade" id="editModal{{ assignment.id }}" tabindex="-1">
+                                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Edit Assignment</h5>
+                                                            <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form method="POST"
+                                                              action="/admin/update-assignment/{{ assignment.id }}">
+                                                            <div class="modal-body">
+                                                                <div class="row">
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label class="form-label">Doctor</label>
+                                                                        <input type="text" class="form-control"
+                                                                               value="{{ doctor.first_name }}"
+                                                                               readonly>
+                                                                    </div>
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label class="form-label">Department</label>
+                                                                        <input type="text" class="form-control"
+                                                                               value="{{ assignment.department.name }}"
+                                                                               readonly>
+                                                                    </div>
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label class="form-label">Specialty</label>
+                                                                        <input type="text" class="form-control"
+                                                                               name="specialty"
+                                                                               value="{{ assignment.specialty or '' }}">
+                                                                    </div>
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label class="form-label">Assigned Date</label>
+                                                                        <input type="date" class="form-control"
+                                                                               value="{{ assignment.assigned_date.strftime('%Y-%m-%d') }}"
+                                                                               readonly>
+                                                                    </div>
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label class="form-label">Experience
+                                                                            Level</label>
+                                                                        <select class="form-select"
+                                                                                name="experience_level" required>
+                                                                            <option value="Junior"
+                                                                                    {% if assignment.experience_level == 'Junior' %}selected{% endif %}>
+                                                                                Junior
+                                                                            </option>
+                                                                            <option value="Mid-level"
+                                                                                    {% if assignment.experience_level == 'Mid-level' %}selected{% endif %}>
+                                                                                Mid-level
+                                                                            </option>
+                                                                            <option value="Senior"
+                                                                                    {% if assignment.experience_level == 'Senior' %}selected{% endif %}>
+                                                                                Senior
+                                                                            </option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label class="form-label">Status</label>
+                                                                        <select class="form-select"
+                                                                                name="current_status" required>
+                                                                            <option value="Active"
+                                                                                    {% if assignment.current_status == 'Active' %}selected{% endif %}>
+                                                                                Active
+                                                                            </option>
+                                                                            <option value="On Leave"
+                                                                                    {% if assignment.current_status == 'On Leave' %}selected{% endif %}>
+                                                                                On Leave
+                                                                            </option>
+                                                                            <option value="Pending"
+                                                                                    {% if assignment.current_status == 'Pending' %}selected{% endif %}>
+                                                                                Pending
+                                                                            </option>
+                                                                            <option value="Inactive"
+                                                                                    {% if assignment.current_status == 'Inactive' %}selected{% endif %}>
+                                                                                Inactive
+                                                                            </option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 mb-3">
+                                                                        <label class="form-label"
+                                                                               for="notes">Notes</label>
+                                                                        <textarea class="form-control" name="notes"
+                                                                                  id="notes"
+                                                                                  rows="3">{{ assignment.notes or '' }}</textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                        data-bs-dismiss="modal">Cancel
+                                                                </button>
+                                                                <button type="submit" class="btn btn-primary">Save
+                                                                    Changes
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="../../../static/assets/images/doctor.png"
+                                                     class="rounded-circle me-2" width="40" height="40" alt="doctor">
+                                                <div>
+                                                    <strong>{{ doctor.first_name }}</strong><br>
+                                                    <small class="text-muted">{{ doctor.designation }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td colspan="6" class="text-center text-muted">No department assignment</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Assignment Modal -->
+    <div class="modal fade" id="assignModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Doctor to Department</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="/admin/assign-doctor-department">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="doctor_id">Doctor*</label>
+                                <select class="form-select" name="doctor_id" id="doctor_id" required>
+                                    <option value="">Select Doctor</option>
+                                    {% for doctor in doctors %}
+                                        <option value="{{ doctor.id }}">{{ doctor.first_name }}
+                                            ({{ doctor.designation }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="department_id">Department*</label>
+                                <select class="form-select" name="department_id" id="department_id" required>
+                                    <option value="">Select Department</option>
+                                    {% for department in departments %}
+                                        <option value="{{ department.id }}">{{ department.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="specialty">Specialty</label>
+                                <input type="text" class="form-control" name="specialty" id="specialty">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="experience_level">Experience Level*</label>
+                                <select class="form-select" name="experience_level" id="experience_level" required>
+                                    <option value="">Select Level</option>
+                                    <option value="Junior">Junior</option>
+                                    <option value="Mid-level">Mid-level</option>
+                                    <option value="Senior">Senior</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="current_status">Status*</label>
+                                <select class="form-select" name="current_status" id="current_status" required>
+                                    <option value="Active">Active</option>
+                                    <option value="On Leave">On Leave</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="assigned_date">Assigned Date*</label>
+                                <input type="date" class="form-control" name="assigned_date" id="assigned_date"
+                                       required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label" for="notes">Notes</label>
+                                <textarea class="form-control" name="notes" id="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Assignment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock body %}
+
+{% block heardLink %}
+
+    <!-- Uploader CSS -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/dropzone/dropzone.min.css">
+
+    <!-- Quill Editor -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/quill/quill.core.css">
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+{% block footerLink %}
+
+    <!-- Dropzone JS -->
+    <script src="../../../static/assets/vendor/dropzone/dropzone.min.js"></script>
+
+    <!-- Quill Editor JS -->
+    <script src="../../../static/assets/vendor/quill/quill.min.js"></script>
+    <script src="../../../static/assets/vendor/quill/custom.js"></script>
+
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+{% endblock footerLink %}

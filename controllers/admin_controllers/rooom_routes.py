@@ -15,31 +15,6 @@ def room_add_room():
     return render_template("admin_templates/room/add-room.html", departments=departments)
 
 
-@admin.route(ROOM_AVAILABLE_ROOM, methods=['GET'], endpoint='available-room')
-def room_available_room():
-    return render_template("admin_templates/room/available-rooms.html")
-
-
-@admin.route(ROOM_BOOK_ROOM, methods=['GET'], endpoint='book-room')
-def room_book_room():
-    return render_template("admin_templates/room/book-room.html")
-
-
-@admin.route(ROOM_ROOM_STATISTICS, methods=['GET'], endpoint='room-statistics')
-def room_room_statistics():
-    return render_template("admin_templates/room/room-statistics.html")
-
-
-@admin.route(ROOM_ROOM_ALLOTTED, methods=['GET'], endpoint='rooms-allotted')
-def room_rooms_allotted():
-    return render_template("admin_templates/room/rooms-allotted.html")
-
-
-@admin.route(ROOM_ROOM_BY_DEPT, methods=['GET'], endpoint='rooms-by-dept')
-def room_room_by_dept():
-    return render_template("admin_templates/room/rooms-by-dept.html")
-
-
 @admin.route(ROOM_ADD_ROOM, methods=['POST'])
 def add_room():
     room_number = request.form.get('room_number')
@@ -76,6 +51,31 @@ def add_room():
     except Exception as e:
         db.session.rollback()
         flash(f'Error adding room: {str(e)}', 'danger')
+
+
+@admin.route(ROOM_AVAILABLE_ROOM, methods=['GET'], endpoint='available-room')
+def room_available_room():
+    return render_template("admin_templates/room/available-rooms.html")
+
+
+@admin.route(ROOM_BOOK_ROOM, methods=['GET'], endpoint='book-room')
+def room_book_room():
+    return render_template("admin_templates/room/book-room.html")
+
+
+@admin.route(ROOM_ROOM_STATISTICS, methods=['GET'], endpoint='room-statistics')
+def room_room_statistics():
+    return render_template("admin_templates/room/room-statistics.html")
+
+
+@admin.route(ROOM_ROOM_ALLOTTED, methods=['GET'], endpoint='rooms-allotted')
+def room_rooms_allotted():
+    return render_template("admin_templates/room/rooms-allotted.html")
+
+
+@admin.route(ROOM_ROOM_BY_DEPT, methods=['GET'], endpoint='rooms-by-dept')
+def room_room_by_dept():
+    return render_template("admin_templates/room/rooms-by-dept.html")
 
 # @admin.route('/add-room', methods=['POST'])
 # def add_room():

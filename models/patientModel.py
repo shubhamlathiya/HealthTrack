@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from utils.config import db
 
 class Patient(db.Model):
@@ -9,6 +11,8 @@ class Patient(db.Model):
     age = db.Column(db.Integer, nullable=True)
     address = db.Column(db.Text, nullable=True)
     phone = db.Column(db.String(20), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationship with the User model (each patient corresponds to a user)
     user = db.relationship('User', backref='patient', uselist=False)

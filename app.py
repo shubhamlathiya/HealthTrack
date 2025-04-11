@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, jsonify, redirect, request
+from flask import Flask, render_template, session, jsonify, redirect, request, send_from_directory
 from flask_mail import Mail
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
@@ -69,7 +69,9 @@ UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    return send_from_directory('uploads', filename)
 @app.route('/logout', methods=['GET'])
 def logout():
     session.clear()
