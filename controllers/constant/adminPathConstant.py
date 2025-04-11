@@ -11,6 +11,7 @@ ADMIN = "admin"
 # blood-bank
 BLOOD_BANK = "/blood-bank"
 BLOOD_BANK_DONOR = f"{BLOOD_BANK}/donor"
+BLOOD_BANK_ADD_DONOR = f"{BLOOD_BANK}/add-donor"
 BLOOD_BANK_STOCK = f"{BLOOD_BANK}/stock"
 BLOOD_BANK_ISSUED = f"{BLOOD_BANK}/issued"
 
@@ -55,6 +56,7 @@ HUMAN_RESOURCES_STAFF_ATTENDANCE = f"{HUMAN_RESOURCES}/staff-attendance"
 INSURANCE ="/insurance"
 INSURANCE_PATIENT = f"{INSURANCE}/patient"
 INSURANCE_PROVIDER = f"{INSURANCE}/provider"
+INSURANCE_ADD_INSURANCE_PROVIDER = f"{INSURANCE}/add-insurance-provider"
 INSURANCE_CLAIM_STATUS = f"{INSURANCE}/claim-status"
 
 # pharmacy

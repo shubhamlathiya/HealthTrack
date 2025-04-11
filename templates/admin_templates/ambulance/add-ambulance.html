@@ -12,41 +12,51 @@
                     <h5 class="card-title">Add Ambulance</h5>
                 </div>
                 <div class="card-body">
-
-                    <!-- Row starts -->
-                    <div class="row gx-4 justify-content-center">
-                        <div class="col-lg-4 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="a1">Vehicle Number</label>
-                                <input type="text" class="form-control" id="a1" placeholder="Enter Vehicle Number">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="a2">Vehicle Name</label>
-                                <input type="email" class="form-control" id="a2" placeholder="Enter Vehicle Name">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="a3">Year Made</label>
-                                <select class="form-select" id="a3">
-                                    <option value="0">Select</option>
-                                    <option value="1">2020</option>
-                                    <option value="2">2021</option>
-                                    <option value="3">2022</option>
-                                    <option value="4">2023</option>
-                                    <option value="5">2024</option>
-                                </select>
-                            </div>
-                            <div class="d-flex gap-2 justify-content-end">
-                                <a href="ambulance-list.html" class="btn btn-outline-secondary">
-                                    Cancel
-                                </a>
-                                <a href="ambulance-list.html" class="btn btn-primary">
-                                    Add New Ambulance
-                                </a>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form method="POST" action="/admin/ambulance/add-ambulance">
+                        <!-- Row starts -->
+                        <div class="row gx-4 justify-content-center">
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="vehicle_number">Vehicle Number</label>
+                                    <input type="text" class="form-control" id="vehicle_number" name="vehicle_number"
+                                           placeholder="Enter Vehicle Number" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="vehicle_name">Vehicle Name</label>
+                                    <input type="text" class="form-control" id="vehicle_name" name="vehicle_name"
+                                           placeholder="Enter Vehicle Name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="year_made">Year Made</label>
+                                    <select class="form-select" id="year_made" name="year_made" required>
+                                        <option value="">Select</option>
+                                        {% for year in range(current_year, current_year-5, -1) %}
+                                            <option value="{{ year }}">{{ year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <a href="ambulance-list.html" class="btn btn-outline-secondary">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        Add New Ambulance
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Row ends -->
-
+                        <!-- Row ends -->
+                    </form>
                 </div>
             </div>
         </div>
