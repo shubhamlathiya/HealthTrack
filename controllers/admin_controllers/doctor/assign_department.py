@@ -1,14 +1,14 @@
 from flask import render_template, request, flash, redirect
 
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import DOCTOR_ASSIGN_DEPARTMENT
+from controllers.constant.adminPathConstant import DOCTOR_ASSIGN_DEPARTMENT, ADMIN, DOCTOR_UPDATE_ASSIGN_DEPARTMENT
 from models.departmentAssignmentModel import DepartmentAssignment
 from models.departmentModel import Department
 from models.doctorModel import Doctor
 from utils.config import db
 
 
-@admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['GET'],endpoint="department_assignments")
+@admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['GET'], endpoint="department_assignments")
 def department_assignments():
     doctors = Doctor.query.options(
         db.joinedload(Doctor.assignments).joinedload(DepartmentAssignment.department)
@@ -16,12 +16,12 @@ def department_assignments():
 
     departments = Department.query.order_by(Department.name).all()
 
-
     return render_template('admin_templates/doctor/assign_department.html',
                            doctors=doctors,
                            departments=departments)
 
-@admin.route('/assign-doctor-department', methods=['POST'],endpoint="assign_doctor_department")
+
+@admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['POST'], endpoint="assign_doctor_department")
 def assign_doctor_department():
     try:
         data = request.form
@@ -59,15 +59,15 @@ def assign_doctor_department():
         db.session.commit()
 
         flash('Department assignment created successfully!', 'success')
-        return redirect("/admin/" + DOCTOR_ASSIGN_DEPARTMENT)
+        return redirect(ADMIN + DOCTOR_ASSIGN_DEPARTMENT)
 
     except Exception as e:
         db.session.rollback()
         flash(f'Error creating assignment: {str(e)}', 'danger')
-        return redirect("/admin/" + DOCTOR_ASSIGN_DEPARTMENT)
+        return redirect(ADMIN + DOCTOR_ASSIGN_DEPARTMENT)
 
-#
-@admin.route('/update-assignment/<int:assignment_id>', methods=['POST'])
+
+@admin.route(DOCTOR_UPDATE_ASSIGN_DEPARTMENT + '/<int:assignment_id>', methods=['POST'])
 def update_assignment(assignment_id):
     try:
         assignment = DepartmentAssignment.query.get_or_404(assignment_id)
@@ -89,10 +89,8 @@ def update_assignment(assignment_id):
 
         db.session.commit()
         flash('Assignment updated successfully!', 'success')
-        return redirect("/admin/" + DOCTOR_ASSIGN_DEPARTMENT)
-
+        return redirect(ADMIN + DOCTOR_ASSIGN_DEPARTMENT)
     except Exception as e:
         db.session.rollback()
         flash(f'Error updating assignment: {str(e)}', 'danger')
-        return redirect("/admin/" + DOCTOR_ASSIGN_DEPARTMENT)
-
+        return redirect(ADMIN + DOCTOR_ASSIGN_DEPARTMENT)

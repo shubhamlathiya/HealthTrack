@@ -9,6 +9,16 @@ from models.userModel import User
 from utils.config import db
 from utils.email_utils import send_email
 
+UPLOAD_FOLDER = 'uploads/profile_pictures'  # Base folder
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @admin.route(DOCTOR_LIST, methods=['GET'], endpoint='doctor_list')
 def doctor_list():
@@ -29,15 +39,6 @@ def doctor_list():
 def department_list():
     return render_template("admin_templates/doctor/add-doctors.html")
 
-
-UPLOAD_FOLDER = 'uploads/profile_pictures'  # Base folder
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['POST'])
 def register_doctor():

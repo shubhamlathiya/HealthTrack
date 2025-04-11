@@ -6,7 +6,7 @@ FORGOT_PASSWORD  = "/forgot-password"
 RESET_PASSWORD ="/reset-password"
 
 # admin
-ADMIN = "admin"
+ADMIN = "/admin"
 
 # blood-bank
 BLOOD_BANK = "/blood-bank"
@@ -41,8 +41,10 @@ DEPARTMENT_ADD_DEPARTMENT = f"{DEPARTMENT}/add-department"
 DOCTOR = "/doctor"
 DOCTOR_LIST = f"{DOCTOR}/doctor-list"
 DOCTOR_ADD_DOCTOR = f"{DOCTOR}/add-doctor"
-DOCTOR_ASSIGN_DEPARTMENT = f"{DOCTOR}/assign-department"
+DOCTOR_ASSIGN_DEPARTMENT = f"/{DOCTOR}/assign-department"
+DOCTOR_UPDATE_ASSIGN_DEPARTMENT = f"{DOCTOR}/update-assign-department"
 DOCTOR_SHIFT_MANAGEMENT = f"{DOCTOR}/shift-management"
+DOCTOR_UPDATE_SHIFT_MANAGEMENT = f"{DOCTOR}/update-shift-management"
 
 
 # human-resources

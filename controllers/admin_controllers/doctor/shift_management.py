@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import request, flash, redirect, render_template, jsonify
 
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import DOCTOR_SHIFT_MANAGEMENT
+from controllers.constant.adminPathConstant import DOCTOR_SHIFT_MANAGEMENT, DOCTOR_UPDATE_SHIFT_MANAGEMENT
 from models.doctorModel import Doctor, Availability
 from utils.config import db
 
@@ -37,7 +37,7 @@ def doctor_shifts():
     return render_template('admin_templates/doctor/shift_management.html', doctors=doctors)
 
 
-@admin.route('/update-shifts/<int:doctor_id>', methods=['POST'])
+@admin.route(DOCTOR_UPDATE_SHIFT_MANAGEMENT + '/<int:doctor_id>', methods=['POST'])
 def update_shifts(doctor_id):
     try:
         # Days map for lookup

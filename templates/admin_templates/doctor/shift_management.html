@@ -216,7 +216,7 @@ $(document).ready(function() {
         const doctorId = $('#doctorId').val();
         const formData = $('#shiftForm').serialize();
 
-        $.post(`/admin/update-shifts/${doctorId}`, formData)
+        $.post(`/admin/doctor/update-shift-management/${doctorId}`, formData)
             .done(function(response) {
                 if (response.success) {
                     location.reload();
