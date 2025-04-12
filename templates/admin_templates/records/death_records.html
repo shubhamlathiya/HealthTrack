@@ -1,21 +1,34 @@
+<!-- death_records.html -->
 {% extends 'base.html' %}
 
 {% block title %}Death Records{% endblock title %}
 {% block page %}Death Records{% endblock page %}
 
 {% block body %}
-
-    <!-- Row starts -->
     <div class="row gx-4">
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Death Records</h5>
-                    <a href="add-death-record.html" class="btn btn-primary ms-auto">Add Record</a>
+                    <div>
+                        <a href="/admin/records/add-death" class="btn btn-primary">Add Record</a>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreDeathRecordsModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted Records
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
-
-                    <!-- Table starts -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                     <div class="table-responsive">
                         <table id="scrollVertical" class="table m-0 align-middle">
                             <thead>
@@ -31,216 +44,487 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td>3453</td>
-                                <td>
-                                    <strong>Eva Willis</strong>
-                                    <div class="text-muted small">76 E. Lower River St.</div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-pink bg-opacity-10 text-pink">Female</span>
-                                </td>
-                                <td>
-                                    02/25/2021<br>
-                                    <span class="text-muted small">3 years ago</span>
-                                </td>
-                                <td>Laurel Maxwell</td>
-                                <td>
-                                    <i class="ri-phone-line align-middle"></i> 123-456-7890
-                                </td>
-                                <td>
-                                    <span class="badge bg-danger bg-opacity-10 text-danger">Heart Attack</span>
-                                </td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" data-bs-title="Print Certificate">
-                                            <i class="ri-printer-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3454</td>
-                                <td>
-                                    <strong>Michael Johnson</strong>
-                                    <div class="text-muted small">123 Main St.</div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary">Male</span>
-                                </td>
-                                <td>
-                                    05/15/2022<br>
-                                    <span class="text-muted small">2 years ago</span>
-                                </td>
-                                <td>Sarah Johnson</td>
-                                <td>
-                                    <i class="ri-phone-line align-middle"></i> 234-567-8901
-                                </td>
-                                <td>
-                                    <span class="badge bg-danger bg-opacity-10 text-danger">Cancer</span>
-                                </td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" data-bs-title="Print Certificate">
-                                            <i class="ri-printer-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3455</td>
-                                <td>
-                                    <strong>Emily Davis</strong>
-                                    <div class="text-muted small">456 Oak Ave.</div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-pink bg-opacity-10 text-pink">Female</span>
-                                </td>
-                                <td>
-                                    11/30/2020<br>
-                                    <span class="text-muted small">3 years ago</span>
-                                </td>
-                                <td>Thomas Brown</td>
-                                <td>
-                                    <i class="ri-phone-line align-middle"></i> 345-678-9012
-                                </td>
-                                <td>
-                                    <span class="badge bg-danger bg-opacity-10 text-danger">Accident</span>
-                                </td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" data-bs-title="Print Certificate">
-                                            <i class="ri-printer-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            {% for record in records %}
+                                <tr data-bs-toggle="modal"
+                                    data-bs-target="#viewDetailsModal{{ record.id }}">
+                                    <td>{{ record.case_number }}</td>
+                                    <td>
+                                        <strong>{{ record.first_name }} {{ record.last_name }}</strong>
+                                        <div class="text-muted small">{{ record.address }}</div>
+                                    </td>
+                                    <td>
+                                        {% if record.gender == 'Female' %}
+                                            <span class="badge bg-pink bg-opacity-10 text-primary-emphasis">Female</span>
+                                        {% else %}
+                                            <span class="badge bg-primary bg-opacity-10 text-primary">Male</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ record.death_date.strftime('%m/%d/%Y') }}<br>
+
+                                    </td>
+                                    <td>{{ record.guardian_name }}</td>
+                                    <td>
+                                        <i class="ri-phone-line align-middle"></i> {{ record.contact_number }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger bg-opacity-10 text-danger">{{ record.cause_of_death }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteRecordModal{{ record.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewDetailsModal{{ record.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editRecordModal{{ record.id }}"
+                                                    data-bs-placement="top" data-bs-title="Edit Case">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                            <a href="/admin/records/death/{{ record.id }}/certificate"
+                                               class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
+                                               data-bs-placement="top" data-bs-title="Print Certificate">
+                                                <i class="ri-printer-line"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <!-- Table ends -->
-
-                    <!-- Modal Delete Row -->
-                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-sm">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="delRowLabel">
-                                        Confirm Deletion
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete this death record? This action cannot be undone.
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
-                                                aria-label="Close">Cancel
-                                        </button>
-                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- View Details Modal -->
-                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
-                         aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="viewDetailsLabel">Death Record Details</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h6>Deceased Information</h6>
-                                            <p><strong>Case Number:</strong> 3453</p>
-                                            <p><strong>Name:</strong> Eva Willis</p>
-                                            <p><strong>Gender:</strong> Female</p>
-                                            <p><strong>Death Date:</strong> February 25, 2021 (3 years ago)</p>
-                                            <p><strong>Address:</strong> 76 E. Lower River St.</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6>Next of Kin</h6>
-                                            <p><strong>Guardian Name:</strong> Laurel Maxwell</p>
-                                            <p><strong>Contact Number:</strong> 123-456-7890</p>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <h6>Death Details</h6>
-                                            <p><strong>Cause of Death:</strong> Heart Attack</p>
-                                            <p><strong>Time of Death:</strong> 14:30</p>
-                                            <p><strong>Pronounced By:</strong> Dr. James Wilson</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6>Administrative</h6>
-                                            <p><strong>Record Created:</strong> February 26, 2021</p>
-                                            <p><strong>Created By:</strong> Admin User</p>
-                                            <p><strong>Last Updated:</strong> February 26, 2021</p>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-12">
-                                            <h6>Additional Notes</h6>
-                                            <div class="card bg-light">
-                                                <div class="card-body">
-                                                    <p class="mb-0">Patient had a history of cardiovascular disease. Pronounced dead at General Hospital after failed resuscitation attempts.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
-                                    </button>
-                                    <button type="button" class="btn btn-primary">Print Death Certificate</button>
-                                    <button type="button" class="btn btn-success">Notify Authorities</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
     </div>
-    <!-- Row ends -->
 
+    <!-- Modals for each record -->
+    {% for record in records %}
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteRecordModal{{ record.id }}" tabindex="-1"
+             aria-labelledby="deleteCaseModalLabel{{ record.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteRecordModal{{ record.id }}">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <b>{{ record.first_name }} {{ record.last_name }}'s</b> case
+                        record?
+                    </div>
+                    <div class="modal-footer">
+                        <form action="/admin/records/death-delete/{{ record.id }}" method="POST">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Details Modal -->
+        <div class="modal fade" id="viewDetailsModal{{ record.id }}" tabindex="-1"
+             aria-labelledby="viewDetailsModalLabel{{ record.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewDetailsModalLabel{{ record.id }}">
+                            <i class="ri-file-text-line"></i> Death Record Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-user-line"></i> Deceased Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Case Number:</strong> {{ record.case_number }}</p>
+                                        <p><strong>Full Name:</strong> {{ record.first_name }} {{ record.last_name }}
+                                        </p>
+                                        <p><strong>Gender:</strong>
+                                            <span class="badge bg-{{ 'pink' if record.gender == 'Female' else 'primary' }} bg-opacity-10 text-{{ 'pink' if record.gender == 'Female' else 'primary' }}">
+                                            {{ record.gender }}
+                                        </span>
+                                        </p>
+                                        <p><strong>Birth
+                                            Date:</strong> {{ record.birth_date.strftime('%m/%d/%Y') if record.birth_date else 'N/A' }}
+                                        </p>
+                                        <p><strong>Age at Death:</strong> {{ record.age_at_death or 'N/A' }}</p>
+                                        <p><strong>Address:</strong> {{ record.address or 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-heart-pulse-line"></i> Death Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Date of Death:</strong> {{ record.death_date.strftime('%m/%d/%Y') }}
+                                        </p>
+                                        <p><strong>Time of
+                                            Death:</strong> {{ record.death_time.strftime('%I:%M %p') if record.death_time else 'N/A' }}
+                                        </p>
+                                        <p><strong>Location:</strong> {{ record.death_location or 'N/A' }}</p>
+                                        <p><strong>Cause of Death:</strong>
+                                            <span class="badge bg-danger bg-opacity-10 text-danger">{{ record.cause_of_death }}</span>
+                                        </p>
+                                        <p><strong>Pronounced By:</strong>
+                                            {% if record.doctor %}
+                                                {{ record.doctor.first_name }} {{ record.doctor.last_name }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-group-line"></i> Next of Kin</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Guardian/Relative:</strong> {{ record.guardian_name or 'N/A' }}</p>
+                                        <p><strong>Contact Number:</strong> {{ record.contact_number or 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-file-text-line"></i> Additional Notes</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ record.notes or 'No additional notes provided' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Close
+                        </button>
+                        <a href="/admin/records/death/{{ record.id }}/certificate" class="btn btn-primary">
+                            <i class="ri-printer-line"></i> Print Certificate
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Record Modal -->
+        <div class="modal fade" id="editRecordModal{{ record.id }}" tabindex="-1"
+             aria-labelledby="editRecordModalLabel{{ record.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="editRecordModalLabel{{ record.id }}">
+                            <i class="ri-edit-line"></i> Edit Death Record
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="/admin/records/death-edit/{{ record.id }}">
+                        <div class="modal-body">
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Case Number</label>
+                                        <input type="text" class="form-control" value="{{ record.case_number }}"
+                                               readonly>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">First Name <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="first_name"
+                                                   value="{{ record.first_name }}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Last Name <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="last_name"
+                                                   value="{{ record.last_name }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="gender" required>
+                                            <option value="Male" {% if record.gender == 'Male' %}selected{% endif %}>
+                                                Male
+                                            </option>
+                                            <option value="Female"
+                                                    {% if record.gender == 'Female' %}selected{% endif %}>Female
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Birth Date</label>
+                                        <input type="date" class="form-control" name="birth_date"
+                                               value="{{ record.birth_date.strftime('%Y-%m-%d') if record.birth_date else '' }}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Address</label>
+                                        <textarea class="form-control" name="address"
+                                                  rows="2">{{ record.address or '' }}</textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Death Date <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" name="death_date"
+                                                   value="{{ record.death_date.strftime('%Y-%m-%d') }}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Time of Death</label>
+                                            <input type="time" class="form-control" name="death_time"
+                                                   value="{{ record.death_time.strftime('%H:%M') if record.death_time else '' }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Cause of Death <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="cause_of_death"
+                                               value="{{ record.cause_of_death }}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Pronounced By (Doctor)</label>
+                                        <select class="form-select" name="pronounced_by">
+                                            <option value="">-- Select Doctor --</option>
+                                            {% for doctor in doctors %}
+                                                <option value="{{ doctor.id }}"
+                                                        {% if record.pronounced_by == doctor.id %}selected{% endif %}>
+                                                    {{ doctor.first_name }} {{ doctor.last_name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Guardian/Relative Name</label>
+                                        <input type="text" class="form-control" name="guardian_name"
+                                               value="{{ record.guardian_name or '' }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" name="contact_number"
+                                               value="{{ record.contact_number or '' }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Additional Notes</label>
+                                <textarea class="form-control" name="notes" rows="3">{{ record.notes or '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-save-line"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
+    <!-- Restore Death Records Modal -->
+    <div class="modal fade" id="restoreDeathRecordsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Archived Death Records
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="deathRestoreTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="death-records-tab" data-bs-toggle="tab"
+                                    data-bs-target="#death-records" type="button" role="tab">
+                                <i class="ri-user-line me-1"></i>
+                                Death Records ({{ deleted_records|length }})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="death-certificates-tab" data-bs-toggle="tab"
+                                    data-bs-target="#death-certificates" type="button" role="tab">
+                                <i class="ri-file-paper-line me-1"></i>
+                                Certificates ({{ deleted_certificates|length }})
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3 border border-top-0 rounded-bottom" id="deathRestoreTabsContent">
+                        <!-- Death Records Tab -->
+                        <div class="tab-pane fade show active" id="death-records" role="tabpanel">
+                            {% if deleted_records %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Case #</th>
+                                            <th>Deceased</th>
+                                            <th>Death Date</th>
+                                            <th>Cause</th>
+                                            <th>Archived On</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for record in deleted_records %}
+                                            <tr>
+                                                <td>{{ record.case_number }}</td>
+                                                <td>
+                                                    <strong>{{ record.first_name }} {{ record.last_name }}</strong>
+                                                    <div class="text-muted small">{{ record.gender }}</div>
+                                                </td>
+                                                <td>{{ record.death_date.strftime('%Y-%m-%d') }}</td>
+                                                <td>
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger">{{ record.cause_of_death }}</span>
+                                                </td>
+                                                <td>
+                                            <span data-bs-toggle="tooltip"
+                                                  title="{{ record.deleted_at.strftime('%Y-%m-%d %H:%M:%S') }}">
+                                                {{ record.deleted_at.strftime('%Y-%m-%d') }}
+                                            </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="d-inline-flex gap-2">
+                                                        <form method="POST"
+                                                              action="/admin/records/restore-death/{{ record.id }}">
+                                                            <button type="submit" class="btn btn-sm btn-success">
+                                                                <i class="ri-refresh-line"></i> Restore
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info mt-3">
+                                    <i class="ri-information-line me-2"></i>
+                                    No archived death records found
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Death Certificates Tab -->
+                        <div class="tab-pane fade" id="death-certificates" role="tabpanel">
+                            {% if deleted_certificates %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Certificate #</th>
+                                            <th>Deceased</th>
+                                            <th>Death Date</th>
+                                            <th>Issued On</th>
+                                            <th>Archived On</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for cert in deleted_certificates %}
+                                            <tr>
+                                                <td>{{ cert.certificate_number }}</td>
+                                                <td>
+                                                    <strong>{{ cert.death_record.first_name }} {{ cert.death_record.last_name }}</strong>
+                                                    <div class="text-muted small">Case
+                                                        #{{ cert.death_record.case_number }}</div>
+                                                </td>
+                                                <td>{{ cert.death_record.death_date.strftime('%Y-%m-%d') }}</td>
+                                                <td>{{ cert.issue_date.strftime('%Y-%m-%d') if cert.issue_date else 'N/A' }}</td>
+                                                <td>
+                                            <span data-bs-toggle="tooltip"
+                                                  title="{{ cert.deleted_at.strftime('%Y-%m-%d %H:%M:%S') }}">
+                                                {{ cert.deleted_at.strftime('%Y-%m-%d') }}
+                                            </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="d-inline-flex gap-2">
+                                                        <button class="btn btn-sm btn-outline-info"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#viewCertificateModal{{ cert.id }}">
+                                                            <i class="ri-eye-line"></i> View
+                                                        </button>
+                                                        <form method="POST"
+                                                              action="{{ url_for('admin.restore_death_certificate', id=cert.id) }}">
+                                                            <button type="submit" class="btn btn-sm btn-success">
+                                                                <i class="ri-refresh-line"></i> Restore
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info mt-3">
+                                    <i class="ri-information-line me-2"></i>
+                                    No archived death certificates found
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock body %}
 
 {% block heardLink %}
@@ -255,19 +539,5 @@
     <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
     <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
     <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
-    
-    <!-- Initialize Bootstrap components -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-            
-            // Initialize modals
-            var modalEl = document.getElementById('viewDetails');
-            var modal = new bootstrap.Modal(modalEl);
-        });
-    </script>
+
 {% endblock footerLink %}

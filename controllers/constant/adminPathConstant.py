@@ -67,7 +67,11 @@ PHARMACY_MEDICINE_LIST = f"{PHARMACY}/medicine-list"
 
 # records
 RECORDS = "/records"
-RECORDS_DEATH = f"{RECORDS}/death"
+RECORDS_DEATH = f"/{RECORDS}/death"
+RECORDS_ADD_DEATH = f"{RECORDS}/add-death"
+RECORDS_DEATH_DELETE = f"{RECORDS}/death-delete"
+RECORDS_DEATH_EDIT = f"{RECORDS}/death-edit"
+RESTORE_RECORDS_DEATH = f"{RECORDS}/restore-death"
 RECORDS_BIRTH = f"/{RECORDS}/birth"
 RECORDS_ADD_BIRTH = f"{RECORDS}/add-birth"
 RECORDS_BIRTH_DELETE = f"{RECORDS}/birth-delete"
