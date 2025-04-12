@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+
+{% block title %}Medicine Companies{% endblock title %}
+
+{% block page %}Medicine Companies{% endblock page %}
+
+{% block body %}
+    <!-- Main Companies List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-building-2-line me-2"></i>Medicine Companies
+                    </h5>
+                    <button class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addCompanyModal">
+                        <i class="ri-add-line me-1"></i>Add Company
+                    </button>
+                    <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                            data-bs-target="#restoreCompaniesModal">
+                        <i class="ri-refresh-line"></i> View & Restore Deleted Records
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Medicines</th>
+                                <th>Last Updated</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for company in companies %}
+                                <tr>
+                                    <td>{{ company.name }}</td>
+                                    <td>{{ company.contact_number or 'N/A' }}</td>
+                                    <td>{{ company.email or 'N/A' }}</td>
+                                    <td>{{ company.medicines|length }}</td>
+                                    <td>{{ company.updated_at.strftime('%m/%d/%Y %I:%M %p') }}</td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewCompanyModal{{ company.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editCompanyModal{{ company.id }}">
+                                                <i class="ri-edit-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteCompanyModal{{ company.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">No companies found</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Company Modal -->
+    <div class="modal fade" id="addCompanyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-add-line me-2"></i>Add New Medicine Company
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="/admin/medicine-companies/add">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Contact Number</label>
+                                    <input type="tel" class="form-control" name="contact_number">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" name="email">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="website">Website</label>
+                                    <input type="url" class="form-control" id="website" name="website">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea class="form-control" name="address" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line"></i> Save Company
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for each company -->
+    {% for company in companies %}
+        <!-- View Company Modal -->
+        <div class="modal fade" id="viewCompanyModal{{ company.id }}" tabindex="-1"
+             aria-labelledby="viewCompanyModalLabel{{ company.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewCompanyModalLabel{{ company.id }}">
+                            <i class="ri-building-2-line me-2"></i>Company Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-information-line"></i> Basic Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Company Name:</strong> {{ company.name }}</p>
+                                        <p><strong>Contact Number:</strong> {{ company.contact_number or 'N/A' }}</p>
+                                        <p><strong>Email Address:</strong> {{ company.email or 'N/A' }}</p>
+                                        <p><strong>Website:</strong>
+                                            {% if company.website %}
+                                                <a href="{{ company.website }}"
+                                                   target="_blank">{{ company.website }}</a>
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-medicine-bottle-line"></i> Medicines Information
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Total Medicines:</strong> {{ company.medicines|length }}</p>
+                                        <p><strong>Last
+                                            Updated:</strong> {{ company.updated_at.strftime('%m/%d/%Y %I:%M %p') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-map-pin-line"></i> Address</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>{{ company.address or 'No address provided' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Company Modal -->
+        <div class="modal fade" id="editCompanyModal{{ company.id }}" tabindex="-1"
+             aria-labelledby="editCompanyModalLabel{{ company.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="editCompanyModalLabel{{ company.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Company
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="/admin/medicine-companies/{{ company.id }}/edit">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Company Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="name" value="{{ company.name }}"
+                                               required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" name="contact_number"
+                                               value="{{ company.contact_number or '' }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Email Address</label>
+                                        <input type="email" class="form-control" name="email"
+                                               value="{{ company.email or '' }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Website</label>
+                                        <input type="url" class="form-control" name="website"
+                                               value="{{ company.website or '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Address</label>
+                                        <textarea class="form-control" name="address"
+                                                  rows="2">{{ company.address or '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="ri-save-line"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Company Modal -->
+        <div class="modal fade" id="deleteCompanyModal{{ company.id }}" tabindex="-1"
+             aria-labelledby="deleteCompanyModalLabel{{ company.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteCompanyModalLabel{{ company.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <b>{{ company.name }}</b>?
+                        <div class="card bg-light mt-3">
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Medicines:</strong> {{ company.medicines|length }}</p>
+                                <p class="mb-0"><strong>Last
+                                    Updated:</strong> {{ company.updated_at.strftime('%m/%d/%Y %I:%M %p') }}</p>
+                            </div>
+                        </div>
+                        {% if company.medicines|length > 0 %}
+                            <div class="alert alert-warning mt-3">
+                                <i class="ri-alert-line me-2"></i>
+                                This company supplies medicines and cannot be deleted
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Cancel
+                        </button>
+                        <form action="/admin/medicine-companies/{{ company.id }}/delete" method="POST">
+                            <button type="submit" class="btn btn-danger"
+                                    {% if company.medicines|length > 0 %}disabled{% endif %}>
+                                <i class="ri-delete-bin-line"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Companies Modal -->
+    <div class="modal fade" id="restoreCompaniesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-refresh-line me-2"></i>Restore Archived Companies
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="restoreTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="companies-tab" data-bs-toggle="tab"
+                                    data-bs-target="#companies" type="button" role="tab">
+                                <i class="ri-building-2-line me-1"></i>
+                                Companies ({{ archived_companies|length }})
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3 border border-top-0" id="restoreTabsContent">
+                        <!-- Companies Tab -->
+                        <div class="tab-pane fade show active" id="companies" role="tabpanel">
+                            {% if archived_companies %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Company Name</th>
+                                            <th>Contact</th>
+                                            <th>Email</th>
+                                            <th>Medicines</th>
+                                            <th>Archived On</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for company in archived_companies %}
+                                            <tr>
+                                                <td>{{ company.name }}</td>
+                                                <td>{{ company.contact_number or 'N/A' }}</td>
+                                                <td>{{ company.email or 'N/A' }}</td>
+                                                <td>{{ company.medicines|length }}</td>
+                                                <td>{{ company.deleted_at.strftime('%Y-%m-%d %H:%M') if company.deleted_at else 'Unknown' }}</td>
+                                                <td>
+                                                    <form method="POST"
+                                                          action="/admin/medicine-companies/{{ company.id }}/restore">
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-success">
+                                                            <i class="ri-refresh-line me-1"></i> Restore
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="ri-information-line me-2"></i>
+                                    No archived companies found
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+{% endblock footerLink %}

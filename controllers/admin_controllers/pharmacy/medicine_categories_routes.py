@@ -1,0 +1,151 @@
+# Categories Routes
+from datetime import datetime
+
+from flask import render_template, request, flash, redirect
+
+from controllers.admin_controllers import admin
+from models.medicineModel import MedicineCategory, MedicineCompany
+from utils.config import db
+
+
+@admin.route('/medicine-categories', methods=['GET'], endpoint='medicine-categories')
+def medicine_categories():
+    categories = MedicineCategory.query.filter_by(is_active=1).order_by(MedicineCategory.name).all()
+    archived_categories = MedicineCategory.query.filter_by(is_active=0).order_by(
+        MedicineCategory.deleted_at.desc()).all()
+    return render_template('admin_templates/pharmacy/medicine_categories.html', categories=categories,
+                           archived_categories=archived_categories)
+
+
+@admin.route('/medicine-categories/add', methods=['POST'], endpoint='medicine-categories/add')
+def add_medicine_category():
+    try:
+        category = MedicineCategory(
+            name=request.form.get('name'),
+            description=request.form.get('description')
+        )
+        db.session.add(category)
+        db.session.commit()
+        flash('Category added successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error adding category: {str(e)}', 'danger')
+    return redirect("/admin/medicine-categories")
+
+
+@admin.route('/medicine-categories/<int:id>/edit', methods=['POST'], endpoint='medicine-categories/<int:id>/edit')
+def edit_medicine_category(id):
+    category = MedicineCategory.query.get_or_404(id)
+    try:
+        category.name = request.form.get('name')
+        category.description = request.form.get('description')
+        db.session.commit()
+        flash('Category updated successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating category: {str(e)}', 'danger')
+    return redirect("/admin/medicine-categories")
+
+
+@admin.route('/medicine-categories/<int:id>/delete', methods=['POST'])
+def delete_medicine_category(id):
+    category = MedicineCategory.query.get_or_404(id)
+    try:
+        category.is_active = False
+        category.deleted_at = datetime.utcnow()
+
+        db.session.commit()
+        flash('Category deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting category: {str(e)}', 'danger')
+    return redirect("/admin/medicine-categories")
+
+
+@admin.route('/medicine-categories/<int:id>/restore', methods=['POST'], endpoint='medicine-categories/<int:id>/restore')
+def restore_medicine_category(id):
+    category = MedicineCategory.query.get_or_404(id)
+    try:
+        category.is_active = True
+        category.deleted_at = None
+        db.session.commit()
+        flash('Category restored successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error restoring category: {str(e)}', 'danger')
+    return redirect("/admin/medicine-categories")
+
+
+# Companies Routes
+@admin.route('/medicine-companies', methods=['GET'], endpoint='medicine-companies')
+def medicine_companies():
+    companies = MedicineCompany.query.filter_by(is_active=1).order_by(MedicineCompany.name).all()
+    archived_companies = MedicineCompany.query.filter_by(is_active=0).order_by(MedicineCompany.deleted_at.desc()).all()
+    return render_template('admin_templates/pharmacy/medicine_companies.html', companies=companies,
+                           archived_companies=archived_companies)
+
+
+@admin.route('/medicine-companies/add', methods=['POST'], endpoint='medicine-companies/add')
+def add_medicine_company():
+    try:
+        company = MedicineCompany(
+            name=request.form.get('name'),
+            address=request.form.get('address'),
+            contact_number=request.form.get('contact_number'),
+            email=request.form.get('email'),
+            website=request.form.get('website')
+        )
+        db.session.add(company)
+        db.session.commit()
+        flash('Company added successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error adding company: {str(e)}', 'danger')
+    return redirect("/admin/medicine-companies")
+
+
+@admin.route('/medicine-companies/<int:id>/edit', methods=['POST'], endpoint='medicine-companies/<int:id>/edit')
+def edit_medicine_company(id):
+    company = MedicineCompany.query.get_or_404(id)
+    try:
+        company.name = request.form.get('name')
+        company.address = request.form.get('address')
+        company.contact_number = request.form.get('contact_number')
+        company.email = request.form.get('email')
+        company.website = request.form.get('website')
+        db.session.commit()
+        flash('Company updated successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating company: {str(e)}', 'danger')
+    return redirect("/admin/medicine-companies")
+
+
+@admin.route('/medicine-companies/<int:id>/delete', methods=['POST'], endpoint='medicine-companies/<int:id>/delete')
+def delete_medicine_company(id):
+    company = MedicineCompany.query.get_or_404(id)
+    try:
+        company.is_active = False
+        company.deleted_at = datetime.utcnow()
+        db.session.commit()
+        flash('Company deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting company: {str(e)}', 'danger')
+    return redirect("/admin/medicine-companies")
+
+
+@admin.route('/medicine-companies/<int:id>/restore', methods=['POST'], endpoint='medicine-companies/<int:id>/restore')
+def restore_medicine_company(id):
+    company = MedicineCompany.query.get_or_404(id)
+    try:
+        company.is_active = True
+        company.deleted_at = None
+
+        db.session.commit()
+        flash('Category restored successfully!', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error restoring category: {str(e)}', 'danger')
+    return redirect("/admin/medicine-companies")

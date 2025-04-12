@@ -20,7 +20,8 @@ from .human_resources_routes import *
 from .accounts_routes import *
 from controllers.admin_controllers.blood_bank.blood_bank_routes import *
 from .insurance_routes import *
-from .pharmacy_routes import *
+from controllers.admin_controllers.pharmacy.pharmacy_routes import *
+from controllers.admin_controllers.pharmacy.medicine_categories_routes import *
 from .records_routes import *
 from controllers.admin_controllers.doctor.assign_department import *
 from controllers.admin_controllers.doctor.shift_management import *
