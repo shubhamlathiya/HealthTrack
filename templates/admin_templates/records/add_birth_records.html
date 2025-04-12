@@ -1,0 +1,82 @@
+<!-- add_child_case.html -->
+{% extends 'base.html' %}
+
+{% block title %}Add Child Case{% endblock title %}
+{% block page %}Add Child Case{% endblock page %}
+
+{% block body %}
+<div class="row gx-4">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Add New Child Case</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/admin/records/add-birth">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" name="first_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" name="last_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender" required>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Birth Date</label>
+                                <input type="date" class="form-control" name="birth_date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Mother's Name</label>
+                                <input type="text" class="form-control" name="mother_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Father's Name</label>
+                                <input type="text" class="form-control" name="father_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contact Number</label>
+                                <input type="tel" class="form-control" name="contact_number" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status">
+                                    <option value="Active">Active</option>
+                                    <option value="Follow-up Needed">Follow-up Needed</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="2" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Case Notes</label>
+                                <textarea class="form-control" name="case_notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="#" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Case</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

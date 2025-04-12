@@ -19,6 +19,7 @@ class Doctor(db.Model):
     address = db.Column(db.String(100), nullable=True)
     bio = db.Column(db.Text, nullable=True)
     profile_picture = db.Column(db.String(200), nullable=True)  # Assuming you are storing the image URL
+    is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

@@ -18,7 +18,7 @@ from .rooom_routes import *
 from .ambulance_routes import *
 from .human_resources_routes import *
 from .accounts_routes import *
-from .blood_bank_routes import *
+from controllers.admin_controllers.blood_bank.blood_bank_routes import *
 from .insurance_routes import *
 from .pharmacy_routes import *
 from .records_routes import *

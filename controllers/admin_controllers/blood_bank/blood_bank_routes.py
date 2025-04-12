@@ -22,7 +22,13 @@ def allowed_file(filename):
 
 @admin.route(BLOOD_BANK_DONOR, methods=['GET'], endpoint='blood_bank_donor')
 def blood_bank_donor():
-    return render_template("admin_templates/blood_bank/blood_donor.html")
+    # Query all blood donors from the database
+    donors = BloodDonor.query.order_by(BloodDonor.registration_date.desc()).all()
+
+    return render_template(
+        "admin_templates/blood_bank/blood_donor.html",
+        donors=donors
+    )
 
 
 @admin.route(BLOOD_BANK_ADD_DONOR, methods=['GET'], endpoint='blood_bank_add_donor')

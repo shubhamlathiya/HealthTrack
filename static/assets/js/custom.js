@@ -205,3 +205,16 @@ var popoverTriggerList = [].slice.call(
 var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
     return new bootstrap.Popover(popoverTriggerEl);
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const flashMessage = document.getElementById('flash-message');
+
+    if (flashMessage) {
+        // Set a timeout to automatically dismiss the flash message after 2 seconds
+        setTimeout(function () {
+            // Use Bootstrap's dismiss method to close the alert
+            const closeButton = flashMessage.querySelector('.btn-close');
+            closeButton.click();
+        }, 4000); // 2000ms = 2 seconds
+    }
+});
