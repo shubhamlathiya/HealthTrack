@@ -2,8 +2,8 @@
 AUTH = "auth"
 LOGIN = "/login"
 REGISTER = "/register"
-FORGOT_PASSWORD  = "/forgot-password"
-RESET_PASSWORD ="/reset-password"
+FORGOT_PASSWORD = "/forgot-password"
+RESET_PASSWORD = "/reset-password"
 
 # admin
 ADMIN = "/admin"
@@ -16,7 +16,7 @@ BLOOD_BANK_STOCK = f"{BLOOD_BANK}/stock"
 BLOOD_BANK_ISSUED = f"{BLOOD_BANK}/issued"
 
 # accounts
-ACCOUNTS =  "/accounts"
+ACCOUNTS = "/accounts"
 ACCOUNTS_INCOME = f"{ACCOUNTS}/income"
 ACCOUNTS_EXPENSES = f"{ACCOUNTS}/expenses"
 ACCOUNTS_INVOICES = f"{ACCOUNTS}/invoices"
@@ -32,11 +32,9 @@ AMBULANCE_AMBULANCE_CALL_LIST = f"{AMBULANCE}/ambulance-call-list"
 AMBULANCE_ADD_DRIVER = f"{AMBULANCE}/add-driver"
 AMBULANCE_DRIVER_LIST = f"{AMBULANCE}/driver-list"
 
-
-DEPARTMENT ="/department"
+DEPARTMENT = "/department"
 DEPARTMENT_LIST = f"{DEPARTMENT}/department-list"
 DEPARTMENT_ADD_DEPARTMENT = f"{DEPARTMENT}/add-department"
-
 
 DOCTOR = "/doctor"
 DOCTOR_LIST = f"{DOCTOR}/doctor-list"
@@ -46,7 +44,6 @@ DOCTOR_UPDATE_ASSIGN_DEPARTMENT = f"{DOCTOR}/update-assign-department"
 DOCTOR_SHIFT_MANAGEMENT = f"{DOCTOR}/shift-management"
 DOCTOR_UPDATE_SHIFT_MANAGEMENT = f"{DOCTOR}/update-shift-management"
 
-
 # human-resources
 HUMAN_RESOURCES = "/human-resources"
 HUMAN_RESOURCES_HR_APPROVALS = f"{HUMAN_RESOURCES}/hr-approvals"
@@ -55,7 +52,7 @@ HUMAN_RESOURCES_STAFF_HOLIDAY = f"{HUMAN_RESOURCES}/staff-holidays"
 HUMAN_RESOURCES_STAFF_ATTENDANCE = f"{HUMAN_RESOURCES}/staff-attendance"
 
 # insurance
-INSURANCE ="/insurance"
+INSURANCE = "/insurance"
 INSURANCE_PATIENT = f"{INSURANCE}/patient"
 INSURANCE_PROVIDER = f"{INSURANCE}/provider"
 INSURANCE_ADD_INSURANCE_PROVIDER = f"{INSURANCE}/add-insurance-provider"
@@ -63,7 +60,18 @@ INSURANCE_CLAIM_STATUS = f"{INSURANCE}/claim-status"
 
 # pharmacy
 PHARMACY = "/pharmacy"
-PHARMACY_MEDICINE_LIST = f"{PHARMACY}/medicine-list"
+PHARMACY_MEDICINE_LIST = f"/{PHARMACY}/medicine-list"
+PHARMACY_MEDICINE_CATEGORIES = f"/{PHARMACY}/medicine-categories"
+PHARMACY_MEDICINE_ADD_CATEGORIES = f"/{PHARMACY}/add-medicine-categories"
+PHARMACY_MEDICINE_EDIT_CATEGORIES = f"{PHARMACY}/edit-medicine-categories"
+PHARMACY_MEDICINE_DELETE_CATEGORIES = f"{PHARMACY}/delete-medicine-categories"
+PHARMACY_MEDICINE_RESTORE_CATEGORIES = f"{PHARMACY}/restore-medicine-categories"
+PHARMACY_MEDICINE_COMPANIES = f"/{PHARMACY}/medicine-companies"
+PHARMACY_MEDICINE_ADD_COMPANIES = f"{PHARMACY}/add-medicine-companies"
+PHARMACY_MEDICINE_EDIT_COMPANIES = f"{PHARMACY}/edit-medicine-companies"
+PHARMACY_MEDICINE_DELETE_COMPANIES = f"{PHARMACY}/delete-medicine-companies"
+PHARMACY_MEDICINE_RESTORE_COMPANIES = f"{PHARMACY}/restore-medicine-companies"
+
 
 # records
 RECORDS = "/records"
@@ -89,6 +97,5 @@ ROOM_BOOK_ROOM = f"{ROOM}/book-room"
 ROOM_ROOM_STATISTICS = f"{ROOM}/room-statistics"
 ROOM_ROOM_ALLOTTED = f"{ROOM}/rooms-allotted"
 ROOM_ROOM_BY_DEPT = f"{ROOM}/rooms-by-dept"
-
 
 STAFF = "/staff"

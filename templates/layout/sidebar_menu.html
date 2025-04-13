@@ -361,13 +361,28 @@
                         </li>
                     </ul>
                 </li>
-
                 <li class="treeview {% if request.path.startswith('/admin/pharmacy') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-medicine-bottle-line"></i>
                         <span class="menu-text">Pharmacy</span>
                     </a>
-                    <ul class="treeview-menu">
+                    <ul class="treeview-menu {% if request.path.startswith('/admin/pharmacy/medicine-categories') %}active current-page{% endif %}">
+                        <li>
+                            <a href="#!">
+                                Medicine
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                            <ul class="treeview-menu {% if request.path.startswith('/admin/pharmacy/medicine-categories') %}active current-page{% endif %}">
+                                <li>
+                                    <a href="/admin/pharmacy/medicine-categories"
+                                    class="{% if request.path == '/admin/pharmacy/medicine-categories' %}active-sub{% endif %}">Categories</a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/medicine-companies"
+                                    class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Companies</a>
+                                </li>
+                            </ul>
+                        </li>
                         <li>
                             <a href="/admin/pharmacy/medicine-list"
                                class="{% if request.path == '/admin/pharmacy/medicine-list' %}active-sub{% endif %}">Medicine

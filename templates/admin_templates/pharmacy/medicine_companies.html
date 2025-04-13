@@ -96,7 +96,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <form method="POST" action="/admin/medicine-companies/add">
+                <form method="POST" action="/admin/pharmacy/add-medicine-companies">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -230,7 +230,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/medicine-companies/{{ company.id }}/edit">
+                    <form method="POST" action="/admin/pharmacy/edit-medicine-companies/{{ company.id }}">
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-6">
@@ -314,7 +314,7 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="ri-close-line"></i> Cancel
                         </button>
-                        <form action="/admin/medicine-companies/{{ company.id }}/delete" method="POST">
+                        <form action="/admin/pharmacy/delete-medicine-companies/{{ company.id }}" method="POST">
                             <button type="submit" class="btn btn-danger"
                                     {% if company.medicines|length > 0 %}disabled{% endif %}>
                                 <i class="ri-delete-bin-line"></i> Delete
@@ -374,7 +374,7 @@
                                                 <td>{{ company.deleted_at.strftime('%Y-%m-%d %H:%M') if company.deleted_at else 'Unknown' }}</td>
                                                 <td>
                                                     <form method="POST"
-                                                          action="/admin/medicine-companies/{{ company.id }}/restore">
+                                                          action="/admin/pharmacy/restore-medicine-companies/{{ company.id }}">
                                                         <button type="submit"
                                                                 class="btn btn-sm btn-success">
                                                             <i class="ri-refresh-line me-1"></i> Restore

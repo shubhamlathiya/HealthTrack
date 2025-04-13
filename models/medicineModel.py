@@ -45,7 +45,7 @@ class MedicineCompany(db.Model):
 class Medicine(db.Model):
     __tablename__ = 'medicines'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True ,autoincrement=True)
     medicine_number = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
@@ -59,8 +59,11 @@ class Medicine(db.Model):
     min_stock_level = db.Column(db.Integer, default=10, nullable=False)
     location = db.Column(db.String(50))
     barcode = db.Column(db.String(50), unique=True)
+
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     stock_transactions = db.relationship('StockTransaction', backref='medicine', lazy=True)
 
@@ -94,7 +97,7 @@ class Medicine(db.Model):
 class StockTransaction(db.Model):
     __tablename__ = 'stock_transactions'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True ,autoincrement=True)
     medicine_id = db.Column(db.Integer, db.ForeignKey('medicines.id'), nullable=False)
     transaction_type = db.Column(db.String(20), nullable=False)  # purchase, dispense, adjustment, etc.
     quantity = db.Column(db.Integer, nullable=False)
@@ -102,7 +105,11 @@ class StockTransaction(db.Model):
     reference = db.Column(db.String(100))  # prescription ID, purchase order, etc.
     notes = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     user = db.relationship('User', backref='stock_transactions')
 

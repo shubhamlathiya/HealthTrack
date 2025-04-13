@@ -4,11 +4,15 @@ from datetime import datetime
 from flask import render_template, request, flash, redirect
 
 from controllers.admin_controllers import admin
+from controllers.constant.adminPathConstant import PHARMACY_MEDICINE_CATEGORIES, PHARMACY_MEDICINE_COMPANIES, \
+    PHARMACY_MEDICINE_ADD_CATEGORIES, PHARMACY_MEDICINE_ADD_COMPANIES, PHARMACY_MEDICINE_EDIT_CATEGORIES, \
+    PHARMACY_MEDICINE_DELETE_CATEGORIES, PHARMACY_MEDICINE_RESTORE_CATEGORIES, PHARMACY_MEDICINE_EDIT_COMPANIES, \
+    PHARMACY_MEDICINE_DELETE_COMPANIES, PHARMACY_MEDICINE_RESTORE_COMPANIES, ADMIN
 from models.medicineModel import MedicineCategory, MedicineCompany
 from utils.config import db
 
 
-@admin.route('/medicine-categories', methods=['GET'], endpoint='medicine-categories')
+@admin.route(PHARMACY_MEDICINE_CATEGORIES, methods=['GET'], endpoint='medicine-categories')
 def medicine_categories():
     categories = MedicineCategory.query.filter_by(is_active=1).order_by(MedicineCategory.name).all()
     archived_categories = MedicineCategory.query.filter_by(is_active=0).order_by(
@@ -17,7 +21,7 @@ def medicine_categories():
                            archived_categories=archived_categories)
 
 
-@admin.route('/medicine-categories/add', methods=['POST'], endpoint='medicine-categories/add')
+@admin.route(PHARMACY_MEDICINE_ADD_CATEGORIES, methods=['POST'], endpoint='medicine-categories/add')
 def add_medicine_category():
     try:
         category = MedicineCategory(
@@ -30,10 +34,10 @@ def add_medicine_category():
     except Exception as e:
         db.session.rollback()
         flash(f'Error adding category: {str(e)}', 'danger')
-    return redirect("/admin/medicine-categories")
+    return redirect(ADMIN + PHARMACY_MEDICINE_CATEGORIES)
 
 
-@admin.route('/medicine-categories/<int:id>/edit', methods=['POST'], endpoint='medicine-categories/<int:id>/edit')
+@admin.route(PHARMACY_MEDICINE_EDIT_CATEGORIES + '/<int:id>', methods=['POST'], endpoint='medicine-categories/<int:id>/edit')
 def edit_medicine_category(id):
     category = MedicineCategory.query.get_or_404(id)
     try:
@@ -44,10 +48,10 @@ def edit_medicine_category(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error updating category: {str(e)}', 'danger')
-    return redirect("/admin/medicine-categories")
+    return redirect(ADMIN + PHARMACY_MEDICINE_CATEGORIES)
 
 
-@admin.route('/medicine-categories/<int:id>/delete', methods=['POST'])
+@admin.route(PHARMACY_MEDICINE_DELETE_CATEGORIES + '/<int:id>', methods=['POST'])
 def delete_medicine_category(id):
     category = MedicineCategory.query.get_or_404(id)
     try:
@@ -59,10 +63,10 @@ def delete_medicine_category(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error deleting category: {str(e)}', 'danger')
-    return redirect("/admin/medicine-categories")
+    return redirect(ADMIN + PHARMACY_MEDICINE_CATEGORIES)
 
 
-@admin.route('/medicine-categories/<int:id>/restore', methods=['POST'], endpoint='medicine-categories/<int:id>/restore')
+@admin.route(PHARMACY_MEDICINE_RESTORE_CATEGORIES + '/<int:id>', methods=['POST'], endpoint='medicine-categories/<int:id>/restore')
 def restore_medicine_category(id):
     category = MedicineCategory.query.get_or_404(id)
     try:
@@ -73,11 +77,11 @@ def restore_medicine_category(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error restoring category: {str(e)}', 'danger')
-    return redirect("/admin/medicine-categories")
+    return redirect(ADMIN + PHARMACY_MEDICINE_CATEGORIES)
 
 
 # Companies Routes
-@admin.route('/medicine-companies', methods=['GET'], endpoint='medicine-companies')
+@admin.route(PHARMACY_MEDICINE_COMPANIES, methods=['GET'], endpoint='medicine-companies')
 def medicine_companies():
     companies = MedicineCompany.query.filter_by(is_active=1).order_by(MedicineCompany.name).all()
     archived_companies = MedicineCompany.query.filter_by(is_active=0).order_by(MedicineCompany.deleted_at.desc()).all()
@@ -85,7 +89,7 @@ def medicine_companies():
                            archived_companies=archived_companies)
 
 
-@admin.route('/medicine-companies/add', methods=['POST'], endpoint='medicine-companies/add')
+@admin.route(PHARMACY_MEDICINE_ADD_COMPANIES, methods=['POST'], endpoint='medicine-companies/add')
 def add_medicine_company():
     try:
         company = MedicineCompany(
@@ -101,10 +105,10 @@ def add_medicine_company():
     except Exception as e:
         db.session.rollback()
         flash(f'Error adding company: {str(e)}', 'danger')
-    return redirect("/admin/medicine-companies")
+    return redirect(ADMIN + PHARMACY_MEDICINE_COMPANIES)
 
 
-@admin.route('/medicine-companies/<int:id>/edit', methods=['POST'], endpoint='medicine-companies/<int:id>/edit')
+@admin.route(PHARMACY_MEDICINE_EDIT_COMPANIES + '/<int:id>', methods=['POST'], endpoint='medicine-companies/<int:id>/edit')
 def edit_medicine_company(id):
     company = MedicineCompany.query.get_or_404(id)
     try:
@@ -118,10 +122,10 @@ def edit_medicine_company(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error updating company: {str(e)}', 'danger')
-    return redirect("/admin/medicine-companies")
+    return redirect(ADMIN + PHARMACY_MEDICINE_COMPANIES)
 
 
-@admin.route('/medicine-companies/<int:id>/delete', methods=['POST'], endpoint='medicine-companies/<int:id>/delete')
+@admin.route(PHARMACY_MEDICINE_DELETE_COMPANIES + '/<int:id>', methods=['POST'], endpoint='medicine-companies/<int:id>/delete')
 def delete_medicine_company(id):
     company = MedicineCompany.query.get_or_404(id)
     try:
@@ -132,10 +136,10 @@ def delete_medicine_company(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error deleting company: {str(e)}', 'danger')
-    return redirect("/admin/medicine-companies")
+    return redirect(ADMIN + PHARMACY_MEDICINE_COMPANIES)
 
 
-@admin.route('/medicine-companies/<int:id>/restore', methods=['POST'], endpoint='medicine-companies/<int:id>/restore')
+@admin.route(PHARMACY_MEDICINE_RESTORE_COMPANIES + '/<int:id>', methods=['POST'], endpoint='medicine-companies/<int:id>/restore')
 def restore_medicine_company(id):
     company = MedicineCompany.query.get_or_404(id)
     try:
@@ -148,4 +152,4 @@ def restore_medicine_company(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error restoring category: {str(e)}', 'danger')
-    return redirect("/admin/medicine-companies")
+    return redirect(ADMIN + PHARMACY_MEDICINE_COMPANIES)
