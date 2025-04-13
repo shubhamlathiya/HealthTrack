@@ -61,11 +61,21 @@ INSURANCE_CLAIM_STATUS = f"{INSURANCE}/claim-status"
 # pharmacy
 PHARMACY = "/pharmacy"
 PHARMACY_MEDICINE_LIST = f"/{PHARMACY}/medicine-list"
+PHARMACY_MEDICINE_ADD = f"{PHARMACY}/add-medicine"
+PHARMACY_MEDICINE_EDIT = f"{PHARMACY}/edit-medicine"
+PHARMACY_MEDICINE_DELETE = f"{PHARMACY}/delete-medicine"
+PHARMACY_MEDICINE_RESTOCK = f"{PHARMACY}/restock-medicine"
+PHARMACY_MEDICINE_TRANSACTIONS = f"{PHARMACY}/transactions-medicine"
+PHARMACY_MEDICINE_DISPENSE = f"{PHARMACY}/dispense-medicine"
+PHARMACY_MEDICINE_RESTORE = f"{PHARMACY}/restore-medicine"
+
 PHARMACY_MEDICINE_CATEGORIES = f"/{PHARMACY}/medicine-categories"
 PHARMACY_MEDICINE_ADD_CATEGORIES = f"/{PHARMACY}/add-medicine-categories"
 PHARMACY_MEDICINE_EDIT_CATEGORIES = f"{PHARMACY}/edit-medicine-categories"
 PHARMACY_MEDICINE_DELETE_CATEGORIES = f"{PHARMACY}/delete-medicine-categories"
 PHARMACY_MEDICINE_RESTORE_CATEGORIES = f"{PHARMACY}/restore-medicine-categories"
+
+
 PHARMACY_MEDICINE_COMPANIES = f"/{PHARMACY}/medicine-companies"
 PHARMACY_MEDICINE_ADD_COMPANIES = f"{PHARMACY}/add-medicine-companies"
 PHARMACY_MEDICINE_EDIT_COMPANIES = f"{PHARMACY}/edit-medicine-companies"

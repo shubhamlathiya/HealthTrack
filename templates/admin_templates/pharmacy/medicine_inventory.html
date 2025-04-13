@@ -135,7 +135,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <form method="POST" action="/admin/medicines/add">
+                <form method="POST" action="/admin/pharmacy/add-medicine">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -238,7 +238,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/medicines/edit/{{ medicine.id }}">
+                    <form method="POST" action="/admin/pharmacy/edit-medicine/{{ medicine.id }}">
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-6">
@@ -433,24 +433,16 @@
                                     </table>
                                 </div>
                                 <div class="text-end mt-2">
-                                    <form action="/admin/medicines/transactions" method="POST">
+                                    <form action="/admin/pharmacy/transactions-medicine" method="POST">
                                         <input type="hidden" name="medicine_id" value="{{ medicine.id }}">
                                         <button type="submit" class="btn btn-sm btn-outline-primary"> View All Transactions</button>
                                     </form>
-{##}
-{#                                    <a href="/admin/medicines/transactions/{{ medicine.id }}"#}
-{#                                       class="btn btn-sm btn-outline-primary">#}
-{#                                        View All Transactions#}
-{#                                    </a>#}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <a href="{{ medicine.id }}" class="btn btn-info">
-                            <i class="fas fa-edit me-1"></i> Edit
-                        </a>
                     </div>
                 </div>
             </div>
@@ -481,7 +473,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <form action="/admin/medicines/delete/{{ medicine.id }}" method="POST">
+                        <form action="/admin/pharmacy/delete-medicine/{{ medicine.id }}" method="POST">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </div>
@@ -500,7 +492,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/medicines/restock/{{ medicine.id }}">
+                    <form method="POST" action="/admin/pharmacy/restock-medicine/{{ medicine.id }}">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label class="form-label">Medicine</label>
@@ -559,7 +551,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/medicines/dispense/{{ medicine.id }}">
+                    <form method="POST" action="/admin/pharmacy/dispense-medicine/{{ medicine.id }}">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label class="form-label">Medicine</label>

@@ -13,7 +13,7 @@
                         <i class="fas fa-history me-2"></i>Stock Transactions
                     </h5>
                     <div>
-                        <a href="#" class="btn btn-sm btn-outline-secondary">
+                        <a href="/admin/pharmacy/medicine-list" class="btn btn-sm btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Back to Inventory
                         </a>
                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
@@ -121,7 +121,7 @@
                         <div class="text-muted small">
                             Showing {{ transactions|length }} transactions
                         </div>
-                        <a href="#" class="btn btn-sm btn-outline-secondary">
+                        <a href="/admin/pharmacy/medicine-list" class="btn btn-sm btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Back to Inventory
                         </a>
                     </div>
@@ -139,7 +139,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <form method="POST" action="/admin/medicines/transactions/{{ medicine.id }}">
+                <form method="POST" action="/admin/pharmacy/transactions-medicine/{{ medicine.id }}">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Medicine</label>

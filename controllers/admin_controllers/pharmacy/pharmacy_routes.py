@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 from flask import render_template, request, flash, redirect
 
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import PHARMACY_MEDICINE_LIST
+from controllers.constant.adminPathConstant import PHARMACY_MEDICINE_LIST, PHARMACY_MEDICINE_ADD, ADMIN, \
+    PHARMACY_MEDICINE_EDIT, PHARMACY_MEDICINE_DELETE, PHARMACY_MEDICINE_RESTOCK, PHARMACY_MEDICINE_TRANSACTIONS, \
+    PHARMACY_MEDICINE_DISPENSE, PHARMACY_MEDICINE_RESTORE
 from middleware.auth_middleware import token_required
 from models.medicineModel import Medicine, StockTransaction, MedicineCategory, MedicineCompany
 from utils.config import db
@@ -11,11 +13,6 @@ from utils.config import db
 
 @admin.route(PHARMACY_MEDICINE_LIST, methods=['GET'], endpoint='medicine-list')
 def pharmacy_medicine_list():
-    return render_template("admin_templates/pharmacy/medicine_list.html")
-
-
-@admin.route('/medicines', methods=['GET'], endpoint='medicine-list123')
-def medicine_inventory():
     medicines = Medicine.query.filter_by(is_active=1).order_by(Medicine.name).all()
     categories = MedicineCategory.query.filter_by(is_active=1).order_by(MedicineCategory.name).all()
     companies = MedicineCompany.query.filter_by(is_active=1).order_by(MedicineCompany.name).all()
@@ -26,7 +23,7 @@ def medicine_inventory():
                            timedelta=timedelta, archived_medicines=archived_medicines)
 
 
-@admin.route('/medicines/add', methods=['POST'], endpoint='medicine-add')
+@admin.route(PHARMACY_MEDICINE_ADD, methods=['POST'], endpoint='medicine-add')
 @token_required
 def add_medicine(current_user):
     print(current_user)
@@ -71,10 +68,10 @@ def add_medicine(current_user):
     except Exception as e:
         db.session.rollback()
         flash(f'Error adding medicine: {str(e)}', 'danger')
-    return redirect("/admin/medicines")
+    return redirect(ADMIN + PHARMACY_MEDICINE_LIST)
 
 
-@admin.route('/medicines/edit/<int:id>', methods=['POST'], endpoint='medicine-edit')
+@admin.route(PHARMACY_MEDICINE_EDIT + '/<int:id>', methods=['POST'], endpoint='medicine-edit')
 def edit_medicine(id):
     medicine = Medicine.query.get_or_404(id)
     try:
@@ -95,10 +92,10 @@ def edit_medicine(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error updating medicine: {str(e)}', 'danger')
-    return redirect("/admin/medicines")
+    return redirect(ADMIN + PHARMACY_MEDICINE_LIST)
 
 
-@admin.route('/medicines/delete/<int:id>', methods=['POST'], endpoint='medicine-delete')
+@admin.route(PHARMACY_MEDICINE_DELETE  + '/<int:id>', methods=['POST'], endpoint='medicine-delete')
 def delete_medicine(id):
     medicine = Medicine.query.get_or_404(id)
     try:
@@ -115,10 +112,10 @@ def delete_medicine(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error deleting medicine: {str(e)}', 'danger')
-    return redirect("/admin/medicines")
+    return redirect(ADMIN + PHARMACY_MEDICINE_LIST)
 
 
-@admin.route('/medicines/restock/<int:id>', methods=['POST'], endpoint='medicine-restock')
+@admin.route(PHARMACY_MEDICINE_RESTOCK + '/<int:id>', methods=['POST'], endpoint='medicine-restock')
 @token_required
 def restock_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
@@ -146,10 +143,10 @@ def restock_medicine(current_user, id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error restocking medicine: {str(e)}', 'danger')
-    return redirect("/admin/medicines")
+    return redirect(ADMIN + PHARMACY_MEDICINE_LIST)
 
 
-@admin.route('/medicines/transactions/<int:id>', methods=['POST'], endpoint='medicine-transactions22')
+@admin.route(PHARMACY_MEDICINE_TRANSACTIONS + '/<int:id>', methods=['POST'], endpoint='medicine-transactions123')
 @token_required
 def transactions_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
@@ -214,14 +211,14 @@ def transactions_medicine(current_user, id):
 @admin.route('/medicines/forward-post/<int:id>', methods=['GET'])
 def forward_to_post(id):
     return f'''
-    <form id="forwardForm" action="/admin/medicines/transactions" method="post">
+    <form id="forwardForm" action="/admin/pharmacy/transactions-medicine" method="post">
         <input type="hidden" name="medicine_id" value="{id}" />
     </form>
     <script>document.getElementById("forwardForm").submit();</script>
     '''
 
 
-@admin.route('/medicines/dispense/<int:id>', methods=['POST'], endpoint='medicine-dispense')
+@admin.route(PHARMACY_MEDICINE_DISPENSE + '/<int:id>', methods=['POST'], endpoint='medicine-dispense')
 @token_required
 def dispense_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
@@ -253,10 +250,10 @@ def dispense_medicine(current_user, id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error dispensing medicine: {str(e)}', 'danger')
-    return redirect("/admin/medicines")
+    return redirect(ADMIN + PHARMACY_MEDICINE_LIST)
 
 
-@admin.route('/medicines/transactions', methods=['POST'], endpoint='medicine-transactions')
+@admin.route(PHARMACY_MEDICINE_TRANSACTIONS, methods=['POST'], endpoint='medicine-transactions')
 def medicine_transactions():
     medicine_id = request.form.get('medicine_id')
     medicine = Medicine.query.get_or_404(medicine_id)
@@ -267,7 +264,7 @@ def medicine_transactions():
                            timedelta=timedelta)
 
 
-@admin.route('/pharmacy/restore-medicine/<int:id>', methods=['POST'])
+@admin.route(PHARMACY_MEDICINE_RESTORE + '/<int:id>', methods=['POST'])
 def restore_medicine(id):
     medicine = Medicine.query.get_or_404(id)
     try:
@@ -282,4 +279,4 @@ def restore_medicine(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error restoring medicine: {str(e)}', 'danger')
-    return redirect("/admin/medicines")
+    return redirect(ADMIN + PHARMACY_MEDICINE_LIST)
