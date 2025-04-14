@@ -13,6 +13,17 @@
                     <a href="#" class="btn btn-primary ms-auto">Add New Doctor</a>
                 </div>
                 <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
                     <!-- Table starts -->
                     <div class="table-responsive">
                         <table id="scrollVertical" class="table m-0 align-middle">
@@ -37,7 +48,8 @@
                                     <td>DR{{ doctor.id }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="/{% if doctor.profile_picture %}{{ doctor.profile_picture }}{% else %} ../../../static/assets/images/doctor.png  {% endif %}"
+                                            <img src="/
+                                                    {% if doctor.profile_picture %}{{ doctor.profile_picture }}{% else %} ../../../static/assets/images/doctor.png  {% endif %}"
                                                  class="rounded-circle me-2" width="40" height="40" alt="doctor">
                                             <div>
                                                 <strong>{{ doctor.first_name }} {{ doctor.last_name }}</strong><br>
@@ -137,7 +149,8 @@
                                     <div class="modal-body">
                                         <div class="row">
                                             <div class="col-md-4 text-center">
-                                                <img src="/{% if doctor.profile_picture %}{{ doctor.profile_picture }}{% else %}{{ url_for('static', filename='assets/images/doctor.png') }}{% endif %}"
+                                                <img src="/
+                                                        {% if doctor.profile_picture %}{{ doctor.profile_picture }}{% else %}{{ url_for('static', filename='assets/images/doctor.png') }}{% endif %}"
                                                      class="rounded-circle mb-3" width="150" height="150" alt="doctor">
                                                 <h4> {{ doctor.first_name }} {{ doctor.last_name }}</h4>
                                                 <p class="text-muted">{{ doctor.designation or 'N/A' }}</p>
