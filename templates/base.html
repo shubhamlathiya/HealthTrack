@@ -52,7 +52,9 @@
                     <!-- App brand starts -->
                     <div class="app-brand">
                         <a href="index.html">
-                            <img src="../static/assets/images/logo.svg" class="logo" alt="Dental Care Admin Template">
+{#                            <img src="../static/assets/images/logo.svg" class="logo" alt="Dental Care Admin Template">#}
+                            <img src="{{ url_for('static', filename='assets/images/logo.svg') }}"  class="logo" alt="Dental Care Admin Template">
+
                         </a>
                     </div>
                     <!-- App brand ends -->

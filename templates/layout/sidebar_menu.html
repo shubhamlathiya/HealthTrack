@@ -6,7 +6,7 @@
         <!-- App brand starts -->
         <div class="app-brand ms-3">
             <a href="/">
-                <img src="../../static/assets/images/logo.svg" class="logo" alt="Hospital Management System">
+                <img src="{{ url_for('static', filename='assets/images/logo.svg') }}" class="logo" alt="Hospital Management System">
             </a>
         </div>
         <!-- App brand ends -->
@@ -21,7 +21,7 @@
 
     <!-- Sidebar profile starts -->
     <div class="sidebar-profile">
-        <img src="../../static/assets/images/doctor5.png" class="rounded-5 border border-primary border-3"
+        <img src="{{ url_for('static', filename='assets/images/doctor5.png') }}" class="rounded-5 border border-primary border-3"
              alt="User Profile">
         <h6 class="mb-1 profile-name text-nowrap text-truncate text-primary">{{ session.get('name', 'User') }}</h6>
         <small class="profile-name text-nowrap text-truncate">{{ session.get('role', 'Role') | capitalize }}</small>
