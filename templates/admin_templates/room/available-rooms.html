@@ -1,426 +1,354 @@
 {% extends 'base.html' %}
 
-{% block title %}Avaliable Room{% endblock title %}
-{% block page %}Avaliable Room{% endblock page %}
+{% block title %}Available Room{% endblock title %}
+{% block page %}Available Room{% endblock page %}
 
 {% block body %}
 
     <!-- Row starts -->
     <div class="row gx-4">
-        <div class="col-lg-6 col-sm-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title">Cardiology</h5>
-                </div>
-                <div class="card-body pt-0">
-
-                    <!-- Table starts -->
-                    <div class="table-outer">
-                        <div class="table-responsive">
-                            <table class="table truncate align-middle m-0">
-                                <thead>
-                                <tr>
-                                    <th>Room No.</th>
-                                    <th>Bed No.</th>
-                                    <th>Room Type</th>
-                                    <th>Availability</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        203
-                                    </td>
-                                    <td>3</td>
-                                    <td>Private</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        308
-                                    </td>
-                                    <td>2</td>
-                                    <td>Delux</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        406
-                                    </td>
-                                    <td>5</td>
-                                    <td>Suite</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        302
-                                    </td>
-                                    <td>2</td>
-                                    <td>Standard</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        605
-                                    </td>
-                                    <td>4</td>
-                                    <td>Delux</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                    <!-- Table ends -->
-
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% if not departments %}
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4 class="text-muted">No rooms available at the moment</h4>
+                        <p class="text-muted">Please check back later or contact administration</p>
+                    </div>
                 </div>
             </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title">Gastroenterology</h5>
-                </div>
-                <div class="card-body pt-0">
-
-                    <!-- Table starts -->
-                    <div class="table-outer">
-                        <div class="table-responsive">
-                            <table class="table truncate align-middle m-0">
-                                <thead>
-                                <tr>
-                                    <th>Room No.</th>
-                                    <th>Bed No.</th>
-                                    <th>Room Type</th>
-                                    <th>Availability</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        502
-                                    </td>
-                                    <td>1</td>
-                                    <td>Delux</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        307
-                                    </td>
-                                    <td>2</td>
-                                    <td>Standard</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        408
-                                    </td>
-                                    <td>4</td>
-                                    <td>Suite</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        303
-                                    </td>
-                                    <td>2</td>
-                                    <td>Delux</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+        {% else %}
+            <div class="col-lg-6 col-sm-12">
+                {% for dept, rooms in departments.items() %}
+                    {% if loop.index <= (departments.items()|length / 2)|round(0, 'ceil') %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title">{{ dept }}</h5>
+                                <p class="card-subtitle text-muted">Floor: {{ rooms[0].floor if rooms else 'N/A' }}</p>
+                            </div>
+                            <div class="card-body pt-0">
+                                {% if not rooms %}
+                                    <div class="alert alert-warning">
+                                        No rooms available in this department
+                                    </div>
+                                {% else %}
+                                    <!-- Table starts -->
+                                    <div class="table-outer">
+                                        <div class="table-responsive">
+                                            <table class="table truncate align-middle m-0">
+                                                <thead>
+                                                <tr>
+                                                    <th>Room No.</th>
+                                                    <th>Bed No.</th>
+                                                    <th>Room Type</th>
+                                                    <th>Charge/Day</th>
+                                                    <th>Availability</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for room in rooms %}
+                                                    <tr>
+                                                        <td>{{ room.room_no }}</td>
+                                                        <td>{{ room.bed_no }}</td>
+                                                        <td>{{ room.room_type }}</td>
+                                                        <td>₹{{ "%.2f"|format(room.charge_per_day) }}</td>
+                                                        <td>
+                                                            {% if room.available %}
+                                                                <button class="btn btn-outline-primary btn-sm book-now-btn"
+                                                                        data-room-id="{{ room.room_id }}"
+                                                                        data-bed-id="{{ room.bed_id }}"
+                                                                        data-room-no="{{ room.room_no }}"
+                                                                        data-bed-no="{{ room.bed_no }}"
+                                                                        data-room-type="{{ room.room_type }}"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#bookRoomModal">
+                                                                    Book Now
+                                                                </button>
+                                                            {% else %}
+                                                                <span class="badge bg-danger">Occupied</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- Table ends -->
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                    <!-- Table ends -->
-
-                </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title">Paediatrician</h5>
-                </div>
-                <div class="card-body pt-0">
-
-                    <!-- Table starts -->
-                    <div class="table-outer">
-                        <div class="table-responsive">
-                            <table class="table truncate align-middle m-0">
-                                <thead>
-                                <tr>
-                                    <th>Room No.</th>
-                                    <th>Bed No.</th>
-                                    <th>Room Type</th>
-                                    <th>Availability</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        103
-                                    </td>
-                                    <td>2</td>
-                                    <td>Suite</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        205
-                                    </td>
-                                    <td>3</td>
-                                    <td>Delux</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        502
-                                    </td>
-                                    <td>4</td>
-                                    <td>Standard</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+            <div class="col-lg-6 col-sm-12">
+                {% for dept, rooms in departments.items() %}
+                    {% if loop.index > (departments.items()|length / 2)|round(0, 'ceil') %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title">{{ dept }}</h5>
+                                <p class="card-subtitle text-muted">Floor: {{ rooms[0].floor if rooms else 'N/A' }}</p>
+                            </div>
+                            <div class="card-body pt-0">
+                                {% if not rooms %}
+                                    <div class="alert alert-warning">
+                                        No rooms available in this department
+                                    </div>
+                                {% else %}
+                                    <!-- Table starts -->
+                                    <div class="table-outer">
+                                        <div class="table-responsive">
+                                            <table class="table truncate align-middle m-0">
+                                                <thead>
+                                                <tr>
+                                                    <th>Room No.</th>
+                                                    <th>Bed No.</th>
+                                                    <th>Room Type</th>
+                                                    <th>Charge/Day</th>
+                                                    <th>Availability</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for room in rooms %}
+                                                    <tr>
+                                                        <td>{{ room.room_no }}</td>
+                                                        <td>{{ room.bed_no }}</td>
+                                                        <td>{{ room.room_type }}</td>
+                                                        <td>₹{{ "%.2f"|format(room.charge_per_day) }}</td>
+                                                        <td>
+                                                            {% if room.available %}
+                                                                <button class="btn btn-outline-primary btn-sm book-now-btn"
+                                                                        data-room-id="{{ room.room_id }}"
+                                                                        data-bed-id="{{ room.bed_id }}"
+                                                                        data-room-no="{{ room.room_no }}"
+                                                                        data-bed-no="{{ room.bed_no }}"
+                                                                        data-room-type="{{ room.room_type }}"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#bookRoomModal">
+                                                                    Book Now
+                                                                </button>
+                                                            {% else %}
+                                                                <span class="badge bg-danger">Occupied</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- Table ends -->
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                    <!-- Table ends -->
-
-                </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-        </div>
-        <div class="col-lg-6 col-sm-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title">Orthopedics</h5>
-                </div>
-                <div class="card-body pt-0">
+        {% endif %}
+    </div>
+    <!-- Row ends -->
 
-                    <!-- Table starts -->
-                    <div class="table-outer">
-                        <div class="table-responsive">
-                            <table class="table truncate align-middle m-0">
-                                <thead>
-                                <tr>
-                                    <th>Room No.</th>
-                                    <th>Bed No.</th>
-                                    <th>Room Type</th>
-                                    <th>Availability</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        203
-                                    </td>
-                                    <td>3</td>
-                                    <td>Delux</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        208
-                                    </td>
-                                    <td>3</td>
-                                    <td>Delux</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        105
-                                    </td>
-                                    <td>1</td>
-                                    <td>Suite</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+    <!-- Book Room Modal -->
+    <div class="modal fade" id="bookRoomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-plus me-2"></i>Book A Room
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="/admin/room/book-room" class="needs-validation" novalidate>
+                    <input type="hidden" id="selectedRoomId" name="room_id">
+                    <input type="hidden" id="selectedBedId" name="bed_id">
+                    <input type="hidden" id="patient_id" name="patient_id">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Patient ID*</label>
+                                    <input type="text" class="form-control" id="patientIdInput"
+                                           placeholder="Enter patient ID" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid patient ID
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2"
+                                            id="fetchPatientBtn">
+                                        <i class="fas fa-search me-1"></i> Fetch Patient Details
+                                    </button>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Patient Name*</label>
+                                    <input type="text" class="form-control" id="patientName" name="patient_name"
+                                           readonly required disabled>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Patient Email*</label>
+                                    <input type="text" class="form-control" id="patientEmail" name="patient_email"
+                                           readonly required disabled>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Gender*</label>
+                                    <input type="text" class="form-control" id="patientGender" name="gender" readonly
+                                           required disabled>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Age*</label>
+                                    <input type="number" class="form-control" id="patientAge" name="age" readonly
+                                           required disabled>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Patient Phone*</label>
+                                    <input type="tel" class="form-control" id="patientPhone" name="phone" readonly
+                                           required disabled>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Room Type*</label>
+                                    <input type="text" class="form-control" id="modalRoomType" name="room_type" readonly
+                                           required disabled>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Room Number*</label>
+                                    <input type="text" class="form-control" id="modalRoomNo" readonly
+                                           required disabled>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Bed Number*</label>
+                                    <input type="text" class="form-control" id="modalBedNo" readonly
+                                           required disabled>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Admission Date*</label>
+                                    <input type="date" class="form-control" name="admission_date" required>
+                                    <div class="invalid-feedback">
+                                        Please select admission date
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <!-- Table ends -->
-
-                </div>
-            </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title">Anatomy</h5>
-                </div>
-                <div class="card-body pt-0">
-
-                    <!-- Table starts -->
-                    <div class="table-outer">
-                        <div class="table-responsive">
-                            <table class="table truncate align-middle m-0">
-                                <thead>
-                                <tr>
-                                    <th>Room No.</th>
-                                    <th>Bed No.</th>
-                                    <th>Room Type</th>
-                                    <th>Availability</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        303
-                                    </td>
-                                    <td>3</td>
-                                    <td>Standard</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        209
-                                    </td>
-                                    <td>3</td>
-                                    <td>Private</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        106
-                                    </td>
-                                    <td>2</td>
-                                    <td>Suite</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        102
-                                    </td>
-                                    <td>4</td>
-                                    <td>Delux</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-bed me-2"></i>Book Room
+                        </button>
                     </div>
-                    <!-- Table ends -->
-
-                </div>
-            </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title">Neurology</h5>
-                </div>
-                <div class="card-body pt-0">
-
-                    <!-- Table starts -->
-                    <div class="table-outer">
-                        <div class="table-responsive">
-                            <table class="table truncate align-middle m-0">
-                                <thead>
-                                <tr>
-                                    <th>Room No.</th>
-                                    <th>Bed No.</th>
-                                    <th>Room Type</th>
-                                    <th>Availability</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        103
-                                    </td>
-                                    <td>2</td>
-                                    <td>Private</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        205
-                                    </td>
-                                    <td>3</td>
-                                    <td>Suite</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!-- Table ends -->
-
-                </div>
-            </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title">Surgeon</h5>
-                </div>
-                <div class="card-body pt-0">
-
-                    <!-- Table starts -->
-                    <div class="table-outer">
-                        <div class="table-responsive">
-                            <table class="table truncate align-middle m-0">
-                                <thead>
-                                <tr>
-                                    <th>Room No.</th>
-                                    <th>Bed No.</th>
-                                    <th>Room Type</th>
-                                    <th>Availability</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        502
-                                    </td>
-                                    <td>4</td>
-                                    <td>Private</td>
-                                    <td>
-                                        <a href="book-room.html" class="btn btn-outline-primary btn-sm">Book Now</a>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!-- Table ends -->
-
-                </div>
+                </form>
             </div>
         </div>
     </div>
-    <!-- Row ends -->
-{% endblock body %}
+    <!-- jQuery CDN (latest version) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle book now button clicks
+            document.querySelectorAll('.book-now-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const roomId = this.getAttribute('data-room-id');
+                    const bedId = this.getAttribute('data-bed-id');
+                    const roomNo = this.getAttribute('data-room-no');
+                    const bedNo = this.getAttribute('data-bed-no');
+                    const roomType = this.getAttribute('data-room-type');
+
+                    // Set the values in the modal
+                    document.getElementById('selectedRoomId').value = roomId;
+                    document.getElementById('selectedBedId').value = bedId;
+                    document.getElementById('modalRoomType').value = roomType;
+                    document.getElementById('modalRoomNo').value = roomNo;
+                    document.getElementById('modalBedNo').value = bedNo;
+                });
+            });
+
+            const fetchPatientBtn = document.getElementById('fetchPatientBtn');
+            const patientIdInput = document.getElementById('patientIdInput');
+
+            // Fetch patient details when button is clicked
+            fetchPatientBtn.addEventListener('click', function () {
+                const patientId = patientIdInput.value.trim();
+                if (!patientId) {
+                    alert('Please enter a patient ID');
+                    return;
+                }
+
+                fetchPatientDetails(patientId);
+            });
+
+            // Also fetch when Enter key is pressed in the patient ID field
+            patientIdInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    fetchPatientDetails(this.value.trim());
+                }
+            });
+
+            async function fetchPatientDetails(patientId) {
+                try {
+                    const response = await fetch(`/admin/get-patient/${patientId}`);
+
+                    if (!response.ok) {
+                        const text = await response.text();  // in case server returns HTML
+                        throw new Error(`Server error: ${text}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Auto-fill patient details
+                    document.getElementById('patientName').value = data.name || '';
+                    document.getElementById('patientEmail').value = data.email || '';
+                    document.getElementById('patientGender').value = data.gender || '';
+                    document.getElementById('patientAge').value = data.age || '';
+                    document.getElementById('patientPhone').value = data.phone || '';
+                    document.getElementById('patient_id').value = data.id || '';
+
+                } catch (error) {
+                    console.error('Error fetching patient data:', error.message);
+
+                    alert(error.message || 'Failed to fetch patient details');
+
+                    // Clear all fields
+                    ['patientName', 'patientEmail', 'patientGender', 'patientAge', 'patientPhone'].forEach(id => {
+                        document.getElementById(id).value = '';
+                    });
+                }
+            }
+
+
+        });
+    </script>
+{% endblock body %}

@@ -1,7 +1,106 @@
+{#{% extends 'base.html' %}#}
+{##}
+{#{% block title %}Room By Dept{% endblock title %}#}
+{#{% block page %}Room By Dept{% endblock page %}#}
+{##}
+{#{% block body %}#}
+{##}
+{#    <!-- Row starts -->#}
+{#    <div class="row gx-4">#}
+{#        <div class="col-sm-12">#}
+{#            <div class="card mb-4">#}
+{#                <div class="card-header">#}
+{#                    <h5 class="card-title">Rooms and Beds by Department</h5>#}
+{#                </div>#}
+{#                <div class="card-body">#}
+{##}
+{#                    <!-- Table starts -->#}
+{#                    <div class="table-outer">#}
+{#                        <div class="table-responsive">#}
+{#                            <table class="table truncate align-middle m-0">#}
+{#                                <thead>#}
+{#                                <tr>#}
+{#                                    <th width="60px">&nbsp;</th>#}
+{#                                    <th width="120px">Department</th>#}
+{#                                    <th width="80px">Total Rooms</th>#}
+{#                                    <th width="80px">Total Beds</th>#}
+{#                                    <th width="80px">Occupied</th>#}
+{#                                    <th width="80px">Reserved</th>#}
+{#                                    <th width="80px">Available</th>#}
+{#                                    <th width="80px">Cleanup</th>#}
+{#                                    <th width="80px">Other</th>#}
+{#                                    <th width="100px">Actions</th>#}
+{#                                </tr>#}
+{#                                </thead>#}
+{#                                <tbody>#}
+{#                                {% if not departments %}#}
+{#                                    <tr>#}
+{#                                        <td colspan="10" class="text-center text-muted py-4">#}
+{#                                            No departments found with room/bed data#}
+{#                                        </td>#}
+{#                                    </tr>#}
+{#                                {% else %}#}
+{#                                    {% for dept in departments %}#}
+{#                                        <tr>#}
+{#                                            <td>#}
+{#                                                <img src="{{ url_for('static', filename='assets/images/products/' + (loop.index % 6 + 1)|string + '.jpg') }}"#}
+{#                                                     alt="{{ dept.name }}" class="rounded-2 img-3x">#}
+{#                                            </td>#}
+{#                                            <td>{{ dept.name }}</td>#}
+{#                                            <td>#}
+{#                                                <span class="badge bg-primary text-white">{{ dept.total_rooms }}</span>#}
+{#                                            </td>#}
+{#                                            <td>#}
+{#                                                <span class="badge bg-success text-white">{{ dept.total_beds }}</span>#}
+{#                                            </td>#}
+{#                                            <td>#}
+{#                                        <span class="badge border border-primary text-primary">#}
+{#                                            <i class="ri-circle-fill"></i> {{ dept.occupied }}#}
+{#                                        </span>#}
+{#                                            </td>#}
+{#                                            <td>#}
+{#                                        <span class="badge border border-danger text-danger">#}
+{#                                            <i class="ri-circle-fill"></i> {{ dept.reserved }}#}
+{#                                        </span>#}
+{#                                            </td>#}
+{#                                            <td>#}
+{#                                        <span class="badge border border-info text-info">#}
+{#                                            <i class="ri-circle-fill"></i> {{ dept.available }}#}
+{#                                        </span>#}
+{#                                            </td>#}
+{#                                            <td>#}
+{#                                        <span class="badge border border-warning text-warning">#}
+{#                                            <i class="ri-circle-fill"></i> {{ dept.needs_cleaning }}#}
+{#                                        </span>#}
+{#                                            </td>#}
+{#                                            <td>#}
+{#                                        <span class="badge border border-secondary text-dark">#}
+{#                                            <i class="ri-circle-fill"></i> {{ dept.maintenance }}#}
+{#                                        </span>#}
+{#                                            </td>#}
+{#                                            <td>#}
+{#                                                <a href="{{ dept.id }}"#}
+{#                                                   class="btn btn-primary btn-sm">View Details</a>#}
+{#                                            </td>#}
+{#                                        </tr>#}
+{#                                    {% endfor %}#}
+{#                                {% endif %}#}
+{#                                </tbody>#}
+{#                            </table>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <!-- Table ends -->#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <!-- Row ends -->#}
+{##}
+{#{% endblock body %}#}
 {% extends 'base.html' %}
 
-{% block title %}Room BY Dept{% endblock title %}
-{% block page %}Room BY Dept{% endblock page %}
+{% block title %}Room By Dept{% endblock title %}
+{% block page %}Room By Dept{% endblock page %}
 
 {% block body %}
 
@@ -10,7 +109,7 @@
         <div class="col-sm-12">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title">Rooms by Department</h5>
+                    <h5 class="card-title">Rooms and Beds by Department</h5>
                 </div>
                 <div class="card-body">
 
@@ -21,182 +120,75 @@
                                 <thead>
                                 <tr>
                                     <th width="60px">&nbsp;</th>
-                                    <th width="100px">Department</th>
-                                    <th width="100px">Total</th>
-                                    <th width="100px">Occupied</th>
-                                    <th width="100px">Reserved</th>
-                                    <th width="100px">Available</th>
-                                    <th width="100px">Cleanup</th>
-                                    <th width="100px">Other</th>
+                                    <th width="120px">Department</th>
+                                    <th width="80px">Total Rooms</th>
+                                    <th width="80px">Total Beds</th>
+                                    <th width="80px">Occupied</th>
+                                    <th width="80px">Reserved</th>
+                                    <th width="80px">Available</th>
+                                    <th width="80px">Cleanup</th>
+                                    <th width="80px">Other</th>
                                     <th width="100px">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>
-                                        <img src="../../../static/assets/images/products/1.jpg" alt="Bootstrap Themes"
-                                             class="rounded-2 img-3x">
-                                    </td>
-                                    <td>Cardiology</td>
-                                    <td>
-                                        <span class="badge bg-primary text-white">25</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-primary text-primary"><i class="ri-circle-fill"></i>
-                                  9</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-danger text-danger"><i class="ri-circle-fill"></i>
-                                  3</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-info text-info"><i class="ri-circle-fill"></i>
-                                  7</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-warning text-warning"><i class="ri-circle-fill"></i>
-                                  2</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-secondary text-dark"><i class="ri-circle-fill"></i>
-                                  4</span>
-                                    </td>
-                                    <td>
-                                        <a href="available-rooms.html" class="btn btn-primary">View Rooms</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <img src="../../../static/assets/images/products/3.jpg" alt="Bootstrap Themes"
-                                             class="rounded-2 img-3x">
-                                    </td>
-                                    <td>Orthopedics</td>
-                                    <td>
-                                        <span class="badge bg-primary text-white">21</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-primary text-primary"><i class="ri-circle-fill"></i>
-                                  6</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-danger text-danger"><i class="ri-circle-fill"></i>
-                                  5</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-info text-info"><i class="ri-circle-fill"></i>
-                                  2</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-warning text-warning"><i class="ri-circle-fill"></i>
-                                  5</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-secondary text-dark"><i class="ri-circle-fill"></i>
-                                  3</span>
-                                    </td>
-                                    <td>
-                                        <a href="available-rooms.html" class="btn btn-primary">View Rooms</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <img src="../../../static/assets/images/products/4.jpg" alt="Bootstrap Themes"
-                                             class="rounded-2 img-3x">
-                                    </td>
-                                    <td>Neurology</td>
-                                    <td>
-                                        <span class="badge bg-primary text-white">15</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-primary text-primary"><i class="ri-circle-fill"></i>
-                                  2</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-danger text-danger"><i class="ri-circle-fill"></i>
-                                  4</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-info text-info"><i class="ri-circle-fill"></i>
-                                  3</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-warning text-warning"><i class="ri-circle-fill"></i>
-                                  4</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-secondary text-dark"><i class="ri-circle-fill"></i>
-                                  2</span>
-                                    </td>
-                                    <td>
-                                        <a href="available-rooms.html" class="btn btn-primary">View Rooms</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <img src="../../../static/assets/images/products/6.jpg" alt="Bootstrap Themes"
-                                             class="rounded-2 img-3x">
-                                    </td>
-                                    <td>Gastroenterology</td>
-                                    <td>
-                                        <span class="badge bg-primary text-white">19</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-primary text-primary"><i class="ri-circle-fill"></i>
-                                  1</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-danger text-danger"><i class="ri-circle-fill"></i>
-                                  5</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-info text-info"><i class="ri-circle-fill"></i>
-                                  3</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-warning text-warning"><i class="ri-circle-fill"></i>
-                                  3</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-secondary text-dark"><i class="ri-circle-fill"></i>
-                                  7</span>
-                                    </td>
-                                    <td>
-                                        <a href="available-rooms.html" class="btn btn-primary">View Rooms</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <img src="../../../static/assets/images/products/2.jpg" alt="Bootstrap Themes"
-                                             class="rounded-2 img-3x">
-                                    </td>
-                                    <td>Anatomy</td>
-                                    <td>
-                                        <span class="badge bg-primary text-white">13</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-primary text-primary"><i class="ri-circle-fill"></i>
-                                  2</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-danger text-danger"><i class="ri-circle-fill"></i>
-                                  2</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-info text-info"><i class="ri-circle-fill"></i>
-                                  1</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-warning text-warning"><i class="ri-circle-fill"></i>
-                                  5</span>
-                                    </td>
-                                    <td>
-                                <span class="badge border border-secondary text-dark"><i class="ri-circle-fill"></i>
-                                  3</span>
-                                    </td>
-                                    <td>
-                                        <a href="available-rooms.html" class="btn btn-primary">View Rooms</a>
-                                    </td>
-                                </tr>
+                                {% if not departments %}
+                                    <tr>
+                                        <td colspan="10" class="text-center text-muted py-4">
+                                            No departments found with room/bed data
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    {% for dept in departments %}
+                                        <tr>
+                                            <td>
+                                                <img src="{{ url_for('static', filename='assets/images/products/' + (loop.index % 6 + 1)|string + '.jpg') }}"
+                                                     alt="{{ dept.name }}" class="rounded-2 img-3x">
+                                            </td>
+                                            <td>{{ dept.name }}</td>
+                                            <td>
+                                                <span class="badge bg-primary text-white">{{ dept.total_rooms }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success text-white">{{ dept.total_beds }}</span>
+                                            </td>
+                                            <td>
+                                        <span class="badge border border-primary text-primary">
+                                            <i class="ri-circle-fill"></i> {{ dept.occupied }}
+                                        </span>
+                                            </td>
+                                            <td>
+                                        <span class="badge border border-danger text-danger">
+                                            <i class="ri-circle-fill"></i> {{ dept.reserved }}
+                                        </span>
+                                            </td>
+                                            <td>
+                                        <span class="badge border border-info text-info">
+                                            <i class="ri-circle-fill"></i> {{ dept.available }}
+                                        </span>
+                                            </td>
+                                            <td>
+                                        <span class="badge border border-warning text-warning">
+                                            <i class="ri-circle-fill"></i> {{ dept.needs_cleaning }}
+                                        </span>
+                                            </td>
+                                            <td>
+                                        <span class="badge border border-secondary text-dark">
+                                            <i class="ri-circle-fill"></i> {{ dept.maintenance }}
+                                        </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm view-details-btn"
+                                                        data-dept-id="{{ dept.id }}"
+                                                        data-dept-name="{{ dept.name }}"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#departmentDetailsModal">
+                                                    View Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
                                 </tbody>
                             </table>
                         </div>
@@ -208,6 +200,265 @@
     </div>
     <!-- Row ends -->
 
+    <!-- Department Details Modal -->
+    <div class="modal fade" id="departmentDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="deptModalTitle">Department Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary bg-opacity-10 border-primary border">
+                                <div class="card-body text-center">
+                                    <h3 class="text-primary" id="totalRooms">0</h3>
+                                    <p class="mb-0 text-muted">Total Rooms</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success bg-opacity-10 border-success border">
+                                <div class="card-body text-center">
+                                    <h3 class="text-success" id="totalBeds">0</h3>
+                                    <p class="mb-0 text-muted">Total Beds</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info bg-opacity-10 border-info border">
+                                <div class="card-body text-center">
+                                    <h3 class="text-info" id="availableBeds">0</h3>
+                                    <p class="mb-0 text-muted">Available</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning bg-opacity-10 border-warning border">
+                                <div class="card-body text-center">
+                                    <h3 class="text-warning" id="cleaningBeds">0</h3>
+                                    <p class="mb-0 text-muted">Needs Cleaning</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Room Status Details</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-primary filter-btn active"
+                                            data-status="all">All
+                                    </button>
+                                    <button type="button" class="btn btn-outline-success filter-btn"
+                                            data-status="available">Available
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger filter-btn"
+                                            data-status="occupied">Occupied
+                                    </button>
+                                    <button type="button" class="btn btn-outline-warning filter-btn"
+                                            data-status="cleaning">Needs Cleaning
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary filter-btn"
+                                            data-status="maintenance">Maintenance
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="roomDetailsTable">
+                                    <thead>
+                                    <tr>
+                                        <th>Room No</th>
+                                        <th>Bed No</th>
+                                        <th>Status</th>
+                                        <th>Patient</th>
+                                        <th>Admission Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- Data will be loaded via AJAX -->
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            Loading room details...
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery CDN (latest version) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle view details button clicks
+            document.querySelectorAll('.view-details-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const deptId = this.getAttribute('data-dept-id');
+                    const deptName = this.getAttribute('data-dept-name');
+
+                    // Set modal title
+                    document.getElementById('deptModalTitle').textContent = `${deptName} - Room Details`;
+
+                    // Fetch department details via AJAX
+                    fetch(`/admin/get-room-department/${deptId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Update summary cards
+                            document.getElementById('totalRooms').textContent = data.total_rooms;
+                            document.getElementById('totalBeds').textContent = data.total_beds;
+                            document.getElementById('availableBeds').textContent = data.available;
+                            document.getElementById('cleaningBeds').textContent = data.needs_cleaning;
+
+                            // Update room details table
+                            const tbody = document.querySelector('#roomDetailsTable tbody');
+                            tbody.innerHTML = '';
+
+                            if (data.rooms && data.rooms.length > 0) {
+                                data.rooms.forEach(room => {
+                                    const row = document.createElement('tr');
+                                    row.setAttribute('data-status', room.status);
+
+                                    // Status badge
+                                    let statusBadge;
+                                    if (room.status === 'available') {
+                                        statusBadge = `<span class="badge bg-success">Available</span>`;
+                                    } else if (room.status === 'occupied') {
+                                        statusBadge = `<span class="badge bg-danger">Occupied</span>`;
+                                    } else if (room.status === 'cleaning') {
+                                        statusBadge = `<span class="badge bg-warning">Needs Cleaning</span>`;
+                                    } else if (room.status === 'maintenance') {
+                                        statusBadge = `<span class="badge bg-secondary">Maintenance</span>`;
+                                    } else {
+                                        statusBadge = `<span class="badge bg-info">${room.status}</span>`;
+                                    }
+
+                                    // Action buttons
+                                    let actionButtons = '';
+                                    if (room.status === 'cleaning') {
+                                        actionButtons = `
+                                            <button class="btn btn-sm btn-success mark-cleaned-btn"
+                                                    data-room-id="${room.id}"
+                                                    data-bed-id="${room.bed_id}">
+                                                <i class="fas fa-check"></i> Mark Cleaned
+                                            </button>
+                                        `;
+                                    } else if (room.status === 'available') {
+                                        actionButtons = `
+                                            <button class="btn btn-sm btn-primary book-btn"
+                                                    data-room-id="${room.id}"
+                                                    data-bed-id="${room.bed_id}">
+                                                <i class="fas fa-bed"></i> Book
+                                            </button>
+                                        `;
+                                    }
+
+                                    row.innerHTML = `
+                                        <td>${room.room_no}</td>
+                                        <td>${room.bed_no}</td>
+                                        <td>${statusBadge}</td>
+                                        <td>${room.patient_name || 'N/A'}</td>
+                                        <td>${room.admission_date || 'N/A'}</td>
+                                        <td>${actionButtons}</td>
+                                    `;
+
+                                    tbody.appendChild(row);
+                                });
+                            } else {
+                                tbody.innerHTML = `
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            No rooms found in this department
+                                        </td>
+                                    </tr>
+                                `;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching department details:', error);
+                            const tbody = document.querySelector('#roomDetailsTable tbody');
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" class="text-center text-danger py-4">
+                                        Failed to load room details
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                });
+            });
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const status = this.getAttribute('data-status');
+
+                    // Update active state
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+
+                    // Filter rows
+                    const rows = document.querySelectorAll('#roomDetailsTable tbody tr');
+                    rows.forEach(row => {
+                        if (status === 'all' || row.getAttribute('data-status') === status) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Handle mark as cleaned button clicks (delegated event)
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('.mark-cleaned-btn')) {
+                    const button = e.target.closest('.mark-cleaned-btn');
+                    const roomId = button.getAttribute('data-room-id');
+                    const bedId = button.getAttribute('data-bed-id');
+
+                    if (confirm('Mark this bed as cleaned?')) {
+                        fetch(`/mark-bed-cleaned/${roomId}/${bedId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Bed marked as cleaned successfully');
+                                    // Refresh the data
+                                    button.closest('.view-details-btn').click();
+                                } else {
+                                    alert('Failed to update bed status');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Failed to update bed status');
+                            });
+                    }
+                }
+            });
+        });
+    </script>
 
 {% endblock body %}
-

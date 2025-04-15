@@ -6,7 +6,8 @@
         <!-- App brand starts -->
         <div class="app-brand ms-3">
             <a href="/">
-                <img src="{{ url_for('static', filename='assets/images/logo.svg') }}" class="logo" alt="Hospital Management System">
+                <img src="{{ url_for('static', filename='assets/images/logo.svg') }}" class="logo"
+                     alt="Hospital Management System">
             </a>
         </div>
         <!-- App brand ends -->
@@ -21,7 +22,8 @@
 
     <!-- Sidebar profile starts -->
     <div class="sidebar-profile">
-        <img src="{{ url_for('static', filename='assets/images/doctor5.png') }}" class="rounded-5 border border-primary border-3"
+        <img src="{{ url_for('static', filename='assets/images/doctor5.png') }}"
+             class="rounded-5 border border-primary border-3"
              alt="User Profile">
         <h6 class="mb-1 profile-name text-nowrap text-truncate text-primary">{{ session.get('name', 'User') }}</h6>
         <small class="profile-name text-nowrap text-truncate">{{ session.get('role', 'Role') | capitalize }}</small>
@@ -167,13 +169,13 @@
                                 Rooms</a>
                         </li>
                         <li>
-                            <a href="/admin/room/book-room"
-                               class="{% if request.path == '/admin/room/book-room' %}active-sub{% endif %}">Book
-                                Room</a>
+                            <a href="/admin/room"
+                               class="{% if request.path == '/admin/room' %}active-sub{% endif %}">Room List</a>
                         </li>
                         <li>
-                            <a href="/admin/room/add-room"
-                               class="{% if request.path == '/admin/room/add-room' %}active-sub{% endif %}">Add Room</a>
+                            <a href="/admin/room/cleaning-logs"
+                               class="{% if request.path == '/admin/room/cleaning-logs' %}active-sub{% endif %}">Cleaning
+                                Logs</a>
                         </li>
                     </ul>
                 </li>
@@ -375,11 +377,11 @@
                             <ul class="treeview-menu {% if request.path.startswith('/admin/pharmacy/medicine-categories') %}active current-page{% endif %}">
                                 <li>
                                     <a href="/admin/pharmacy/medicine-categories"
-                                    class="{% if request.path == '/admin/pharmacy/medicine-categories' %}active-sub{% endif %}">Categories</a>
+                                       class="{% if request.path == '/admin/pharmacy/medicine-categories' %}active-sub{% endif %}">Categories</a>
                                 </li>
                                 <li>
                                     <a href="/admin/pharmacy/medicine-companies"
-                                    class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Companies</a>
+                                       class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Companies</a>
                                 </li>
                             </ul>
                         </li>

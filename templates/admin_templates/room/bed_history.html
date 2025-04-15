@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Bed History - {{ bed.number }}{% endblock %}
+{% block page %}Bed History{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5>History for Bed #{{ bed.number }}</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Patient</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alloc in bed.status_history() %}
+                <tr>
+                    <td>{{ alloc.admission_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if alloc.status == 'occupied' %}bg-success
+                            {% elif alloc.status == 'reserved' %}bg-warning
+                            {% elif alloc.status == 'cleanup' %}bg-info
+                            {% elif alloc.status == 'available' %}bg-primary
+                            {% else %}bg-secondary{% endif %}">
+                            {{ alloc.status|capitalize }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if alloc.patient %}
+                        {{ alloc.patient.full_name }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>{{ alloc.notes or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

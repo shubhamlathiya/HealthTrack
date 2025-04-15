@@ -4,7 +4,6 @@
 {% block page %}Room Allotted{% endblock page %}
 
 {% block body %}
-
     <!-- Row starts -->
     <div class="row gx-4">
         <div class="col-sm-12">
@@ -13,7 +12,16 @@
                     <h5 class="card-title">Allotted Rooms</h5>
                 </div>
                 <div class="card-body">
-
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                     <!-- Table starts -->
                     <div class="table-outer">
                         <div class="table-responsive">
@@ -28,153 +36,97 @@
                                     <th width="100px">Age</th>
                                     <th width="100px">Gender</th>
                                     <th width="100px">Room Type</th>
+                                    <th width="100px">Status</th>
                                     <th width="100px">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>Endocrinology</td>
-                                    <td>301</td>
-                                    <td>3</td>
-                                    <td>James Macias</td>
-                                    <td>12/07/2024</td>
-                                    <td>65</td>
-                                    <td>Male</td>
-                                    <td><span class="badge border border-success text-success">Delux</span></td>
-                                    <td>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#dischargeNow">Discharge
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Pathology</td>
-                                    <td>810</td>
-                                    <td>2</td>
-                                    <td>Liza Morrison</td>
-                                    <td>26/05/2024</td>
-                                    <td>31</td>
-                                    <td>Female</td>
-                                    <td><span class="badge border border-success text-success">Delux</span></td>
-                                    <td>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#dischargeNow">Discharge
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Cardiology</td>
-                                    <td>608</td>
-                                    <td>2</td>
-                                    <td>Jerold Rich</td>
-                                    <td>30/06/2024</td>
-                                    <td>22</td>
-                                    <td>Male</td>
-                                    <td><span class="badge border border-info text-info">Standard</span></td>
-                                    <td>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#dischargeNow">Discharge
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Anatomy</td>
-                                    <td>507</td>
-                                    <td>1</td>
-                                    <td>Kim Crosby</td>
-                                    <td>14/05/2024</td>
-                                    <td>71</td>
-                                    <td>Male</td>
-                                    <td><span class="badge border border-primary text-primary">Private</span></td>
-                                    <td>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#dischargeNow">Discharge
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Gastroenterology</td>
-                                    <td>212</td>
-                                    <td>4</td>
-                                    <td>Helena Moyer</td>
-                                    <td>18/06/2024</td>
-                                    <td>29</td>
-                                    <td>Female</td>
-                                    <td><span class="badge border border-success text-success">Delux</span></td>
-                                    <td>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#dischargeNow">Discharge
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Neurology</td>
-                                    <td>408</td>
-                                    <td>1</td>
-                                    <td>Beverly Vaughan</td>
-                                    <td>20/05/2024</td>
-                                    <td>53</td>
-                                    <td>Female</td>
-                                    <td><span class="badge border border-info text-info">Standard</span></td>
-                                    <td>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#dischargeNow">Discharge
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Orthopedics</td>
-                                    <td>503</td>
-                                    <td>3</td>
-                                    <td>Joni Hull</td>
-                                    <td>12/06/2024</td>
-                                    <td>36</td>
-                                    <td>Female</td>
-                                    <td><span class="badge border border-warning text-warning">Suite</span></td>
-                                    <td>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#dischargeNow">Discharge
-                                        </button>
-                                    </td>
-                                </tr>
+                                {% for row in results %}
+                                    <tr>
+                                        <td>{{ row.department_name }}</td>
+                                        <td>{{ row.room_number }}</td>
+                                        <td>{{ row.bed_number }}</td>
+                                        <td>{{ row.patient_name }}</td>
+                                        <td>{{ row.admission_date.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ row.age }}</td>
+                                        <td>{{ row.gender }}</td>
+                                        <td>
+                                            <span class="badge bg-info-subtle text-info fs-6">{{ row.room_type }}</span>
+                                        </td>
+                                        <td>
+                                            {% if row.allocation_status == 'occupied' %}
+                                                <span class="badge bg-warning">Occupied</span>
+                                            {% elif row.allocation_status == 'released' %}
+                                                <span class="badge bg-info">Released</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if row.allocation_status == 'occupied' %}
+                                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#dischargeNow-{{ row.allocation_id }}"
+                                                        data-patient="{{ row.patient_name }}">
+                                                    Discharge
+                                                </button>
+                                            {% elif row.allocation_status == 'released' %}
+                                                {% if row.cleaned_at %}
+                                                    <span class="text-success">Cleaned on {{ row.cleaned_at.strftime('%d/%m/%Y') }}</span>
+                                                {% else %}
+                                                    <span class="text-warning">Awaiting Cleaning</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    {% if row.allocation_status == 'occupied' %}
+                                        <!-- Modal for discharge confirmation -->
+                                        <div class="modal fade" id="dischargeNow-{{ row.allocation_id }}" tabindex="-1"
+                                             aria-labelledby="dischargeNowLabel"
+                                             aria-hidden="true">
+                                            <div class="modal-dialog modal-sm">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="dischargeNowLabel">
+                                                            Confirm Discharge
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to discharge
+                                                            <strong>{{ row.patient_name }}</strong> from
+                                                            Bed {{ row.bed_number }}?</p>
+                                                        {% if row.expected_discharge %}
+                                                            <p class="text-muted small">Expected
+                                                                discharge: {{ row.expected_discharge.strftime('%d/%m/%Y') }}</p>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <div class="d-flex justify-content-end gap-2">
+                                                            <form action="/admin/room/discharge-room/{{ row.allocation_id }}"
+                                                                  method="POST">
+                                                                <button type="button" class="btn btn-outline-secondary"
+                                                                        data-bs-dismiss="modal">Cancel
+                                                                </button>
+                                                                <button type="submit" class="btn btn-danger">Confirm
+                                                                    Discharge
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <!-- Table ends -->
-
-                    <!-- Modal Delete Row -->
-                    <div class="modal fade" id="dischargeNow" tabindex="-1" aria-labelledby="dischargeNowLabel"
-                         aria-hidden="true">
-                        <div class="modal-dialog modal-sm">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="dischargeNowLabel">
-                                        Confirm
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to discharge?
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
-                                                aria-label="Close">No
-                                        </button>
-                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Yes
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
     </div>
     <!-- Row ends -->
 {% endblock body %}
-

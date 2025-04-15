@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Bed{% endblock %}
+{% block page %}Add Bed to Room {{ room.room_number }}{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <h5 class="card-title">Add New Bed</h5>
+
+            <div class="mb-3">
+                <p><strong>Room:</strong> {{ room.room_number }}</p>
+                <p><strong>Floor:</strong> {{ room.floor }}</p>
+                <p><strong>Next Bed Number:</strong> {{ next_bed_number }}</p>
+            </div>
+
+            <form method="POST">
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Bed {{ next_bed_number }}
+                    </button>
+                    <a href="{{ room.id }}"
+                       class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Existing Beds in This Room</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th>Bed #</th>
+                        <th>Status</th>
+                        <th>Availability</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for bed in room.beds|sort(attribute='bed_number') %}
+                        <tr>
+                            <td>{{ bed.bed_number }}</td>
+                            <td>
+                                {% if bed.is_empty %}
+                                    <span class="badge bg-success">Vacant</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Occupied</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if bed.is_available %}
+                                    <span class="badge bg-primary">Available</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Unavailable</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center">No beds in this room yet</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

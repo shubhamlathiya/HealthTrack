@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Management{% endblock title %}
+{% block page %}Room Management{% endblock page %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Room Management</h5>
+                    <div>
+                        <button class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+                            <i class="ri-add-line"></i> Add New Room
+                        </button>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreRoomsModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted Rooms
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead>
+                            <tr>
+                                <th>Room Number</th>
+                                <th>Floor</th>
+                                <th>Type</th>
+                                <th>Department</th>
+                                <th>Charge/Day</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for room in rooms %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ room.room_number }}</strong>
+                                        {% if room.message %}
+                                            <div class="text-muted small">{{ room.message }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ room.floor }}</td>
+                                    <td>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                                        {{ room.room_type }}
+                                    </span>
+                                    </td>
+                                    <td>
+                                        {% if room.department %}
+                                            <span class="badge bg-info bg-opacity-10 text-info">
+                                            {{ room.department.name }}
+                                        </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ "₹{:,.2f}".format(room.charge_per_day) }}</td>
+                                    <td>
+                                        {% if room.is_available %}
+                                            {% if room.is_empty %}
+                                                <span class="badge bg-success bg-opacity-10 text-success">Available</span>
+                                            {% else %}
+                                                <span class="badge bg-warning bg-opacity-10 text-warning">Occupied</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary">Unavailable</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <a href="/admin/room/add-bad/{{ room.id }}"
+                                               class="btn btn-outline-success btn-sm"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-title="Add Bed">
+                                                <i class="ri-file-add-line"></i> Bed
+                                            </a>
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editRoomModal{{ room.id }}"
+                                                    data-bs-placement="top"
+                                                    data-bs-title="Edit Room">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteRoomModal{{ room.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Room Modal -->
+    <div class="modal fade" id="addRoomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Room
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="/admin/room/add-room" class="needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Room Number*</label>
+                                    <input type="text" class="form-control" name="room_number"
+                                           placeholder="e.g., 101" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a room number
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Floor*</label>
+                                    <input type="number" class="form-control" name="floor"
+                                           placeholder="e.g., 1" min="1" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid floor number
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Room Type*</label>
+                                    <select class="form-select" name="room_type" required>
+                                        <option value="" disabled selected>Select Room Type</option>
+                                        <option value="1">Standard (₹1000/day)</option>
+                                        <option value="2">Deluxe (₹2000/day)</option>
+                                        <option value="3">Suite (₹3500/day)</option>
+                                        <option value="4">Private (₹5000/day)</option>
+                                        <option value="5">Ward (₹500/day)</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a room type
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Department*</label>
+                                    <select class="form-select" name="department_id" required>
+                                        <option value="" selected>Select Department</option>
+                                        {% for dept in departments %}
+                                            <option value="{{ dept.id }}">
+                                                {{ dept.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a department
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Additional Notes</label>
+                                    <textarea class="form-control" name="message"
+                                              placeholder="Optional information about the room" rows="4"></textarea>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="is_available"
+                                           id="is_available" checked>
+                                    <label class="form-check-label" for="is_available">Room Available</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Room
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for each room -->
+    {% for room in rooms %}
+        <!-- Delete Room Modal -->
+        <div class="modal fade" id="deleteRoomModal{{ room.id }}" tabindex="-1"
+             aria-labelledby="deleteRoomModalLabel{{ room.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteRoomModalLabel{{ room.id }}">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete Room <b>{{ room.room_number }}</b>?
+                        {% if not room.is_empty %}
+                            <div class="alert alert-warning mt-2">
+                                <i class="ri-alert-line"></i> This room has active allocations!
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <form action="/admin/room/delete-room/{{ room.id }}" method="POST">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Room Modal -->
+        <div class="modal fade" id="editRoomModal{{ room.id }}" tabindex="-1"
+             aria-labelledby="editRoomModalLabel{{ room.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editRoomModalLabel{{ room.id }}">Edit
+                            Room: {{ room.room_number }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="/admin/room/edit-room/{{ room.id }}">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Room Number</label>
+                                        <input type="text" class="form-control" name="room_number"
+                                               value="{{ room.room_number }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Floor</label>
+                                        <input type="text" class="form-control" name="floor"
+                                               value="{{ room.floor }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Room Type</label>
+                                        <select class="form-select" name="room_type" required>
+                                            {% for key, value in room.ROOM_TYPES.items() %}
+                                                <option value="{{ key }}"
+                                                        {% if room.room_type == value[0] %}selected{% endif %}>
+                                                    {{ value[0] }} (₹{{ value[1] }}/day)
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Department</label>
+                                        <select class="form-select" name="department_id">
+                                            <option value="">-- Select Department --</option>
+                                            {% for dept in departments %}
+                                                <option value="{{ dept.id }}"
+                                                        {% if room.department_id == dept.id %}selected{% endif %}>
+                                                    {{ dept.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="is_available"
+                                                   id="is_available{{ room.id }}"
+                                                   {% if room.is_available %}checked{% endif %}>
+                                            <label class="form-check-label" for="is_available{{ room.id }}">
+                                                {% if room.is_available %}Available{% else %}Unavailable{% endif %}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Notes</label>
+                                        <textarea class="form-control" name="message"
+                                                  rows="2">{{ room.message or '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Rooms Modal -->
+    <div class="modal fade" id="restoreRoomsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Restore Deleted Rooms</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Room #</th>
+                                <th>Type</th>
+                                <th>Floor</th>
+                                <th>Department</th>
+                                <th>Deleted On</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for room in deleted_rooms %}
+                                <tr>
+                                    <td>{{ room.room_number }}</td>
+                                    <td>{{ room.room_type }}</td>
+                                    <td>{{ room.floor }}</td>
+                                    <td>
+                                        {% if room.department %}
+                                            {{ room.department.name }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ room.deleted_at.strftime('%Y-%m-%d %H:%M') if room.deleted_at else 'Unknown' }}</td>
+                                    <td>
+                                        <form method="POST" action="/admin/room/restore-room/{{ room.id }}">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="ri-refresh-line"></i> Restore
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No deleted rooms found</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <!-- Initialize tooltips and validation -->
+    <script>
+        $(document).ready(function () {
+            // Initialize tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Form validation
+            (function () {
+                'use strict'
+
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.querySelectorAll('.needs-validation')
+
+                // Loop over them and prevent submission
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })()
+        });
+    </script>
+{% endblock %}
