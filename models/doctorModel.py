@@ -19,14 +19,24 @@ class Doctor(db.Model):
     address = db.Column(db.String(100), nullable=True)
     bio = db.Column(db.Text, nullable=True)
     profile_picture = db.Column(db.String(200), nullable=True)  # Assuming you are storing the image URL
-    is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     # Relationships
-    department_assignments = db.relationship('DepartmentAssignment', back_populates='doctor')
+    department_assignments = db.relationship(
+        'DepartmentAssignment',
+        back_populates='doctor',
+        cascade='all, delete-orphan'
+    )
 
-    availabilities = db.relationship('Availability', back_populates='doctor', cascade='all, delete-orphan')
+    availabilities = db.relationship(
+        'Availability',
+        back_populates='doctor',
+        cascade='all, delete-orphan'
+    )
 
 
     def __repr__(self):

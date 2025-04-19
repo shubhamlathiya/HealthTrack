@@ -14,12 +14,15 @@ class DepartmentAssignment(db.Model):
     experience_level = db.Column(db.Enum('Junior', 'Mid-level', 'Senior', name='experience_level'))
     current_status = db.Column(db.Enum('Active', 'On Leave', 'Inactive', 'Pending', name='assignment_status'))
     notes = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationships
-    doctor = db.relationship('Doctor', backref='assignments')
-    department = db.relationship('Department')
+    # Fixed relationships using back_populates
+    doctor = db.relationship('Doctor', back_populates='department_assignments')
+    department = db.relationship('Department', back_populates='assignments')
+
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
         return f'<DepartmentAssignment {self.doctor.full_name} -> {self.department.name}>'

@@ -19,9 +19,9 @@ class ChildCase(db.Model):
     status = db.Column(db.String(20), default='Active')
     case_notes = db.Column(db.Text)
 
-    is_active = db.Column(db.Boolean, default=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
     deleted_at = db.Column(db.DateTime, nullable=True)
 
     medical_visits = db.relationship('MedicalVisit', backref='child_case', lazy=True)
@@ -39,7 +39,7 @@ class MedicalVisit(db.Model):
     notes = db.Column(db.Text)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'))
 
-    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     deleted_at = db.Column(db.DateTime, nullable=True)

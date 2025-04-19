@@ -13,8 +13,11 @@ class Patient(db.Model):
     address = db.Column(db.Text, nullable=True)
     phone = db.Column(db.String(20), nullable=True)
     gender = db.Column(db.String(10))  # or appropriate type
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     # Relationships
     user = db.relationship('User', backref='patient', uselist=False)
@@ -36,5 +39,7 @@ class PatientPayment(db.Model):
     payment_date = db.Column(db.DateTime)
     remarks = db.Column(db.String(255))
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)

@@ -13,13 +13,14 @@ class Department(db.Model):
     status = db.Column(db.String(10), nullable=False)
     message = db.Column(db.Text)
 
-    assignments = db.relationship('DepartmentAssignment', back_populates='department')
-    rooms = db.relationship('Room', back_populates='department')
-
-    is_available = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
     deleted_at = db.Column(db.DateTime, nullable=True)
+
+    # Relationships
+    assignments = db.relationship('DepartmentAssignment', back_populates='department', cascade='all, delete-orphan')
+    rooms = db.relationship('Room', back_populates='department')
 
     def __repr__(self):
         return f'<Department {self.name}>'

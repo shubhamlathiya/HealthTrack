@@ -1,6 +1,7 @@
 from utils.config import db
 from datetime import datetime
 
+
 # Define the User model
 class User(db.Model):
     __tablename__ = 'users'  # Table name
@@ -14,6 +15,19 @@ class User(db.Model):
     verified = db.Column(db.Boolean, nullable=True)  # Email verification status
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    insurance_records = db.relationship(
+        'InsuranceRecord',
+        back_populates='patient_user',
+        cascade='all, delete-orphan'
+    )
+
+    created_claims = db.relationship(
+        'InsuranceClaim',
+        back_populates='creator',
+        cascade='all, delete-orphan'
+    )
 
     # Constructor to easily create a User object
     def __init__(self, email, password, role, status, verified):
