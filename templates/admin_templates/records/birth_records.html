@@ -52,7 +52,7 @@
                                     </td>
                                     <td>
                                         {% if case.gender == 'Female' %}
-                                            <span class="badge bg-pink bg-opacity-10 text-pink">Female</span>
+                                            <span class="badge bg-info-subtle bg-opacity-10 text-primary">Female</span>
                                         {% else %}
                                             <span class="badge bg-primary bg-opacity-10 text-primary">Male</span>
                                         {% endif %}
@@ -75,7 +75,7 @@
                                         {% elif case.status == 'Follow-up Needed' %}
                                             <span class="badge bg-warning bg-opacity-10 text-warning">Follow-up Needed</span>
                                         {% else %}
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ case.status }}</span>
+                                            <span class="badge bg-info bg-opacity-10 text-primary">{{ case.status }}</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -96,7 +96,7 @@
                                                     data-bs-placement="top" data-bs-title="View Details">
                                                 <i class="ri-eye-line"></i>
                                             </button>
-                                            <a href="/admin/child-cases/{{ case.id }}/certificate"
+                                            <a href="/admin/records/birth/{{ case.id }}/certificate"
                                                class="btn btn-outline-primary btn-sm"
                                                data-bs-toggle="tooltip"
                                                data-bs-placement="top" data-bs-title="Print Certificate">

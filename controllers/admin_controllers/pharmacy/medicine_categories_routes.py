@@ -14,8 +14,8 @@ from utils.config import db
 
 @admin.route(PHARMACY_MEDICINE_CATEGORIES, methods=['GET'], endpoint='medicine-categories')
 def medicine_categories():
-    categories = MedicineCategory.query.filter_by(is_active=1).order_by(MedicineCategory.name).all()
-    archived_categories = MedicineCategory.query.filter_by(is_active=0).order_by(
+    categories = MedicineCategory.query.filter_by(is_deleted=0).order_by(MedicineCategory.name).all()
+    archived_categories = MedicineCategory.query.filter_by(is_deleted=1).order_by(
         MedicineCategory.deleted_at.desc()).all()
     return render_template('admin_templates/pharmacy/medicine_categories.html', categories=categories,
                            archived_categories=archived_categories)
@@ -55,7 +55,7 @@ def edit_medicine_category(id):
 def delete_medicine_category(id):
     category = MedicineCategory.query.get_or_404(id)
     try:
-        category.is_active = False
+        category.is_deleted = True
         category.deleted_at = datetime.utcnow()
 
         db.session.commit()
@@ -70,7 +70,7 @@ def delete_medicine_category(id):
 def restore_medicine_category(id):
     category = MedicineCategory.query.get_or_404(id)
     try:
-        category.is_active = True
+        category.is_deleted = False
         category.deleted_at = None
         db.session.commit()
         flash('Category restored successfully!', 'success')
@@ -83,8 +83,8 @@ def restore_medicine_category(id):
 # Companies Routes
 @admin.route(PHARMACY_MEDICINE_COMPANIES, methods=['GET'], endpoint='medicine-companies')
 def medicine_companies():
-    companies = MedicineCompany.query.filter_by(is_active=1).order_by(MedicineCompany.name).all()
-    archived_companies = MedicineCompany.query.filter_by(is_active=0).order_by(MedicineCompany.deleted_at.desc()).all()
+    companies = MedicineCompany.query.filter_by(is_deleted=0).order_by(MedicineCompany.name).all()
+    archived_companies = MedicineCompany.query.filter_by(is_deleted=1).order_by(MedicineCompany.deleted_at.desc()).all()
     return render_template('admin_templates/pharmacy/medicine_companies.html', companies=companies,
                            archived_companies=archived_companies)
 
@@ -129,7 +129,7 @@ def edit_medicine_company(id):
 def delete_medicine_company(id):
     company = MedicineCompany.query.get_or_404(id)
     try:
-        company.is_active = False
+        company.is_deleted = True
         company.deleted_at = datetime.utcnow()
         db.session.commit()
         flash('Company deleted successfully!', 'success')
@@ -143,7 +143,7 @@ def delete_medicine_company(id):
 def restore_medicine_company(id):
     company = MedicineCompany.query.get_or_404(id)
     try:
-        company.is_active = True
+        company.is_deleted = False
         company.deleted_at = None
 
         db.session.commit()

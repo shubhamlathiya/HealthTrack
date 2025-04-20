@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Blood Donor{% endblock title %}
-{% block page %}Blood Donor{% endblock page %}
+{% block title %}Departments{% endblock title %}
+{% block page %}Departments{% endblock page %}
 
 {% block body %}
     <!-- Row starts -->
@@ -9,28 +9,24 @@
         <div class="col-sm-6">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title">Departments</h5>
+                    <h5 class="card-title">Departments Distribution</h5>
                 </div>
                 <div class="card-body">
-
                     <div class="chart-height-lg">
                         <div id="total-department" class="auto-align-graph"></div>
                     </div>
-
                 </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title">Employees</h5>
+                    <h5 class="card-title">Employees by Department</h5>
                 </div>
                 <div class="card-body">
-
                     <div class="chart-height-lg">
                         <div id="employees" class="auto-align-graph"></div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -38,229 +34,614 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Department List</h5>
-                    <a href="/admin/department/add-department" class="btn btn-primary ms-auto">Add Department</a>
+                    <div>
+                        <a href="/admin/department/add-department" class="btn btn-primary ms-auto">
+                            <i class="ri-add-line"></i> Add Department
+                        </a>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreDepartmentsModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
 
                     <!-- Table starts -->
                     <div class="table-responsive">
-                        <table id="basicExample" class="table m-0 align-middle">
+                        <table id="scrollVertical" class="table m-0 align-middle">
                             <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Department</th>
                                 <th>Department Head</th>
-                                <th>Doctors List</th>
+                                <th>Status</th>
+                                <th>Doctors</th>
+                                <th>Created</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td>001</td>
-                                <td>Surgeon</td>
-                                <td>
-                                    <img src="../../../static/assets/images/doctor.png" class="img-2x rounded-5 me-1"
-                                         alt="Doctors Admin Template">
-                                    Deena Cooley
-                                </td>
-                                <td>
-                                    <div class="stacked-images">
-                                        <img src="../../../static/assets/images/doctor.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor2.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor3.png" alt="Dentist Dashboard">
-                                        <span class="plus bg-primary">+5</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Department">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Gynecologist</td>
-                                <td>
-                                    <img src="../../../static/assets/images/doctor2.png" class="img-2x rounded-5 me-1"
-                                         alt="Doctors Admin Template">
-                                    Hector Banks
-                                </td>
-                                <td>
-                                    <div class="stacked-images">
-                                        <img src="../../../static/assets/images/doctor3.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor4.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor5.png" alt="Dentist Dashboard">
-                                        <span class="plus bg-danger">+8</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Department">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>Psychiatrists</td>
-                                <td>
-                                    <img src="../../../static/assets/images/doctor3.png" class="img-2x rounded-5 me-1"
-                                         alt="Doctors Admin Template">
-                                    Owen Scott
-                                </td>
-                                <td>
-                                    <div class="stacked-images">
-                                        <img src="../../../static/assets/images/doctor.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor3.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor2.png" alt="Dentist Dashboard">
-                                        <span class="plus bg-success">+3</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Department">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>004</td>
-                                <td>Urologist</td>
-                                <td>
-                                    <img src="../../../static/assets/images/doctor5.png" class="img-2x rounded-5 me-1"
-                                         alt="Doctors Admin Template">
-                                    Alison Estrada
-                                </td>
-                                <td>
-                                    <div class="stacked-images">
-                                        <img src="../../../static/assets/images/doctor4.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor2.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor1.png" alt="Dentist Dashboard">
-                                        <span class="plus bg-warning">+6</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Department">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>005</td>
-                                <td>Paediatrician</td>
-                                <td>
-                                    <img src="../../../static/assets/images/doctor4.png" class="img-2x rounded-5 me-1"
-                                         alt="Doctors Admin Template">
-                                    Mitchel Alvarez
-                                </td>
-                                <td>
-                                    <div class="stacked-images">
-                                        <img src="../../../static/assets/images/doctor1.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor4.png" alt="Dentist Dashboard">
-                                        <img src="../../../static/assets/images/doctor5.png" alt="Dentist Dashboard">
-                                        <span class="plus bg-info">+2</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm rounded-5" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-department.html" class="btn btn-outline-success btn-sm rounded-5"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Department">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
+                            {% for department in departments %}
+                                <tr data-bs-toggle="modal"
+                                    data-bs-target="#viewDepartmentModal{{ department.id }}">
+                                    <td>{{ department.id }}</td>
+                                    <td>
+                                        <strong>{{ department.name }}</strong>
+                                        <div class="text-muted small">{{ department.email }}</div>
+                                    </td>
+                                    <td>
+                                        <img src="../../../static/assets/images/doctor.png"
+                                             class="img-2x rounded-5 me-1"
+                                             alt="Department Head">
+                                        {{ department.department_head }}
+                                    </td>
+                                    <td>
+                                        {% if department.status == 'active' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="stacked-images">
+                                            <img src="../../../static/assets/images/doctor.png" alt="Doctor">
+                                            <img src="../../../static/assets/images/doctor2.png" alt="Doctor">
+                                            <img src="../../../static/assets/images/doctor3.png" alt="Doctor">
+                                            {% if department.assignments|length > 0 %}
+                                                <span class="plus bg-primary">+{{ department.assignments|length }}</span>
+                                            {% endif %}
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ department.created_at.strftime('%Y-%m-%d') }}
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteDepartmentModal{{ department.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewDepartmentModal{{ department.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editDepartmentModal{{ department.id }}"
+                                                    data-bs-placement="top" data-bs-title="Edit Department">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
                     <!-- Table ends -->
-
-                    <!-- Modal Delete Row -->
-                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-sm">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="delRowLabel">
-                                        Confirm
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete the department?
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <a href="departments-list.html" class="btn btn-secondary"
-                                           data-bs-dismiss="modal"
-                                           aria-label="Close">No</a>
-                                        <a href="departments-list.html" class="btn btn-danger" data-bs-dismiss="modal"
-                                           aria-label="Close">Yes</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
     </div>
     <!-- Row ends -->
 
+    <!-- Modals for each department -->
+    {% for department in departments %}
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteDepartmentModal{{ department.id }}" tabindex="-1"
+             aria-labelledby="deleteDepartmentModalLabel{{ department.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteDepartmentModalLabel{{ department.id }}">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete the <b>{{ department.name }}</b> department?
+                        <div class="alert alert-warning mt-2">
+                            <i class="ri-alert-line"></i> This action will also remove all associated doctors and rooms.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form action="/admin/department/delete-department/{{ department.id }}" method="POST">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- View Details Modal -->
+        <div class="modal fade" id="viewDepartmentModal{{ department.id }}" tabindex="-1"
+             aria-labelledby="viewDepartmentModalLabel{{ department.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewDepartmentModalLabel{{ department.id }}">
+                            <i class="ri-building-line"></i> Department Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-information-line"></i> Basic Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Department ID:</strong> {{ department.id }}</p>
+                                        <p><strong>Name:</strong> {{ department.name }}</p>
+                                        <p><strong>Email:</strong> {{ department.email }}</p>
+                                        <p><strong>Status:</strong>
+                                            <span class="badge bg-{{ 'success' if department.status == 'active' else 'danger' }} bg-opacity-10 text-{{ 'success' if department.status == 'active' else 'danger' }}">
+                                                {{ department.status|capitalize }}
+                                            </span>
+                                        </p>
+                                        <p><strong>Created:</strong> {{ department.created_at.strftime('%Y-%m-%d') }}
+                                        </p>
+                                        <p><strong>Last
+                                            Updated:</strong> {{ department.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-user-star-line"></i> Department Head</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <img src="../../../static/assets/images/doctor.png"
+                                                 class="img-3x rounded-5 me-3"
+                                                 alt="Department Head">
+                                            <div>
+                                                <h6 class="mb-0">{{ department.department_head }}</h6>
+                                                <p class="text-muted small mb-0">Head of Department</p>
+                                            </div>
+                                        </div>
+                                        <p><strong>Phone:</strong> {{ department.phone }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-group-line"></i> Doctors
+                                            ({{ department.doctors|length }})</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if department.assignments %}
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-borderless">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Specialization</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for assignment in department.assignments[:5] %}
+                                                        {% if assignment.doctor %}
+                                                            <tr>
+                                                                <td>{{ assignment.doctor.first_name }} {{ assignment.doctor.last_name }}</td>
+                                                                <td>{{ assignment.specialty }}</td>
+                                                                <td>
+                        <span class="badge bg-{{ 'success' if assignment.current_status == 'Active' else 'danger' }} bg-opacity-10 text-{{ 'success' if assignment.current_status == 'Active' else 'danger' }}">
+                            {{ assignment.current_status }}
+                        </span>
+                                                                </td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% if department.assignments|length > 5 %}
+                                                        <tr>
+                                                            <td colspan="3" class="text-center">
+                                                                + {{ department.assignments|length - 5 }} more doctors
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-info mb-0">
+                                                <i class="ri-information-line"></i> No doctors assigned to this
+                                                department
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-door-line"></i> Rooms
+                                            ({{ department.rooms|length }})</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if department.rooms %}
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-borderless">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Room No</th>
+                                                        <th>Type</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for room in department.rooms[:5] %}
+                                                        <tr>
+                                                            <td>{{ room.room_number }}</td>
+                                                            <td>{{ room.room_type }}</td>
+                                                            <td>
+                                                                    <span class="badge bg-{{ 'success' if room.status == 'available' else 'danger' }} bg-opacity-10 text-{{ 'success' if room.status == 'available' else 'danger' }}">
+                                                                        {{ room.status|capitalize }}
+                                                                    </span>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    {% if department.rooms|length > 5 %}
+                                                        <tr>
+                                                            <td colspan="3" class="text-center">
+                                                                + {{ department.rooms|length - 5 }} more rooms
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-info mb-0">
+                                                <i class="ri-information-line"></i> No rooms assigned to this department
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-file-text-line"></i> Additional Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ department.message or 'No additional information provided' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Department Modal -->
+        <div class="modal fade" id="editDepartmentModal{{ department.id }}" tabindex="-1"
+             aria-labelledby="editDepartmentModalLabel{{ department.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="editDepartmentModalLabel{{ department.id }}">
+                            <i class="ri-edit-line"></i> Edit Department
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="/admin/department/edit-department/{{ department.id }}">
+                        <div class="modal-body">
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Department ID</label>
+                                        <input type="text" class="form-control" value="{{ department.id }}" readonly>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Department Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="name"
+                                               value="{{ department.name }}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" name="email"
+                                               value="{{ department.email }}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Status <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="status" required>
+                                            <option value="active"
+                                                    {% if department.status == 'active' %}selected{% endif %}>Active
+                                            </option>
+                                            <option value="inactive"
+                                                    {% if department.status == 'inactive' %}selected{% endif %}>Inactive
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Department Head <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="department_head"
+                                               value="{{ department.department_head }}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" name="phone"
+                                               value="{{ department.phone }}" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Additional Message</label>
+                                <textarea class="form-control" name="message"
+                                          rows="3">{{ department.message or '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-save-line"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Departments Modal -->
+    <div class="modal fade" id="restoreDepartmentsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Archived Departments
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_departments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Department</th>
+                                    <th>Head</th>
+                                    <th>Status</th>
+                                    <th>Deleted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for department in deleted_departments %}
+                                    <tr>
+                                        <td>{{ department.id }}</td>
+                                        <td>
+                                            <strong>{{ department.name }}</strong>
+                                            <div class="text-muted small">{{ department.email }}</div>
+                                        </td>
+                                        <td>{{ department.department_head }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ 'success' if department.status == 'active' else 'danger' }} bg-opacity-10 text-{{ 'success' if department.status == 'active' else 'danger' }}">
+                                                {{ department.status|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span data-bs-toggle="tooltip"
+                                                  title="{{ department.deleted_at.strftime('%Y-%m-%d %H:%M:%S') }}">
+                                                {{ department.deleted_at.strftime('%Y-%m-%d') }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-2">
+                                                <form method="POST"
+                                                      action="/admin/department/restore-department/{{ department.id }}">
+                                                    <button type="submit" class="btn btn-sm btn-success">
+                                                        <i class="ri-refresh-line"></i> Restore
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mt-3">
+                            <i class="ri-information-line me-2"></i>
+                            No archived departments found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock body %}
-{% block heardLink %}
 
+{% block heardLink %}
     <!-- Data Tables -->
     <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
     <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
     <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
 {% endblock %}
+
 {% block footerLink %}
-   <!-- Apex Charts -->
+    <!-- Apex Charts -->
     <script src="../../../static/assets/vendor/apex/apexcharts.min.js"></script>
-    <script src="../../../static/assets/vendor/apex/custom/department/department-list.js"></script>
-    <script src="../../../static/assets/vendor/apex/custom/department/employees.js"></script>
+
+    <script>
+        // Department Distribution Pie Chart
+        var departmentOptions = {
+            chart: {
+                width: '70%',
+                type: "pie",
+            },
+            labels: [
+                {% for department in departments %}
+                    "{{ department.name }}"{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            series: [
+                {% for department in departments %}
+                    {{ department.assignments|length }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            legend: {
+                position: "bottom",
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                width: 0,
+            },
+            colors: [
+                "#566FE2", "#6480E7", "#7292EC", "#80A3F1", "#8EB4F5", "#9CC6FA", "#AAD7FF"
+            ],
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 300
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+        var departmentChart = new ApexCharts(document.querySelector("#total-department"), departmentOptions);
+        departmentChart.render();
+
+        // Employees by Department Bar Chart
+        var employeeOptions = {
+            chart: {
+                height: 300,
+                width: '100%',
+                type: 'bar',
+                toolbar: {
+                    show: false,
+                },
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    distributed: true,
+                    columnWidth: '50%',
+                    borderRadius: 4,
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 0,
+                colors: [
+                    "#566FE2", "#6480E7", "#7292EC", "#80A3F1", "#8EB4F5", "#9CC6FA", "#AAD7FF"]
+            },
+            series: [{
+                name: 'Employees',
+                data: [
+                    {% for department in departments %}
+                        {{ department.doctors|length }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            }],
+            legend: {
+                show: false,
+            },
+            xaxis: {
+                categories: [
+                    {% for department in departments %}
+                        "{{ department.name }}"{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+            },
+            yaxis: {
+                show: false,
+            },
+            fill: {
+                colors: [
+                    "#566FE2", "#6480E7", "#7292EC", "#80A3F1", "#8EB4F5", "#9CC6FA", "#AAD7FF"],
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return val + " doctors"
+                    }
+                }
+            },
+            grid: {
+                show: false,
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: false,
+                    }
+                },
+            },
+            colors: ['#ffffff'],
+        };
+        var employeeChart = new ApexCharts(
+            document.querySelector("#employees"),
+            employeeOptions
+        );
+        employeeChart.render();
+    </script>
 
     <!-- Data Tables -->
     <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
     <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
     <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
-
 {% endblock footerLink %}

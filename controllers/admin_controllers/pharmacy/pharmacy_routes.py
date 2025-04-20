@@ -13,10 +13,10 @@ from utils.config import db
 
 @admin.route(PHARMACY_MEDICINE_LIST, methods=['GET'], endpoint='medicine-list')
 def pharmacy_medicine_list():
-    medicines = Medicine.query.filter_by(is_active=1).order_by(Medicine.name).all()
-    categories = MedicineCategory.query.filter_by(is_active=1).order_by(MedicineCategory.name).all()
-    companies = MedicineCompany.query.filter_by(is_active=1).order_by(MedicineCompany.name).all()
-    archived_medicines = Medicine.query.filter_by(is_active=0).order_by(Medicine.deleted_at.desc()).all()
+    medicines = Medicine.query.filter_by(is_deleted=0).order_by(Medicine.name).all()
+    categories = MedicineCategory.query.filter_by(is_deleted=0).order_by(MedicineCategory.name).all()
+    companies = MedicineCompany.query.filter_by(is_deleted=0).order_by(MedicineCompany.name).all()
+    archived_medicines = Medicine.query.filter_by(is_deleted=1).order_by(Medicine.deleted_at.desc()).all()
 
     return render_template('admin_templates/pharmacy/medicine_inventory.html', medicines=medicines,
                            categories=categories, companies=companies, datetime=datetime,
@@ -101,11 +101,11 @@ def delete_medicine(id):
     try:
         # Delete associated transactions first
         StockTransaction.query.filter_by(medicine_id=id).update({
-            'is_active': False,
+            'is_deleted': True,
             'deleted_at': datetime.utcnow()
         })
 
-        medicine.is_active = False
+        medicine.is_deleted = True
         medicine.deleted_at = datetime.utcnow()
         db.session.commit()
         flash('Medicine deleted successfully!', 'success')
@@ -269,10 +269,10 @@ def restore_medicine(id):
     medicine = Medicine.query.get_or_404(id)
     try:
         StockTransaction.query.filter_by(medicine_id=id).update({
-            'is_active': True,
+            'is_deleted': False,
             'deleted_at': None
         })
-        medicine.is_active = True
+        medicine.is_deleted = False
         medicine.deleted_at = None
         db.session.commit()
         flash('Medicine restored successfully!', 'success')

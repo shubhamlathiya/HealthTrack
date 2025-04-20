@@ -10,7 +10,16 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body">
-
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                     <div class="custom-tabs-container">
                         <!-- Form starts -->
                         <form method="POST" action="/admin/doctor/add-doctor" enctype="multipart/form-data"
@@ -77,17 +86,8 @@
                                                         class="text-danger">*</span></label>
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="ri-flower-line"></i></span>
-                                                    <select class="form-select" id="a3" name="a3" required>
-                                                        <option value="">Select Age</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
-                                                        <option value="4">4</option>
-                                                        <option value="5">5</option>
-                                                        <option value="6">6</option>
-                                                        <option value="7">7</option>
-                                                        <option value="8">8</option>
-                                                    </select>
+                                                    <input type="text" class="form-control" id="a3" name="a3"
+                                                           placeholder="Enter Age" required>
                                                 </div>
                                             </div>
                                         </div>

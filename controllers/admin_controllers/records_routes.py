@@ -16,16 +16,16 @@ from fpdf import FPDF
 
 @admin.route(RECORDS_DEATH, methods=['GET'], endpoint='records_death')
 def records_death():
-    records = DeathRecord.query.filter_by(is_active=1).order_by(DeathRecord.death_date.desc()).all()
-    doctors = Doctor.query.filter_by(is_active=1).order_by(Doctor.first_name).all()
-    deleted_records = DeathRecord.query.filter_by(is_active=0).order_by(DeathRecord.deleted_at.desc()).all()
+    records = DeathRecord.query.filter_by(is_deleted=0).order_by(DeathRecord.death_date.desc()).all()
+    doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
+    deleted_records = DeathRecord.query.filter_by(is_deleted=1).order_by(DeathRecord.deleted_at.desc()).all()
     return render_template("admin_templates/records/death_records.html", records=records, doctors=doctors,
                            deleted_records=deleted_records)
 
 
 @admin.route(RECORDS_ADD_DEATH, methods=['GET', 'POST'])
 def add_death_record():
-    doctors = Doctor.query.filter_by(is_active=1).order_by(Doctor.first_name).all()
+    doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
     if request.method == 'POST':
         try:
             last_case = DeathRecord.query.order_by(DeathRecord.id.desc()).first()
@@ -91,7 +91,7 @@ def delete_death_record(id):
     record = DeathRecord.query.get_or_404(id)
     try:
         # Soft delete
-        record.is_active = False
+        record.is_deleted = True
         record.deleted_at = datetime.utcnow()
         db.session.commit()
         flash('Death record has been archived successfully!', 'success')
@@ -103,9 +103,9 @@ def delete_death_record(id):
 
 @admin.route(RESTORE_RECORDS_DEATH + '/<int:id>', methods=['POST'])
 def restore_death_record(id):
-    record = DeathRecord.query.filter_by(id=id, is_active=False).first_or_404()
+    record = DeathRecord.query.filter_by(id=id, is_deleted=True).first_or_404()
     try:
-        record.is_active = True
+        record.is_deleted = False
         record.deleted_at = None
         db.session.commit()
         flash('Death record restored successfully!', 'success')
@@ -238,12 +238,12 @@ def death_certificate(id):
 
 @admin.route(RECORDS_BIRTH, methods=['GET'], endpoint='records_birth')
 def records_birth():
-    deleted_child_cases = ChildCase.query.filter_by(is_active=False).all()
-    deleted_medical_visits = MedicalVisit.query.filter_by(is_active=False).all()
+    deleted_child_cases = ChildCase.query.filter_by(is_deleted=True).all()
+    deleted_medical_visits = MedicalVisit.query.filter_by(is_deleted=True).all()
 
-    cases = ChildCase.query.filter_by(is_active=1).order_by(ChildCase.created_at.desc()).all()
+    cases = ChildCase.query.filter_by(is_deleted=0).order_by(ChildCase.created_at.desc()).all()
 
-    doctors = Doctor.query.filter_by(is_active=1).order_by(Doctor.first_name).all()
+    doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
     return render_template("admin_templates/records/birth_records.html",
                            cases=cases,
                            doctors=doctors,
@@ -315,12 +315,12 @@ def delete_child_case(id):
     try:
         # First soft delete all related medical visits
         MedicalVisit.query.filter_by(child_case_id=id).update({
-            'is_active': False,
+            'is_deleted': True,
             'deleted_at': datetime.utcnow()
         })
 
         # Then soft delete the child case
-        case.is_active = False
+        case.is_deleted = True
         case.deleted_at = datetime.utcnow()
 
         db.session.commit()
@@ -390,7 +390,7 @@ def delete_medical_visit(visit_id):
     visit = MedicalVisit.query.get_or_404(visit_id)
     try:
         # Soft delete the medical visit
-        visit.is_active = False
+        visit.is_deleted = True
         visit.deleted_at = datetime.utcnow()
 
         db.session.commit()
@@ -459,12 +459,12 @@ def restore_child_case(id):
     try:
         # Restore related visits
         MedicalVisit.query.filter_by(child_case_id=id).update({
-            'is_active': True,
+            'is_deleted': False,
             'deleted_at': None
         })
 
         ChildCase.query.filter_by(id=id).update({
-            'is_active': True,
+            'is_deleted': False,
             'deleted_at': None
         })
 
@@ -479,9 +479,9 @@ def restore_child_case(id):
 
 @admin.route(RESTORE_BIRTH_MEDICAL_VISIT + '/<int:id>', methods=['POST'])
 def restore_medical_visit(id):
-    visit = MedicalVisit.query.filter_by(id=id, is_active=False).first_or_404()
+    visit = MedicalVisit.query.filter_by(id=id, is_deleted=True).first_or_404()
     try:
-        visit.is_active = True
+        visit.is_deleted = False
         visit.deleted_at = None
         db.session.commit()
         flash('Medical visit restored successfully!', 'success')

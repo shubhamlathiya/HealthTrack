@@ -21,7 +21,7 @@ from utils.config import db
 def list_rooms():
     rooms = Room.query.filter_by(deleted_at=None).order_by(Room.room_number).all()
     departments = Department.query.all()
-    deleted_rooms = Room.query.filter_by(is_available=0).order_by(Room.room_number).all()
+    deleted_rooms = Room.query.filter_by(is_deleted=1).order_by(Room.room_number).all()
     return render_template('admin_templates/room/room-list.html', rooms=rooms, departments=departments,
                            deleted_rooms=deleted_rooms)
 
@@ -61,7 +61,7 @@ def add_room():
         message=message
     )
     new_room.charge_per_day = charge_per_day  # Redundant but explicit
-    new_room.is_available = True
+    new_room.is_deleted = False
 
     try:
         db.session.add(new_room)
@@ -92,7 +92,7 @@ def edit_room(room_id):
         room.department_id = int(dept_id) if dept_id else None
 
         # Handle availability status
-        room.is_available = 'is_available' in request.form
+        room.is_deleted = 'is_deleted' in request.form
 
         # Update optional message
         room.message = request.form.get('message', '').strip() or None
@@ -108,12 +108,12 @@ def edit_room(room_id):
 def delete_room(room_id):
     room = Room.query.get_or_404(room_id)
     try:
-        room.is_available = False
+        room.is_deleted = True
         room.deleted_at = datetime.utcnow()
         # Also soft delete all beds in this room
         Bed.query.filter_by(room_id=room_id).update({
             'deleted_at': datetime.utcnow(),
-            'is_available': False
+            'is_deleted': True
         })
         db.session.commit()
         flash('Room and its beds have been archived', 'success')
@@ -128,12 +128,12 @@ def room_restore(id):
     room = Room.query.get_or_404(id)
     try:
         # Restore related visits
-        room.is_available = True
+        room.is_deleted = False
         room.deleted_at = None
         # Also soft delete all beds in this room
         Bed.query.filter_by(room_id=id).update({
             'deleted_at': None,
-            'is_available': True
+            'is_deleted': False
         })
         db.session.commit()
         flash('Rooms data have been restored!', 'success')
@@ -149,14 +149,14 @@ def room_available_room():
     # Get all departments with their available rooms and beds
     departments_data = {}
 
-    all_departments = Department.query.filter_by(is_available=1).all()
+    all_departments = Department.query.filter_by(is_deleted=0).all()
 
     print(all_departments)
     for department in all_departments:
         # Get all available rooms for this department
         rooms = Room.query.filter_by(
             department_id=department.id,
-            is_available=1,
+            is_deleted=0,
             is_empty=1
         ).all()
         print(rooms)
@@ -165,7 +165,7 @@ def room_available_room():
             # Get all beds for this room
             beds = Bed.query.filter_by(
                 room_id=room.id,
-                is_available=1,
+                is_deleted=0,
                 is_empty=1
             ).all()
 
@@ -178,7 +178,7 @@ def room_available_room():
                     "bed_no": bed.bed_number,
                     "room_type": room.room_type,
                     "charge_per_day": room.charge_per_day,
-                    "available": room.is_available and room.is_empty and bed.is_available and bed.is_empty
+                    "available": room.is_deleted and room.is_empty and bed.is_deleted and bed.is_empty
                 })
 
         if department_rooms:  # Only add department if it has available rooms
@@ -492,7 +492,7 @@ def complete_cleaning(current_user, allocation_id):
 
         # Mark bed as available
         bed = Bed.query.get(allocation.bed_id)
-        bed.is_available = True
+        bed.is_empty = True
 
         db.session.commit()
         flash("Bed cleaning completed and ready for new patients", "success")
@@ -575,7 +575,7 @@ def room_room_by_dept():
                 ).order_by(BedAllocation.admission_date.desc()).first()
 
                 if not allocation:
-                    if bed.is_available:
+                    if bed.is_empty:
                         stats['available'] += 1
                     else:
                         stats['maintenance'] += 1
@@ -671,7 +671,7 @@ def get_department_details(dept_id):
                 elif needs_cleaning:
                     status = 'needs_cleaning'
                     data['needs_cleaning'] += 1
-                elif not bed.is_available:
+                elif not bed.is_deleted:
                     status = 'maintenance'
                     data['maintenance'] += 1
                 else:

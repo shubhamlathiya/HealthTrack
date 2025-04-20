@@ -1,24 +1,43 @@
+from datetime import datetime
+
 from flask import render_template, request, flash, redirect
+import logging
 
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import DOCTOR_ASSIGN_DEPARTMENT, ADMIN, DOCTOR_UPDATE_ASSIGN_DEPARTMENT
+from controllers.constant.adminPathConstant import DOCTOR_ASSIGN_DEPARTMENT, ADMIN, DOCTOR_UPDATE_ASSIGN_DEPARTMENT, \
+    DOCTOR_REMOVE_ASSIGN_DEPARTMENT
 from models.departmentAssignmentModel import DepartmentAssignment
 from models.departmentModel import Department
 from models.doctorModel import Doctor
 from utils.config import db
 
 
+
 @admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['GET'], endpoint="department_assignments")
 def department_assignments():
-    doctors = Doctor.query.options(
-        db.joinedload(Doctor.assignments).joinedload(DepartmentAssignment.department)
-    ).order_by(Doctor.last_name).all()
+    try:
+        doctors = Doctor.query.options(
+            db.joinedload(Doctor.department_assignments)
+            .joinedload(DepartmentAssignment.department)
+        ).filter(
+            Doctor.is_deleted == False
+        ).order_by(Doctor.last_name, Doctor.first_name).all()
 
-    departments = Department.query.order_by(Department.name).all()
+        # Get all active departments
+        departments = Department.query.filter(
+            Department.is_deleted == False,
+            Department.status == 'active'
+        ).order_by(Department.name).all()
 
-    return render_template('admin_templates/doctor/assign_department.html',
-                           doctors=doctors,
-                           departments=departments)
+        for doc in doctors:
+            for da in doc.department_assignments:
+                print(f"{doc.first_name} - {da.department.name if da.department else 'MISSING DEPARTMENT'}")
+
+        return render_template('admin_templates/doctor/assign_department.html',
+                               doctors=doctors,
+                               departments=departments)
+    except Exception as e:
+        return "An error occurred while loading the department assignment page.", 500
 
 
 @admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['POST'], endpoint="assign_doctor_department")
@@ -32,7 +51,7 @@ def assign_doctor_department():
         existing_assignment = DepartmentAssignment.query.filter_by(
             doctor_id=doctor_id,
             department_id=department_id,
-            current_status='Active'
+            current_status='active'
         ).first()
 
         if existing_assignment:

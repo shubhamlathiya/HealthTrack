@@ -40,7 +40,7 @@
                             </thead>
                             <tbody>
                             {% for doctor in doctors %}
-                                {% for assignment in doctor.assignments %}
+                                {% for assignment in doctor.department_assignments %}
                                     <tr data-bs-toggle="modal"
                                         data-bs-target="#editModal{{ assignment.id }}">
                                         <td>

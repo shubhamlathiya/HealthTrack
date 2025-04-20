@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, redirect
+from flask import render_template, request, jsonify, redirect, flash
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import os
@@ -104,7 +104,7 @@ def register_doctor():
             # Skip if "Not working" (i.e., "None" or missing value)
             if from_time and to_time and from_time != 'None' and to_time != 'None':
                 availability = Availability(
-                    day_of_week=day,
+                    day_of_week=i,
                     from_time=from_time,
                     to_time=to_time,
                     doctor_id=new_doctor.id
@@ -123,7 +123,7 @@ def register_doctor():
         #     'message': 'Doctor registered successfully',
         #     'doctor_id': new_doctor.id
         # }), 201
-
+        flash("Doctor registered successfully")
         return redirect("/admin/" + DOCTOR_ADD_DOCTOR)
     except Exception as e:
         db.session.rollback()
