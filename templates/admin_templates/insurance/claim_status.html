@@ -1,223 +1,901 @@
 {% extends 'base.html' %}
 
-{% block title %}Insurance Claims{% endblock title %}
-{% block page %}Insurance Claims{% endblock page %}
-{% block body %}
+{% block title %}Insurance Claims Management{% endblock title %}
+{% block page %}Insurance Claims Management{% endblock page %}
 
-    <!-- Row starts -->
+{% block body %}
     <div class="row gx-4">
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Insurance Claims</h5>
-                    <a href="add-claim.html" class="btn btn-primary ms-auto">New Claim</a>
+                    <div>
+                        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal"
+                                data-bs-target="#addClaimModal">
+                            <i class="ri-add-line me-1"></i> New Claim
+                        </button>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreClaimsModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
-
-                    <!-- Table starts -->
-                    <div class="table-responsive">
-                        <table id="scrollVertical" class="table m-0 align-middle">
-                            <thead>
-                            <tr>
-                                <th>Claim ID</th>
-                                <th>Patient</th>
-                                <th>Claim Type</th>
-                                <th>Doctor</th>
-                                <th>Claim Amount</th>
-                                <th>Approved</th>
-                                <th>Status</th>
-                                <th>Claim Date</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>CLAIM1006</td>
-                                <td>Michael Harris</td>
-                                <td>Surgery</td>
-                                <td>Dr. Linda Wilson</td>
-                                <td>
-                                    <span class="text-primary">$1,800</span>
-                                </td>
-                                <td>
-                                    <span class="text-success">$1,750</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-success">Approved</span>
-                                </td>
-                                <td>2024-11-13</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" data-bs-title="Print Claim">
-                                            <i class="ri-printer-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CLAIM1007</td>
-                                <td>Sarah Johnson</td>
-                                <td>Hospitalization</td>
-                                <td>Dr. Robert Chen</td>
-                                <td>
-                                    <span class="text-primary">$3,200</span>
-                                </td>
-                                <td>
-                                    <span class="text-success">$3,200</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-success">Approved</span>
-                                </td>
-                                <td>2024-11-10</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" data-bs-title="Print Claim">
-                                            <i class="ri-printer-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CLAIM1008</td>
-                                <td>David Miller</td>
-                                <td>Diagnostic</td>
-                                <td>Dr. Emily Park</td>
-                                <td>
-                                    <span class="text-primary">$450</span>
-                                </td>
-                                <td>
-                                    <span class="text-danger">$0</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-danger">Rejected</span>
-                                </td>
-                                <td>2024-11-05</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" data-bs-title="Print Claim">
-                                            <i class="ri-printer-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Table ends -->
-
-                    <!-- View Details Modal -->
-                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
-                         aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="viewDetailsLabel">Claim Details</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h6>Claim Information</h6>
-                                            <p><strong>Claim ID:</strong> CLAIM1006</p>
-                                            <p><strong>Patient Name:</strong> Michael Harris</p>
-                                            <p><strong>Claim Type:</strong> Surgery</p>
-                                            <p><strong>Claim Date:</strong> November 13, 2024</p>
-                                            <p><strong>Status:</strong> <span class="badge bg-success">Approved</span>
-                                            </p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6>Medical Information</h6>
-                                            <p><strong>Doctor Name:</strong> Dr. Linda Wilson</p>
-                                            <p><strong>Hospital Name:</strong> Eastside Medical Group</p>
-                                            <p><strong>Procedure Code:</strong> CPT-49560</p>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <h6>Financial Details</h6>
-                                            <p><strong>Claim Amount:</strong> $1,800.00</p>
-                                            <p><strong>Approved Amount:</strong> $1,750.00</p>
-                                            <p><strong>Deductible Applied:</strong> $50.00</p>
-                                            <p><strong>Patient Responsibility:</strong> $50.00</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6>Approval Details</h6>
-                                            <p><strong>Approved Date:</strong> November 15, 2024</p>
-                                            <p><strong>Approved By:</strong> Insurance Processor #421</p>
-                                            <p><strong>Payment Date:</strong> November 20, 2024</p>
-                                            <p><strong>Payment Method:</strong> EFT to Provider</p>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-12">
-                                            <h6>Rejection Reason</h6>
-                                            <div class="card bg-light">
-                                                <div class="card-body">
-                                                    <p class="mb-0">N/A (Claim Approved)</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary">Total Claims</h6>
+                                    <h3 class="mb-0">{{ stats.total }}</h3>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
-                                    </button>
-                                    <button type="button" class="btn btn-primary">Print Full Claim</button>
-                                    <button type="button" class="btn btn-success">Appeal Claim</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-success">Approved</h6>
+                                    <h3 class="mb-0">{{ stats.approved }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-warning">Pending</h6>
+                                    <h3 class="mb-0">{{ stats.pending }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-danger">Rejected</h6>
+                                    <h3 class="mb-0">{{ stats.rejected }}</h3>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <div class="table-responsive">
+                        <table id="claimsTable" class="table m-0 align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Patient Details</th>
+                                <th>Claim Info</th>
+                                <th>Provider</th>
+                                <th>Amounts</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for claim in claims %}
+                                <tr data-bs-toggle="modal"
+                                    data-bs-target="#viewClaimModal{{ claim.id }}">
+                                    <td>{{ claim.claim_id }}</td>
+                                    <td>
+                                        <strong>{{ claim.patient_name }}</strong>
+                                        <div class="text-muted small">
+                                            <i class="ri-id-card-line"></i> {{ claim.patient_id }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary mb-1">
+                                            {{ claim.claim_type }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {{ claim.insurance_provider.name }}
+                                        <div class="text-muted small">
+                                            {{ claim.insurance_record.policy_number }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-primary">${{ "%.2f"|format(claim.claim_amount) }}</span>
+                                        <div class="text-muted small">
+                                            {% if claim.status == 'Approved' %}
+                                                Approved: ${{ "%.2f"|format(claim.approved_amount) }}
+                                            {% elif claim.status == 'Rejected' %}
+                                                Rejected
+                                            {% else %}
+                                                Pending
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if claim.status == 'Approved' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success">Approved</span>
+                                        {% elif claim.status == 'Pending' %}
+                                            <span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
+                                        {% elif claim.status == 'Rejected' %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+                                        {% elif claim.status == 'Appeal Pending' %}
+                                            <span class="badge bg-info bg-opacity-10 text-info">Appeal Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ claim.claim_date.strftime('%Y-%m-%d') }}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteClaimModal{{ claim.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-dark btn-sm"
+                                                    onclick="printClaim('{{ claim.id }}')">
+                                                <i class="ri-printer-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewClaimModal{{ claim.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            {% if claim.status == 'Pending' or claim.status == 'Appeal Pending' %}
+                                                <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
+                                                        data-bs-target="#processClaimModal{{ claim.id }}">
+                                                    <i class="ri-check-line"></i>
+                                                </button>
+                                            {% endif %}
+                                            {% if claim.status == 'Rejected' %}
+                                                <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                        data-bs-target="#appealClaimModal{{ claim.id }}">
+                                                    <i class="ri-chat-check-line"></i>
+                                                </button>
+                                            {% endif %}
+                                            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#editClaimModal{{ claim.id }}">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- View Claim Modal -->
+                                <div class="modal fade" id="viewClaimModal{{ claim.id }}" tabindex="-1"
+                                     aria-labelledby="viewClaimModalLabel{{ claim.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-primary text-white">
+                                                <h5 class="modal-title" id="viewClaimModalLabel{{ claim.id }}">
+                                                    <i class="ri-file-list-line me-2"></i>Claim Details
+                                                    - {{ claim.claim_id }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header bg-light">
+                                                                <h6 class="mb-0"><i class="ri-user-line me-2"></i>Patient
+                                                                    Information</h6>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p><strong>Name:</strong> {{ claim.patient_name }}</p>
+                                                                <p><strong>ID:</strong> {{ claim.patient_id }}</p>
+                                                                <p>
+                                                                    <strong>Provider:</strong> {{ claim.insurance_provider.name }}
+                                                                </p>
+                                                                <p><strong>Policy
+                                                                    Number:</strong> {{ claim.insurance_record.policy_number }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header bg-light">
+                                                                <h6 class="mb-0"><i class="ri-file-text-line me-2"></i>Claim
+                                                                    Information</h6>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p><strong>Type:</strong> {{ claim.claim_type }}</p>
+                                                                <p>
+                                                                    <strong>Date:</strong> {{ claim.claim_date.strftime('%Y-%m-%d') }}
+                                                                </p>
+                                                                <p><strong>Status:</strong>
+                                                                    {% if claim.status == 'Approved' %}
+                                                                        <span class="badge bg-success bg-opacity-10 text-success">Approved</span>
+                                                                    {% elif claim.status == 'Pending' %}
+                                                                        <span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
+                                                                    {% elif claim.status == 'Rejected' %}
+                                                                        <span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+                                                                    {% else %}
+                                                                        <span class="badge bg-info bg-opacity-10 text-info">Appeal Pending</span>
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header bg-light">
+                                                                <h6 class="mb-0"><i class="ri-hospital-line me-2"></i>Medical
+                                                                    Information</h6>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p><strong>Provider:</strong> {{ claim.provider_name }}
+                                                                </p>
+                                                                <p><strong>Service
+                                                                    Date:</strong> {{ claim.service_date.strftime('%Y-%m-%d') }}
+                                                                </p>
+                                                                <p>
+                                                                    <strong>Diagnosis:</strong> {{ claim.diagnosis_code }}
+                                                                </p>
+                                                                <p>
+                                                                    <strong>Procedure:</strong> {{ claim.procedure_code }}
+                                                                </p>
+                                                                <p>
+                                                                    <strong>Description:</strong> {{ claim.service_description }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="card mb-3">
+                                                            <div class="card-header bg-light">
+                                                                <h6 class="mb-0"><i
+                                                                        class="ri-money-dollar-circle-line me-2"></i>Financial
+                                                                    Details</h6>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p><strong>Claim Amount:</strong>
+                                                                    ${{ "%.2f"|format(claim.claim_amount) }}</p>
+                                                                <p><strong>Approved Amount:</strong>
+                                                                    {% if claim.status == 'Approved' %}
+                                                                        ${{ "%.2f"|format(claim.approved_amount) }}
+                                                                    {% else %}
+                                                                        N/A
+                                                                    {% endif %}
+                                                                </p>
+                                                                <p><strong>Deductible:</strong>
+                                                                    ${{ "%.2f"|format(claim.deductible) }}</p>
+                                                                <p><strong>Co-payment:</strong>
+                                                                    ${{ "%.2f"|format(claim.copayment) }}</p>
+                                                                <p><strong>Patient Responsibility:</strong>
+                                                                    ${{ "%.2f"|format(claim.patient_responsibility) }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% if claim.status == 'Approved' or claim.status == 'Rejected' %}
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="card mb-3">
+                                                                <div class="card-header bg-light">
+                                                                    <h6 class="mb-0"><i class="ri-time-line me-2"></i>Processing
+                                                                        Details</h6>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    {% if claim.status == 'Approved' %}
+                                                                        <p><strong>Approved Date:</strong>
+                                                                            {% if claim.processed_date %}
+                                                                                {{ claim.processed_date.strftime('%Y-%m-%d') }}
+                                                                            {% else %}
+                                                                                Not processed yet
+                                                                            {% endif %}
+                                                                        </p>
+                                                                        <p><strong>Payment Date:</strong>
+                                                                            {% if claim.payment_date %}
+                                                                                {{ claim.payment_date.strftime('%Y-%m-%d') }}
+                                                                            {% else %}
+                                                                                Pending
+                                                                            {% endif %}
+                                                                        </p>
+                                                                        <p><strong>Payment
+                                                                            Method:</strong> {{ claim.payment_method or 'N/A' }}
+                                                                        </p>
+                                                                    {% elif claim.status == 'Rejected' %}
+                                                                        <p><strong>Rejected
+                                                                            Date:</strong> {{ claim.processed_date.strftime('%Y-%m-%d') }}
+                                                                        </p>
+                                                                        <p><strong>Rejected
+                                                                            By:</strong> {{ claim.processed_by }}</p>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if claim.status == 'Rejected' %}
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="card mb-3">
+                                                                <div class="card-header bg-light">
+                                                                    <h6 class="mb-0"><i
+                                                                            class="ri-close-circle-line me-2"></i>Rejection
+                                                                        Reason</h6>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <p>{{ claim.rejection_reason or 'No reason provided' }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if claim.appeal_reason %}
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="card mb-3">
+                                                                <div class="card-header bg-light">
+                                                                    <h6 class="mb-0"><i
+                                                                            class="ri-chat-check-line me-2"></i>Appeal
+                                                                        Reason</h6>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <p>{{ claim.appeal_reason }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="card">
+                                                    <div class="card-header bg-light">
+                                                        <h6 class="mb-0"><i class="ri-file-list-line me-2"></i>Additional
+                                                            Notes</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <p>{{ claim.notes or 'No additional notes provided' }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="ri-close-line me-1"></i> Close
+                                                </button>
+                                                <button type="button" class="btn btn-primary"
+                                                        onclick="printClaim('{{ claim.id }}')">
+                                                    <i class="ri-printer-line me-1"></i> Print Claim
+                                                </button>
+                                                {% if claim.status == 'Rejected' %}
+                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                                            data-bs-target="#appealClaimModal{{ claim.id }}"
+                                                            data-bs-dismiss="modal">
+                                                        <i class="ri-chat-check-line me-1"></i> Appeal Claim
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Process Claim Modal -->
+                                <div class="modal fade" id="processClaimModal{{ claim.id }}" tabindex="-1"
+                                     aria-labelledby="processClaimModalLabel{{ claim.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-primary text-white">
+                                                <h5 class="modal-title" id="processClaimModalLabel{{ claim.id }}">
+                                                    <i class="ri-check-line me-2"></i>Process Claim
+                                                    - {{ claim.claim_id }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <form method="POST"
+                                                  action="/admin/insurance/claim-status-process/{{ claim.id }}">
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Action</label>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="action"
+                                                                   id="approve{{ claim.id }}" value="approve" checked>
+                                                            <label class="form-check-label" for="approve{{ claim.id }}">
+                                                                Approve Claim
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="action"
+                                                                   id="reject{{ claim.id }}" value="reject">
+                                                            <label class="form-check-label" for="reject{{ claim.id }}">
+                                                                Reject Claim
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3" id="approvedAmountGroup{{ claim.id }}">
+                                                        <label class="form-label">Approved Amount ($)</label>
+                                                        <input type="number" step="0.01" class="form-control"
+                                                               name="approved_amount" value="{{ claim.claim_amount }}">
+                                                    </div>
+                                                    <div class="mb-3 d-none" id="rejectionReasonGroup{{ claim.id }}">
+                                                        <label class="form-label">Rejection Reason</label>
+                                                        <textarea class="form-control" name="rejection_reason"
+                                                                  rows="3"></textarea>
+                                                    </div>
+                                                    <input type="hidden" name="processed_by"
+                                                           value="{{ current_user }}">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                        <i class="ri-close-line me-1"></i> Cancel
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="ri-save-line me-1"></i> Submit
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Appeal Claim Modal -->
+                                {% if claim.status == 'Rejected' %}
+                                    <div class="modal fade" id="appealClaimModal{{ claim.id }}" tabindex="-1"
+                                         aria-labelledby="appealClaimModalLabel{{ claim.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-info text-white">
+                                                    <h5 class="modal-title" id="appealClaimModalLabel{{ claim.id }}">
+                                                        <i class="ri-chat-check-line me-2"></i>Appeal Claim
+                                                        - {{ claim.claim_id }}
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                </div>
+                                                <form method="POST"
+                                                      action="/admin/insurance/claim-status-appeal/{{ claim.id }}"
+                                                      enctype="multipart/form-data">
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Appeal Reason <span
+                                                                    class="text-danger">*</span></label>
+                                                            <textarea class="form-control" name="appeal_reason" rows="4"
+                                                                      required></textarea>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Supporting Document</label>
+                                                            <input type="file" class="form-control"
+                                                                   name="appeal_document">
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">
+                                                            <i class="ri-close-line me-1"></i> Cancel
+                                                        </button>
+                                                        <button type="submit" class="btn btn-info">
+                                                            <i class="ri-send-plane-line me-1"></i> Submit Appeal
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Edit Claim Modal -->
+                                <div class="modal fade" id="editClaimModal{{ claim.id }}" tabindex="-1"
+                                     aria-labelledby="editClaimModalLabel{{ claim.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-secondary text-white">
+                                                <h5 class="modal-title" id="editClaimModalLabel{{ claim.id }}">
+                                                    <i class="ri-edit-line me-2"></i>Edit Claim - {{ claim.claim_id }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <form method="POST"
+                                                  action="/admin/insurance/edit-claim-status/{{ claim.id }}"
+                                                  enctype="multipart/form-data">
+                                                <div class="modal-body">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Service Date <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="date" class="form-control"
+                                                                       name="service_date"
+                                                                       value="{{ claim.service_date.strftime('%Y-%m-%d') }}"
+                                                                       required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Claim Type <span
+                                                                        class="text-danger">*</span></label>
+                                                                <select class="form-select" name="claim_type" required>
+                                                                    <option value="Medical"
+                                                                            {% if claim.claim_type == 'Medical' %}selected{% endif %}>
+                                                                        Medical
+                                                                    </option>
+                                                                    <option value="Dental"
+                                                                            {% if claim.claim_type == 'Dental' %}selected{% endif %}>
+                                                                        Dental
+                                                                    </option>
+                                                                    <option value="Vision"
+                                                                            {% if claim.claim_type == 'Vision' %}selected{% endif %}>
+                                                                        Vision
+                                                                    </option>
+                                                                    <option value="Hospitalization"
+                                                                            {% if claim.claim_type == 'Hospitalization' %}selected{% endif %}>
+                                                                        Hospitalization
+                                                                    </option>
+                                                                    <option value="Surgery"
+                                                                            {% if claim.claim_type == 'Surgery' %}selected{% endif %}>
+                                                                        Surgery
+                                                                    </option>
+                                                                    <option value="Diagnostic"
+                                                                            {% if claim.claim_type == 'Diagnostic' %}selected{% endif %}>
+                                                                        Diagnostic
+                                                                    </option>
+                                                                    <option value="Pharmacy"
+                                                                            {% if claim.claim_type == 'Pharmacy' %}selected{% endif %}>
+                                                                        Pharmacy
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Diagnosis Code (ICD-10) <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text" class="form-control"
+                                                                       name="diagnosis_code"
+                                                                       value="{{ claim.diagnosis_code }}" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Procedure Code (CPT) <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text" class="form-control"
+                                                                       name="procedure_code"
+                                                                       value="{{ claim.procedure_code }}" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Claim Amount ($) <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="number" step="0.01" class="form-control"
+                                                                       name="claim_amount"
+                                                                       value="{{ claim.claim_amount }}" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Service Description <span
+                                                                        class="text-danger">*</span></label>
+                                                                <textarea class="form-control"
+                                                                          name="service_description"
+                                                                          rows="3"
+                                                                          required>{{ claim.service_description }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Deductible ($)</label>
+                                                                <input type="number" step="0.01" class="form-control"
+                                                                       name="deductible"
+                                                                       value="{{ claim.deductible }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Co-payment ($)</label>
+                                                                <input type="number" step="0.01" class="form-control"
+                                                                       name="copayment"
+                                                                       value="{{ claim.copayment }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Notes</label>
+                                                                <textarea class="form-control" name="notes"
+                                                                          rows="3">{{ claim.remarks or '' }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                        <i class="ri-close-line me-1"></i> Cancel
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="ri-save-line me-1"></i> Save Changes
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Claim Modal -->
+                                <div class="modal fade" id="deleteClaimModal{{ claim.id }}" tabindex="-1"
+                                     aria-labelledby="deleteClaimModalLabel{{ claim.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title" id="deleteClaimModalLabel{{ claim.id }}">
+                                                    <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete this claim for
+                                                    <b>{{ claim.patient_name }}</b>?</p>
+                                                <div class="alert alert-warning">
+                                                    <i class="ri-alert-line me-2"></i>This action will mark the claim as
+                                                    inactive and remove it from active listings.
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="POST"
+                                                      action="/admin/insurance/delete-claim-status/{{ claim.id }}">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                        <i class="ri-close-line me-1"></i> Cancel
+                                                    </button>
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="ri-delete-bin-line me-1"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Row ends -->
 
+    <!-- Add New Claim Modal -->
+    <div class="modal fade" id="addClaimModal" tabindex="-1" aria-labelledby="addClaimModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addClaimModalLabel">
+                        <i class="ri-add-line me-2"></i>Submit New Insurance Claim
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="/admin/insurance/new-claim"
+                      enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Insurance Record <span class="text-danger">*</span></label>
+                                <select class="form-select" name="insurance_record_id" required>
+                                    <option value="">Select Record</option>
+                                    {% for record in records %}
+                                        <option value="{{ record.id }}">
+                                            {{ record.policy_number }} ({{ record.insurance_provider.name }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Claim Type <span class="text-danger">*</span></label>
+                                <select class="form-select" name="claim_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Dental">Dental</option>
+                                    <option value="Vision">Vision</option>
+                                    <option value="Hospitalization">Hospitalization</option>
+                                    <option value="Surgery">Surgery</option>
+                                    <option value="Diagnostic">Diagnostic</option>
+                                    <option value="Pharmacy">Pharmacy</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Service Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="service_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Diagnosis Code (ICD-10) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="diagnosis_code" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Procedure Code (CPT) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="procedure_code" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Service Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="service_description" rows="2"
+                                          required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Claim Amount ($) <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control" name="claim_amount" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Deductible Applied ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="deductible" value="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Co-payment ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="copayment" value="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Supporting Documents</label>
+                                <input type="file" class="form-control" name="documents" multiple>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Submit Claim
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Claims Modal -->
+    <div class="modal fade" id="restoreClaimsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Deleted Claims
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_claims %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Claim ID</th>
+                                    <th>Patient</th>
+                                    <th>Provider</th>
+                                    <th>Amount</th>
+                                    <th>Deleted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for claim in deleted_claims %}
+                                    <tr>
+                                        <td>{{ claim.claim_id }}</td>
+                                        <td>
+                                            <strong>{{ claim.patient_name }}</strong>
+                                            <div class="text-muted small">
+                                                ID: {{ claim.patient_id }}
+                                            </div>
+                                        </td>
+                                        <td>{{ claim.insurance_provider.name }}</td>
+                                        <td>${{ "%.2f"|format(claim.claim_amount) }}</td>
+                                        <td>
+                                            {{ claim.deleted_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </td>
+                                        <td class="text-end">
+                                            <form method="POST"
+                                                  action="/admin/insurance/restore-claim-status/{{ claim.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No deleted claims found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock body %}
+
 
 {% block heardLink %}
     <!-- Data Tables -->
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+    <style>
+        .badge {
+            font-size: 0.85em;
+            padding: 0.35em 0.65em;
+        }
+
+        #claimsTable tbody tr {
+            cursor: pointer;
+        }
+
+        #claimsTable tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+    </style>
 {% endblock %}
 
 {% block footerLink %}
     <!-- Data Tables -->
-    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
-    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
-    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
 
-    <!-- Initialize Bootstrap components -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Toggle between approve/reject forms in process modal
+            document.querySelectorAll('input[name="action"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const claimId = this.closest('.modal').id.replace('processClaimModal', '');
+                    const isReject = this.value === 'reject';
+
+                    document.getElementById(`approvedAmountGroup${claimId}`).classList.toggle('d-none', isReject);
+                    document.getElementById(`rejectionReasonGroup${claimId}`).classList.toggle('d-none', !isReject);
+                });
+            });
+
             // Initialize tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
-            // Initialize modals
-            var modalEl = document.getElementById('viewDetails');
-            var modal = new bootstrap.Modal(modalEl);
+            // Print claim function
+            function printClaim(claimId) {
+                window.open(`/admin/insurance/claim-status-print/${claimId}`, '_blank');
+            }
+
+            window.printClaim = printClaim;
+
+            // Initialize DataTable
+            $('#claimsTable').DataTable({
+                responsive: true,
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                pageLength: 10,
+                order: [[7, 'desc']] // Sort by claim date descending
+            });
         });
     </script>
-{% endblock footerLink %}
+{% endblock %}

@@ -26,14 +26,14 @@ def add_bed(room_id):
                 bed_number=next_bed_number,
                 room_id=room_id,
                 is_empty=True,
-                is_available=True
+                is_deleted=False
             )
 
             db.session.add(new_bed)
             db.session.commit()
 
             flash(f'Bed {next_bed_number} added successfully to Room {room.room_number}', 'success')
-            return redirect(ADMIN + ROOM_ADD_BAD + "/"+str(room.id))
+            return redirect(ADMIN + ROOM_ADD_BAD + "/" + str(room.id))
 
         except Exception as e:
             db.session.rollback()
@@ -48,6 +48,7 @@ def add_bed(room_id):
 def delete_bed(bed_id):
     bed = Bed.query.get_or_404(bed_id)
     try:
+        bed.is_deleted = True
         bed.deleted_at = datetime.utcnow()
         db.session.commit()
         flash('Bed has been archived', 'success')

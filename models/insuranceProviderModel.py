@@ -3,9 +3,10 @@ from utils.config import db
 
 # Association table for many-to-many relationship between providers and coverage types
 provider_coverage = db.Table('provider_coverage',
-    db.Column('provider_id', db.Integer, db.ForeignKey('insurance_providers.id'), primary_key=True),
-    db.Column('coverage_id', db.Integer, db.ForeignKey('coverage_types.id'), primary_key=True)
-)
+                             db.Column('provider_id', db.Integer, db.ForeignKey('insurance_providers.id'),
+                                       primary_key=True),
+                             db.Column('coverage_id', db.Integer, db.ForeignKey('coverage_types.id'), primary_key=True)
+                             )
 
 
 class InsuranceProvider(db.Model):
@@ -153,19 +154,26 @@ class InsuranceClaim(db.Model):
     procedure_code = db.Column(db.String(20), nullable=False)  # CPT
     service_description = db.Column(db.Text, nullable=False)
     claim_amount = db.Column(db.Numeric(12, 2), nullable=False)
+    claim_type = db.Column(db.String(20), nullable=False)
     approved_amount = db.Column(db.Numeric(12, 2))
     deductible = db.Column(db.Numeric(10, 2), default=0)
     copayment = db.Column(db.Numeric(10, 2), default=0)
     patient_responsibility = db.Column(db.Numeric(10, 2), default=0)
     status = db.Column(db.String(20), default='Pending')  # Pending, Approved, Rejected
+    documents = db.Column(db.Text)
     remarks = db.Column(db.Text)
+    processed_date = db.Column(db.Date, nullable=True)
+
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     # Foreign key to User who created the claim
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     # Relationship back to User
     creator = db.relationship('User', back_populates='created_claims')
-
 
     # Foreign Keys
     insurance_provider_id = db.Column(db.Integer, db.ForeignKey('insurance_providers.id'))

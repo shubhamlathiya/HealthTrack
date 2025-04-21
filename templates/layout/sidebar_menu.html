@@ -343,7 +343,13 @@
                     <ul class="treeview-menu">
                         <li>
                             <a href="/admin/insurance/coverage-types"
-                               class="{% if request.path == '/admin/insurance/coverage-types' %}active-sub{% endif %}">Coverage Types</a>
+                               class="{% if request.path == '/admin/insurance/coverage-types' %}active-sub{% endif %}">Coverage
+                                Types</a>
+                        </li>
+                        <li>
+                            <a href="/admin/insurance/provider"
+                               class="{% if request.path == '/admin/insurance/provider' %}active-sub{% endif %}">Insurance
+                                Provider</a>
                         </li>
                         <li>
                             <a href="/admin/insurance/patient"
@@ -351,20 +357,11 @@
                                 Insurance</a>
                         </li>
                         <li>
-                            <a href="/admin/insurance/new-claim"
-                               class="{% if request.path == '/admin/insurance/new-claim' %}active-sub{% endif %}">New
-                                Claim</a>
-                        </li>
-                        <li>
                             <a href="/admin/insurance/claim-status"
                                class="{% if request.path == '/admin/insurance/claim-status' %}active-sub{% endif %}">Claim
                                 Status</a>
                         </li>
-                        <li>
-                            <a href="/admin/insurance/provider"
-                               class="{% if request.path == '/admin/insurance/provider' %}active-sub{% endif %}">Insurance
-                                Provider</a>
-                        </li>
+
                     </ul>
                 </li>
                 <li class="treeview {% if request.path.startswith('/admin/pharmacy') %}active current-page{% endif %}">

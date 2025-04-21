@@ -14,21 +14,7 @@ app = Flask(__name__, static_folder="static")
 init_app(app)
 
 with app.app_context():
-    db.create_all()  # This will create the tables in the MySQL database
-    # Add coverage types if they don't exist
-    coverage_types = [
-        ('Health', 'General health coverage'),
-        ('Dental', 'Dental procedures and checkups'),
-        ('Vision', 'Eye care and vision correction'),
-        ('Mental Health', 'Psychiatric and counseling services'),
-        ('Pharmacy', 'Prescription medication coverage')
-    ]
-
-    for name, desc in coverage_types:
-        if not CoverageType.query.filter_by(name=name).first():
-            db.session.add(CoverageType(name=name, description=desc))
-
-    db.session.commit()
+    db.create_all()
 
 # Flask-Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'

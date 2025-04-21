@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+
+{% block title %}Coverage Types{% endblock title %}
+{% block page %}Coverage Types Management{% endblock page %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Coverage Types</h5>
+                    <div>
+                        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal"
+                                data-bs-target="#addCoverageModal">
+                            <i class="ri-add-line me-1"></i> Add New Coverage
+                        </button>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreCoverageModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Stats Card -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-primary bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary">Total Coverage Types</h6>
+                                    <h3 class="mb-0">{{ coverage_types|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-success">Active</h6>
+                                    <h3 class="mb-0">{{ coverage_types|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger bg-opacity-10 border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-danger">Assigned to Providers</h6>
+                                    <h3 class="mb-0">{{ coverage_types|selectattr('providers')|list|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Coverage Name</th>
+                                <th>Description</th>
+                                <th>Assigned Providers</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for coverage in coverage_types %}
+                                <tr>
+                                    <td>{{ coverage.id }}</td>
+                                    <td>
+                                        <strong>{{ coverage.name }}</strong>
+                                    </td>
+                                    <td>{{ coverage.description|default('No description', true) }}</td>
+                                    <td>
+                                        {% if coverage.providers %}
+                                            <span class="badge bg-primary bg-opacity-10 text-primary">
+                                                {{ coverage.providers|length }} provider(s)
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                                Not assigned
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteCoverageModal{{ coverage.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewCoverageModal{{ coverage.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editCoverageModal{{ coverage.id }}"
+                                                    data-bs-placement="top" data-bs-title="Edit Coverage">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Coverage Modal -->
+    <div class="modal fade" id="addCoverageModal" tabindex="-1" aria-labelledby="addCoverageModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addCoverageModalLabel">
+                        <i class="ri-add-line me-2"></i>Add New Coverage Type
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="/admin/insurance/add-coverage-type">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Coverage
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for each coverage type -->
+    {% for coverage in coverage_types %}
+        <!-- View Coverage Modal -->
+        <div class="modal fade" id="viewCoverageModal{{ coverage.id }}" tabindex="-1"
+             aria-labelledby="viewCoverageModalLabel{{ coverage.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewCoverageModalLabel{{ coverage.id }}">
+                            <i class="ri-shield-check-line me-2"></i>Coverage Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-information-line me-2"></i>Basic Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>ID:</strong> {{ coverage.id }}</p>
+                                        <p><strong>Name:</strong> {{ coverage.name }}</p>
+                                        <p><strong>Description:</strong> {{ coverage.description or 'No description' }}
+                                        </p>
+                                        <p><strong>Created:</strong> {{ coverage.created_at.strftime('%Y-%m-%d') }}</p>
+                                        <p><strong>Last
+                                            Updated:</strong> {{ coverage.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-building-line me-2"></i>Assigned Providers</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if coverage.providers %}
+                                            <div class="d-flex flex-wrap gap-2">
+                                                {% for provider in coverage.providers %}
+                                                    <span class="badge bg-primary bg-opacity-10 text-primary mb-1">
+                                                        {{ provider.name }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
+                                            <p class="mt-2 mb-0 small text-muted">
+                                                Used by {{ coverage.providers|length }} provider(s)
+                                            </p>
+                                        {% else %}
+                                            <p class="text-muted">No providers assigned to this coverage type</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Coverage Modal -->
+        <div class="modal fade" id="editCoverageModal{{ coverage.id }}" tabindex="-1"
+             aria-labelledby="editCoverageModalLabel{{ coverage.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="editCoverageModalLabel{{ coverage.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Coverage Type
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="/admin/insurance/edit-coverage-type/{{ coverage.id }}">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" value="{{ coverage.name }}"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description"
+                                          rows="3">{{ coverage.description or '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-save-line me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Coverage Modal -->
+        <div class="modal fade" id="deleteCoverageModal{{ coverage.id }}" tabindex="-1"
+             aria-labelledby="deleteCoverageModalLabel{{ coverage.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteCoverageModalLabel{{ coverage.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete <b>{{ coverage.name }}</b>?</p>
+                        {% if coverage.providers %}
+                            <div class="alert alert-warning">
+                                <i class="ri-alert-line me-2"></i>This coverage type is assigned
+                                to {{ coverage.providers|length }} provider(s) and cannot be deleted.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="ri-alert-line me-2"></i>This action cannot be undone.
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        {% if not coverage.providers %}
+                            <form method="POST" action="/admin/insurance/delete-coverage-type/{{ coverage.id }}">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="ri-close-line me-1"></i> Cancel
+                                </button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="ri-delete-bin-line me-1"></i> Delete
+                                </button>
+                            </form>
+                        {% else %}
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Close
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Coverage Modal -->
+    <div class="modal fade" id="restoreCoverageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Deleted Coverage Types
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_coverage_types %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Deleted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for coverage in deleted_coverage_types %}
+                                    <tr>
+                                        <td>{{ coverage.id }}</td>
+                                        <td>{{ coverage.name }}</td>
+                                        <td>{{ coverage.description|default('No description', true) }}</td>
+                                        <td>{{ coverage.deleted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="text-end">
+                                            <form method="POST"
+                                                  action="/admin/insurance/restore-coverage-type/{{ coverage.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No deleted coverage types found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Enable tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+{% endblock footerLink %}

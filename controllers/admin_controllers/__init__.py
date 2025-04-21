@@ -20,7 +20,10 @@ from .ambulance_routes import *
 from .human_resources_routes import *
 from .accounts_routes import *
 from controllers.admin_controllers.blood_bank.blood_bank_routes import *
-from .insurance_routes import *
+from controllers.admin_controllers.insurance.coverage_types_routes import *
+from controllers.admin_controllers.insurance.insurance_providers_routes import *
+from controllers.admin_controllers.insurance.insurance_patient_routes import *
+from controllers.admin_controllers.insurance.insurance_claims_routes import *
 from controllers.admin_controllers.pharmacy.pharmacy_routes import *
 from controllers.admin_controllers.pharmacy.medicine_categories_routes import *
 from .records_routes import *
