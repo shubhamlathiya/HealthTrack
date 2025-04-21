@@ -4,12 +4,14 @@ from flask import request, flash, redirect, render_template, jsonify
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import ROOM_ADD_BAD, ADMIN, ROOM_DELETE_BAD
+from middleware.auth_middleware import token_required
 from models.roomModel import Room, Bed
 from utils.config import db
 
 
 @admin.route(ROOM_ADD_BAD + '/<int:room_id>', methods=['GET', 'POST'], endpoint='add_bed')
-def add_bed(room_id):
+@token_required
+def add_bed(current_user , room_id):
     # Get the room or return 404 if not found
     room = Room.query.get_or_404(int(room_id))
 
@@ -45,7 +47,8 @@ def add_bed(room_id):
 
 
 @admin.route(ROOM_DELETE_BAD + '/<int:bed_id>', methods=['POST'], endpoint='delete_bed')
-def delete_bed(bed_id):
+@token_required
+def delete_bed(current_user ,bed_id):
     bed = Bed.query.get_or_404(bed_id)
     try:
         bed.is_deleted = True

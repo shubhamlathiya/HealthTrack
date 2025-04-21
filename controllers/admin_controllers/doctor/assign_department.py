@@ -1,20 +1,17 @@
-from datetime import datetime
-
 from flask import render_template, request, flash, redirect
-import logging
 
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import DOCTOR_ASSIGN_DEPARTMENT, ADMIN, DOCTOR_UPDATE_ASSIGN_DEPARTMENT, \
-    DOCTOR_REMOVE_ASSIGN_DEPARTMENT
+from controllers.constant.adminPathConstant import DOCTOR_ASSIGN_DEPARTMENT, ADMIN, DOCTOR_UPDATE_ASSIGN_DEPARTMENT
+from middleware.auth_middleware import token_required
 from models.departmentAssignmentModel import DepartmentAssignment
 from models.departmentModel import Department
 from models.doctorModel import Doctor
 from utils.config import db
 
 
-
 @admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['GET'], endpoint="department_assignments")
-def department_assignments():
+@token_required
+def department_assignments(current_user):
     try:
         doctors = Doctor.query.options(
             db.joinedload(Doctor.department_assignments)
@@ -41,7 +38,8 @@ def department_assignments():
 
 
 @admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['POST'], endpoint="assign_doctor_department")
-def assign_doctor_department():
+@token_required
+def assign_doctor_department(current_user):
     try:
         data = request.form
         doctor_id = data.get('doctor_id')
@@ -87,7 +85,8 @@ def assign_doctor_department():
 
 
 @admin.route(DOCTOR_UPDATE_ASSIGN_DEPARTMENT + '/<int:assignment_id>', methods=['POST'])
-def update_assignment(assignment_id):
+@token_required
+def update_assignment(current_user, assignment_id):
     try:
         assignment = DepartmentAssignment.query.get_or_404(assignment_id)
         data = request.form

@@ -4,12 +4,14 @@ from flask import request, flash, redirect, render_template, jsonify
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DOCTOR_SHIFT_MANAGEMENT, DOCTOR_UPDATE_SHIFT_MANAGEMENT
+from middleware.auth_middleware import token_required
 from models.doctorModel import Doctor, Availability
 from utils.config import db
 
 
 @admin.route(DOCTOR_SHIFT_MANAGEMENT, methods=['GET'], endpoint='doctor-shifts')
-def doctor_shifts():
+@token_required
+def doctor_shifts(current_user):
     doctors = Doctor.query.options(db.joinedload(Doctor.availabilities)).all()
 
     days_map = {
@@ -38,7 +40,8 @@ def doctor_shifts():
 
 
 @admin.route(DOCTOR_UPDATE_SHIFT_MANAGEMENT + '/<int:doctor_id>', methods=['POST'])
-def update_shifts(doctor_id):
+@token_required
+def update_shifts(current_user, doctor_id):
     try:
         # Days map for lookup
         days_map = {

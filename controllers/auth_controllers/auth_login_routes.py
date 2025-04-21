@@ -27,7 +27,7 @@ def login():
             # Generate a JWT token that expires in 1 hour
             token = jwt.encode({
                 'user_id': str(user.id),
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=10)
             }, 'your_secret_key', algorithm='HS256')
 
             # Store user data in session

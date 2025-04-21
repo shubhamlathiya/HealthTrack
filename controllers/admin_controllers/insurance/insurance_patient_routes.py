@@ -1,19 +1,15 @@
-from flask import render_template, request, flash, redirect, url_for, jsonify, current_app
-from datetime import datetime, timedelta, date
+from flask import render_template, request, flash, redirect
+from datetime import date
 from sqlalchemy import func, cast, Date
-from werkzeug.utils import secure_filename
 import os
-import uuid
-from sqlalchemy.orm import joinedload
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import INSURANCE_PATIENT, INSURANCE_CLAIM_STATUS, ADMIN, \
+from controllers.constant.adminPathConstant import INSURANCE_PATIENT, ADMIN, \
     INSURANCE_PATIENT_ADD_RECORDS, INSURANCE_PATIENT_RESTORE_RECORDS, INSURANCE_PATIENT_DELETE_RECORDS, \
     INSURANCE_PATIENT_EDIT_RECORDS
 from middleware.auth_middleware import token_required
 from models.patientModel import Patient
 from models.insuranceProviderModel import (
     InsuranceProvider,
-    InsuranceClaim,
     InsuranceRecord
 )
 from utils.config import db
@@ -36,7 +32,8 @@ from datetime import datetime, timedelta
 
 
 @admin.route(INSURANCE_PATIENT, methods=['GET'], endpoint='insurance_patient')
-def insurance_patient():
+@token_required
+def insurance_patient(current_user):
     try:
         today = date.today()
         next_30_days = today + timedelta(days=30)
@@ -101,7 +98,8 @@ def insurance_patient():
 
 
 @admin.route(INSURANCE_PATIENT_ADD_RECORDS, methods=['POST'], endpoint="insurance_patient_add_records")
-def add_record():
+@token_required
+def add_record(current_user):
     try:
         print(request.form)
 
@@ -140,14 +138,14 @@ def add_record():
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error adding insurance record: {str(e)}")
         flash(f'Error adding insurance record: {str(e)}', 'danger')
 
     return redirect(ADMIN + INSURANCE_PATIENT)
 
 
 @admin.route(INSURANCE_PATIENT_EDIT_RECORDS + '/<int:record_id>', methods=['POST'], endpoint='insurance_record_edit')
-def edit_record(record_id):
+@token_required
+def edit_record(current_user, record_id):
     try:
         # Get the existing record
         record = InsuranceRecord.query.get_or_404(record_id)
@@ -175,14 +173,14 @@ def edit_record(record_id):
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error updating insurance record {record_id}: {str(e)}")
         flash(f'Error updating insurance record: {str(e)}', 'danger')
 
     return redirect(ADMIN + INSURANCE_PATIENT)
 
 
 @admin.route(INSURANCE_PATIENT_DELETE_RECORDS + '/<int:record_id>', methods=['POST'])
-def delete_record(record_id):
+@token_required
+def delete_record(current_user, record_id):
     try:
         record = InsuranceRecord.query.get_or_404(record_id)
         record.is_deleted = True
@@ -191,14 +189,14 @@ def delete_record(record_id):
         flash('Insurance record deleted successfully', 'success')
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error deleting insurance record: {str(e)}")
         flash('Error deleting insurance record', 'danger')
     return redirect(ADMIN + INSURANCE_PATIENT)
 
 
 @admin.route(INSURANCE_PATIENT_RESTORE_RECORDS + '/<int:record_id>', methods=['POST'],
              endpoint="insurance_record_restore")
-def restore_record(record_id):
+@token_required
+def restore_record(current_user, record_id):
     try:
         record = InsuranceRecord.query.get_or_404(record_id)
         record.is_deleted = False
@@ -207,6 +205,5 @@ def restore_record(record_id):
         flash('Insurance record deleted successfully', 'success')
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error deleting insurance record: {str(e)}")
         flash('Error deleting insurance record', 'danger')
     return redirect(ADMIN + INSURANCE_PATIENT)

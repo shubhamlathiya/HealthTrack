@@ -8,12 +8,14 @@ from controllers.constant.adminPathConstant import PHARMACY_MEDICINE_CATEGORIES,
     PHARMACY_MEDICINE_ADD_CATEGORIES, PHARMACY_MEDICINE_ADD_COMPANIES, PHARMACY_MEDICINE_EDIT_CATEGORIES, \
     PHARMACY_MEDICINE_DELETE_CATEGORIES, PHARMACY_MEDICINE_RESTORE_CATEGORIES, PHARMACY_MEDICINE_EDIT_COMPANIES, \
     PHARMACY_MEDICINE_DELETE_COMPANIES, PHARMACY_MEDICINE_RESTORE_COMPANIES, ADMIN
+from middleware.auth_middleware import token_required
 from models.medicineModel import MedicineCategory, MedicineCompany
 from utils.config import db
 
 
 @admin.route(PHARMACY_MEDICINE_CATEGORIES, methods=['GET'], endpoint='medicine-categories')
-def medicine_categories():
+@token_required
+def medicine_categories(current_user):
     categories = MedicineCategory.query.filter_by(is_deleted=0).order_by(MedicineCategory.name).all()
     archived_categories = MedicineCategory.query.filter_by(is_deleted=1).order_by(
         MedicineCategory.deleted_at.desc()).all()
@@ -22,7 +24,8 @@ def medicine_categories():
 
 
 @admin.route(PHARMACY_MEDICINE_ADD_CATEGORIES, methods=['POST'], endpoint='medicine-categories/add')
-def add_medicine_category():
+@token_required
+def add_medicine_category(current_user):
     try:
         category = MedicineCategory(
             name=request.form.get('name'),
@@ -37,8 +40,10 @@ def add_medicine_category():
     return redirect(ADMIN + PHARMACY_MEDICINE_CATEGORIES)
 
 
-@admin.route(PHARMACY_MEDICINE_EDIT_CATEGORIES + '/<int:id>', methods=['POST'], endpoint='medicine-categories/<int:id>/edit')
-def edit_medicine_category(id):
+@admin.route(PHARMACY_MEDICINE_EDIT_CATEGORIES + '/<int:id>', methods=['POST'],
+             endpoint='medicine-categories/<int:id>/edit')
+@token_required
+def edit_medicine_category(current_user, id):
     category = MedicineCategory.query.get_or_404(id)
     try:
         category.name = request.form.get('name')
@@ -52,7 +57,8 @@ def edit_medicine_category(id):
 
 
 @admin.route(PHARMACY_MEDICINE_DELETE_CATEGORIES + '/<int:id>', methods=['POST'])
-def delete_medicine_category(id):
+@token_required
+def delete_medicine_category(current_user, id):
     category = MedicineCategory.query.get_or_404(id)
     try:
         category.is_deleted = True
@@ -66,8 +72,10 @@ def delete_medicine_category(id):
     return redirect(ADMIN + PHARMACY_MEDICINE_CATEGORIES)
 
 
-@admin.route(PHARMACY_MEDICINE_RESTORE_CATEGORIES + '/<int:id>', methods=['POST'], endpoint='medicine-categories/<int:id>/restore')
-def restore_medicine_category(id):
+@admin.route(PHARMACY_MEDICINE_RESTORE_CATEGORIES + '/<int:id>', methods=['POST'],
+             endpoint='medicine-categories/<int:id>/restore')
+@token_required
+def restore_medicine_category(current_user, id):
     category = MedicineCategory.query.get_or_404(id)
     try:
         category.is_deleted = False
@@ -82,7 +90,8 @@ def restore_medicine_category(id):
 
 # Companies Routes
 @admin.route(PHARMACY_MEDICINE_COMPANIES, methods=['GET'], endpoint='medicine-companies')
-def medicine_companies():
+@token_required
+def medicine_companies(current_user):
     companies = MedicineCompany.query.filter_by(is_deleted=0).order_by(MedicineCompany.name).all()
     archived_companies = MedicineCompany.query.filter_by(is_deleted=1).order_by(MedicineCompany.deleted_at.desc()).all()
     return render_template('admin_templates/pharmacy/medicine_companies.html', companies=companies,
@@ -90,7 +99,8 @@ def medicine_companies():
 
 
 @admin.route(PHARMACY_MEDICINE_ADD_COMPANIES, methods=['POST'], endpoint='medicine-companies/add')
-def add_medicine_company():
+@token_required
+def add_medicine_company(current_user):
     try:
         company = MedicineCompany(
             name=request.form.get('name'),
@@ -108,8 +118,10 @@ def add_medicine_company():
     return redirect(ADMIN + PHARMACY_MEDICINE_COMPANIES)
 
 
-@admin.route(PHARMACY_MEDICINE_EDIT_COMPANIES + '/<int:id>', methods=['POST'], endpoint='medicine-companies/<int:id>/edit')
-def edit_medicine_company(id):
+@admin.route(PHARMACY_MEDICINE_EDIT_COMPANIES + '/<int:id>', methods=['POST'],
+             endpoint='medicine-companies/<int:id>/edit')
+@token_required
+def edit_medicine_company(current_user, id):
     company = MedicineCompany.query.get_or_404(id)
     try:
         company.name = request.form.get('name')
@@ -125,8 +137,10 @@ def edit_medicine_company(id):
     return redirect(ADMIN + PHARMACY_MEDICINE_COMPANIES)
 
 
-@admin.route(PHARMACY_MEDICINE_DELETE_COMPANIES + '/<int:id>', methods=['POST'], endpoint='medicine-companies/<int:id>/delete')
-def delete_medicine_company(id):
+@admin.route(PHARMACY_MEDICINE_DELETE_COMPANIES + '/<int:id>', methods=['POST'],
+             endpoint='medicine-companies/<int:id>/delete')
+@token_required
+def delete_medicine_company(current_user, id):
     company = MedicineCompany.query.get_or_404(id)
     try:
         company.is_deleted = True
@@ -139,8 +153,10 @@ def delete_medicine_company(id):
     return redirect(ADMIN + PHARMACY_MEDICINE_COMPANIES)
 
 
-@admin.route(PHARMACY_MEDICINE_RESTORE_COMPANIES + '/<int:id>', methods=['POST'], endpoint='medicine-companies/<int:id>/restore')
-def restore_medicine_company(id):
+@admin.route(PHARMACY_MEDICINE_RESTORE_COMPANIES + '/<int:id>', methods=['POST'],
+             endpoint='medicine-companies/<int:id>/restore')
+@token_required
+def restore_medicine_company(current_user, id):
     company = MedicineCompany.query.get_or_404(id)
     try:
         company.is_deleted = False

@@ -5,12 +5,14 @@ from flask import render_template, request, redirect, flash
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DEPARTMENT_LIST, DEPARTMENT_ADD_DEPARTMENT, ADMIN, \
     DEPARTMENT_EDIT_DEPARTMENT, DEPARTMENT_DELETE_DEPARTMENT, DEPARTMENT_RESTORE_DEPARTMENT
+from middleware.auth_middleware import token_required
 from models.departmentModel import Department
 from utils.config import db
 
 
 @admin.route(DEPARTMENT_LIST, methods=['GET'], endpoint='departments-list')
-def department_list():
+@token_required
+def department_list(current_user):
     departments = Department.query.filter_by(is_deleted=0).order_by(Department.name.desc()).all()
     deleted_departments = Department.query.filter_by(is_deleted=1).order_by(Department.name.desc()).all()
 
@@ -24,18 +26,20 @@ def department_list():
 
     return render_template("admin_templates/department/departments-list.html",
                            departments=departments,
-                           deleted_departments = deleted_departments,
+                           deleted_departments=deleted_departments,
                            doctors=all_doctors,
                            rooms=all_rooms)
 
 
 @admin.route(DEPARTMENT_ADD_DEPARTMENT, methods=['GET'], endpoint='add-department')
-def department_list():
+@token_required
+def department_list(current_user):
     return render_template("admin_templates/department/add-department.html")
 
 
 @admin.route(DEPARTMENT_ADD_DEPARTMENT, methods=['POST'])
-def add_department():
+@token_required
+def add_department(current_user):
     name = request.form.get('name')
     email = request.form.get('email')
     head = request.form.get('head')
@@ -64,7 +68,8 @@ def add_department():
 
 
 @admin.route(DEPARTMENT_EDIT_DEPARTMENT + '/<int:id>', methods=['POST'])
-def edit_department(id):
+@token_required
+def edit_department(current_user, id):
     try:
         department = Department.query.get_or_404(id)
 
@@ -88,7 +93,8 @@ def edit_department(id):
 
 
 @admin.route(DEPARTMENT_DELETE_DEPARTMENT + '/<int:id>', methods=['POST'])
-def delete_department(id):
+@token_required
+def delete_department(current_user, id):
     try:
         department = Department.query.get_or_404(id)
         department.is_deleted = True
@@ -104,7 +110,8 @@ def delete_department(id):
 
 
 @admin.route(DEPARTMENT_RESTORE_DEPARTMENT + '/<int:id>', methods=['POST'])
-def restore_department(id):
+@token_required
+def restore_department(current_user,id):
     try:
         Department.query.filter_by(id=id).update({
             'is_deleted': False,

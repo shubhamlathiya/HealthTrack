@@ -6,13 +6,15 @@ from flask import render_template, flash, request, redirect
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import INSURANCE_CONVERAGE_TYPE, INSURANCE_ADD_CONVERAGE_TYPE, ADMIN, \
     INSURANCE_EDIT_CONVERAGE_TYPE, INSURANCE_DELETE_CONVERAGE_TYPE, INSURANCE_RESTORE_CONVERAGE_TYPE
+from middleware.auth_middleware import token_required
 from models.insuranceProviderModel import CoverageType
 from utils.config import db
 
 
 # Coverage Type Management
 @admin.route(INSURANCE_CONVERAGE_TYPE, methods=['GET'], endpoint='coverage_types')
-def list_coverage_types():
+@token_required
+def list_coverage_types(current_user):
     try:
         coverage_types = CoverageType.query \
             .filter_by(is_deleted=False) \
@@ -39,7 +41,8 @@ def list_coverage_types():
 
 
 @admin.route(INSURANCE_ADD_CONVERAGE_TYPE, methods=['POST'], endpoint="add_coverage_type")
-def add_coverage_type():
+@token_required
+def add_coverage_type(current_user):
     try:
         name = request.form.get('name')
         description = request.form.get('description')
@@ -72,7 +75,8 @@ def add_coverage_type():
 
 
 @admin.route(INSURANCE_EDIT_CONVERAGE_TYPE + '/<int:coverage_id>', methods=['POST'], endpoint='edit_coverage_type')
-def edit_coverage_type(coverage_id):
+@token_required
+def edit_coverage_type(current_user, coverage_id):
     coverage = CoverageType.query.get_or_404(coverage_id)
 
     try:
@@ -111,7 +115,8 @@ def edit_coverage_type(coverage_id):
 
 
 @admin.route(INSURANCE_DELETE_CONVERAGE_TYPE + '/<int:coverage_id>', methods=['POST'], endpoint='delete_coverage_type')
-def delete_coverage_type(coverage_id):
+@token_required
+def delete_coverage_type(current_user, coverage_id):
     coverage = CoverageType.query.get_or_404(coverage_id)
 
     try:
@@ -133,7 +138,8 @@ def delete_coverage_type(coverage_id):
 
 @admin.route(INSURANCE_RESTORE_CONVERAGE_TYPE + '/<int:coverage_id>', methods=['POST'],
              endpoint="restore_coverage_type")
-def restore_coverage_type(coverage_id):
+@token_required
+def restore_coverage_type(current_user, coverage_id):
     coverage = CoverageType.query.filter_by(id=coverage_id, is_deleted=True).first_or_404()
 
     try:

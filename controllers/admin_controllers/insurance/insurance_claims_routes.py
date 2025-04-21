@@ -253,8 +253,7 @@ def appeal_insurance_claim(current_user, claim_id):
 
 
 @admin.route(INSURANCE_CLAIM_STATUS_PRINT + '/<int:claim_id>', methods=['GET'], endpoint='insurance_claims_print')
-@token_required
-def print_insurance_claim(current_user, claim_id):
+def print_insurance_claim(claim_id):
     try:
         claim = InsuranceClaim.query.get_or_404(claim_id)
         return render_template('admin_templates/insurance/print_claim.html', claim=claim)

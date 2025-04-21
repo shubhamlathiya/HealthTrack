@@ -12,7 +12,8 @@ from utils.config import db
 
 
 @admin.route(PHARMACY_MEDICINE_LIST, methods=['GET'], endpoint='medicine-list')
-def pharmacy_medicine_list():
+@token_required
+def pharmacy_medicine_list(current_user):
     medicines = Medicine.query.filter_by(is_deleted=0).order_by(Medicine.name).all()
     categories = MedicineCategory.query.filter_by(is_deleted=0).order_by(MedicineCategory.name).all()
     companies = MedicineCompany.query.filter_by(is_deleted=0).order_by(MedicineCompany.name).all()
@@ -72,7 +73,8 @@ def add_medicine(current_user):
 
 
 @admin.route(PHARMACY_MEDICINE_EDIT + '/<int:id>', methods=['POST'], endpoint='medicine-edit')
-def edit_medicine(id):
+@token_required
+def edit_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
     try:
         medicine.name = request.form.get('name')
@@ -95,8 +97,9 @@ def edit_medicine(id):
     return redirect(ADMIN + PHARMACY_MEDICINE_LIST)
 
 
-@admin.route(PHARMACY_MEDICINE_DELETE  + '/<int:id>', methods=['POST'], endpoint='medicine-delete')
-def delete_medicine(id):
+@admin.route(PHARMACY_MEDICINE_DELETE + '/<int:id>', methods=['POST'], endpoint='medicine-delete')
+@token_required
+def delete_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
     try:
         # Delete associated transactions first
@@ -254,7 +257,8 @@ def dispense_medicine(current_user, id):
 
 
 @admin.route(PHARMACY_MEDICINE_TRANSACTIONS, methods=['POST'], endpoint='medicine-transactions')
-def medicine_transactions():
+@token_required
+def medicine_transactions(current_user):
     medicine_id = request.form.get('medicine_id')
     medicine = Medicine.query.get_or_404(medicine_id)
     transactions = StockTransaction.query.filter_by(medicine_id=medicine_id).order_by(
@@ -265,7 +269,8 @@ def medicine_transactions():
 
 
 @admin.route(PHARMACY_MEDICINE_RESTORE + '/<int:id>', methods=['POST'])
-def restore_medicine(id):
+@token_required
+def restore_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
     try:
         StockTransaction.query.filter_by(medicine_id=id).update({

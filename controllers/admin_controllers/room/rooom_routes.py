@@ -18,7 +18,8 @@ from utils.config import db
 
 
 @admin.route(ROOM, methods=['GET'], endpoint="room")
-def list_rooms():
+@token_required
+def list_rooms(current_user):
     rooms = Room.query.filter_by(deleted_at=None).order_by(Room.room_number).all()
     departments = Department.query.all()
     deleted_rooms = Room.query.filter_by(is_deleted=1).order_by(Room.room_number).all()
@@ -27,7 +28,8 @@ def list_rooms():
 
 
 @admin.route(ROOM_ADD_ROOM, methods=['POST'], endpoint='add-room')
-def add_room():
+@token_required
+def add_room(current_user):
     room_number = request.form.get('room_number')
     floor = request.form.get('floor')
     room_type_key = request.form.get('room_type')
@@ -74,7 +76,8 @@ def add_room():
 
 
 @admin.route(ROOM_EDIT_ROOM + '/<int:room_id>', methods=['POST'])
-def edit_room(room_id):
+@token_required
+def edit_room(current_user, room_id):
     room = Room.query.get_or_404(room_id)
     try:
         # Update basic room information
@@ -105,7 +108,8 @@ def edit_room(room_id):
 
 
 @admin.route(ROOM_DELETE_ROOM + '/<int:room_id>', methods=['POST'])
-def delete_room(room_id):
+@token_required
+def delete_room(current_user, room_id):
     room = Room.query.get_or_404(room_id)
     try:
         room.is_deleted = True
@@ -124,7 +128,8 @@ def delete_room(room_id):
 
 
 @admin.route(ROOM_RESTORE_ROOM + '/<int:id>', methods=['POST'])
-def room_restore(id):
+@token_required
+def room_restore(current_user, id):
     room = Room.query.get_or_404(id)
     try:
         # Restore related visits
@@ -145,7 +150,8 @@ def room_restore(id):
 
 
 @admin.route(ROOM_AVAILABLE_ROOM, methods=['GET'], endpoint='available-room')
-def room_available_room():
+@token_required
+def room_available_room(current_user):
     # Get all departments with their available rooms and beds
     departments_data = {}
 
@@ -188,7 +194,8 @@ def room_available_room():
 
 
 @admin.route(ROOM_BOOK_ROOM, methods=['POST'], endpoint="book-room")
-def book_room():
+@token_required
+def book_room(current_user):
     # Get form data
     patient_id = request.form.get('patient_id')
     bed_id = request.form.get('bed_id')
@@ -246,7 +253,8 @@ def get_patient(patient_id):
 
 
 @admin.route(ROOM_ROOM_STATISTICS, methods=['GET'], endpoint='room-statistics')
-def room_room_statistics():
+@token_required
+def room_room_statistics(current_user):
     # Fetch bed allocation statistics for the chart (last 12 months)
     current_date = datetime.utcnow()
     monthly_stats = []
@@ -368,7 +376,8 @@ def room_room_statistics():
 
 
 @admin.route(ROOM_ROOM_ALLOTTED, methods=['GET'], endpoint='rooms-allotted')
-def room_rooms_allotted():
+@token_required
+def room_rooms_allotted(current_user):
     # Get all occupied beds and include cleaning status
     results = db.session.execute(
         select(
@@ -413,7 +422,8 @@ def room_rooms_allotted():
 
 
 @admin.route(ROOM_DISCHARGE_ROOM + "/<int:allocation_id>", methods=["POST"], endpoint="room_discharge")
-def discharge_patient(allocation_id):
+@token_required
+def discharge_patient(current_user, allocation_id):
     try:
         allocation = BedAllocation.query.get_or_404(allocation_id)
 
@@ -505,7 +515,8 @@ def complete_cleaning(current_user, allocation_id):
 
 
 @admin.route(ROOM_CLEANING_LOGS, methods=["GET"], endpoint="cleaning_logs")
-def cleaning_logs():
+@token_required
+def cleaning_logs(current_user):
     try:
         # Calculate cleaning stats
         total_cleanings = BedCleaningLog.query.count()
@@ -540,7 +551,8 @@ def cleaning_logs():
 
 
 @admin.route(ROOM_ROOM_BY_DEPT, methods=['GET'], endpoint='rooms-by-dept')
-def room_room_by_dept():
+@token_required
+def room_room_by_dept(current_user):
     # Query all non-deleted departments with their rooms
     departments = Department.query.filter_by(deleted_at=None).all()
 

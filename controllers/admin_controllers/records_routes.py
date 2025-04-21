@@ -7,6 +7,7 @@ from controllers.constant.adminPathConstant import RECORDS_DEATH, RECORDS_BIRTH,
     RECORDS_BIRTH_DELETE, RECORDS_BIRTH_EDIT, RECORDS_BIRTH_MEDICAL_VISIT, RECORDS_BIRTH_MEDICAL_VISIT_DELETE, \
     RESTORE_RECORDS_BIRTH, RESTORE_BIRTH_MEDICAL_VISIT, RECORDS_DEATH_DELETE, RECORDS_DEATH_EDIT, RESTORE_RECORDS_DEATH, \
     RECORDS_ADD_DEATH
+from middleware.auth_middleware import token_required
 from models.birthRecordeModel import ChildCase, MedicalVisit
 from models.deathRecordeModel import DeathRecord
 from models.doctorModel import Doctor
@@ -15,7 +16,8 @@ from fpdf import FPDF
 
 
 @admin.route(RECORDS_DEATH, methods=['GET'], endpoint='records_death')
-def records_death():
+@token_required
+def records_death(current_user):
     records = DeathRecord.query.filter_by(is_deleted=0).order_by(DeathRecord.death_date.desc()).all()
     doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
     deleted_records = DeathRecord.query.filter_by(is_deleted=1).order_by(DeathRecord.deleted_at.desc()).all()
@@ -24,7 +26,8 @@ def records_death():
 
 
 @admin.route(RECORDS_ADD_DEATH, methods=['GET', 'POST'])
-def add_death_record():
+@token_required
+def add_death_record(current_user):
     doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
     if request.method == 'POST':
         try:
@@ -59,7 +62,8 @@ def add_death_record():
 
 
 @admin.route(RECORDS_DEATH_EDIT + '/<int:id>', methods=['POST'])
-def edit_death_record(id):
+@token_required
+def edit_death_record(current_user, id):
     record = DeathRecord.query.get_or_404(id)
     try:
         record.first_name = request.form.get('first_name')
@@ -87,7 +91,8 @@ def edit_death_record(id):
 
 
 @admin.route(RECORDS_DEATH_DELETE + '/<int:id>', methods=['POST'])
-def delete_death_record(id):
+@token_required
+def delete_death_record(current_user, id):
     record = DeathRecord.query.get_or_404(id)
     try:
         # Soft delete
@@ -102,7 +107,8 @@ def delete_death_record(id):
 
 
 @admin.route(RESTORE_RECORDS_DEATH + '/<int:id>', methods=['POST'])
-def restore_death_record(id):
+@token_required
+def restore_death_record(current_user, id):
     record = DeathRecord.query.filter_by(id=id, is_deleted=True).first_or_404()
     try:
         record.is_deleted = False
@@ -237,7 +243,8 @@ def death_certificate(id):
 
 
 @admin.route(RECORDS_BIRTH, methods=['GET'], endpoint='records_birth')
-def records_birth():
+@token_required
+def records_birth(current_user):
     deleted_child_cases = ChildCase.query.filter_by(is_deleted=True).all()
     deleted_medical_visits = MedicalVisit.query.filter_by(is_deleted=True).all()
 
@@ -252,7 +259,8 @@ def records_birth():
 
 
 @admin.route(RECORDS_ADD_BIRTH, methods=['GET', 'POST'])
-def add_child_case():
+@token_required
+def add_child_case(current_user):
     if request.method == 'POST':
         try:
             # Generate case number
@@ -285,7 +293,8 @@ def add_child_case():
 
 
 @admin.route(RECORDS_BIRTH_EDIT + '/<int:id>', methods=['POST'])
-def edit_child_case(id):
+@token_required
+def edit_child_case(current_user, id):
     case = ChildCase.query.get_or_404(id)
 
     try:
@@ -309,7 +318,8 @@ def edit_child_case(id):
 
 
 @admin.route(RECORDS_BIRTH_DELETE + '/<int:id>', methods=['POST'])
-def delete_child_case(id):
+@token_required
+def delete_child_case(current_user, id):
     case = ChildCase.query.get_or_404(id)
 
     try:
@@ -333,7 +343,8 @@ def delete_child_case(id):
 
 
 @admin.route(RECORDS_BIRTH_MEDICAL_VISIT + '/<int:case_id>/add-visit', methods=['POST'])
-def add_medical_visit(case_id):
+@token_required
+def add_medical_visit(current_user, case_id):
     try:
         print(request.form.get("visit_date"))
         visit = MedicalVisit(
@@ -356,7 +367,8 @@ def add_medical_visit(case_id):
 
 
 @admin.route(RECORDS_BIRTH_MEDICAL_VISIT + '/<int:visit_id>/edit', methods=['POST'])
-def edit_medical_visit(visit_id):
+@token_required
+def edit_medical_visit(current_user, visit_id):
     try:
         visit = MedicalVisit.query.get_or_404(visit_id)
 
@@ -386,7 +398,8 @@ def edit_medical_visit(visit_id):
 
 
 @admin.route(RECORDS_BIRTH_MEDICAL_VISIT_DELETE + '/<int:visit_id>', methods=['POST'])
-def delete_medical_visit(visit_id):
+@token_required
+def delete_medical_visit(current_user, visit_id):
     visit = MedicalVisit.query.get_or_404(visit_id)
     try:
         # Soft delete the medical visit
@@ -454,7 +467,8 @@ def child_case_certificate(id):
 
 
 @admin.route(RESTORE_RECORDS_BIRTH + '/<int:id>', methods=['POST'])
-def restore_child_case(id):
+@token_required
+def restore_child_case(current_user, id):
     case = ChildCase.query.get_or_404(id)
     try:
         # Restore related visits
@@ -478,7 +492,8 @@ def restore_child_case(id):
 
 
 @admin.route(RESTORE_BIRTH_MEDICAL_VISIT + '/<int:id>', methods=['POST'])
-def restore_medical_visit(id):
+@token_required
+def restore_medical_visit(current_user, id):
     visit = MedicalVisit.query.filter_by(id=id, is_deleted=True).first_or_404()
     try:
         visit.is_deleted = False

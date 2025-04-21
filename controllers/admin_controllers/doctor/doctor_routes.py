@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DOCTOR_ADD_DOCTOR, DOCTOR_LIST
+from middleware.auth_middleware import token_required
 from models.doctorModel import Availability, Doctor
 from models.userModel import User
 from utils.config import db
@@ -21,7 +22,8 @@ def allowed_file(filename):
 
 
 @admin.route(DOCTOR_LIST, methods=['GET'], endpoint='doctor_list')
-def doctor_list():
+@token_required
+def doctor_list(current_user):
     # Query all doctors ordered by most recent first
     doctors = Doctor.query.order_by(Doctor.created_at.desc()).all()
 
@@ -36,12 +38,14 @@ def doctor_list():
 
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['GET'], endpoint='add_doctor')
-def department_list():
+@token_required
+def department_list(current_user):
     return render_template("admin_templates/doctor/add-doctors.html")
 
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['POST'])
-def register_doctor():
+@token_required
+def register_doctor(current_user):
     try:
         data = request.form
         print(data)
