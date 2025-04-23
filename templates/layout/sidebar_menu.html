@@ -304,12 +304,12 @@
                     </a>
                     <ul class="treeview-menu">
                         <li>
-                            <a href="/admin/inventory/stock"
+                            <a href="/admin/inventory/item-stock-list"
                                class="{% if request.path == '/admin/inventory/stock' %}active-sub{% endif %}">Item Stock
                                 List</a>
                         </li>
                         <li>
-                            <a href="/admin/inventory/issued"
+                            <a href="/admin/inventory/issued-item"
                                class="{% if request.path == '/admin/inventory/issued' %}active-sub{% endif %}">Issued
                                 Items</a>
                         </li>
@@ -412,6 +412,42 @@
                 </li>
                 <li class="treeview {% if request.path.startswith('/admin/view-staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">
                     <a href="#!">
+                        <i class="ri-scissors-line"></i>
+                        <span class="menu-text">Operations Management</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="#!">
+                                Operation Resources
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                            <ul class="treeview-menu {% if request.path.startswith('/admin/pharmacy/medicine-categories') %}active current-page{% endif %}">
+                                <li>
+                                    <a href="/admin/pharmacy/medicine-categories"
+                                       class="{% if request.path == '/admin/pharmacy/medicine-categories' %}active-sub{% endif %}">Operation
+                                        Rooms</a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/medicine-companies"
+                                       class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Surgical
+                                        Teams</a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/medicine-companies"
+                                       class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Equipment
+                                        Inventory</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/admin/add-staff"
+                               class="{% if request.path == '/admin/add-staff' %}active-sub{% endif %}">Outcomes &
+                                Reports</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="treeview {% if request.path.startswith('/admin/view-staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">
+                    <a href="#!">
                         <i class="ri-nurse-line"></i>
                         <span class="menu-text">Staff</span>
                     </a>
@@ -425,12 +461,6 @@
                                class="{% if request.path == '/admin/add-staff' %}active-sub{% endif %}">Add Staff</a>
                         </li>
                     </ul>
-                </li>
-                <li class="{% if request.path == '/admin/get-operations' %}active current-page{% endif %}">
-                    <a href="/admin/get-operations">
-                        <i class="ri-scissors-line"></i>
-                        <span class="menu-text">Operations</span>
-                    </a>
                 </li>
                 <li class="{% if request.path == '/admin/view-patients' %}active current-page{% endif %}">
                     <a href="/admin/view-patients">

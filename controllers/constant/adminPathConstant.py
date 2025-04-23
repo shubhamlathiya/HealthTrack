@@ -15,6 +15,21 @@ BLOOD_BANK_ADD_DONOR = f"{BLOOD_BANK}/add-donor"
 BLOOD_BANK_STOCK = f"{BLOOD_BANK}/stock"
 BLOOD_BANK_ISSUED = f"{BLOOD_BANK}/issued"
 
+# inventory
+INVENTORY = "/inventory"
+INVENTORY_ITEM_STOCK_LIST = f"{INVENTORY}/item-stock-list"
+INVENTORY_ADD_ITEM = f"{INVENTORY}/add-item"
+INVENTORY_EDIT_ITEM = f"{INVENTORY}/edit-item"
+INVENTORY_DELETE_ITEM = f"{INVENTORY}/delete-item"
+INVENTORY_RESTORE_ITEM = f"{INVENTORY}/restore-item"
+
+INVENTORY_ISSUED_ITEM = f"{INVENTORY}/issued-item"
+INVENTORY_ADD_ISSUED_ITEM = f"{INVENTORY}/add-issued-item"
+INVENTORY_EDIT_ISSUED_ITEM = f"{INVENTORY}/edit-issued-item"
+INVENTORY_DELETE_ISSUED_ITEM = f"{INVENTORY}/delete-issued-item"
+INVENTORY_RESTORE_ISSUED_ITEM = f"{INVENTORY}/restore-issued-item"
+INVENTORY_RETURN_ISSUED_ITEM = f"{INVENTORY}/return-issued-item"
+
 # accounts
 ACCOUNTS = "/accounts"
 ACCOUNTS_INCOME = f"{ACCOUNTS}/income"
