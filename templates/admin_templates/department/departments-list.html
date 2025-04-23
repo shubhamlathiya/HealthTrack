@@ -298,8 +298,8 @@
                                                             <td>{{ room.room_number }}</td>
                                                             <td>{{ room.room_type }}</td>
                                                             <td>
-                                                                    <span class="badge bg-{{ 'success' if room.status == 'available' else 'danger' }} bg-opacity-10 text-{{ 'success' if room.status == 'available' else 'danger' }}">
-                                                                        {{ room.status|capitalize }}
+                                                                    <span class="badge bg-{{ 'success' if room.is_empty == 1 else 'danger' }} bg-opacity-10 text-{{ 'success' if room.is_empty == 1 else 'danger' }}">
+                                                                        {{ room.is_empty|capitalize }}
                                                                     </span>
                                                             </td>
                                                         </tr>
