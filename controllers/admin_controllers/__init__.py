@@ -6,7 +6,6 @@ from ..constant.adminPathConstant import ADMIN
 admin = Blueprint(ADMIN, __name__)
 
 from .department_routes import *
-from controllers.admin_controllers.doctor.doctor_routes import *
 from .dashboard_routes import *
 from .resources_routes import *
 from .leave_management_routes import *
@@ -14,40 +13,37 @@ from .search_routes import *
 from .patient_routes import *
 from .operation_routes import *
 from .staff_routes import *
+
+# Room
 from controllers.admin_controllers.room.rooom_routes import *
 from controllers.admin_controllers.room.bad_routes import *
+
 from .ambulance_routes import *
 from .human_resources_routes import *
 from .accounts_routes import *
+
+# inventory
 from controllers.admin_controllers.inventory.inventory_routes import *
+from controllers.admin_controllers.inventory.issued_item_routes import *
+
+# Blood Bank
 from controllers.admin_controllers.blood_bank.blood_bank_routes import *
+
+# insurance
 from controllers.admin_controllers.insurance.coverage_types_routes import *
 from controllers.admin_controllers.insurance.insurance_providers_routes import *
 from controllers.admin_controllers.insurance.insurance_patient_routes import *
 from controllers.admin_controllers.insurance.insurance_claims_routes import *
+
+# pharmacy
 from controllers.admin_controllers.pharmacy.pharmacy_routes import *
 from controllers.admin_controllers.pharmacy.medicine_categories_routes import *
-from .records_routes import *
+
+# Records
+from controllers.admin_controllers.records.death_records_routes import *
+from controllers.admin_controllers.records.birth_records_routes import *
+
+# Doctor
 from controllers.admin_controllers.doctor.assign_department import *
 from controllers.admin_controllers.doctor.shift_management import *
-
-# @admin.route('/user-status', methods=['POST'],endpoint='userStatus')
-# @token_required
-# def user_status(current_user):
-#     data = request.get_json()
-#
-#     user_id = data.get('user_id')  # User ID passed from the client-side
-#     new_status = data.get('status')  # New status (true/false)
-#
-#     if user_id and new_status:
-#         # Update the user's status in the database
-#         result = mongo.db.users.update_one(
-#             {'_id': ObjectId(user_id)},
-#             {'$set': {'status': new_status}}
-#         )
-#
-#         if result.modified_count > 0:
-#             return jsonify({'success': True, 'message': 'Status updated successfully'})
-#         else:
-#             return jsonify({'success': False, 'message': 'Status update failed'})
-#     return jsonify({'success': False, 'message': 'Invalid request'}), 400
+from controllers.admin_controllers.doctor.doctor_routes import *
