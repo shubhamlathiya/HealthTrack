@@ -246,7 +246,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="treeview {% if request.path.startswith('/admin/human-resources') %}active current-page{% endif %}">
+                <li class="treeview {% if request.path.startswith('/admin/human_resources') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-group-2-line"></i>
                         <span class="menu-text">Human Resources</span>
@@ -254,21 +254,21 @@
                     <ul class="treeview-menu">
                         <li>
                             <a href="/admin/human-resources/hr-approvals"
-                               class="{% if request.path == '/admin/human-resources/hr-approvals' %}active-sub{% endif %}">HR
+                               class="{% if request.path == '/admin/human_resources/hr-approvals' %}active-sub{% endif %}">HR
                                 Approvals</a>
                         </li>
                         <li>
                             <a href="/admin/human-resources/staff-attendance"
-                               class="{% if request.path == '/admin/human-resources/staff-attendance' %}active-sub{% endif %}">Attendance</a>
+                               class="{% if request.path == '/admin/human_resources/staff-attendance' %}active-sub{% endif %}">Attendance</a>
                         </li>
                         <li>
                             <a href="/admin/human-resources/staff-leaves"
-                               class="{% if request.path == '/admin/human-resources/staff-leaves' %}active-sub{% endif %}">Staff
+                               class="{% if request.path == '/admin/human_resources/staff-leaves' %}active-sub{% endif %}">Staff
                                 Leaves</a>
                         </li>
                         <li>
                             <a href="/admin/human-resources/staff-holidays"
-                               class="{% if request.path == '/admin/human-resources/staff-holidays' %}active-sub{% endif %}">Holidays</a>
+                               class="{% if request.path == '/admin/human_resources/staff-holidays' %}active-sub{% endif %}">Holidays</a>
                         </li>
                     </ul>
                 </li>
