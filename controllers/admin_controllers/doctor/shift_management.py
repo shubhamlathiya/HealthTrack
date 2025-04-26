@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import request, flash, redirect, render_template, jsonify
 
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import DOCTOR_SHIFT_MANAGEMENT, DOCTOR_UPDATE_SHIFT_MANAGEMENT
+from controllers.constant.adminPathConstant import DOCTOR_SHIFT_MANAGEMENT, DOCTOR_UPDATE_SHIFT_MANAGEMENT, ADMIN
 from middleware.auth_middleware import token_required
 from models.doctorModel import Doctor, Availability
 from utils.config import db
@@ -36,7 +36,10 @@ def doctor_shifts(current_user):
 
         doctor.temp_schedule = schedule  # Add it as a temp attribute
 
-    return render_template('admin_templates/doctor/shift_management.html', doctors=doctors)
+    return render_template('admin_templates/doctor/shift_management.html', doctors=doctors,
+                           ADMIN = ADMIN,
+                           DOCTOR_UPDATE_SHIFT_MANAGEMENT = DOCTOR_UPDATE_SHIFT_MANAGEMENT,
+                           )
 
 
 @admin.route(DOCTOR_UPDATE_SHIFT_MANAGEMENT + '/<int:doctor_id>', methods=['POST'])

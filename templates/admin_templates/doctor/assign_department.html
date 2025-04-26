@@ -95,7 +95,7 @@
                                                             data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <form method="POST"
-                                                      action="/admin/doctor/update-assign-department/{{ assignment.id }}">
+                                                      action="{{ ADMIN + DOCTOR_UPDATE_ASSIGN_DEPARTMENT }}/{{ assignment.id }}">
                                                     <div class="modal-body">
                                                         <div class="row">
                                                             <div class="col-md-6 mb-3">
@@ -216,7 +216,7 @@
                     <h5 class="modal-title">Assign Doctor to Department</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" action="/admin/doctor/assign-department">
+                <form method="POST" action="{{ ADMIN + DOCTOR_ASSIGN_DEPARTMENT }}">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">

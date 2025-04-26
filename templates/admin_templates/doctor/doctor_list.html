@@ -10,7 +10,7 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Doctor List</h5>
-                    <a href="#" class="btn btn-primary ms-auto">Add New Doctor</a>
+                    <a href="{{ ADMIN + DOCTOR_ADD_DOCTOR }}" class="btn btn-primary ms-auto">Add New Doctor</a>
                 </div>
                 <div class="card-body">
                     {% with messages = get_flashed_messages(with_categories=true) %}

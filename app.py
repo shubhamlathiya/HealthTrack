@@ -1,12 +1,7 @@
-from flask import Flask, render_template, session, jsonify, redirect, request, send_from_directory
+from flask import Flask, render_template, session, jsonify, redirect, send_from_directory
 from flask_mail import Mail
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
-from models.insuranceProviderModel import CoverageType
-from models.userModel import User
-# from controllers.doctor_controllers import doctors
-# from controllers.laboratory_controllers import laboratory
-# from controllers.patients_controllers import patients
 from utils.config import init_app, db
 
 app = Flask(__name__, static_folder="static")
@@ -32,9 +27,6 @@ app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(admin, url_prefix='/admin')
 
 
-# app.register_blueprint(patients, url_prefix='/patients')
-# app.register_blueprint(doctors, url_prefix='/doctor')
-# app.register_blueprint(laboratory, url_prefix='/laboratory')
 @app.route('/')
 def index():  # put application's code here
     return render_template('auth_templates/login_templates.html')

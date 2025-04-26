@@ -21,6 +21,7 @@ class Department(db.Model):
     # Relationships
     assignments = db.relationship('DepartmentAssignment', back_populates='department', cascade='all, delete-orphan')
     rooms = db.relationship('Room', back_populates='department')
+    staff = db.relationship('Staff', backref='department', lazy=True)
 
     def __repr__(self):
         return f'<Department {self.name}>'

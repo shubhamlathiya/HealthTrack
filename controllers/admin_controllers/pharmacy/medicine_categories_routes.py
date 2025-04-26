@@ -20,7 +20,12 @@ def medicine_categories(current_user):
     archived_categories = MedicineCategory.query.filter_by(is_deleted=1).order_by(
         MedicineCategory.deleted_at.desc()).all()
     return render_template('admin_templates/pharmacy/medicine_categories.html', categories=categories,
-                           archived_categories=archived_categories)
+                           archived_categories=archived_categories,
+                           ADMIN=ADMIN,
+                           PHARMACY_MEDICINE_ADD_CATEGORIES=PHARMACY_MEDICINE_ADD_CATEGORIES,
+                           PHARMACY_MEDICINE_EDIT_CATEGORIES=PHARMACY_MEDICINE_EDIT_CATEGORIES,
+                           PHARMACY_MEDICINE_DELETE_CATEGORIES=PHARMACY_MEDICINE_DELETE_CATEGORIES,
+                           PHARMACY_MEDICINE_RESTORE_CATEGORIES=PHARMACY_MEDICINE_RESTORE_CATEGORIES)
 
 
 @admin.route(PHARMACY_MEDICINE_ADD_CATEGORIES, methods=['POST'], endpoint='medicine-categories/add')
@@ -95,7 +100,13 @@ def medicine_companies(current_user):
     companies = MedicineCompany.query.filter_by(is_deleted=0).order_by(MedicineCompany.name).all()
     archived_companies = MedicineCompany.query.filter_by(is_deleted=1).order_by(MedicineCompany.deleted_at.desc()).all()
     return render_template('admin_templates/pharmacy/medicine_companies.html', companies=companies,
-                           archived_companies=archived_companies)
+                           archived_companies=archived_companies,
+                           ADMIN=ADMIN,
+                           PHARMACY_MEDICINE_ADD_COMPANIES=PHARMACY_MEDICINE_ADD_COMPANIES,
+                           PHARMACY_MEDICINE_EDIT_COMPANIES=PHARMACY_MEDICINE_EDIT_COMPANIES,
+                           PHARMACY_MEDICINE_DELETE_COMPANIES=PHARMACY_MEDICINE_DELETE_COMPANIES,
+                           PHARMACY_MEDICINE_RESTORE_COMPANIES=PHARMACY_MEDICINE_RESTORE_COMPANIES
+                           )
 
 
 @admin.route(PHARMACY_MEDICINE_ADD_COMPANIES, methods=['POST'], endpoint='medicine-companies/add')

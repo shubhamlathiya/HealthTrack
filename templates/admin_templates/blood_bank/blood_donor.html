@@ -1,28 +1,46 @@
 {% extends 'base.html' %}
 
-{% block title %}Blood Donor{% endblock title %}
-{% block page %}Blood Donor{% endblock page %}
+{% block title %}Blood Donors{% endblock %}
+{% block page %}Blood Bank - Donor Management{% endblock %}
 
 {% block body %}
-    <!-- Row starts -->
     <div class="row gx-4">
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Blood Donor List</h5>
-                    <a href="/admin/blood-bank/add-donor" class="btn btn-primary ms-auto">Add New Donor</a>
+                    <div>
+                        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal"
+                                data-bs-target="#addDonorModal">
+                            <i class="ri-add-line me-1"></i> Add New Donor
+                        </button>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreDonorsModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <!-- Table starts -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
                     <div class="table-responsive">
-                        <table  id=scrollVertical class="table m-0 align-middle">
-                            <thead>
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead class="table-light">
                             <tr>
-                                <th>#</th>
+                                <th>Donor ID</th>
                                 <th>Donor Name</th>
                                 <th>Blood Type</th>
                                 <th>Gender</th>
-                                <th>Date of Birth</th>
+                                <th>Age</th>
                                 <th>Phone</th>
                                 <th>Status</th>
                                 <th>Last Donation</th>
@@ -33,21 +51,24 @@
                             <tbody>
                             {% for donor in donors %}
                                 <tr>
-                                    <td>D{{ "%03d" % donor.id }}</td>
+                                    <td>{{ donor.donor_id }}</td>
                                     <td>
-                                        <img src="../../../static/assets/images/patient5.png"
-                                             class="img-2x rounded-5 me-1" alt="Donor Image">
-                                        {{ donor.first_name }} {{ donor.last_name }}
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <strong>{{ donor.first_name }} {{ donor.last_name }}</strong>
+                                                <div class="text-muted small">{{ donor.email or 'No email' }}</div>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>{{ donor.blood_type }}</td>
                                     <td>{{ donor.gender }}</td>
-                                    <td>{{ donor.date_of_birth.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ donor.calculate_age() }}</td>
                                     <td>{{ donor.phone }}</td>
                                     <td>
                                         {% if donor.status == 'Active' %}
                                             <span class="badge bg-success">Active</span>
                                         {% elif donor.status == 'Temporary Deferral' %}
-                                            <span class="badge bg-warning">Temporary Deferral</span>
+                                            <span class="badge bg-warning">Deferred</span>
                                         {% else %}
                                             <span class="badge bg-danger">Inactive</span>
                                         {% endif %}
@@ -56,14 +77,18 @@
                                         {% if donor.last_donation %}
                                             {{ donor.last_donation.strftime('%d/%m/%Y') }}
                                         {% else %}
-                                            Never
+                                            <span class="text-muted">Never</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if donor.next_eligible %}
-                                            {{ donor.next_eligible.strftime('%d/%m/%Y') }}
+                                            {% if donor.next_eligible < datetime.utcnow().date() %}
+                                                <span class="badge bg-success">Eligible Now</span>
+                                            {% else %}
+                                                {{ donor.next_eligible.strftime('%d/%m/%Y') }}
+                                            {% endif %}
                                         {% else %}
-                                            N/A
+                                            <span class="text-muted">N/A</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -72,18 +97,22 @@
                                                     data-bs-target="#deleteDonorModal{{ donor.id }}">
                                                 <i class="ri-delete-bin-line"></i>
                                             </button>
-                                            <a href="/admin/blood-bank/{{ donor.id }}"
-                                               class="btn btn-outline-success btn-sm"
-                                               data-bs-toggle="tooltip"
-                                               data-bs-placement="top" data-bs-title="Edit Donor">
-                                                <i class="ri-edit-box-line"></i>
-                                            </a>
-                                            <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#viewDonorModal{{ donor.id }}"
-                                                    data-bs-placement="top"
-                                                    data-bs-title="View Details">
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewDonorModal{{ donor.id }}">
                                                 <i class="ri-eye-line"></i>
                                             </button>
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editDonorModal{{ donor.id }}">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                            {#                                            <a href="{{ ADMIN + BLOOD_BANK_EDIT_DONOR }}/{{ donor.id }}"#}
+                                            {#                                               class="btn btn-outline-success btn-sm"#}
+                                            {#                                               data-bs-toggle="tooltip"#}
+                                            {#                                               data-bs-placement="top" data-bs-title="Edit Donor">#}
+                                            {#                                                <i class="ri-edit-box-line"></i>#}
+                                            {#                                            </a>#}
                                         </div>
                                     </td>
                                 </tr>
@@ -91,153 +120,726 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- Table ends -->
-
-                    <!-- Modals for each donor -->
-                    {% for donor in donors %}
-                        <!-- Delete Modal -->
-                        <div class="modal fade" id="deleteDonorModal{{ donor.id }}" tabindex="-1"
-                             aria-labelledby="deleteDonorModalLabel{{ donor.id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-sm">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteDonorModalLabel{{ donor.id }}">
-                                            Confirm Deletion
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to delete {{ donor.first_name }} {{ donor.last_name }}'s
-                                        record?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <form action="/admin/blood-bank{{ donor.id }}" method="POST">
-                                            <button type="button" class="btn btn-outline-secondary"
-                                                    data-bs-dismiss="modal">Cancel
-                                            </button>
-                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- View Details Modal -->
-                        <div class="modal fade" id="viewDonorModal{{ donor.id }}" tabindex="-1"
-                             aria-labelledby="viewDonorModalLabel{{ donor.id }}"
-                             aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="viewDonorModalLabel{{ donor.id }}">Donor
-                                            Details</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-md-4 text-center">
-                                                <img src="../../../static/assets/images/patient4.png"
-                                                     class="rounded-circle mb-3" width="150" height="150"
-                                                     alt="Donor Image">
-                                                <h4>{{ donor.first_name }} {{ donor.last_name }}</h4>
-                                                <p class="text-muted">Blood Type: {{ donor.blood_type }}</p>
-                                            </div>
-                                            <div class="col-md-8">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <p><strong>Donor ID:</strong> D{{ "%03d" % donor.id }}</p>
-                                                        <p><strong>Date of
-                                                            Birth:</strong> {{ donor.date_of_birth.strftime('%d/%m/%Y') }}
-                                                        </p>
-                                                        <p><strong>Gender:</strong> {{ donor.gender }}</p>
-                                                        <p><strong>Phone:</strong> {{ donor.phone }}</p>
-                                                        <p><strong>Email:</strong> {{ donor.email or 'N/A' }}</p>
-                                                        <p>
-                                                            <strong>Address:</strong> {{ donor.address }}, {{ donor.city }}, {{ donor.state }}, {{ donor.country }}
-                                                        </p>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <p><strong>Status:</strong>
-                                                            {% if donor.status == 'Active' %}
-                                                                <span class="badge bg-success">Active</span>
-                                                            {% elif donor.status == 'Temporary Deferral' %}
-                                                                <span class="badge bg-warning">Temporary Deferral</span>
-                                                            {% else %}
-                                                                <span class="badge bg-danger">Inactive</span>
-                                                            {% endif %}
-                                                        </p>
-                                                        <p><strong>Last Donation:</strong>
-                                                            {% if donor.last_donation %}
-                                                                {{ donor.last_donation.strftime('%d/%m/%Y') }}
-                                                            {% else %}
-                                                                Never
-                                                            {% endif %}
-                                                        </p>
-                                                        <p><strong>Next Eligible:</strong>
-                                                            {% if donor.next_eligible %}
-                                                                {{ donor.next_eligible.strftime('%d/%m/%Y') }}
-                                                            {% else %}
-                                                                N/A
-                                                            {% endif %}
-                                                        </p>
-                                                        <p><strong>Registration
-                                                            Date:</strong> {{ donor.registration_date.strftime('%d/%m/%Y') }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="row mt-3">
-                                                    <div class="col-12">
-                                                        <h6>Medical History</h6>
-                                                        <p>{{ donor.medical_history or 'No medical history recorded' }}</p>
-                                                    </div>
-                                                </div>
-                                                <div class="row mt-3">
-                                                    <div class="col-12">
-                                                        <h6>Emergency Contact</h6>
-                                                        <p>
-                                                            {{ donor.emergency_contact_name or 'N/A' }}
-                                                            ({{ donor.emergency_contact_relation or 'N/A' }}) -
-                                                            {{ donor.emergency_contact_phone or 'N/A' }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="row mt-3">
-                                                    <div class="col-12">
-                                                        <h6>Notes</h6>
-                                                        <p>{{ donor.notes or 'No additional notes' }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
-                                        </button>
-                                        <a href="/admin/blood-bank/{{donor.id }}"
-                                           class="btn btn-primary">Edit Donor</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-    <!-- Row ends -->
-{% endblock body %}
-{% block heardLink %}
 
-    <!-- Data Tables -->
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+    <!-- Add Donor Modal - Redesigned -->
+    <div class="modal fade" id="addDonorModal" tabindex="-1" aria-labelledby="addDonorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addDonorModalLabel">
+                        <i class="ri-user-add-line me-2"></i>Add New Blood Donor
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + BLOOD_BANK_ADD_DONOR }}" id="donorForm">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <!-- Section 1: Patient Relationship -->
+                            <div class="col-12 border-bottom pb-3 mb-3">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="isExistingPatient"
+                                           name="is_existing_patient">
+                                    <label class="form-check-label fw-bold" for="isExistingPatient">
+                                        <i class="ri-user-search-line me-1"></i> This donor is an existing patient
+                                    </label>
+                                </div>
+
+                                <div id="patientIdSection" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <label class="form-label">Patient ID*</label>
+                                            <input type="text" class="form-control" id="patientIdInput"
+                                                   name="patient_id"
+                                                   placeholder="Enter patient ID">
+                                        </div>
+                                        <div class="col-md-4 pt-4">
+                                            <button type="button" class="btn btn-outline-primary mt-2"
+                                                    id="fetchPatientBtn">
+                                                <i class="fas fa-search me-1"></i> Verify Patient
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="patientValidationMsg" class="small mt-2"></div>
+                                </div>
+
+                                <div id="createPatientSection" class="alert alert-info mt-3" style="display: none;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="createPatient"
+                                               name="create_patient" checked>
+                                        <label class="form-check-label" for="createPatient">
+                                            <i class="ri-user-add-line me-1"></i> Also create a patient record
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Personal Information -->
+                            <div class="col-12">
+                                <h6 class="mb-3 text-primary"><i class="ri-user-line me-1"></i> Personal Information
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="first_name" id="patientName"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="last_name" id="patientLastName"
+                                               required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Blood Type <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="blood_type" id="blood_type" required>
+                                            {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                                <option value="{{ bt }}">{{ bt }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="gender" id="patientGender" required>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Date of Birth <span
+                                                class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" name="date_of_birth" id="patientAge"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 3: Contact Information -->
+                            <div class="col-12 mt-3">
+                                <h6 class="mb-3 text-primary"><i class="ri-contacts-line me-1"></i> Contact Information
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" name="phone" id="patientPhone" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" name="email" id="patientEmail"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 4: Donation Information -->
+                            <div class="col-12 mt-3">
+                                <h6 class="mb-3 text-primary"><i class="ri-drop-line me-1"></i> Donation Information
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Donation Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" name="last_donation" id="last_donation"
+                                               value="{{ datetime.utcnow().strftime('%Y-%m-%d') }}" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 5: Emergency Contacts -->
+                            <div class="col-12 mt-3">
+                                <h6 class="mb-3 text-primary"><i class="ri-emergency-line me-1"></i> Emergency Contacts
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Contact Name</label>
+                                        <input type="text" class="form-control" name="emergency_contact_name"
+                                               id="editEmergencyContactName">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Relationship</label>
+                                        <input type="text" class="form-control" name="emergency_contact_relation"
+                                               id="editEmergencyContactRelation">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" name="emergency_contact_phone"
+                                               id="editEmergencyContactPhone">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 6: Additional Information -->
+                            <div class="col-12 mt-3">
+                                <h6 class="mb-3 text-primary"><i class="ri-file-text-line me-1"></i> Additional
+                                    Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Notes</label>
+                                        <textarea class="form-control" name="notes" id="editNotes" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Donor
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for each donor -->
+    {% for donor in donors %}
+        <!-- View Donor Modal - Redesigned -->
+        <div class="modal fade" id="viewDonorModal{{ donor.id }}" tabindex="-1"
+             aria-labelledby="viewDonorModalLabel{{ donor.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewDonorModalLabel{{ donor.id }}">
+                            <i class="ri-user-line me-2"></i>Donor Details: {{ donor.first_name }} {{ donor.last_name }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Left Column - Profile Section -->
+                            <div class="col-md-4 border-end">
+                                <div class="text-center mb-4">
+                                    <h4 class="mb-1">{{ donor.first_name }} {{ donor.last_name }}</h4>
+                                    <div class="text-muted mb-2">ID: {{ donor.donor_id }}</div>
+                                    <span class="badge {% if donor.status == 'Active' %}bg-success{% elif donor.status == 'Temporary Deferral' %}bg-warning{% else %}bg-danger{% endif %} py-2 px-3">
+                                {{ donor.status }}
+                            </span>
+                                </div>
+
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary mb-3">
+                                            <i class="ri-information-line me-2"></i>Quick Info
+                                        </h6>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                <span><i class="ri-drop-line me-2 text-danger"></i>Blood Type</span>
+                                                <strong>{{ donor.blood_type }}</strong>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                <span><i class="ri-calendar-line me-2 text-info"></i>Age</span>
+                                                <strong>
+                                                    {% if donor.date_of_birth %}
+                                                        {{ (datetime.utcnow().date() - donor.date_of_birth).days // 365 }}
+                                                        years
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </strong>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                <span><i class="ri-phone-line me-2 text-success"></i>Phone</span>
+                                                <strong>{{ donor.phone }}</strong>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column - Detailed Information -->
+                            <div class="col-md-8">
+                                <!-- Personal Information Card -->
+                                <div class="card mb-4 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary mb-3">
+                                            <i class="ri-profile-line me-2"></i>Personal Information
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1"><strong>Gender:</strong> {{ donor.gender }}</p>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1"><strong>Date of Birth:</strong>
+                                                    {{ donor.date_of_birth.strftime('%d/%m/%Y') if donor.date_of_birth else 'N/A' }}
+                                                </p>
+                                            </div>
+                                            <div class="col-12 mb-2">
+                                                <p class="mb-1"><strong>Email:</strong> {{ donor.email or 'N/A' }}</p>
+                                            </div>
+                                            <div class="col-12">
+                                                <p class="mb-1"><strong>Address:</strong>
+                                                    {% if donor.address %}
+                                                        {{ donor.address }}, {{ donor.city }}, {{ donor.state }},
+                                                        {{ donor.country }}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Donation Information Card -->
+                                <div class="card mb-4 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary mb-3">
+                                            <i class="ri-heart-pulse-line me-2"></i>Donation Information
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1"><strong>Last Donation:</strong>
+                                                    {{ donor.last_donation.strftime('%d/%m/%Y') if donor.last_donation else 'Never' }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1"><strong>Next Eligible:</strong>
+                                                    {% if donor.next_eligible %}
+                                                        {% if donor.next_eligible < datetime.utcnow().date() %}
+                                                            <span class="badge bg-success">Eligible Now</span>
+                                                        {% else %}
+                                                            {{ donor.next_eligible.strftime('%d/%m/%Y') }}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>Registered On:</strong>
+                                                    {{ donor.registration_date.strftime('%d/%m/%Y') }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Emergency Contact Card -->
+                                <div class="card mb-4 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary mb-3">
+                                            <i class="ri-emergency-line me-2"></i>Emergency Contact
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1"><strong>Name:</strong>
+                                                    {{ donor.emergency_contact_name or 'N/A' }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1"><strong>Relationship:</strong>
+                                                    {{ donor.emergency_contact_relation or 'N/A' }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>Phone:</strong>
+                                                    {{ donor.emergency_contact_phone or 'N/A' }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Additional Information Cards -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-primary mb-3">
+                                                    <i class="ri-file-text-line me-2"></i>Medical History
+                                                </h6>
+                                                <div class="bg-light p-3 rounded">
+                                                    {{ donor.medical_history or 'No medical history recorded' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-primary mb-3">
+                                                    <i class="ri-sticky-note-line me-2"></i>Notes
+                                                </h6>
+                                                <div class="bg-light p-3 rounded">
+                                                    {{ donor.notes or 'No additional notes' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                        <a href="{{ ADMIN + BLOOD_BANK_EDIT_DONOR }}/{{ donor.id }}" class="btn btn-primary">
+                            <i class="ri-edit-line me-1"></i> Edit Donor
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Donor Modal (Limited Fields) -->
+        <div class="modal fade" id="editDonorModal{{ donor.id }}" tabindex="-1"
+             aria-labelledby="editDonorModalLabel{{ donor.id }}"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="editDonorModalLabel{{ donor.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Blood
+                            Donor: {{ donor.first_name }} {{ donor.last_name }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + BLOOD_BANK_EDIT_DONOR }}/{{ donor.id }}"
+                          id="editDonorForm{{ donor.id }}">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <!-- Donor Info Display -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Donor ID</label>
+                                    <input type="text" class="form-control" value="{{ donor.donor_id }}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control"
+                                           value="{{ donor.first_name }} {{ donor.last_name }}" readonly>
+                                </div>
+
+                                <!-- Blood Type (Editable) -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Blood Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="blood_type" required>
+                                        {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                            <option value="{{ bt }}" {% if donor.blood_type == bt %}selected{% endif %}>
+                                                {{ bt }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Status (Editable) -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="status" required>
+                                        {% for status in ['Active', 'Temporary Deferral', 'Permanent Deferral'] %}
+                                            <option value="{{ status }}"
+                                                    {% if donor.status == status %}selected{% endif %}>
+                                                {{ status }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Donation Information Section -->
+                                <div class="col-12 mt-3">
+                                    <h6 class="mb-3 text-primary"><i class="ri-drop-line me-2"></i> Donation Information
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Last Donation Date</label>
+                                            <input type="date" class="form-control" name="last_donation"
+                                                   value="{{ donor.last_donation.strftime('%Y-%m-%d') if donor.last_donation else '' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Next Eligible Date</label>
+                                            <input type="date" class="form-control" name="next_eligible"
+                                                   value="{{ donor.next_eligible.strftime('%Y-%m-%d') if donor.next_eligible else '' }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Emergency Contact Section -->
+                                <div class="col-12 mt-3">
+                                    <h6 class="mb-3 text-primary"><i class="ri-emergency-line me-2"></i> Emergency
+                                        Contact</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Contact Name</label>
+                                            <input type="text" class="form-control" name="emergency_contact_name"
+                                                   value="{{ donor.emergency_contact_name or '' }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Relationship</label>
+                                            <input type="text" class="form-control" name="emergency_contact_relation"
+                                                   value="{{ donor.emergency_contact_relation or '' }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" name="emergency_contact_phone"
+                                                   value="{{ donor.emergency_contact_phone or '' }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Notes Section -->
+                                <div class="col-12 mt-3">
+                                    <h6 class="mb-3 text-primary"><i class="ri-sticky-note-line me-2"></i> Notes</h6>
+                                    <textarea class="form-control" name="notes"
+                                              rows="3">{{ donor.notes or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ri-save-line me-1"></i> Update Donor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Donor Modal -->
+        <div class="modal fade" id="deleteDonorModal{{ donor.id }}" tabindex="-1"
+             aria-labelledby="deleteDonorModalLabel{{ donor.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteDonorModalLabel{{ donor.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete donor <b>{{ donor.first_name }} {{ donor.last_name }}</b>
+                            ({{ donor.donor_id }})?</p>
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i>This action will mark the donor as deleted but preserve
+                            the record.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN + BLOOD_BANK_DELETE_DONOR }}/{{ donor.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-delete-bin-line me-1"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Donors Modal -->
+    <div class="modal fade" id="restoreDonorsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Deleted Donors
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    {% if deleted_donors %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Donor ID</th>
+                                    <th>Name</th>
+                                    <th>Blood Type</th>
+                                    <th>Deleted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for donor in deleted_donors %}
+                                    <tr>
+                                        <td>{{ donor.donor_id }}</td>
+                                        <td>{{ donor.first_name }} {{ donor.last_name }}</td>
+                                        <td>{{ donor.blood_type }}</td>
+                                        <td>{{ donor.deleted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="text-end">
+                                            <form method="POST"
+                                                  action="{{ ADMIN + BLOOD_BANK_RESTORE_DONOR }}/{{ donor.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No deleted donors found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
 {% block footerLink %}
     <!-- Data Tables -->
-    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
-    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
-    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
-{% endblock footerLink %}
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Enable tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="date_of_birth"]').max = today;
+
+            // For edit forms, set the max date for date_of_birth
+            {% if donor %}
+                document.querySelector('input[name="date_of_birth"]').max = today;
+            {% endif %}
+        });
+    </script>
+
+
+    {#    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toggle patient sections based on checkbox
+            const isExistingPatientCheckbox = document.getElementById('isExistingPatient');
+            const patientIdSection = document.getElementById('patientIdSection');
+            const createPatientSection = document.getElementById('createPatientSection');
+
+            isExistingPatientCheckbox.addEventListener('change', function () {
+                if (this.checked) {
+                    patientIdSection.style.display = 'block';
+                    createPatientSection.style.display = 'none';
+                    // Make patient ID field required
+                    document.getElementById('patientIdInput').required = true;
+                    // Make email not required since we'll get it from patient
+                    document.getElementById('patientEmail').required = false;
+                } else {
+                    patientIdSection.style.display = 'none';
+                    createPatientSection.style.display = 'block';
+                    document.getElementById('patientIdInput').required = false;
+                    document.getElementById('patientEmail').required = true;
+                }
+            });
+
+            const fetchPatientBtn = document.getElementById('fetchPatientBtn');
+            const patientIdInput = document.getElementById('patientIdInput');
+            const patientValidationMsg = document.getElementById('patientValidationMsg');
+
+            // Fetch patient details when button is clicked
+            fetchPatientBtn.addEventListener('click', function () {
+                fetchPatientDetails();
+            });
+
+            // Also fetch when Enter key is pressed in the patient ID field
+            patientIdInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    fetchPatientDetails();
+                }
+            });
+
+            async function fetchPatientDetails() {
+                const patientLastName = document.getElementById('patientLastName');
+                const patientId = patientIdInput.value.trim();
+                if (!patientId) {
+                    patientValidationMsg.textContent = 'Please enter a patient ID';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/admin/get-patient/${patientId}`);
+
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Auto-fill patient details
+                    document.getElementById('patientName').value = data.first_name || '';
+                    patientLastName.value = data.last_name || '';
+                    document.getElementById('patientEmail').value = data.email || '';
+                    document.getElementById('patientGender').value = data.gender || '';
+
+                    // Calculate age from date of birth if available
+                    if (data.date_of_birth) {
+                        const dob = new Date(data.date_of_birth);
+                        document.getElementById('patientAge').value = dob.toISOString().split('T')[0];
+                    }
+
+                    document.getElementById('patientPhone').value = data.phone || '';
+
+
+                    patientValidationMsg.textContent = '';
+                    patientValidationMsg.className = 'text-success small mt-1';
+                    patientValidationMsg.textContent = 'Patient verified successfully';
+
+                    // Store patient ID in a hidden field for form submission
+                    const hiddenPatientId = document.createElement('input');
+                    hiddenPatientId.type = 'hidden';
+                    hiddenPatientId.name = 'verified_patient_id';
+                    hiddenPatientId.value = patientId;
+                    document.getElementById('donorForm').appendChild(hiddenPatientId);
+
+                } catch (error) {
+                    console.error('Error fetching patient data:', error);
+                    patientValidationMsg.className = 'text-danger small mt-1';
+                    patientValidationMsg.textContent = error.message || 'Failed to fetch patient details';
+
+                    // Clear and enable fields
+                    ['patientName', 'patientLastName', 'patientEmail', 'patientGender', 'patientAge', 'patientPhone'].forEach(id => {
+                        document.getElementById(id).value = '';
+                        document.getElementById(id).readOnly = false;
+                    });
+                }
+            }
+
+            // Set max date for date of birth to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('patientAge').max = today;
+        });
+    </script>
+{% endblock %}

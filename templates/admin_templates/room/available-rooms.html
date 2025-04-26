@@ -62,20 +62,16 @@
                                                         <td>{{ room.room_type }}</td>
                                                         <td>₹{{ "%.2f"|format(room.charge_per_day) }}</td>
                                                         <td>
-                                                            {% if room.available %}
-                                                                <button class="btn btn-outline-primary btn-sm book-now-btn"
-                                                                        data-room-id="{{ room.room_id }}"
-                                                                        data-bed-id="{{ room.bed_id }}"
-                                                                        data-room-no="{{ room.room_no }}"
-                                                                        data-bed-no="{{ room.bed_no }}"
-                                                                        data-room-type="{{ room.room_type }}"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#bookRoomModal">
-                                                                    Book Now
-                                                                </button>
-                                                            {% else %}
-                                                                <span class="badge bg-danger">Occupied</span>
-                                                            {% endif %}
+                                                            <button class="btn btn-outline-primary btn-sm book-now-btn"
+                                                                    data-room-id="{{ room.room_id }}"
+                                                                    data-bed-id="{{ room.bed_id }}"
+                                                                    data-room-no="{{ room.room_no }}"
+                                                                    data-bed-no="{{ room.bed_no }}"
+                                                                    data-room-type="{{ room.room_type }}"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#bookRoomModal">
+                                                                Book Now
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -125,20 +121,18 @@
                                                         <td>{{ room.room_type }}</td>
                                                         <td>₹{{ "%.2f"|format(room.charge_per_day) }}</td>
                                                         <td>
-                                                            {% if room.available %}
-                                                                <button class="btn btn-outline-primary btn-sm book-now-btn"
-                                                                        data-room-id="{{ room.room_id }}"
-                                                                        data-bed-id="{{ room.bed_id }}"
-                                                                        data-room-no="{{ room.room_no }}"
-                                                                        data-bed-no="{{ room.bed_no }}"
-                                                                        data-room-type="{{ room.room_type }}"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#bookRoomModal">
-                                                                    Book Now
-                                                                </button>
-                                                            {% else %}
-                                                                <span class="badge bg-danger">Occupied</span>
-                                                            {% endif %}
+
+                                                            <button class="btn btn-outline-primary btn-sm book-now-btn"
+                                                                    data-room-id="{{ room.room_id }}"
+                                                                    data-bed-id="{{ room.bed_id }}"
+                                                                    data-room-no="{{ room.room_no }}"
+                                                                    data-bed-no="{{ room.bed_no }}"
+                                                                    data-room-type="{{ room.room_type }}"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#bookRoomModal">
+                                                                Book Now
+                                                            </button>
+
                                                         </td>
                                                     </tr>
                                                 {% endfor %}

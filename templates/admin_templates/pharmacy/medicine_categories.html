@@ -94,7 +94,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <form method="POST" action="/admin/pharmacy/add-medicine-categories">
+                <form method="POST" action="{{ ADMIN + PHARMACY_MEDICINE_ADD_CATEGORIES }}">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Category Name <span class="text-danger">*</span></label>
@@ -173,7 +173,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/pharmacy/edit-medicine-categories/{{ category.id }}">
+                    <form method="POST" action="{{ ADMIN + PHARMACY_MEDICINE_EDIT_CATEGORIES }}/{{ category.id }}">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label class="form-label">Category Name <span class="text-danger">*</span></label>
@@ -230,7 +230,8 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="ri-close-line"></i> Cancel
                         </button>
-                        <form action="/admin/pharmacy/delete-medicine-categories/{{ category.id }}" method="POST">
+                        <form action="{{ ADMIN + PHARMACY_MEDICINE_DELETE_CATEGORIES }}/{{ category.id }}"
+                              method="POST">
                             <button type="submit" class="btn btn-danger"
                                     {% if category.medicines|length > 0 %}disabled{% endif %}>
                                 <i class="ri-delete-bin-line"></i> Delete
@@ -288,7 +289,7 @@
                                                 <td>{{ category.deleted_at.strftime('%Y-%m-%d %H:%M') if category.deleted_at else 'Unknown' }}</td>
                                                 <td>
                                                     <form method="POST"
-                                                          action="/admin/pharmacy/restore-medicine-categories/{{ category.id }}">
+                                                          action="{{ ADMIN + PHARMACY_MEDICINE_RESTORE_CATEGORIES }}/{{ category.id }}">
                                                         <button type="submit"
                                                                 class="btn btn-sm btn-success">
                                                             <i class="ri-refresh-line me-1"></i> Restore

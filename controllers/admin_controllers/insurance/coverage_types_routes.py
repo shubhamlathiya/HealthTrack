@@ -29,14 +29,24 @@ def list_coverage_types(current_user):
         return render_template(
             'admin_templates/insurance/coverage_types.html',
             coverage_types=coverage_types,
-            deleted_coverage_types=deleted_coverage_types
+            deleted_coverage_types=deleted_coverage_types,
+            ADMIN=ADMIN,
+            INSURANCE_ADD_CONVERAGE_TYPE=INSURANCE_ADD_CONVERAGE_TYPE,
+            INSURANCE_EDIT_CONVERAGE_TYPE=INSURANCE_EDIT_CONVERAGE_TYPE,
+            INSURANCE_DELETE_CONVERAGE_TYPE=INSURANCE_DELETE_CONVERAGE_TYPE,
+            INSURANCE_RESTORE_CONVERAGE_TYPE=INSURANCE_RESTORE_CONVERAGE_TYPE
         )
     except Exception as e:
         flash(f'Error loading coverage types: {str(e)}', 'danger')
         return render_template(
             'admin_templates/insurance/coverage_types.html',
             coverage_types=[],
-            deleted_coverage_types=[]
+            deleted_coverage_types=[],
+            ADMIN=ADMIN,
+            INSURANCE_ADD_CONVERAGE_TYPE=INSURANCE_ADD_CONVERAGE_TYPE,
+            INSURANCE_EDIT_CONVERAGE_TYPE=INSURANCE_EDIT_CONVERAGE_TYPE,
+            INSURANCE_DELETE_CONVERAGE_TYPE=INSURANCE_DELETE_CONVERAGE_TYPE,
+            INSURANCE_RESTORE_CONVERAGE_TYPE=INSURANCE_RESTORE_CONVERAGE_TYPE
         )
 
 

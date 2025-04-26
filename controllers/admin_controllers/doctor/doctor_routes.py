@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import os
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import DOCTOR_ADD_DOCTOR, DOCTOR_LIST
+from controllers.constant.adminPathConstant import DOCTOR_ADD_DOCTOR, DOCTOR_LIST, ADMIN
 from middleware.auth_middleware import token_required
 from models.doctorModel import Availability, Doctor
 from models.userModel import User
@@ -33,14 +33,20 @@ def doctor_list(current_user):
 
     return render_template(
         "admin_templates/doctor/doctor_list.html",
-        doctors=doctors
+        doctors=doctors,
+        ADMIN=ADMIN,
+        DOCTOR_ADD_DOCTOR=DOCTOR_ADD_DOCTOR,
+
     )
 
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['GET'], endpoint='add_doctor')
 @token_required
 def department_list(current_user):
-    return render_template("admin_templates/doctor/add-doctors.html")
+    return render_template("admin_templates/doctor/add-doctors.html",
+                           ADMIN=ADMIN,
+                           DOCTOR_ADD_DOCTOR=DOCTOR_ADD_DOCTOR,
+                           )
 
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['POST'])
@@ -117,11 +123,11 @@ def register_doctor(current_user):
 
         db.session.commit()
 
-        print(1)
+        # print(1)
         # Send a verification email (You should have your email setup)
         verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
         send_email('Verify Your Email', email, verification_link)
-        print(2)
+        # print(2)
         # return jsonify({
         #     'success': True,
         #     'message': 'Doctor registered successfully',

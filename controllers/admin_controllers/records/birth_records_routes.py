@@ -5,8 +5,9 @@ from fpdf import FPDF
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import RECORDS_BIRTH, RECORDS_ADD_BIRTH, ADMIN, RECORDS_BIRTH_EDIT, \
-    RECORDS_BIRTH_DELETE, RECORDS_BIRTH_MEDICAL_VISIT, RECORDS_BIRTH_MEDICAL_VISIT_DELETE, RESTORE_RECORDS_BIRTH, \
-    RESTORE_BIRTH_MEDICAL_VISIT
+    RECORDS_BIRTH_DELETE, RECORDS_BIRTH_MEDICAL_VISIT_DELETE, RESTORE_RECORDS_BIRTH, \
+    RESTORE_BIRTH_MEDICAL_VISIT, RECORDS_BIRTH_CERTIFICATE, RECORDS_BIRTH_ADD_MEDICAL_VISIT, \
+    RECORDS_BIRTH_EDIT_MEDICAL_VISIT
 from middleware.auth_middleware import token_required
 from models.birthRecordeModel import ChildCase, MedicalVisit
 from models.doctorModel import Doctor
@@ -26,7 +27,18 @@ def records_birth(current_user):
                            cases=cases,
                            doctors=doctors,
                            deleted_child_cases=deleted_child_cases,
-                           deleted_medical_visits=deleted_medical_visits)
+                           deleted_medical_visits=deleted_medical_visits,
+                           ADMIN=ADMIN,
+                           RECORDS_ADD_BIRTH=RECORDS_ADD_BIRTH,
+                           RECORDS_BIRTH_EDIT=RECORDS_BIRTH_EDIT,
+                           RECORDS_BIRTH_DELETE=RECORDS_BIRTH_DELETE,
+                           RECORDS_BIRTH_CERTIFICATE=RECORDS_BIRTH_CERTIFICATE,
+                           RECORDS_BIRTH_ADD_MEDICAL_VISIT=RECORDS_BIRTH_ADD_MEDICAL_VISIT,
+                           RECORDS_BIRTH_EDIT_MEDICAL_VISIT=RECORDS_BIRTH_EDIT_MEDICAL_VISIT,
+                           RECORDS_BIRTH_MEDICAL_VISIT_DELETE=RECORDS_BIRTH_MEDICAL_VISIT_DELETE,
+                           RESTORE_RECORDS_BIRTH=RESTORE_RECORDS_BIRTH,
+                           RESTORE_BIRTH_MEDICAL_VISIT=RESTORE_BIRTH_MEDICAL_VISIT
+                           )
 
 
 @admin.route(RECORDS_ADD_BIRTH, methods=['GET', 'POST'])
@@ -60,7 +72,10 @@ def add_child_case(current_user):
             flash(f'Error adding child case: {str(e)}', 'danger')
             return redirect(ADMIN + RECORDS_ADD_BIRTH)
 
-    return render_template("admin_templates/records/add_birth_records.html")
+    return render_template("admin_templates/records/add_birth_records.html",
+                           ADMIN=ADMIN,
+                           RECORDS_ADD_BIRTH=RECORDS_ADD_BIRTH,
+                           )
 
 
 @admin.route(RECORDS_BIRTH_EDIT + '/<int:id>', methods=['POST'])
@@ -113,7 +128,7 @@ def delete_child_case(current_user, id):
     return redirect(ADMIN + RECORDS_BIRTH)
 
 
-@admin.route(RECORDS_BIRTH_MEDICAL_VISIT + '/<int:case_id>/add-visit', methods=['POST'])
+@admin.route(RECORDS_BIRTH_ADD_MEDICAL_VISIT + '/<int:case_id>', methods=['POST'], endpoint="add_medical_visit")
 @token_required
 def add_medical_visit(current_user, case_id):
     try:
@@ -137,7 +152,7 @@ def add_medical_visit(current_user, case_id):
         return redirect(ADMIN + RECORDS_BIRTH)
 
 
-@admin.route(RECORDS_BIRTH_MEDICAL_VISIT + '/<int:visit_id>/edit', methods=['POST'])
+@admin.route(RECORDS_BIRTH_EDIT_MEDICAL_VISIT + '/<int:visit_id>', methods=['POST'])
 @token_required
 def edit_medical_visit(current_user, visit_id):
     try:
@@ -186,7 +201,7 @@ def delete_medical_visit(current_user, visit_id):
     return redirect(ADMIN + RECORDS_BIRTH)
 
 
-@admin.route(RECORDS_BIRTH + '/<int:id>/certificate', methods=['GET'])
+@admin.route(RECORDS_BIRTH_CERTIFICATE + '/<int:id>', methods=['GET'])
 def child_case_certificate(id):
     case = ChildCase.query.get_or_404(id)
 

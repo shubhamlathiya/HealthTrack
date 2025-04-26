@@ -12,6 +12,8 @@ from .leave_management_routes import *
 from .search_routes import *
 from .patient_routes import *
 from controllers.admin_controllers.operations.operation_routes import *
+
+# Staff
 from controllers.admin_controllers.staff.staff_routes import *
 
 # Room
@@ -27,7 +29,9 @@ from controllers.admin_controllers.inventory.inventory_routes import *
 from controllers.admin_controllers.inventory.issued_item_routes import *
 
 # Blood Bank
-from controllers.admin_controllers.blood_bank.blood_bank_routes import *
+from controllers.admin_controllers.blood_bank.blood_bank_issued_routes import *
+from controllers.admin_controllers.blood_bank.blood_bank_stock_routes import *
+from controllers.admin_controllers.blood_bank.blood_bank_donor_routes import *
 
 # insurance
 from controllers.admin_controllers.insurance.coverage_types_routes import *

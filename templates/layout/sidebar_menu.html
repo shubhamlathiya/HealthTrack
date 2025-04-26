@@ -305,12 +305,13 @@
                     <ul class="treeview-menu">
                         <li>
                             <a href="/admin/inventory/item-stock-list"
-                               class="{% if request.path == '/admin/inventory/stock' %}active-sub{% endif %}">Item Stock
+                               class="{% if request.path == '/admin/inventory/item-stock-list' %}active-sub{% endif %}">Item
+                                Stock
                                 List</a>
                         </li>
                         <li>
                             <a href="/admin/inventory/issued-item"
-                               class="{% if request.path == '/admin/inventory/issued' %}active-sub{% endif %}">Issued
+                               class="{% if request.path == '/admin/inventory/issued-item' %}active-sub{% endif %}">Issued
                                 Items</a>
                         </li>
                     </ul>
@@ -329,7 +330,7 @@
                         </li>
                         <li>
                             <a href="/admin/records/birth"
-                               class="{% if request.path == '/admin/inventory/issued' %}active-sub{% endif %}">Birth
+                               class="{% if request.path == '/admin/records/birth' %}active-sub{% endif %}">Birth
                                 Records</a>
                         </li>
                     </ul>
@@ -391,11 +392,6 @@
                                class="{% if request.path == '/admin/pharmacy/medicine-list' %}active-sub{% endif %}">Medicine
                                 List</a>
                         </li>
-                        <li>
-                            <a href="/admin/pharmacy/add-medicine"
-                               class="{% if request.path == '/admin/pharmacy/add-medicine' %}active-sub{% endif %}">Add
-                                Medicine</a>
-                        </li>
                     </ul>
                 </li>
                 <li class="{% if request.path == '/admin/get-resources' %}active current-page{% endif %}">
@@ -410,7 +406,7 @@
                         <span class="menu-text">Doctors</span>
                     </a>
                 </li>
-                <li class="treeview {% if request.path.startswith('/admin/view-staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">
+                <li class="treeview {% if request.path.startswith('/admin/staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-scissors-line"></i>
                         <span class="menu-text">Operations Management</span>
@@ -453,12 +449,8 @@
                     </a>
                     <ul class="treeview-menu">
                         <li>
-                            <a href="/admin/view-staff"
-                               class="{% if request.path == '/admin/view-staff' %}active-sub{% endif %}">Staff List</a>
-                        </li>
-                        <li>
-                            <a href="/admin/add-staff"
-                               class="{% if request.path == '/admin/add-staff' %}active-sub{% endif %}">Add Staff</a>
+                            <a href="/admin/staff"
+                               class="{% if request.path == '/admin/staff' %}active-sub{% endif %}">Staff List</a>
                         </li>
                     </ul>
                 </li>

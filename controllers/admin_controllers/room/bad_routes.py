@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import request, flash, redirect, render_template, jsonify
 
 from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import ROOM_ADD_BAD, ADMIN, ROOM_DELETE_BAD
+from controllers.constant.adminPathConstant import ROOM_ADD_BAD, ADMIN, ROOM_DELETE_BAD, ROOM
 from middleware.auth_middleware import token_required
 from models.roomModel import Room, Bed
 from utils.config import db
@@ -43,7 +43,9 @@ def add_bed(current_user , room_id):
 
     return render_template('admin_templates/room/add_bed.html',
                            room=room,
-                           next_bed_number=next_bed_number)
+                           next_bed_number=next_bed_number,
+                           ADMIN = ADMIN,
+                           ROOM = ROOM)
 
 
 @admin.route(ROOM_DELETE_BAD + '/<int:bed_id>', methods=['POST'], endpoint='delete_bed')

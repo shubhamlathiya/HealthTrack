@@ -16,6 +16,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    staff = db.relationship('Staff', backref='user', uselist=False)
+
     # Relationships
     insurance_records = db.relationship(
         'InsuranceRecord',

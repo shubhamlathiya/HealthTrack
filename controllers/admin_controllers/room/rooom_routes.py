@@ -165,7 +165,7 @@ def room_available_room(current_user):
             is_deleted=0,
             is_empty=1
         ).all()
-        print(rooms)
+        # print(rooms)
         department_rooms = []
         for room in rooms:
             # Get all beds for this room
@@ -189,7 +189,7 @@ def room_available_room(current_user):
 
         if department_rooms:  # Only add department if it has available rooms
             departments_data[department.name] = department_rooms
-
+        print(departments_data)
     return render_template("admin_templates/room/available-rooms.html", departments=departments_data)
 
 
@@ -245,7 +245,9 @@ def get_patient(patient_id):
     return jsonify({
         'id': patient.id,
         'name': patient.first_name,
-        'email': patient.last_name,  # If this is really email, fix the field name
+        'first_name': patient.first_name,
+        'last_name': patient.last_name,
+        'email': patient.user.email,  # If this is really email, fix the field name
         'phone': patient.phone,
         'gender': patient.gender,
         'age': patient.age

@@ -40,6 +40,7 @@
                                 <th>Type</th>
                                 <th>Department</th>
                                 <th>Charge/Day</th>
+                                <th>Total Bed</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -69,8 +70,9 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ "₹{:,.2f}".format(room.charge_per_day) }}</td>
+                                    <td>{{ room.beds|length }}</td>
                                     <td>
-                                        {% if room.is_available %}
+                                        {% if room.is_empty %}
                                             {% if room.is_empty %}
                                                 <span class="badge bg-success bg-opacity-10 text-success">Available</span>
                                             {% else %}

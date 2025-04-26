@@ -12,8 +12,15 @@ from utils.config import db
 def item_stock_list():
     active_items = Item.query.filter_by(is_deleted=False).all()
     deleted_items = Item.query.filter_by(is_deleted=True).all()
-    return render_template('admin_templates/inventory/item_stock_list.html', items=active_items,
-                           deleted_items=deleted_items)
+    return render_template('admin_templates/inventory/item_stock_list.html',
+                           items=active_items,
+                           deleted_items=deleted_items,
+                           ADMIN=ADMIN,
+                           INVENTORY_ITEM_STOCK_LIST=INVENTORY_ITEM_STOCK_LIST,
+                           INVENTORY_ADD_ITEM=INVENTORY_ADD_ITEM,
+                           INVENTORY_EDIT_ITEM=INVENTORY_EDIT_ITEM,
+                           INVENTORY_DELETE_ITEM=INVENTORY_DELETE_ITEM,
+                           INVENTORY_RESTORE_ITEM=INVENTORY_RESTORE_ITEM)
 
 
 @admin.route(INVENTORY_ADD_ITEM, methods=['POST'], endpoint='inventory_item_add')

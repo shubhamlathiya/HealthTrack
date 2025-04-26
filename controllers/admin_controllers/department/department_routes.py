@@ -28,13 +28,21 @@ def department_list(current_user):
                            departments=departments,
                            deleted_departments=deleted_departments,
                            doctors=all_doctors,
-                           rooms=all_rooms)
+                           rooms=all_rooms,
+                           ADMIN=ADMIN,
+                           DEPARTMENT_ADD_DEPARTMENT=DEPARTMENT_ADD_DEPARTMENT,
+                           DEPARTMENT_EDIT_DEPARTMENT=DEPARTMENT_EDIT_DEPARTMENT,
+                           DEPARTMENT_DELETE_DEPARTMENT=DEPARTMENT_DELETE_DEPARTMENT,
+                           DEPARTMENT_RESTORE_DEPARTMENT=DEPARTMENT_RESTORE_DEPARTMENT
+                           )
 
 
 @admin.route(DEPARTMENT_ADD_DEPARTMENT, methods=['GET'], endpoint='add-department')
 @token_required
 def department_list(current_user):
-    return render_template("admin_templates/department/add-department.html")
+    return render_template("admin_templates/department/add-department.html",
+                           ADMIN=ADMIN,
+                           DEPARTMENT_ADD_DEPARTMENT=DEPARTMENT_ADD_DEPARTMENT)
 
 
 @admin.route(DEPARTMENT_ADD_DEPARTMENT, methods=['POST'])
@@ -60,11 +68,11 @@ def add_department(current_user):
     try:
         db.session.add(new_dept)
         db.session.commit()
-
-        return redirect("/admin/" + DEPARTMENT_LIST)
+        flash('Department added successfully!', 'success')
     except Exception as e:
         db.session.rollback()
-        print(f'Error adding department: {str(e)}', 'danger')
+        flash(f'Error adding department: {str(e)}', 'danger')
+    return redirect(ADMIN + DEPARTMENT_LIST)
 
 
 @admin.route(DEPARTMENT_EDIT_DEPARTMENT + '/<int:id>', methods=['POST'])
@@ -111,7 +119,7 @@ def delete_department(current_user, id):
 
 @admin.route(DEPARTMENT_RESTORE_DEPARTMENT + '/<int:id>', methods=['POST'])
 @token_required
-def restore_department(current_user,id):
+def restore_department(current_user, id):
     try:
         Department.query.filter_by(id=id).update({
             'is_deleted': False,

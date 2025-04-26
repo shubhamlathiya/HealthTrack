@@ -11,7 +11,7 @@
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Death Records</h5>
                     <div>
-                        <a href="/admin/records/add-death" class="btn btn-primary">Add Record</a>
+                        <a href="{{ ADMIN + RECORDS_ADD_DEATH }}" class="btn btn-primary">Add Record</a>
                         <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
                                 data-bs-target="#restoreDeathRecordsModal">
                             <i class="ri-refresh-line"></i> View & Restore Deleted Records
@@ -87,7 +87,7 @@
                                                     data-bs-placement="top" data-bs-title="Edit Case">
                                                 <i class="ri-edit-box-line"></i>
                                             </button>
-                                            <a href="/admin/records/death/{{ record.id }}/certificate"
+                                            <a href="{{ ADMIN + RECORDS_DEATH_CERTIFICATE }}/{{ record.id }}"
                                                class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip"
                                                data-bs-placement="top" data-bs-title="Print Certificate">
                                                 <i class="ri-printer-line"></i>
@@ -121,7 +121,7 @@
                         record?
                     </div>
                     <div class="modal-footer">
-                        <form action="/admin/records/death-delete/{{ record.id }}" method="POST">
+                        <form action="{{ ADMIN + RECORDS_DEATH_DELETE }}/{{ record.id }}" method="POST">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel
                             </button>
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -224,7 +224,7 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="ri-close-line"></i> Close
                         </button>
-                        <a href="/admin/records/death/{{ record.id }}/certificate" class="btn btn-primary">
+                        <a href="{{ ADMIN + RECORDS_DEATH_CERTIFICATE }}/{{ record.id }}" class="btn btn-primary">
                             <i class="ri-printer-line"></i> Print Certificate
                         </a>
                     </div>
@@ -244,7 +244,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/records/death-edit/{{ record.id }}">
+                    <form method="POST" action="{{ ADMIN + RECORDS_DEATH_EDIT }}/{{ record.id }}">
                         <div class="modal-body">
                             <div class="row">
                                 <!-- Left Column -->
@@ -436,7 +436,7 @@
                                                 <td class="text-end">
                                                     <div class="d-inline-flex gap-2">
                                                         <form method="POST"
-                                                              action="/admin/records/restore-death/{{ record.id }}">
+                                                              action="{{ ADMIN + RECORDS_RESTORE_DEATH }}/{{ record.id }}">
                                                             <button type="submit" class="btn btn-sm btn-success">
                                                                 <i class="ri-refresh-line"></i> Restore
                                                             </button>
@@ -496,7 +496,7 @@
                                                             <i class="ri-eye-line"></i> View
                                                         </button>
                                                         <form method="POST"
-                                                              action="{{ url_for('admin.restore_death_certificate', id=cert.id) }}">
+                                                              action="{{ cert.id }}">
                                                             <button type="submit" class="btn btn-sm btn-success">
                                                                 <i class="ri-refresh-line"></i> Restore
                                                             </button>

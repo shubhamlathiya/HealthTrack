@@ -32,7 +32,10 @@ def department_assignments(current_user):
 
         return render_template('admin_templates/doctor/assign_department.html',
                                doctors=doctors,
-                               departments=departments)
+                               departments=departments,
+                               ADMIN=ADMIN,
+                               DOCTOR_ASSIGN_DEPARTMENT = DOCTOR_ASSIGN_DEPARTMENT,
+                               DOCTOR_UPDATE_ASSIGN_DEPARTMENT = DOCTOR_UPDATE_ASSIGN_DEPARTMENT)
     except Exception as e:
         return "An error occurred while loading the department assignment page.", 500
 
@@ -84,7 +87,7 @@ def assign_doctor_department(current_user):
         return redirect(ADMIN + DOCTOR_ASSIGN_DEPARTMENT)
 
 
-@admin.route(DOCTOR_UPDATE_ASSIGN_DEPARTMENT + '/<int:assignment_id>', methods=['POST'])
+@admin.route(DOCTOR_UPDATE_ASSIGN_DEPARTMENT + '/<int:assignment_id>', methods=['POST'] ,endpoint="update_assignment")
 @token_required
 def update_assignment(current_user, assignment_id):
     try:

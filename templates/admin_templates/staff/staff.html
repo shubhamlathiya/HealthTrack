@@ -1,0 +1,573 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Management{% endblock %}
+{% block page %}Human Resources - Staff Management{% endblock %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">All Staff Members</h5>
+                    <div>
+                        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal"
+                                data-bs-target="#addStaffModal">
+                            <i class="ri-add-line me-1"></i> Add New Staff
+                        </button>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreStaffModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Staff Member</th>
+                                <th>Designation</th>
+                                <th>Department</th>
+                                <th>Mobile</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for staff in staff_list %}
+                                <tr>
+                                    <td>{{ staff.id }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if staff.profile_picture %}
+                                                <img src="/static/{% if staff.profile_picture %}{{ staff.profile_picture }}{% else %} ../../../static/assets/images/doctor.png  {% endif %}"
+                                                     class="rounded-circle me-2" width="40" height="40">
+                                            {% else %}
+                                                <div class="avatar-placeholder me-2">
+                                                    {{ staff.first_name[0] }}{{ staff.last_name[0] }}</div>
+                                            {% endif %}
+                                            <div>
+                                                <strong>{{ staff.first_name }} {{ staff.last_name }}</strong>
+                                                <div class="text-muted small">{{ staff.email }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ staff.designation }}</td>
+                                    <td>{{ staff.department.name if staff.department else 'N/A' }}</td>
+                                    <td>{{ staff.mobile }}</td>
+                                    <td>
+                                        {% if staff.status == 'Active' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                                        {% elif staff.status == 'Inactive' %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger">Inactive</span>
+                                        {% else %}
+                                            <span class="badge bg-warning bg-opacity-10 text-warning">Suspended</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteStaffModal{{ staff.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewStaffModal{{ staff.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editStaffModal{{ staff.id }}"
+                                                    data-bs-placement="top" data-bs-title="Edit Staff">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Staff Modal -->
+    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-labelledby="addStaffModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addStaffModalLabel">
+                        <i class="ri-add-line me-2"></i>Add New Staff Member
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="/admin/staff/add-staff" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="first_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="last_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" name="mobile" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" name="password" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Designation <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="designation" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="department">Department <span class="text-danger">*</span></label>
+                                <select class="form-select" name="department"  id="department" required>
+                                    {% for dept in departments %}
+                                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Joining Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="joining_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Salary</label>
+                                <input type="number" step="0.01" class="form-control" name="salary">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" required>
+                                    <option value="Active" selected>Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="Suspended">Suspended</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Shift</label>
+                                <select class="form-select" name="shift">
+                                    <option value="Day">Day</option>
+                                    <option value="Night">Night</option>
+                                    <option value="Rotational">Rotational</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Experience (Years)</label>
+                                <input type="number" class="form-control" name="experience">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" name="date_of_birth">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="2"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Education</label>
+                                <textarea class="form-control" name="education" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control" name="profile_picture" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Staff
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for each staff member -->
+    {% for staff in staff_list %}
+        <!-- View Staff Modal -->
+        <div class="modal fade" id="viewStaffModal{{ staff.id }}" tabindex="-1"
+             aria-labelledby="viewStaffModalLabel{{ staff.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewStaffModalLabel{{ staff.id }}">
+                            <i class="ri-user-line me-2"></i>Staff Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                {% if staff.profile_picture %}
+                                     <img src="/static/{% if staff.profile_picture %}{{ staff.profile_picture }}{% else %} ../../../static/assets/images/doctor.png  {% endif %}"
+                                                     class="rounded-circle me-2" width="150">
+                                {% else %}
+                                    <div class="avatar-placeholder mb-3">
+                                        {{ staff.first_name[0] }}{{ staff.last_name[0] }}</div>
+                                {% endif %}
+                                <h4>{{ staff.first_name }} {{ staff.last_name }}</h4>
+                                <p class="text-muted">{{ staff.designation }}</p>
+                                <p>
+                                    <span class="badge bg-{{ 'success' if staff.status == 'Active' else 'danger' if staff.status == 'Inactive'
+                                            else 'warning'
+                                            }}">
+                                        {{ staff.status }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Email:</strong> {{ staff.email }}</p>
+                                        <p><strong>Mobile:</strong> {{ staff.mobile }}</p>
+                                        <p>
+                                            <strong>Department:</strong> {{ staff.department.name if staff.department else 'N/A' }}
+                                        </p>
+                                        <p><strong>Joining Date:</strong> {{ staff.joining_date.strftime('%Y-%m-%d') }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Shift:</strong> {{ staff.shift or 'N/A' }}</p>
+                                        <p><strong>Experience:</strong> {{ staff.experience }} years</p>
+                                        <p><strong>Gender:</strong> {{ staff.gender|capitalize }}</p>
+                                        <p><strong>Date of
+                                            Birth:</strong> {{ staff.date_of_birth.strftime('%Y-%m-%d') if staff.date_of_birth else 'N/A' }}
+                                        </p>
+                                    </div>
+                                    <div class="col-12">
+                                        <p><strong>Address:</strong> {{ staff.address or 'N/A' }}</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <p><strong>Education:</strong></p>
+                                        <div class="bg-light p-3 rounded">
+                                            {{ staff.education or 'No education information provided' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Staff Modal -->
+        <div class="modal fade" id="editStaffModal{{ staff.id }}" tabindex="-1"
+             aria-labelledby="editStaffModalLabel{{ staff.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="editStaffModalLabel{{ staff.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Staff Member
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="/admin/staff/edit-staff/{{ staff.id }}" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="first_name"
+                                           value="{{ staff.first_name }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="last_name"
+                                           value="{{ staff.last_name }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" name="mobile"
+                                           value="{{ staff.mobile }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Designation <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="designation"
+                                           value="{{ staff.designation }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Department <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="department" required>
+                                        {% for dept in departments %}
+                                            <option value="{{ dept.id }}"
+                                                    {% if staff.department_id == dept.id %}selected{% endif %}>
+                                                {{ dept.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Joining Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="joining_date"
+                                           value="{{ staff.joining_date.strftime('%Y-%m-%d') }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Salary</label>
+                                    <input type="number" step="0.01" class="form-control" name="salary"
+                                           value="{{ staff.salary }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="status" required>
+                                        <option value="Active" {% if staff.status == 'Active' %}selected{% endif %}>
+                                            Active
+                                        </option>
+                                        <option value="Inactive" {% if staff.status == 'Inactive' %}selected{% endif %}>
+                                            Inactive
+                                        </option>
+                                        <option value="Suspended"
+                                                {% if staff.status == 'Suspended' %}selected{% endif %}>Suspended
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Shift</label>
+                                    <select class="form-select" name="shift">
+                                        <option value="Day" {% if staff.shift == 'Day' %}selected{% endif %}>Day
+                                        </option>
+                                        <option value="Night" {% if staff.shift == 'Night' %}selected{% endif %}>Night
+                                        </option>
+                                        <option value="Rotational"
+                                                {% if staff.shift == 'Rotational' %}selected{% endif %}>Rotational
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Experience (Years)</label>
+                                    <input type="number" class="form-control" name="experience"
+                                           value="{{ staff.experience }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Gender</label>
+                                    <select class="form-select" name="gender">
+                                        <option value="male" {% if staff.gender == 'male' %}selected{% endif %}>Male
+                                        </option>
+                                        <option value="female" {% if staff.gender == 'female' %}selected{% endif %}>
+                                            Female
+                                        </option>
+                                        <option value="other" {% if staff.gender == 'other' %}selected{% endif %}>
+                                            Other
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" name="date_of_birth"
+                                           value="{{ staff.date_of_birth.strftime('%Y-%m-%d') if staff.date_of_birth else '' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Address</label>
+                                    <textarea class="form-control" name="address"
+                                              rows="2">{{ staff.address }}</textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Education</label>
+                                    <textarea class="form-control" name="education"
+                                              rows="3">{{ staff.education }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Profile Picture</label>
+                                    <input type="file" class="form-control" name="profile_picture" accept="image/*">
+                                    {% if staff.profile_picture %}
+                                        <div class="mt-2">
+                                       <img src="/static/{% if staff.profile_picture %}{{ staff.profile_picture }}{% else %} ../../../static/assets/images/doctor.png  {% endif %}"
+                                                     class="rounded-circle me-2" width="100">
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-save-line me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Staff Modal -->
+        <div class="modal fade" id="deleteStaffModal{{ staff.id }}" tabindex="-1"
+             aria-labelledby="deleteStaffModalLabel{{ staff.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteStaffModalLabel{{ staff.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete <b>{{ staff.first_name }} {{ staff.last_name }}</b>?</p>
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i>This action will mark the staff member as inactive and
+                            remove them from active listings.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="/admin/staff/delete-staff/{{ staff.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-delete-bin-line me-1"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Staff Modal -->
+    <div class="modal fade" id="restoreStaffModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Deleted Staff Members
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_staff %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Staff Member</th>
+                                    <th>Designation</th>
+                                    <th>Department</th>
+                                    <th>Deleted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for staff in deleted_staff %}
+                                    <tr>
+                                        <td>{{ staff.id }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if staff.profile_picture %}
+                                                    <img src="{{ url_for('static', filename=staff.profile_picture) }}"
+                                                         class="rounded-circle me-2" width="40" height="40">
+                                                {% else %}
+                                                    <div class="avatar-placeholder me-2">
+                                                        {{ staff.first_name[0] }}{{ staff.last_name[0] }}</div>
+                                                {% endif %}
+                                                <div>
+                                                    <strong>{{ staff.first_name }} {{ staff.last_name }}</strong>
+                                                    <div class="text-muted small">{{ staff.email }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ staff.designation }}</td>
+                                        <td>{{ staff.department.name if staff.department else 'N/A' }}</td>
+                                        <td>{{ staff.deleted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="text-end">
+                                            <form method="POST" action="/admin/staff/restore-staff/{{ staff.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No deleted staff members found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Enable tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // Set default date for joining date
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="joining_date"]').value = today;
+        });
+    </script>
+{% endblock %}

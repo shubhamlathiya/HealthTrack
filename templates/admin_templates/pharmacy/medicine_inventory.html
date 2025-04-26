@@ -135,7 +135,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <form method="POST" action="/admin/pharmacy/add-medicine">
+                <form method="POST" action="{{ ADMIN + PHARMACY_MEDICINE_ADD }}">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -238,7 +238,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/pharmacy/edit-medicine/{{ medicine.id }}">
+                    <form method="POST" action="{{ ADMIN + PHARMACY_MEDICINE_EDIT }}/{{ medicine.id }}">
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-6">
@@ -433,9 +433,11 @@
                                     </table>
                                 </div>
                                 <div class="text-end mt-2">
-                                    <form action="/admin/pharmacy/transactions-medicine" method="POST">
+                                    <form action="{{ ADMIN + PHARMACY_MEDICINE_TRANSACTIONS }}" method="POST">
                                         <input type="hidden" name="medicine_id" value="{{ medicine.id }}">
-                                        <button type="submit" class="btn btn-sm btn-outline-primary"> View All Transactions</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary"> View All
+                                            Transactions
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -473,7 +475,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <form action="/admin/pharmacy/delete-medicine/{{ medicine.id }}" method="POST">
+                        <form action="{{ ADMIN + PHARMACY_MEDICINE_DELETE }}/{{ medicine.id }}" method="POST">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </div>
@@ -492,7 +494,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/pharmacy/restock-medicine/{{ medicine.id }}">
+                    <form method="POST" action="{{ ADMIN + PHARMACY_MEDICINE_RESTOCK }}/{{ medicine.id }}">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label class="form-label">Medicine</label>
@@ -551,7 +553,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/pharmacy/dispense-medicine/{{ medicine.id }}">
+                    <form method="POST" action="{{ ADMIN + PHARMACY_MEDICINE_DISPENSE }}/{{ medicine.id }}">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label class="form-label">Medicine</label>
@@ -661,7 +663,7 @@
                                                 <td>{{ medicine.deleted_at.strftime('%Y-%m-%d %H:%M') if medicine.deleted_at else 'Unknown' }}</td>
                                                 <td>
                                                     <form method="POST"
-                                                          action="/admin/pharmacy/restore-medicine/{{ medicine.id }}">
+                                                          action="{{ADMIN + PHARMACY_MEDICINE_RESTORE}}/{{ medicine.id }}">
                                                         <button type="submit"
                                                                 class="btn btn-sm btn-success">
                                                             <i class="ri-refresh-line me-1"></i> Restore

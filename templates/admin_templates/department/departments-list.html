@@ -35,7 +35,7 @@
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Department List</h5>
                     <div>
-                        <a href="/admin/department/add-department" class="btn btn-primary ms-auto">
+                        <a href="{{ ADMIN + DEPARTMENT_ADD_DEPARTMENT }}" class="btn btn-primary ms-auto">
                             <i class="ri-add-line"></i> Add Department
                         </a>
                         <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
@@ -155,7 +155,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <form action="/admin/department/delete-department/{{ department.id }}" method="POST">
+                        <form action="{{ ADMIN + DEPARTMENT_DELETE_DEPARTMENT }}/{{ department.id }}" method="POST">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel
                             </button>
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -354,7 +354,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/department/edit-department/{{ department.id }}">
+                    <form method="POST" action="{{ ADMIN + DEPARTMENT_EDIT_DEPARTMENT }}/{{ department.id }}">
                         <div class="modal-body">
                             <div class="row">
                                 <!-- Left Column -->
@@ -475,7 +475,7 @@
                                         <td class="text-end">
                                             <div class="d-inline-flex gap-2">
                                                 <form method="POST"
-                                                      action="/admin/department/restore-department/{{ department.id }}">
+                                                      action="{{ ADMIN + DEPARTMENT_RESTORE_DEPARTMENT }}/{{ department.id }}">
                                                     <button type="submit" class="btn btn-sm btn-success">
                                                         <i class="ri-refresh-line"></i> Restore
                                                     </button>
@@ -590,7 +590,7 @@
                 name: 'Employees',
                 data: [
                     {% for department in departments %}
-                        {{ department.doctors|length }}{% if not loop.last %},{% endif %}
+                        {{ department.assignments|length }} + {{ department.staff|length }}{% if not loop.last %},{% endif %}
                     {% endfor %}
                 ]
             }],
@@ -614,7 +614,7 @@
             tooltip: {
                 y: {
                     formatter: function (val) {
-                        return val + " doctors"
+                        return val
                     }
                 }
             },

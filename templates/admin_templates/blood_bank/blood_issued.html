@@ -1,241 +1,807 @@
 {% extends 'base.html' %}
 
-{% block title %}Blood Issued{% endblock title %}
-{% block page %}Blood Issued{% endblock page %}
+{% block title %}Blood Issuance Management{% endblock %}
+{% block page %}Blood Bank - Issuance Records{% endblock %}
 
 {% block body %}
-
-    <!-- Row starts -->
-    <div class="row gx-4">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title">Blood Issuance Records</h5>
-                    <a href="add-issuance.html" class="btn btn-primary ms-auto">New Issuance</a>
+    <div class="container-fluid">
+        <!-- Status Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary bg-opacity-10 border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-primary">Total Issuances</h6>
+                                <h3>{{ issuances|length }}</h3>
+                            </div>
+                            <i class="ri-drop-fill fs-1 text-primary"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-
-                    <!-- Table starts -->
-                    <div class="table-responsive">
-                        <table id="scrollVertical" class="table m-0 align-middle">
-                            <thead>
-                            <tr>
-                                <th>Issue ID</th>
-                                <th>Patient</th>
-                                <th>Blood Product</th>
-                                <th>Blood Type</th>
-                                <th>Component</th>
-                                <th>Quantity</th>
-                                <th>Issue Date</th>
-                                <th>Status</th>
-                                <th>Doctor</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>BI001</td>
-                                <td>
-                                    <strong>John Doe</strong><br>
-                                    <small>P001 | 35/M</small>
-                                </td>
-                                <td>BP001</td>
-                                <td>O+</td>
-                                <td>Red Blood Cells</td>
-                                <td>350 mL</td>
-                                <td>2024-11-05</td>
-                                <td><span class="badge bg-success">Transfused</span></td>
-                                <td>Dr. Emily Watson</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>BI002</td>
-                                <td>
-                                    <strong>Sarah Johnson</strong><br>
-                                    <small>P002 | 28/F</small>
-                                </td>
-                                <td>BP002</td>
-                                <td>A-</td>
-                                <td>Plasma</td>
-                                <td>250 mL</td>
-                                <td>2024-11-06</td>
-                                <td><span class="badge bg-warning">Pending</span></td>
-                                <td>Dr. Michael Brown</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>BI003</td>
-                                <td>
-                                    <strong>Robert Wilson</strong><br>
-                                    <small>P003 | 45/M</small>
-                                </td>
-                                <td>BP003</td>
-                                <td>B+</td>
-                                <td>Platelets</td>
-                                <td>1 Unit</td>
-                                <td>2024-11-07</td>
-                                <td><span class="badge bg-success">Transfused</span></td>
-                                <td>Dr. Emily Watson</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#viewDetails">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Table ends -->
-
-                    <!-- Modal Delete Row -->
-                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-sm">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="delRowLabel">
-                                        Confirm Deletion
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete this issuance record?
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
-                                                aria-label="Close">Cancel
-                                        </button>
-                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Delete
-                                        </button>
-                                    </div>
-                                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success bg-opacity-10 border-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-success">Completed</h6>
+                                <h3>{{ issuances|selectattr('status', 'equalto', 'Completed')|list|length }}</h3>
                             </div>
+                            <i class="ri-checkbox-circle-fill fs-1 text-success"></i>
                         </div>
                     </div>
-
-                    <!-- View Details Modal -->
-                    <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="viewDetailsLabel"
-                         aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="viewDetailsLabel">Blood Issuance Details</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h6>Patient Information</h6>
-                                            <p><strong>Issue ID:</strong> BI001</p>
-                                            <p><strong>Patient ID:</strong> P001</p>
-                                            <p><strong>Name:</strong> John Doe</p>
-                                            <p><strong>Age/Gender:</strong> 35 / Male</p>
-                                            <p><strong>Blood Group:</strong> O+</p>
-                                            <p><strong>Issue Reason:</strong> Surgery</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6>Blood Product Information</h6>
-                                            <p><strong>Blood Product ID:</strong> BP001</p>
-                                            <p><strong>Blood Type:</strong> O+</p>
-                                            <p><strong>Component Type:</strong> Red Blood Cells</p>
-                                            <p><strong>Quantity Issued:</strong> 350 mL</p>
-                                            <p><strong>Batch Number:</strong> BATCH12345</p>
-                                            <p><strong>Status:</strong> Fresh</p>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <h6>Medical Information</h6>
-                                            <p><strong>Doctor ID:</strong> D001</p>
-                                            <p><strong>Doctor Name:</strong> Dr. Emily Watson</p>
-                                            <p><strong>Transfusion Date:</strong> 2024-11-06</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6>Administrative</h6>
-                                            <p><strong>Issue Date:</strong> 2024-11-05</p>
-                                            <p><strong>Issued By:</strong> Dr. Emily Watson</p>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-12">
-                                            <h6>Remarks</h6>
-                                            <p>Patient recovering well post-surgery.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
-                                    </button>
-                                    <button type="button" class="btn btn-primary">Print Record</button>
-                                </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning bg-opacity-10 border-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-warning">Pending</h6>
+                                <h3>{{ issuances|selectattr('status', 'equalto', 'Pending')|list|length }}</h3>
                             </div>
+                            <i class="ri-time-line fs-1 text-warning"></i>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger bg-opacity-10 border-danger">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-danger">Cancelled</h6>
+                                <h3>{{ issuances|selectattr('status', 'equalto', 'Cancelled')|list|length }}</h3>
+                            </div>
+                            <i class="ri-close-circle-fill fs-1 text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Main Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Blood Issuance Records</h5>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addIssuanceModal">
+                        <i class="ri-add-line me-1"></i> New Issuance
+                    </button>
+                    <button class="btn btn-outline-secondary ms-2" data-bs-toggle="modal"
+                            data-bs-target="#restoreModal">
+                        <i class="ri-archive-line me-1"></i> View Archive
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" id="issuanceTable">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Issue ID</th>
+                            <th>Patient</th>
+                            <th>Blood Product</th>
+                            <th>Blood Type</th>
+                            <th>Component</th>
+                            <th>Quantity</th>
+                            <th>Issue Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for issuance in issuances %}
+                            <tr class="{% if issuance.status == 'Completed' %}table-success{% elif issuance.status == 'Cancelled' %}table-danger{% elif issuance.status == 'Pending' %}table-warning{% endif %}">
+                                <td>{{ issuance.issue_id }}</td>
+                                <td>
+                                    <strong>{{ issuance.patient_name }}</strong><br>
+                                    <small>ID: {{ issuance.patient_id }}</small>
+                                </td>
+                                <td>{{ issuance.blood_product.product_code }}</td>
+                                <td>{{ issuance.blood_type }}</td>
+                                <td>{{ issuance.component_type }}</td>
+                                <td>{{ issuance.quantity }} units</td>
+                                <td>{{ issuance.issue_date.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    {% if issuance.status == 'Completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% elif issuance.status == 'Pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#viewModal{{ issuance.id }}">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-success" data-bs-toggle="modal"
+                                                data-bs-target="#editModal{{ issuance.id }}">
+                                            <i class="ri-edit-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal{{ issuance.id }}">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Row ends -->
 
-{% endblock body %}
+    <!-- Add Issuance Modal - Enhanced -->
+    <div class="modal fade" id="addIssuanceModal" tabindex="-1" aria-labelledby="addIssuanceModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addIssuanceModalLabel">
+                        <i class="ri-drop-line me-2"></i>New Blood Issuance
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + BLOOD_BANK_ADD_ISSUED }}" id="issuanceForm">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <!-- Section 1: Patient Information -->
+                            <div class="col-12 border-bottom pb-3 mb-3">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="isExistingPatient"
+                                           name="is_existing_patient">
+                                    <label class="form-check-label fw-bold" for="isExistingPatient">
+                                        <i class="ri-user-search-line me-1"></i> This is an existing patient
+                                    </label>
+                                </div>
+
+                                <div id="patientIdSection" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <label class="form-label">Patient ID <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="patientIdInput"
+                                                   name="patient_id" required placeholder="Enter patient ID">
+                                        </div>
+                                        <div class="col-md-4 pt-4">
+                                            <button type="button" class="btn btn-outline-primary mt-2"
+                                                    id="fetchPatientBtn">
+                                                <i class="ri-search-line me-1"></i> Verify Patient
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="patientValidationMsg" class="small mt-2"></div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Patient Details -->
+                            <div class="col-12">
+                                <h6 class="mb-3 text-primary"><i class="ri-user-line me-1"></i> Patient Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Patient Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="patient_name" id="patientName"
+                                               required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Patient Age</label>
+                                        <input type="number" class="form-control" name="patient_age" id="patientAge">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Patient Gender</label>
+                                        <select class="form-select" name="patient_gender" id="patientGender">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Patient Email</label>
+                                        <input type="email" class="form-control" name="patient_email" id="patientEmail">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Patient Phone</label>
+                                        <input type="tel" class="form-control" name="patient_phone" id="patientPhone">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 3: Blood Product Information -->
+                            <div class="col-12 mt-3">
+                                <h6 class="mb-3 text-primary"><i class="ri-drop-line me-1"></i> Blood Product
+                                    Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Blood Type <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="blood_type" required>
+                                            {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                                <option value="{{ bt }}">{{ bt }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Component Type <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" name="component_type" required>
+                                            <option value="Whole Blood">Whole Blood</option>
+                                            <option value="Red Blood Cells">Red Blood Cells</option>
+                                            <option value="Plasma">Plasma</option>
+                                            <option value="Platelets">Platelets</option>
+                                            <option value="Cryoprecipitate">Cryoprecipitate</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Quantity (units) <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="quantity" min="1" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 4: Issuance Details -->
+                            <div class="col-12 mt-3">
+                                <h6 class="mb-3 text-primary"><i class="ri-calendar-line me-1"></i> Issuance Details
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Issue Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" name="issue_date" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Transfusion Date</label>
+                                        <input type="date" class="form-control" name="transfusion_date">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Status <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="status" required>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Completed">Completed</option>
+                                            <option value="Cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Issue Reason</label>
+                                        <textarea class="form-control" name="issue_reason" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 5: Payment Information -->
+                            <div class="col-12 mt-3 payment-section" style="display: none;">
+                                <div class="card border-primary">
+                                    <div class="card-header bg-primary bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-money-dollar-circle-line me-2"></i> Payment
+                                            Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Amount <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="number" class="form-control" name="payment_amount"
+                                                       step="0.01" min="0" required>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Payment Status</label>
+                                                <select class="form-select" name="payment_status">
+                                                    <option value="unpaid">Unpaid</option>
+                                                    <option value="paid">Paid</option>
+                                                    <option value="pending">Pending</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Payment Date</label>
+                                                <input type="date" class="form-control" name="payment_date">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Payment Remarks</label>
+                                                <textarea class="form-control" name="payment_remarks"
+                                                          rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 6: Additional Information -->
+                            <div class="col-12 mt-3">
+                                <h6 class="mb-3 text-primary"><i class="ri-file-text-line me-1"></i> Additional
+                                    Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Remarks</label>
+                                        <textarea class="form-control" name="remarks" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Issuance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issuance Modals -->
+    {% for issuance in issuances %}
+        <!-- View Modal -->
+        <div class="modal fade" id="viewModal{{ issuance.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">Issuance Details: {{ issuance.issue_id }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-user-line me-2"></i>Patient Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Patient ID:</strong> {{ issuance.patient_id }}</p>
+                                        <p><strong>Name:</strong> {{ issuance.patient_name }}</p>
+                                        <p><strong>Age:</strong> {{ issuance.patient_age or 'N/A' }}</p>
+                                        <p><strong>Gender:</strong> {{ issuance.patient_gender or 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-drop-line me-2"></i>Blood Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Product ID:</strong> {{ issuance.blood_product_id }}</p>
+                                        <p><strong>Blood Type:</strong> {{ issuance.blood_type }}</p>
+                                        <p><strong>Component:</strong> {{ issuance.component_type }}</p>
+                                        <p><strong>Quantity:</strong> {{ issuance.quantity }} units</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-file-text-line me-2"></i>Issuance Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <p><strong>Issue
+                                                    Date:</strong> {{ issuance.issue_date.strftime('%d/%m/%Y') }}</p>
+                                                <p><strong>Status:</strong>
+                                                    {% if issuance.status == 'Completed' %}
+                                                        <span class="badge bg-success">Completed</span>
+                                                    {% elif issuance.status == 'Pending' %}
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Cancelled</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p><strong>Doctor:</strong> {{ issuance.doctor_name or 'N/A' }}</p>
+                                                <p><strong>Transfusion
+                                                    Date:</strong> {{ issuance.transfusion_date.strftime('%d/%m/%Y') if issuance.transfusion_date else 'N/A' }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p><strong>Issued
+                                                    By:</strong> {{ issuance.issued_by.username if issuance.issued_by else 'System' }}
+                                                </p>
+                                                <p><strong>Last
+                                                    Updated:</strong> {{ issuance.updated_at.strftime('%d/%m/%Y %H:%M') if issuance.updated_at else 'N/A' }}
+                                                </p>
+                                            </div>
+                                            <div class="col-12 mt-2">
+                                                <p><strong>Reason:</strong> {{ issuance.issue_reason or 'N/A' }}</p>
+                                                <p><strong>Remarks:</strong> {{ issuance.remarks or 'N/A' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal{{ issuance.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Edit Issuance: {{ issuance.issue_id }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + BLOOD_BANK_EDIT_ISSUED }}/{{ issuance.id }}">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <!-- Patient Information -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Patient ID <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="patient_id"
+                                           value="{{ issuance.patient_id }}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Patient Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="patient_name"
+                                           value="{{ issuance.patient_name }}" readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Patient Age</label>
+                                    <input type="number" class="form-control" name="patient_age"
+                                           value="{{ issuance.patient_age or '' }}" readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Patient Gender</label>
+                                    <select class="form-select" name="patient_gender" readonly>
+                                        <option value="">Select Gender</option>
+                                        <option value="Male"
+                                                {% if issuance.patient_gender == 'Male' %}selected{% endif %}>Male
+                                        </option>
+                                        <option value="Female"
+                                                {% if issuance.patient_gender == 'Female' %}selected{% endif %}>Female
+                                        </option>
+                                        <option value="Other"
+                                                {% if issuance.patient_gender == 'Other' %}selected{% endif %}>Other
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Blood Product Information -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Blood Product ID <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="blood_product_id"
+                                           value="{{ issuance.blood_product_id }}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Blood Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="blood_type" required>
+                                        {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                            <option value="{{ bt }}"
+                                                    {% if issuance.blood_type == bt %}selected{% endif %}>{{ bt }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Component Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="component_type" required>
+                                        <option value="Whole Blood"
+                                                {% if issuance.component_type == 'Whole Blood' %}selected{% endif %}>
+                                            Whole Blood
+                                        </option>
+                                        <option value="Red Blood Cells"
+                                                {% if issuance.component_type == 'Red Blood Cells' %}selected{% endif %}>
+                                            Red Blood Cells
+                                        </option>
+                                        <option value="Plasma"
+                                                {% if issuance.component_type == 'Plasma' %}selected{% endif %}>Plasma
+                                        </option>
+                                        <option value="Platelets"
+                                                {% if issuance.component_type == 'Platelets' %}selected{% endif %}>
+                                            Platelets
+                                        </option>
+                                        <option value="Cryoprecipitate"
+                                                {% if issuance.component_type == 'Cryoprecipitate' %}selected{% endif %}>
+                                            Cryoprecipitate
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Quantity (units) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="quantity"
+                                           value="{{ issuance.quantity }}" min="1" required>
+                                </div>
+
+                                <!-- Issuance Details -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Issue Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="issue_date"
+                                           value="{{ issuance.issue_date.strftime('%Y-%m-%d') }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Transfusion Date</label>
+                                    <input type="date" class="form-control" name="transfusion_date"
+                                           value="{{ issuance.transfusion_date.strftime('%Y-%m-%d') if issuance.transfusion_date else '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="status" required>
+                                        <option value="Pending"
+                                                {% if issuance.status == 'Pending' %}selected{% endif %}>Pending
+                                        </option>
+                                        <option value="Completed"
+                                                {% if issuance.status == 'Completed' %}selected{% endif %}>Completed
+                                        </option>
+                                        <option value="Cancelled"
+                                                {% if issuance.status == 'Cancelled' %}selected{% endif %}>Cancelled
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Issue Reason</label>
+                                    <textarea class="form-control" name="issue_reason"
+                                              rows="2">{{ issuance.issue_reason or '' }}</textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Remarks</label>
+                                    <textarea class="form-control" name="remarks"
+                                              rows="2">{{ issuance.remarks or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Update Record</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal{{ issuance.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Confirm Archive</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to archive this issuance record?</p>
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i>This will remove the record from active listings but
+                            preserve it in the archive.
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <p><strong>Issuance ID:</strong> {{ issuance.issue_id }}</p>
+                                <p><strong>Patient:</strong> {{ issuance.patient_name }}</p>
+                                <p><strong>Blood Product:</strong> {{ issuance.blood_product_id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN + BLOOD_BANK_DELETE_ISSUED }}/{{ issuance.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Archive Record</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Modal -->
+    <div class="modal fade" id="restoreModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="ri-archive-line me-2"></i>Archived Issuance Records</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_issuances %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Issue ID</th>
+                                    <th>Patient</th>
+                                    <th>Blood Product</th>
+                                    <th>Quantity</th>
+                                    <th>Issue Date</th>
+                                    <th>Archived On</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for issuance in deleted_issuances %}
+                                    <tr>
+                                        <td>{{ issuance.issue_id }}</td>
+                                        <td>{{ issuance.patient_name }}</td>
+                                        <td>{{ issuance.blood_product_id }}</td>
+                                        <td>{{ issuance.quantity }} units</td>
+                                        <td>{{ issuance.issue_date.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ issuance.deleted_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                        <td>
+                                            <form method="POST"
+                                                  action="{{ ADMIN + BLOOD_BANK_RESTORE_ISSUED }}/{{ issuance.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No archived issuance records found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
 
 {% block heardLink %}
-    <!-- Data Tables -->
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
-    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
 {% endblock %}
 
 {% block footerLink %}
-    <!-- Data Tables -->
-    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
-    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
-    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
-    
-    <!-- Initialize Bootstrap components -->
+    <!-- DataTables JS -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize DataTable
+            $('#issuanceTable').DataTable({
+                responsive: true,
+                order: [[6, 'desc']] // Sort by issue date by default
             });
-            
-            // Initialize modals
-            var modalEl = document.getElementById('viewDetails');
-            var modal = new bootstrap.Modal(modalEl);
+
+            // Set default issue date to today
+            const today = new Date();
+            const issueDate = today.toISOString().split('T')[0];
+            document.querySelector('#addIssuanceModal input[name="issue_date"]').value = issueDate;
+
+            // Check if patient exists and show payment section
+            document.querySelector('#addIssuanceModal input[name="patient_id"]').addEventListener('change', function () {
+                const patientId = this.value;
+                const paymentSection = document.querySelector('.payment-section');
+
+                // In a real application, you would make an AJAX call here to check if patient exists
+                // For demo purposes, we'll just show it if ID is not empty
+                if (patientId.trim() !== '') {
+                    paymentSection.style.display = 'block';
+                } else {
+                    paymentSection.style.display = 'none';
+                }
+            });
         });
     </script>
-{% endblock footerLink %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toggle patient ID section
+            const isExistingPatient = document.getElementById('isExistingPatient');
+            const patientIdSection = document.getElementById('patientIdSection');
+            const paymentSection = document.querySelector('.payment-section');
+
+            isExistingPatient.addEventListener('change', function () {
+                if (this.checked) {
+                    patientIdSection.style.display = 'block';
+                } else {
+                    patientIdSection.style.display = 'none';
+                    paymentSection.style.display = 'none';
+                    resetPatientFields();
+                }
+            });
+
+            // Enhanced patient verification with error handling
+            document.getElementById('fetchPatientBtn').addEventListener('click', async function () {
+                const patientId = document.getElementById('patientIdInput').value.trim();
+                const validationMsg = document.getElementById('patientValidationMsg');
+
+                if (!patientId) {
+                    showValidationMessage(validationMsg, 'Please enter a patient ID', 'danger');
+                    return;
+                }
+
+                try {
+                    showValidationMessage(validationMsg, 'Verifying patient...', 'info', true);
+
+                    const response = await fetch(`/admin/get-patient/${patientId}`);
+
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Auto-fill patient details
+                    fillPatientDetails(data);
+                    showValidationMessage(validationMsg, `Patient verified: ${data.first_name} ${data.last_name}`, 'success');
+
+                    // Show payment section for existing patients
+                    paymentSection.style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    showValidationMessage(validationMsg, error.message || 'Error verifying patient', 'danger');
+                    paymentSection.style.display = 'none';
+                    resetPatientFields();
+                }
+            });
+
+            // Helper functions
+            function fillPatientDetails(data) {
+                document.getElementById('patientName').value = data.full_name || `${data.first_name || ''} ${data.last_name || ''}`.trim();
+                document.getElementById('patientAge').value = data.age || '';
+                document.getElementById('patientGender').value = data.gender || '';
+                document.getElementById('patientEmail').value = data.email || '';
+                document.getElementById('patientPhone').value = data.phone || '';
+            }
+
+            function resetPatientFields() {
+                document.getElementById('patientName').value = '';
+                document.getElementById('patientAge').value = '';
+                document.getElementById('patientGender').value = '';
+                document.getElementById('patientEmail').value = '';
+                document.getElementById('patientPhone').value = '';
+            }
+
+            function showValidationMessage(element, message, type, loading = false) {
+                const icons = {
+                    info: 'ri-information-line',
+                    success: 'ri-checkbox-circle-line',
+                    danger: 'ri-error-warning-line',
+                    loading: 'ri-loader-4-line spin'
+                };
+
+                const iconClass = loading ? icons.loading : icons[type] || '';
+                const icon = iconClass ? `<i class="${iconClass} me-1"></i>` : '';
+
+                element.innerHTML = `<span class="text-${type}">${icon}${message}</span>`;
+            }
+
+            // Set default issue date to today
+            document.querySelector('input[name="issue_date"]').valueAsDate = new Date();
+        });
+    </script>
+{% endblock %}

@@ -1,192 +1,205 @@
-# from datetime import datetime
-# import random
-#
-# from bson import ObjectId
-# from flask import redirect, jsonify, render_template, request
-# from werkzeug.security import generate_password_hash
-#
-# from controllers.admin_controllers import admin
-# from utils.config import mongo
-# from utils.email_utils import send_email
-# from middleware.auth_middleware import token_required
-#
-#
-# @admin.route('/add-staff', methods=['GET', 'POST'], endpoint='add_staff')
-# def add_staff():
-#     if request.method == 'POST':
-#         try:
-#             # Get form data
-#             name = request.form['name']
-#             email = request.form['email']
-#             password = request.form['password']  # Ensure to hash the password before saving
-#             age = int(request.form['age'])
-#             address = request.form['address']
-#             mobile_number = request.form['mobile_number']
-#             gender = request.form['gender']
-#             dob = datetime.strptime(request.form['dob'], "%Y-%m-%d")
-#             department_id = request.form['department_id']
-#             specialization = request.form['specialization']
-#             start_time = request.form['start_time']
-#             end_time = request.form['end_time']
-#
-#             current_date = datetime.utcnow()
-#             year = current_date.year
-#             month = f"{current_date.month:02d}"
-#             day = f"{current_date.day:02d}"
-#
-#             # Generate random 2-digit number
-#             random_digits = random.randint(10, 99)
-#
-#             unique_patient_id = f"{year}{month}{day}{random_digits}"
-#
-#             hashed_password = generate_password_hash(password)
-#
-#             # Insert doctor data
-#             doctor_data = {
-#                 "user_id": unique_patient_id,  # Generate a user_id
-#                 "name": name,
-#                 "email": email,
-#                 "password": hashed_password,  # Hash password before saving
-#                 "age": age,
-#                 "address": address,
-#                 "mobile_number": mobile_number,
-#                 "gender": gender,
-#                 "dob": dob,
-#                 "role": "staff",
-#                 "status": True,
-#                 "created_at": datetime.utcnow(),
-#                 "updated_at": datetime.utcnow()
-#             }
-#             doctor_result = mongo.db.users.insert_one(doctor_data)
-#             doctor_id = doctor_result.inserted_id
-#
-#             # Insert department data
-#             department_data = {
-#                 "user_id": doctor_id,  # Link the department to the doctor
-#                 "department_id": ObjectId(department_id),
-#                 "specialization": specialization,
-#                 "shift_schedule": [
-#                     {"start_time": start_time, "end_time": end_time}
-#                 ]
-#             }
-#             department_result = mongo.db.DoctorsAndStaff.insert_one(department_data)
-#
-#             # patient_id = mongo.db.users.insert_one(patient).inserted_id
-#
-#             verification_link = f"http://localhost:5000/auth/verify-email/{str(doctor_id)}"
-#             send_email('Verify Your Email', email, verification_link)
-#
-#             # Redirect to success page or show success message
-#             return redirect("/admin/dashboard")
-#
-#         except Exception as e:
-#             return jsonify({
-#                 "message": "Error adding doctor and department",
-#                 "error": str(e)
-#             }), 500
-#     elif request.method == 'GET':
-#
-#         departments = list(mongo.db.departments.find())
-#
-#         return render_template('admin_templates/staff/add_staff_templates.html', departments=departments)
-#
-#
-# @admin.route('/get-all-staff', methods=['GET'],endpoint='get_staff')
-# def get_all_staff():
-#     try:
-#         # Define the aggregation pipeline to get doctors and their details
-#         pipeline = [
-#             {
-#                 "$match": {
-#                     "role": "staff"  # Ensure that only doctors are fetched from the users collection
-#                 }
-#             },
-#             {
-#                 "$lookup": {
-#                     "from": "DoctorsAndStaff",  # The collection to join with
-#                     "localField": "_id",  # Field in the users collection to match with
-#                     "foreignField": "user_id",  # Field in the DoctorsAndStaff collection to match with
-#                     "as": "doctor_details"  # The alias for the joined data
-#                 }
-#             },
-#             {
-#                 "$unwind": "$doctor_details"  # Flatten the joined data
-#             },
-#             {
-#                 "$project": {
-#                     "user_id": 1,
-#                     "name": 1,
-#                     "specialization": "$doctor_details.specialization",
-#                     "email": 1,
-#                     "mobile_number": 1,
-#                     "gender": 1,
-#                     "created_at": 1,
-#                     "status": 1,
-#
-#                 }
-#             }
-#         ]
-#
-#         # Execute the aggregation query
-#         staffs = list(mongo.db.users.aggregate(pipeline))
-#
-#         # Convert _id to string for JSON serialization
-#         for staff in staffs:
-#             if '_id' in staff:
-#                 staff['_id'] = str(staff['_id'])  # Convert ObjectId to string
-#
-#         # print(doctors)
-#         # Return the result as JSON (corrected to return the list directly)
-#         return jsonify(staffs), 200
-#
-#     except Exception as e:
-#         print(f"Error fetching doctors: {e}")
-#         return jsonify({"error": "Unable to fetch doctors"}), 500
-#
-#
-# @admin.route('/view-staff', methods=['GET'], endpoint="view_staff")
-# def view_all_staffs():
-#     try:
-#         # Define the aggregation pipeline to get doctors and their details
-#         pipeline = [
-#             {
-#                 "$match": {
-#                     "role": "staff"  # Ensure that only doctors are fetched from the users collection
-#                 }
-#             },
-#             {
-#                 "$lookup": {
-#                     "from": "DoctorsAndStaff",  # The collection to join with
-#                     "localField": "_id",  # Field in the users collection to match with
-#                     "foreignField": "user_id",  # Field in the DoctorsAndStaff collection to match with
-#                     "as": "doctor_details"  # The alias for the joined data
-#                 }
-#             },
-#             {
-#                 "$unwind": "$doctor_details"  # Flatten the joined data
-#             },
-#             {
-#                 "$project": {
-#                     "user_id": 1,
-#                     "name": 1,
-#                     "specialization": "$doctor_details.specialization",
-#                     "email": 1,
-#                     "mobile_number": 1,
-#                     "gender": 1,
-#                     "created_at": 1,
-#                     "status": 1,
-#
-#                 }
-#             }
-#         ]
-#
-#         # Execute the aggregation query
-#         staffs = list(mongo.db.users.aggregate(pipeline))
-#
-#         # print(staffs)
-#
-#         return render_template("admin_templates/staff/view_staff_templates.html", staffs=staffs)
-#
-#     except Exception as e:
-#         print(f"Error fetching doctors: {e}")
-#         return jsonify({"error": "Unable to fetch doctors"}), 500
+from sqlite3 import IntegrityError
+
+from flask import render_template, request, redirect, flash
+from datetime import datetime
+
+from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
+import os
+
+from controllers.admin_controllers import admin
+from controllers.constant.adminPathConstant import STAFF, STAFF_ADD, ADMIN, STAFF_EDIT, STAFF_DELETE, STAFF_RESTORE
+from models.departmentModel import Department
+from models.staffModel import Staff
+from models.userModel import User
+from utils.config import db
+from utils.email_utils import send_email
+
+
+# All Staff
+@admin.route(STAFF, methods=['GET'], endpoint='all-staff')
+def all_staff():
+    active_staff = Staff.query.filter_by(is_deleted=False).all()
+    departments = Department.query.filter_by(is_deleted=False).all()
+    deleted_staff = Staff.query.filter_by(is_deleted=True).all()
+    return render_template('admin_templates/staff/staff.html',
+                           staff_list=active_staff,
+                           departments=departments,
+                           deleted_staff=deleted_staff)
+
+
+# Add Staff
+
+@admin.route(STAFF_ADD, methods=['POST'], endpoint='add-staff')
+def add_staff():
+    try:
+        # Check if email already exists
+        if User.query.filter_by(email=request.form['email']).first():
+            flash('Email address already exists!', 'danger')
+            return redirect(ADMIN + STAFF)
+
+        # Handle file upload
+        profile_pic = None
+        if 'profile_picture' in request.files:
+            file = request.files['profile_picture']
+            if file.filename != '':
+                filename = secure_filename(file.filename)
+                upload_folder = os.path.join('static', 'uploads', 'staff')
+                os.makedirs(upload_folder, exist_ok=True)
+                file.save(os.path.join(upload_folder, filename))
+                profile_pic = os.path.join('uploads', 'staff', filename)
+
+        # Create user first
+        user = User(
+            email=request.form['email'],
+            password=generate_password_hash(request.form['password']),
+            role='staff',  # Default role for staff members
+            status=True if request.form['status'] == 'Active' else False,
+            verified=False  # Will be verified after email confirmation
+        )
+        db.session.add(user)
+        db.session.flush()  # To get the user ID
+
+        # Create staff profile
+        staff = Staff(
+            user_id=user.id,
+            first_name=request.form['first_name'],
+            last_name=request.form['last_name'],
+            mobile=request.form['mobile'],
+            designation=request.form['designation'],
+            department_id=request.form['department'],
+            joining_date=datetime.strptime(request.form['joining_date'], '%Y-%m-%d').date(),
+            salary=float(request.form['salary']),
+            status=request.form['status'],
+            shift=request.form['shift'],
+            experience=int(request.form['experience']),
+            gender=request.form['gender'],
+            address=request.form['address'],
+            date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d').date(),
+            education=request.form['education'],
+            profile_picture=profile_pic
+        )
+
+        db.session.add(staff)
+        db.session.commit()
+
+        verification_link = f"http://localhost:5000/auth/verify-email/{user.id}"
+        send_email('Verify Your Email', user.email, verification_link)
+
+        flash('Staff member added successfully! Verification email sent.', 'success')
+    except ValueError as e:
+        db.session.rollback()
+        flash(f'Invalid data: {str(e)}', 'danger')
+    except IntegrityError as e:
+        db.session.rollback()
+        flash('Database error occurred. Please try again.', 'danger')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error adding staff: {str(e)}', 'danger')
+
+    return redirect(ADMIN + STAFF)
+
+
+# Edit Staff
+@admin.route(STAFF_EDIT + '/<int:id>', methods=['POST'], endpoint='edit-staff')
+def edit_staff(id):
+    staff = Staff.query.get_or_404(id)
+    # user = staff.user
+
+    try:
+        # Update user account if email changed
+        # if user.email != request.form['email']:
+        #     if User.query.filter(User.email == request.form['email'], User.id != user.id).first():
+        #         flash('Email address already in use!', 'danger')
+        #         return redirect(ADMIN + STAFF)
+        #     user.email = request.form['email']
+        #
+        # # Update password if provided
+        # if request.form['password']:
+        #     user.password = generate_password_hash(request.form['password'])
+        #
+        # user.status = True if request.form['status'] == 'Active' else False
+        # user.updated_at = datetime.utcnow()
+
+        # Handle file upload
+        if 'profile_picture' in request.files:
+            file = request.files['profile_picture']
+            if file.filename != '':
+                # Delete old file if exists
+                if staff.profile_picture:
+                    old_file = os.path.join('static', staff.profile_picture)
+                    if os.path.exists(old_file):
+                        os.remove(old_file)
+
+                # Save new file
+                filename = secure_filename(file.filename)
+                upload_folder = os.path.join('static', 'uploads', 'staff')
+                os.makedirs(upload_folder, exist_ok=True)
+                file.save(os.path.join(upload_folder, filename))
+                staff.profile_picture = os.path.join('uploads', 'staff', filename)
+
+        # Update staff details
+        staff.first_name = request.form['first_name']
+        staff.last_name = request.form['last_name']
+        staff.mobile = request.form['mobile']
+        staff.designation = request.form['designation']
+        staff.department_id = request.form['department']
+        staff.joining_date = datetime.strptime(request.form['joining_date'], '%Y-%m-%d').date()
+        staff.salary = float(request.form['salary'])
+        staff.work_status = request.form['status']
+        staff.shift = request.form['shift']
+        staff.experience = int(request.form['experience'])
+        staff.gender = request.form['gender']
+        staff.address = request.form['address']
+        staff.date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d').date()
+        staff.education = request.form['education']
+
+        db.session.commit()
+        flash('Staff member updated successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating staff: {str(e)}', 'danger')
+
+    return redirect(ADMIN + STAFF)
+
+
+# Delete Staff (Soft Delete)
+@admin.route(STAFF_DELETE + '/<int:id>', methods=['POST'], endpoint="delete-staff")
+def delete_staff(id):
+    staff = Staff.query.get_or_404(id)
+    user = staff.user
+    try:
+        staff.is_deleted = True
+        staff.deleted_at = datetime.now()
+
+        # Also deactivate user account
+        user.status = False
+        user.updated_at = datetime.utcnow()
+
+        db.session.commit()
+        flash('Staff member deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting staff: {str(e)}', 'danger')
+    return redirect(ADMIN + STAFF)
+
+
+# Restore Staff
+@admin.route(STAFF_RESTORE + '/<int:id>', methods=['POST'], endpoint="restore-staff")
+def restore_staff(id):
+    staff = Staff.query.get_or_404(id)
+    user = staff.user
+    try:
+        staff.is_deleted = False
+        staff.deleted_at = None
+
+        # Reactivate user account
+        user.status = True
+        user.updated_at = datetime.utcnow()
+
+        db.session.commit()
+        flash('Staff member restored successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error restoring staff: {str(e)}', 'danger')
+    return redirect(ADMIN + STAFF)

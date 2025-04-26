@@ -131,7 +131,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <form method="POST" action="/admin/insurance/add-coverage-type">
+                <form method="POST" action="{{ ADMIN + INSURANCE_ADD_CONVERAGE_TYPE }}">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Name <span class="text-danger">*</span></label>
@@ -233,7 +233,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/insurance/edit-coverage-type/{{ coverage.id }}">
+                    <form method="POST" action="{{ ADMIN + INSURANCE_EDIT_CONVERAGE_TYPE }}/{{ coverage.id }}">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label class="form-label">Name <span class="text-danger">*</span></label>
@@ -286,7 +286,8 @@
                     </div>
                     <div class="modal-footer">
                         {% if not coverage.providers %}
-                            <form method="POST" action="/admin/insurance/delete-coverage-type/{{ coverage.id }}">
+                            <form method="POST"
+                                  action="{{ ADMIN + INSURANCE_DELETE_CONVERAGE_TYPE }}/{{ coverage.id }}">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                     <i class="ri-close-line me-1"></i> Cancel
                                 </button>
@@ -338,7 +339,7 @@
                                         <td>{{ coverage.deleted_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                         <td class="text-end">
                                             <form method="POST"
-                                                  action="/admin/insurance/restore-coverage-type/{{ coverage.id }}">
+                                                  action="{{ ADMIN + INSURANCE_RESTORE_CONVERAGE_TYPE }}/{{ coverage.id }}">
                                                 <button type="submit" class="btn btn-sm btn-success">
                                                     <i class="ri-refresh-line me-1"></i> Restore
                                                 </button>

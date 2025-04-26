@@ -21,7 +21,16 @@ def pharmacy_medicine_list(current_user):
 
     return render_template('admin_templates/pharmacy/medicine_inventory.html', medicines=medicines,
                            categories=categories, companies=companies, datetime=datetime,
-                           timedelta=timedelta, archived_medicines=archived_medicines)
+                           timedelta=timedelta, archived_medicines=archived_medicines,
+                           ADMIN = ADMIN,
+                           PHARMACY_MEDICINE_ADD =PHARMACY_MEDICINE_ADD,
+                           PHARMACY_MEDICINE_EDIT =PHARMACY_MEDICINE_EDIT,
+                           PHARMACY_MEDICINE_DELETE =PHARMACY_MEDICINE_DELETE,
+                           PHARMACY_MEDICINE_RESTOCK = PHARMACY_MEDICINE_RESTOCK,
+                           PHARMACY_MEDICINE_TRANSACTIONS= PHARMACY_MEDICINE_TRANSACTIONS,
+                           PHARMACY_MEDICINE_RESTORE =PHARMACY_MEDICINE_RESTORE,
+                           PHARMACY_MEDICINE_DISPENSE=PHARMACY_MEDICINE_DISPENSE
+                           )
 
 
 @admin.route(PHARMACY_MEDICINE_ADD, methods=['POST'], endpoint='medicine-add')

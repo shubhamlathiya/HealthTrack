@@ -9,7 +9,7 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Child Case Records</h5>
-                    <a href="/admin/records/add-birth" class="btn btn-primary ms-auto">Add New Case</a>
+                    <a href="{{ ADMIN + RECORDS_ADD_BIRTH }}" class="btn btn-primary ms-auto">Add New Case</a>
                     <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
                             data-bs-target="#restoreRecordsModal">
                         <i class="ri-refresh-line"></i> View & Restore Deleted Records
@@ -96,7 +96,7 @@
                                                     data-bs-placement="top" data-bs-title="View Details">
                                                 <i class="ri-eye-line"></i>
                                             </button>
-                                            <a href="/admin/records/birth/{{ case.id }}/certificate"
+                                            <a href="{{ ADMIN + RECORDS_BIRTH_CERTIFICATE }}/{{ case.id }}"
                                                class="btn btn-outline-primary btn-sm"
                                                data-bs-toggle="tooltip"
                                                data-bs-placement="top" data-bs-title="Print Certificate">
@@ -129,7 +129,7 @@
                         Are you sure you want to delete <b>{{ case.first_name }}'s</b> case record?
                     </div>
                     <div class="modal-footer">
-                        <form action="/admin/records/birth-delete/{{ case.id }}" method="POST">
+                        <form action="{{ ADMIN + RECORDS_BIRTH_DELETE }}/{{ case.id }}" method="POST">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel
                             </button>
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -149,7 +149,7 @@
                             Case: {{ case.first_name }} {{ case.last_name }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/records/birth-edit/{{ case.id }}">
+                    <form method="POST" action="{{ ADMIN + RECORDS_BIRTH_EDIT }}/{{ case.id }}">
 
                         <div class="modal-body">
                             <div class="row">
@@ -347,7 +347,7 @@
                                 data-bs-placement="top" data-bs-title="Edit Case">
                             <i class="ri-edit-box-line"> Add Medical Visit</i>
                         </button>
-                        <a href="/admin/records/birth/{{ case.id }}/certificate" class="btn btn-primary">Print
+                        <a href="{{ ADMIN + RECORDS_BIRTH_CERTIFICATE }}/{{ case.id }}" class="btn btn-primary">Print
                             Certificate</a>
                     </div>
                 </div>
@@ -364,7 +364,7 @@
                             for {{ case.first_name }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="/admin/records/birth-visit/{{ case.id }}/add-visit">
+                    <form method="POST" action="{{ ADMIN + RECORDS_BIRTH_ADD_MEDICAL_VISIT }}/{{ case.id }}">
 
                         <div class="modal-body">
                             <div class="mb-3">
@@ -432,7 +432,8 @@
                             Are you sure you want to delete {{ visit.id }}'s case record?
                         </div>
                         <div class="modal-footer">
-                            <form action="/admin/records/birth-visit-delete/{{ visit.id }}" method="POST">
+                            <form action="{{ ADMIN + RECORDS_BIRTH_MEDICAL_VISIT_DELETE }}/{{ visit.id }}"
+                                  method="POST">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel
                                 </button>
                                 <button type="submit" class="btn btn-danger">Delete</button>
@@ -452,7 +453,7 @@
                                 Visit</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form method="POST" action="/admin/records/birth-visit/{{ visit.id }}/edit">
+                        <form method="POST" action="{{ ADMIN + RECORDS_BIRTH_EDIT_MEDICAL_VISIT }}/{{ visit.id }}">
 
                             <div class="modal-body">
                                 <div class="mb-3">
@@ -577,7 +578,7 @@
                                                 <td>{{ case.deleted_at.strftime('%Y-%m-%d %H:%M') if case.deleted_at else 'Unknown' }}</td>
                                                 <td>
                                                     <form method="POST"
-                                                          action="/admin/records/restore-birth/{{ case.id }}">
+                                                          action="{{ ADMIN + RESTORE_RECORDS_BIRTH }}/{{ case.id }}">
                                                         <button type="submit"
                                                                 class="btn btn-sm btn-success">
                                                             <i class="ri-refresh-line"></i> Restore
@@ -624,7 +625,7 @@
                                                 <td>{{ visit.deleted_at.strftime('%Y-%m-%d %H:%M') if visit.deleted_at else 'Unknown' }}</td>
                                                 <td>
                                                     <form method="POST"
-                                                          action="/admin/records/restore-birth-visit/{{ visit.id }}">
+                                                          action="{{ ADMIN + RESTORE_BIRTH_MEDICAL_VISIT }}/{{ visit.id }}">
                                                         <button type="submit"
                                                                 class="btn btn-sm btn-success">
                                                             <i class="ri-refresh-line"></i> Restore

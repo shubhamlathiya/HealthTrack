@@ -18,7 +18,13 @@ def issued_items():
     active_items = Item.query.filter_by(is_deleted=False).all()
     return render_template('admin_templates/inventory/issued_items.html', issued_items=active_issued_items,
                            deleted_issued_items=deleted_issued_items,
-                           items=active_items)
+                           items=active_items,
+                           ADMIN = ADMIN ,
+                           INVENTORY_ADD_ISSUED_ITEM =INVENTORY_ADD_ISSUED_ITEM,
+                           INVENTORY_EDIT_ISSUED_ITEM = INVENTORY_EDIT_ISSUED_ITEM,
+                           INVENTORY_RETURN_ISSUED_ITEM = INVENTORY_RETURN_ISSUED_ITEM,
+                           INVENTORY_DELETE_ISSUED_ITEM=INVENTORY_DELETE_ISSUED_ITEM,
+                           INVENTORY_RESTORE_ISSUED_ITEM=INVENTORY_RESTORE_ISSUED_ITEM)
 
 
 @admin.route(INVENTORY_ADD_ISSUED_ITEM, methods=['POST'], endpoint="inventory_add_item_issued")

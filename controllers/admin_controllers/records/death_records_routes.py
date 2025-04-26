@@ -4,10 +4,9 @@ from flask import render_template, request, flash, redirect, make_response
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import RECORDS_DEATH, ADMIN, \
-    RECORDS_DEATH_DELETE, RECORDS_DEATH_EDIT, RESTORE_RECORDS_DEATH, \
-    RECORDS_ADD_DEATH
+    RECORDS_DEATH_DELETE, RECORDS_DEATH_EDIT, \
+    RECORDS_ADD_DEATH, RECORDS_DEATH_CERTIFICATE, RECORDS_RESTORE_DEATH
 from middleware.auth_middleware import token_required
-from models.birthRecordeModel import ChildCase, MedicalVisit
 from models.deathRecordeModel import DeathRecord
 from models.doctorModel import Doctor
 from utils.config import db
@@ -20,8 +19,17 @@ def records_death(current_user):
     records = DeathRecord.query.filter_by(is_deleted=0).order_by(DeathRecord.death_date.desc()).all()
     doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
     deleted_records = DeathRecord.query.filter_by(is_deleted=1).order_by(DeathRecord.deleted_at.desc()).all()
-    return render_template("admin_templates/records/death_records.html", records=records, doctors=doctors,
-                           deleted_records=deleted_records)
+    return render_template("admin_templates/records/death_records.html",
+                           records=records,
+                           doctors=doctors,
+                           deleted_records=deleted_records,
+                           ADMIN=ADMIN,
+                           RECORDS_ADD_DEATH=RECORDS_ADD_DEATH,
+                           RECORDS_DEATH_EDIT=RECORDS_DEATH_EDIT,
+                           RECORDS_DEATH_DELETE=RECORDS_DEATH_DELETE,
+                           RECORDS_RESTORE_DEATH=RECORDS_RESTORE_DEATH,
+                           RECORDS_DEATH_CERTIFICATE=RECORDS_DEATH_CERTIFICATE
+                           )
 
 
 @admin.route(RECORDS_ADD_DEATH, methods=['GET', 'POST'])
@@ -57,7 +65,10 @@ def add_death_record(current_user):
         except Exception as e:
             db.session.rollback()
             flash(f'Error adding death record: {str(e)}', 'danger')
-    return render_template('admin_templates/records/add_death_record.html', doctors=doctors)
+    return render_template('admin_templates/records/add_death_record.html', doctors=doctors,
+                           ADMIN=ADMIN,
+                           RECORDS_ADD_DEATH=RECORDS_ADD_DEATH,
+                           )
 
 
 @admin.route(RECORDS_DEATH_EDIT + '/<int:id>', methods=['POST'])
@@ -105,7 +116,7 @@ def delete_death_record(current_user, id):
     return redirect(ADMIN + RECORDS_DEATH)
 
 
-@admin.route(RESTORE_RECORDS_DEATH + '/<int:id>', methods=['POST'])
+@admin.route(RECORDS_RESTORE_DEATH + '/<int:id>', methods=['POST'])
 @token_required
 def restore_death_record(current_user, id):
     record = DeathRecord.query.filter_by(id=id, is_deleted=True).first_or_404()
@@ -120,7 +131,7 @@ def restore_death_record(current_user, id):
     return redirect(ADMIN + RECORDS_DEATH)
 
 
-@admin.route(RECORDS_DEATH + '/<int:id>/certificate', methods=['GET'])
+@admin.route(RECORDS_DEATH_CERTIFICATE + '/<int:id>', methods=['GET'])
 def death_certificate(id):
     record = DeathRecord.query.get_or_404(id)
 
@@ -194,7 +205,6 @@ def death_certificate(id):
         pdf.cell(0, 10, 'PRONOUNCED BY', 0, 1)
         pdf.set_font('Arial', '', 12)
         pdf.cell(col_width, row_height, f"Dr. {record.doctor.first_name} {record.doctor.last_name}", 0, 0)
-        pdf.cell(col_width, row_height, f"License: {record.doctor.license_number or 'N/A'}", 0, 1)
         pdf.ln(10)
 
     # Next of kin section

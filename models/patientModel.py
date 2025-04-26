@@ -33,7 +33,7 @@ class PatientPayment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    room_charge_id = db.Column(db.Integer, db.ForeignKey('room_charge.id'), nullable=False)
+    room_charge_id = db.Column(db.Integer, db.ForeignKey('room_charge.id'), nullable=True)
     amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(20), default='unpaid')  # unpaid / paid / pending
     payment_date = db.Column(db.DateTime)
