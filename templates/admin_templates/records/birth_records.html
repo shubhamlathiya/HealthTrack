@@ -102,6 +102,13 @@
                                                data-bs-placement="top" data-bs-title="Print Certificate">
                                                 <i class="ri-printer-line"></i>
                                             </a>
+                                            <a href="{{ ADMIN + RECORDS_BIRTH_CERTIFICATE }}/send-email/{{ case.id }}"
+                                               class="btn btn-outline-success btn-sm send-email-btn"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-title="Send Certificate via Email">
+                                                <i class="ri-mail-send-line"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -198,6 +205,11 @@
                                                value="{{ case.father_name }}" required>
                                     </div>
                                     <div class="mb-3">
+                                        <label class="form-label" for="father_email">Father's Emails</label>
+                                        <input type="email" class="form-control" name="father_email" id="father_email"
+                                               value="{{ case.father_email }}" required>
+                                    </div>
+                                    <div class="mb-3">
                                         <label class="form-label">Contact Number</label>
                                         <input type="tel" class="form-control" name="contact_number"
                                                value="{{ case.contact_number }}" required>
@@ -270,6 +282,7 @@
                                 <h6>Parent Information</h6>
                                 <p><strong>Mother's Name:</strong> {{ case.mother_name }}</p>
                                 <p><strong>Father's Name:</strong> {{ case.father_name }}</p>
+                                <p><strong>Father's Emails:</strong> {{ case.father_email }}</p>
                                 <p><strong>Contact Number:</strong> {{ case.contact_number }}</p>
                                 <p><strong>Status:</strong>
                                     {% if case.status == 'Active' %}

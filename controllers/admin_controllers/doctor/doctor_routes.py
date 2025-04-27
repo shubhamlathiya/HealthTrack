@@ -123,16 +123,21 @@ def register_doctor(current_user):
 
         db.session.commit()
 
-        # print(1)
-        # Send a verification email (You should have your email setup)
+        body_html = render_template("email_templates/templates/welcome.html",
+                                    user_name=new_doctor.first_name,
+                                    new_user=new_doctor,
+                                    temp_password=password,
+                                    login_url="http://localhost:5000/")
+
+        send_email('Welcome to HealthTrack Hospital', new_user.email, body_html)
+
         verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
-        send_email('Verify Your Email', email, verification_link)
-        # print(2)
-        # return jsonify({
-        #     'success': True,
-        #     'message': 'Doctor registered successfully',
-        #     'doctor_id': new_doctor.id
-        # }), 201
+        body_html = render_template("email_templates/templates/verification_mail.html",
+                                    verification_link=verification_link,
+                                    user_name=new_doctor.first_name)
+
+        send_email('Verify Your Email', new_user.email, body_html)
+
         flash("Doctor registered successfully")
         return redirect("/admin/" + DOCTOR_ADD_DOCTOR)
     except Exception as e:

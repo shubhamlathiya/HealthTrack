@@ -51,3 +51,22 @@ from controllers.admin_controllers.records.birth_records_routes import *
 from controllers.admin_controllers.doctor.assign_department import *
 from controllers.admin_controllers.doctor.shift_management import *
 from controllers.admin_controllers.doctor.doctor_routes import *
+
+
+@admin.route(GET_PATIENT + '/<patient_id>', methods=['GET'])
+def get_patient(patient_id):
+    patient = Patient.query.filter_by(patient_id=patient_id).first()  # <-- fixed here
+
+    if not patient:
+        return jsonify({'error': 'Patient not found'}), 404
+
+    return jsonify({
+        'id': patient.id,
+        'name': patient.first_name,
+        'first_name': patient.first_name,
+        'last_name': patient.last_name,
+        'email': patient.user.email,  # If this is really email, fix the field name
+        'phone': patient.phone,
+        'gender': patient.gender,
+        'age': patient.age
+    }), 200

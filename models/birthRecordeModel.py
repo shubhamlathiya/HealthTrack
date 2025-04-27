@@ -15,6 +15,7 @@ class ChildCase(db.Model):
     address = db.Column(db.String(200), nullable=False)
     mother_name = db.Column(db.String(100), nullable=False)
     father_name = db.Column(db.String(100), nullable=False)
+    father_email = db.Column(db.String(100), nullable=False)
     contact_number = db.Column(db.String(20), nullable=False)
     status = db.Column(db.String(20), default='Active')
     case_notes = db.Column(db.Text)

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birth Certificate - {{ case.first_name }}</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        .header {
+            background: #4e73df;
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .hospital-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .hospital-info {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 5px 0 0;
+        }
+
+        /* Content */
+        .content {
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2e374f;
+            text-align: center;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        /* Certificate Info */
+        .certificate-info {
+            background: #f8f9fc;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-item {
+            margin-bottom: 12px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #5a5c69;
+            display: inline-block;
+            width: 140px;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #858796;
+            background: #f8f9fc;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header {
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .info-label {
+                width: 100%;
+                display: block;
+                margin-bottom: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Header -->
+    <div class="header">
+        <h1 class="hospital-name">Health Track</h1>
+        <p class="hospital-info">Hospital Address, City, State, Zip</p>
+        <p class="hospital-info">Phone: (123) 456-7890
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <h1>BIRTH CERTIFICATE</h1>
+
+        <p>Dear {{ case.father_name }},</p>
+
+        <p>We are pleased to attach the official birth certificate for your child. This document has been digitally
+            signed and is valid for all legal purposes.</p>
+
+        <div class="certificate-info">
+            <div class="info-item">
+                <span class="info-label">Certificate Number:</span>
+                {{ case.case_number }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Child's Name:</span>
+                {{ case.first_name }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Date of Birth:</span>
+                {{ case.birth_date }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Gender:</span>
+                {{ case.gender }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Mother's Name:</span>
+                {{ case.mother_name }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Father's Name:</span>
+                {{ case.father_name }}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Place of Birth:</span>
+                Hospital Name, City
+            </div>
+        </div>
+
+        <p><strong>Important Notes:</strong></p>
+        <ul>
+            <li>This is an official legal document</li>
+            <li>Keep multiple copies in safe places</li>
+            <li>Required for school admissions, passport applications, and other legal purposes</li>
+            <li>Contact hospital administration for any corrections</li>
+        </ul>
+
+        <p>Congratulations on your new family member!</p>
+
+        <p>Sincerely,<br>
+            <strong>Medical Records Department</strong><br>
+            Hospital Name</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>This is an automated message. Please do not reply to this email.</p>
+        <p>© Hospital Name. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

@@ -28,9 +28,14 @@ def forgot_password():
         # Generate the reset token
         reset_token = s.dumps(email, salt='password-reset-salt')
 
-        # Send reset email with the link
         reset_link = f"http://127.0.0.1:5000/auth/reset-password/{reset_token}"
-        send_email("Password Reset Request", email, reset_link)
+
+        body_html = render_template("email_templates/templates/reset_password_mail.html" ,
+                                    user_name = user.email,
+                                    reset_link = reset_link)
+        # Send reset email with the link
+
+        send_email("Password Reset Request", user.email, body_html)
 
         return jsonify({"message": "Password reset link sent to your email"}), 200
 

@@ -235,25 +235,6 @@ def book_room(current_user):
     return redirect(ADMIN + ROOM_AVAILABLE_ROOM)
 
 
-@admin.route(GET_PATIENT + '/<patient_id>', methods=['GET'])
-def get_patient(patient_id):
-    patient = Patient.query.filter_by(patient_id=patient_id).first()  # <-- fixed here
-
-    if not patient:
-        return jsonify({'error': 'Patient not found'}), 404
-
-    return jsonify({
-        'id': patient.id,
-        'name': patient.first_name,
-        'first_name': patient.first_name,
-        'last_name': patient.last_name,
-        'email': patient.user.email,  # If this is really email, fix the field name
-        'phone': patient.phone,
-        'gender': patient.gender,
-        'age': patient.age
-    }), 200
-
-
 @admin.route(ROOM_ROOM_STATISTICS, methods=['GET'], endpoint='room-statistics')
 @token_required
 def room_room_statistics(current_user):

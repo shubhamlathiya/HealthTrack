@@ -103,16 +103,20 @@ def add_blood_donor():
                 db.session.flush()
 
                 patient_id = new_patient.patient_id
-                body = f"""Welcome to our healthcare Hospital!
+                body_html = render_template("email_templates/templates/welcome.html",
+                                            user_name=new_patient.patient_id,
+                                            new_user=new_user,
+                                            temp_password=temp_password,
+                                            login_url="http://localhost:5000/")
 
-                                Your temporary password is: {temp_password}
-
-                                Please change your password after logging in.
-                                            """
-                send_email("Your New Patient Account", new_user.email, body)
+                send_email('Welcome to HealthTrack Hospital', new_user.email, body_html)
 
                 verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
-                send_email('Verify Your Email', new_user.email, verification_link)
+                body_html = render_template("email_templates/templates/verification_mail.html",
+                                            verification_link=verification_link,
+                                            user_name=new_patient.patient_id)
+
+                send_email('Verify Your Email', new_user.email, body_html)
 
         # Create new donor
         new_donor = BloodDonor(

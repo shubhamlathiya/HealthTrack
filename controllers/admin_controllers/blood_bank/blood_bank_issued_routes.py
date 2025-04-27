@@ -20,20 +20,6 @@ import string
 
 from utils.email_utils import send_email
 
-
-def send_welcome_email(email, temp_password, user_id):
-    body = f"""Welcome to our Healthcare System!
-
-Your temporary password is: {temp_password}
-
-Please change your password after logging in.
-    """
-    send_email("Your New Patient Account", email, body)
-
-    verification_link = f"{request.host_url}auth/verify-email/{user_id}"
-    send_email('Verify Your Email', email, verification_link)
-
-
 def calculate_expiry_date(component_type):
     today = datetime.utcnow().date()
     expiry_days = {
@@ -193,8 +179,20 @@ def add_blood_issuance(current_user):
                 db.session.flush()
                 patient_id = new_patient.patient_id
 
-                # Send welcome email
-                send_welcome_email(new_user.email, temp_password, new_user.id)
+                body_html = render_template("email_templates/templates/welcome.html",
+                                            user_name=new_patient.patient_id,
+                                            new_user=new_user,
+                                            temp_password=temp_password,
+                                            login_url="http://localhost:5000/")
+
+                send_email('Welcome to HealthTrack Hospital', new_user.email, body_html)
+
+                verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
+                body_html = render_template("email_templates/templates/verification_mail.html",
+                                            verification_link=verification_link,
+                                            user_name=new_patient.patient_id)
+
+                send_email('Verify Your Email', new_user.email, body_html)
 
                 # Reduce blood product quantity
         existing_product.quantity -= quantity

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template, request, flash, redirect, make_response
+from flask import render_template, request, flash, redirect, make_response, jsonify
 from fpdf import FPDF
 
 from controllers.admin_controllers import admin
@@ -12,6 +12,7 @@ from middleware.auth_middleware import token_required
 from models.birthRecordeModel import ChildCase, MedicalVisit
 from models.doctorModel import Doctor
 from utils.config import db
+from utils.email_utils import send_email_with_attachment
 
 
 @admin.route(RECORDS_BIRTH, methods=['GET'], endpoint='records_birth')
@@ -37,8 +38,7 @@ def records_birth(current_user):
                            RECORDS_BIRTH_EDIT_MEDICAL_VISIT=RECORDS_BIRTH_EDIT_MEDICAL_VISIT,
                            RECORDS_BIRTH_MEDICAL_VISIT_DELETE=RECORDS_BIRTH_MEDICAL_VISIT_DELETE,
                            RESTORE_RECORDS_BIRTH=RESTORE_RECORDS_BIRTH,
-                           RESTORE_BIRTH_MEDICAL_VISIT=RESTORE_BIRTH_MEDICAL_VISIT
-                           )
+                           RESTORE_BIRTH_MEDICAL_VISIT=RESTORE_BIRTH_MEDICAL_VISIT)
 
 
 @admin.route(RECORDS_ADD_BIRTH, methods=['GET', 'POST'])
@@ -59,6 +59,7 @@ def add_child_case(current_user):
                 address=request.form['address'],
                 mother_name=request.form['mother_name'],
                 father_name=request.form['father_name'],
+                father_email=request.form['father_email'],
                 contact_number=request.form['contact_number'],
                 case_notes=request.form.get('case_notes', ''),
                 status=request.form.get('status', 'Active')
@@ -91,6 +92,7 @@ def edit_child_case(current_user, id):
         case.address = request.form['address']
         case.mother_name = request.form['mother_name']
         case.father_name = request.form['father_name']
+        case.father_email = request.form['father_email']
         case.contact_number = request.form['contact_number']
         case.case_notes = request.form.get('case_notes', '')
         case.status = request.form.get('status', 'Active')
@@ -201,10 +203,8 @@ def delete_medical_visit(current_user, visit_id):
     return redirect(ADMIN + RECORDS_BIRTH)
 
 
-@admin.route(RECORDS_BIRTH_CERTIFICATE + '/<int:id>', methods=['GET'])
-def child_case_certificate(id):
-    case = ChildCase.query.get_or_404(id)
-
+def generate_birth_certificate_pdf(case):
+    """Generate PDF birth certificate for a given case."""
     # Calculate age
     today = datetime.now().date()
     age = today.year - case.birth_date.year - ((today.month, today.day) < (case.birth_date.month, case.birth_date.day))
@@ -245,11 +245,51 @@ def child_case_certificate(id):
     pdf.cell(0, 10, '_________________________', 0, 1, 'R')
     pdf.cell(0, 10, 'Hospital Administrator', 0, 1, 'R')
 
-    # Output
+    return pdf
+
+
+@admin.route(RECORDS_BIRTH_CERTIFICATE + '/<int:id>', methods=['GET'], endpoint="child_case_certificate")
+def child_case_certificate(id):
+    case = ChildCase.query.get_or_404(id)
+    pdf = generate_birth_certificate_pdf(case)
+
+    # Output for download
     response = make_response(pdf.output(dest='S').encode('latin1'))
     response.headers.set('Content-Disposition', 'attachment', filename=f'birth_certificate_{case.case_number}.pdf')
     response.headers.set('Content-Type', 'application/pdf')
     return response
+
+
+@admin.route(RECORDS_BIRTH_CERTIFICATE + '/send-email/<int:id>', methods=['GET'],
+             endpoint="send_birth_certificate_email")
+def send_birth_certificate_email(id):
+    case = ChildCase.query.get_or_404(id)
+
+    # Get email from request
+    recipient_email = case.father_email
+    if not recipient_email:
+        return jsonify({"success": False, "message": "Email address is required"}), 400
+
+    # Generate PDF
+    pdf = generate_birth_certificate_pdf(case)
+    pdf_data = pdf.output(dest='S').encode('latin1')
+
+    # Prepare email content
+    subject = f"Health Track | Birth Certificate for {case.first_name} {case.last_name}"
+    body_html = render_template("email_templates/templates/birth_certificate_mail.html",
+                                case=case
+                                )
+
+    # Send email with attachment
+    filename = f"birth_certificate_{case.case_number}.pdf"
+    success = send_email_with_attachment(subject, recipient_email, body_html, pdf_data, filename)
+
+    if success:
+        flash('Birth certificate has been sent via email successfully!', 'success')
+
+    else:
+        flash('Failed to send email with birth certificate', 'danger')
+    return redirect(ADMIN + RECORDS_BIRTH)
 
 
 @admin.route(RESTORE_RECORDS_BIRTH + '/<int:id>', methods=['POST'])

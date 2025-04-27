@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template, request, flash, redirect, make_response
+from flask import render_template, request, flash, redirect, make_response, jsonify
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import RECORDS_DEATH, ADMIN, \
@@ -11,6 +11,8 @@ from models.deathRecordeModel import DeathRecord
 from models.doctorModel import Doctor
 from utils.config import db
 from fpdf import FPDF
+
+from utils.email_utils import send_email_with_attachment
 
 
 @admin.route(RECORDS_DEATH, methods=['GET'], endpoint='records_death')
@@ -53,7 +55,10 @@ def add_death_record(current_user):
                     'death_time') else None,
                 address=request.form.get('address'),
                 cause_of_death=request.form.get('cause_of_death'),
+                email=request.form.get("email"),
                 guardian_name=request.form.get('guardian_name'),
+                relationship=request.form.get("relationship"),
+                place_of_death=request.form.get("place_of_death"),
                 contact_number=request.form.get('contact_number'),
                 pronounced_by=request.form.get('pronounced_by'),
                 notes=request.form.get('notes')
@@ -86,6 +91,9 @@ def edit_death_record(current_user, id):
             'death_time') else None
         record.address = request.form.get('address')
         record.cause_of_death = request.form.get('cause_of_death')
+        record.email = request.form.get("email")
+        record.relationship = request.form.get("relationship")
+        record.place_of_death = request.form.get("place_of_death")
         record.guardian_name = request.form.get('guardian_name')
         record.contact_number = request.form.get('contact_number')
         record.pronounced_by = request.form.get('pronounced_by')
@@ -131,17 +139,15 @@ def restore_death_record(current_user, id):
     return redirect(ADMIN + RECORDS_DEATH)
 
 
-@admin.route(RECORDS_DEATH_CERTIFICATE + '/<int:id>', methods=['GET'])
-def death_certificate(id):
-    record = DeathRecord.query.get_or_404(id)
-
-    # Create PDF
+def generate_death_certificate_pdf(record):
+    """Generate PDF death certificate for a given death record."""
     pdf = FPDF()
     pdf.add_page()
 
     # Set document properties
     pdf.set_title(f"Death Certificate - {record.first_name} {record.last_name}")
     pdf.set_author("Hospital Management System")
+    pdf.set_creator("Hospital Management System")
 
     # Header with hospital information
     pdf.set_font('Arial', 'B', 16)
@@ -153,92 +159,125 @@ def death_certificate(id):
 
     # Certificate title with border
     pdf.set_font('Arial', 'B', 18)
-    pdf.cell(0, 10, 'OFFICIAL DEATH CERTIFICATE', 0, 1, 'C')
+    pdf.set_fill_color(240, 240, 240)
+    pdf.cell(0, 12, 'OFFICIAL DEATH CERTIFICATE', 0, 1, 'C', True)
     pdf.ln(10)
-
-    # Seal/logo placeholder
-    # pdf.image('static/assets/images/hospital_seal.png', x=10, y=30, w=30)
-    # pdf.image('static/assets/images/hospital_seal.png', x=170, y=30, w=30)
 
     # Deceased information section
     pdf.set_font('Arial', 'B', 14)
-    pdf.cell(0, 10, 'DECEASED INFORMATION', 0, 1)
+    pdf.cell(0, 10, 'DECEASED INFORMATION', 'B', 1)
     pdf.set_font('Arial', '', 12)
 
     # Create a table-like structure for deceased info
     col_width = 90
     row_height = 8
+    line_height = 6
 
-    # Row 1
+    # Row 1: Name and Gender
     pdf.cell(col_width, row_height, f"Full Name: {record.first_name} {record.last_name}", 0, 0)
     pdf.cell(col_width, row_height, f"Gender: {record.gender}", 0, 1)
 
-    # Row 2
-    pdf.cell(col_width, row_height,
-             f"Date of Birth: {record.birth_date.strftime('%B %d, %Y') if record.birth_date else 'N/A'}", 0, 0)
-    # pdf.cell(col_width, row_height, f"Age at Death: {record.age_at_death or 'N/A'} years", 0, 1)
+    # Row 2: Birth Date and Age
+    birth_date = record.birth_date.strftime('%B %d, %Y') if record.birth_date else 'N/A'
+    pdf.cell(col_width, row_height, f"Date of Birth: {birth_date}", 0, 0)
 
-    # Row 3
-    pdf.cell(col_width, row_height, f"Address: {record.address or 'N/A'}", 0, 1)
+    if record.birth_date and record.death_date:
+        age = record.death_date.year - record.birth_date.year
+        if (record.death_date.month, record.death_date.day) < (record.birth_date.month, record.birth_date.day):
+            age -= 1
+        pdf.cell(col_width, row_height, f"Age at Death: {age} years", 0, 1)
+    else:
+        pdf.cell(col_width, row_height, "Age at Death: N/A", 0, 1)
+
+    # Row 3: Address
+    pdf.cell(0, row_height, f"Address: {record.address or 'N/A'}", 0, 1)
     pdf.ln(5)
 
     # Death details section
     pdf.set_font('Arial', 'B', 14)
-    pdf.cell(0, 10, 'DEATH DETAILS', 0, 1)
+    pdf.cell(0, 10, 'DEATH DETAILS', 'B', 1)
     pdf.set_font('Arial', '', 12)
 
-    # Row 1
-    pdf.cell(col_width, row_height, f"Date of Death: {record.death_date.strftime('%B %d, %Y')}", 0, 0)
-    pdf.cell(col_width, row_height,
-             f"Time of Death: {record.death_time.strftime('%I:%M %p') if record.death_time else 'N/A'}", 0, 1)
+    # Row 1: Date and Time of Death
+    death_date = record.death_date.strftime('%B %d, %Y') if record.death_date else 'N/A'
+    death_time = record.death_time.strftime('%I:%M %p') if record.death_time else 'N/A'
+    pdf.cell(col_width, row_height, f"Date of Death: {death_date}", 0, 0)
+    pdf.cell(col_width, row_height, f"Time of Death: {death_time}", 0, 1)
 
-    # Row 2
-    pdf.cell(col_width, row_height, f"Case Number: {record.case_number}", 0, 1)
+    # Row 2: Case Number and Place of Death
+    pdf.cell(col_width, row_height, f"Case Number: {record.case_number}", 0, 0)
+    pdf.cell(col_width, row_height, f"Place of Death: {record.place_of_death or 'Hospital'}", 0, 1)
+    pdf.ln(5)
 
-    # Row 3
-    pdf.multi_cell(0, row_height, f"Primary Cause of Death: {record.cause_of_death}", 0, 1)
+    # Cause of Death with multi-cell for long text
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(0, row_height, "Primary Cause of Death:", 0, 1)
+    pdf.set_font('Arial', '', 12)
+    pdf.multi_cell(0, line_height, record.cause_of_death or 'Not specified', 0, 1)
+
     pdf.ln(5)
 
     # Pronouncing physician section
     if record.doctor:
         pdf.set_font('Arial', 'B', 14)
-        pdf.cell(0, 10, 'PRONOUNCED BY', 0, 1)
+        pdf.cell(0, 10, 'PRONOUNCED BY', 'B', 1)
         pdf.set_font('Arial', '', 12)
+
+        # Doctor information
         pdf.cell(col_width, row_height, f"Dr. {record.doctor.first_name} {record.doctor.last_name}", 0, 0)
-        pdf.ln(10)
+        # pdf.cell(col_width, row_height, f"License: {record.doctor.license_number or 'N/A'}", 0, 1)
+        # pdf.cell(0, row_height, f"Specialty: {record.doctor.specialization or 'N/A'}", 0, 1)
+        pdf.ln(5)
 
     # Next of kin section
     pdf.set_font('Arial', 'B', 14)
-    pdf.cell(0, 10, 'NEXT OF KIN', 0, 1)
+    pdf.cell(0, 10, 'NEXT OF KIN', 'B', 1)
     pdf.set_font('Arial', '', 12)
+
+    # Kin information
     pdf.cell(col_width, row_height, f"Name: {record.guardian_name or 'N/A'}", 0, 0)
-    pdf.cell(col_width, row_height, f"Contact: {record.contact_number or 'N/A'}", 0, 1)
-    pdf.ln(15)
+    pdf.cell(col_width, row_height, f"Relationship: {record.relationship or 'N/A'}", 0, 1)
+    pdf.cell(col_width, row_height, f"Contact: {record.contact_number or 'N/A'}", 0, 0)
+    pdf.cell(col_width, row_height, f"Address: {record.address or 'N/A'}", 0, 1)
+    pdf.ln(10)
 
     # Certification section
     pdf.set_font('Arial', 'I', 10)
     pdf.cell(0, 10, f'Certificate generated on: {datetime.now().strftime("%B %d, %Y at %I:%M %p")}', 0, 1, 'C')
     pdf.ln(10)
 
-    # Signature lines
+    # Signature lines with space for actual signatures
     pdf.set_font('Arial', 'B', 12)
     pdf.cell(0, 10, 'Authorized Signatures', 0, 1, 'C')
     pdf.ln(8)
 
-    # Physician signature
+    # Create two signature areas
     pdf.cell(95, 10, '_________________________', 0, 0, 'C')
     pdf.cell(95, 10, '_________________________', 0, 1, 'C')
     pdf.cell(95, 5, 'Attending Physician', 0, 0, 'C')
     pdf.cell(95, 5, 'Hospital Administrator', 0, 1, 'C')
-    pdf.ln(10)
+    pdf.ln(15)
 
     # Official stamp notice
     pdf.set_font('Arial', 'I', 10)
     pdf.multi_cell(0, 8,
-                   'NOTE: This document becomes valid only when accompanied by the official hospital seal and signatures.',
+                   'NOTE: This document becomes valid only when accompanied by the official hospital seal and signatures. '
+                   'Unauthorized duplication or alteration of this certificate is prohibited by law.',
                    0, 'C')
 
-    # Output the PDF
+    # Add page border
+    pdf.set_draw_color(150, 150, 150)
+    pdf.rect(5, 5, 200, 287)
+
+    return pdf
+
+
+@admin.route(RECORDS_DEATH_CERTIFICATE + '/<int:id>', methods=['GET'])
+def death_certificate(id):
+    record = DeathRecord.query.get_or_404(id)
+    pdf = generate_death_certificate_pdf(record)
+
+    # Output for download
     response = make_response(pdf.output(dest='S').encode('latin1'))
     response.headers.set('Content-Disposition', 'attachment', filename=f'death_certificate_{record.case_number}.pdf')
     response.headers.set('Content-Type', 'application/pdf')
@@ -249,3 +288,37 @@ def death_certificate(id):
     db.session.commit()
 
     return response
+
+
+@admin.route(RECORDS_DEATH_CERTIFICATE + '/send-email/<int:id>', methods=['GET'])
+def send_death_certificate_email(id):
+    record = DeathRecord.query.get_or_404(id)
+
+    # Get email from request
+    recipient_email = record.email
+    if not recipient_email:
+        return jsonify({"success": False, "message": "Email address is required"}), 400
+
+    # Generate PDF
+    pdf = generate_death_certificate_pdf(record)
+    pdf_data = pdf.output(dest='S').encode('latin1')
+
+    # Prepare email content
+    subject = f"Death Certificate for {record.first_name} {record.last_name}"
+    body_html = render_template("email_templates/templates/death_certificate_mail.html",
+                                record=record)
+
+    # Send email with attachment
+    filename = f"death_certificate_{record.case_number}.pdf"
+    success = send_email_with_attachment(subject, recipient_email, body_html, pdf_data, filename)
+
+    if success:
+        # Update certificate issued status
+        record.death_certificate_issued = True
+        record.certificate_issue_date = datetime.utcnow()
+        db.session.commit()
+
+        flash("Death certificate has been sent via email successfully!", 'success')
+    else:
+        flash("Failed to send email with death certificate", 'danger')
+    return redirect(ADMIN + RECORDS_DEATH)

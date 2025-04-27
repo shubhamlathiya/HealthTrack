@@ -6,11 +6,11 @@ from utils.email_utils import send_email
 
 from models.userModel import User
 
-
 from flask import request, jsonify, render_template
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 import random
+
 
 # Assuming Patient and User models are already imported from your models
 # Also assuming send_email is a utility function to send emails
@@ -70,9 +70,20 @@ def register_patient():
             db.session.add(new_patient)
             db.session.commit()
 
-            # Send a verification email (You should have your email setup)
+            body_html = render_template("email_templates/templates/welcome.html",
+                                        user_name=new_patient.patient_id,
+                                        new_user=new_user,
+                                        temp_password=data['password'],
+                                        login_url="http://localhost:5000/")
+
+            send_email('Welcome to HealthTrack Hospital', new_user.email, body_html)
+
             verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
-            send_email('Verify Your Email', data['email'], verification_link)
+            body_html = render_template("email_templates/templates/verification_mail.html",
+                                        verification_link=verification_link,
+                                        user_name=new_patient.patient_id)
+
+            send_email('Verify Your Email', new_user.email, body_html)
 
             return jsonify({'message': 'Patient registered successfully'})
 
@@ -83,6 +94,7 @@ def register_patient():
     elif request.method == 'GET':
         # If GET request, render registration page
         return render_template('auth_templates/register_templates.html')
+
 
 @auth.route('/verify-email/<int:patient_id>', methods=['GET'])
 def verify_email(patient_id):
@@ -97,7 +109,7 @@ def verify_email(patient_id):
         try:
             # Commit the change to the database
             db.session.commit()
-            return  render_template('auth_templates/email_verified.html'), 200
+            return render_template('auth_templates/email_verified.html'), 200
         except Exception as e:
             db.session.rollback()  # Rollback in case of error
             return jsonify({'error': str(e)}), 500

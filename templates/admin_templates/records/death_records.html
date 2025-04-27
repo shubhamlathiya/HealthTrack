@@ -92,6 +92,13 @@
                                                data-bs-placement="top" data-bs-title="Print Certificate">
                                                 <i class="ri-printer-line"></i>
                                             </a>
+                                            <a href="{{ ADMIN + RECORDS_DEATH_CERTIFICATE }}/send-email/{{ record.id }}"
+                                               class="btn btn-outline-success btn-sm send-email-btn"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-title="Send Certificate via Email">
+                                                <i class="ri-mail-send-line"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -181,7 +188,8 @@
                                         <p><strong>Time of
                                             Death:</strong> {{ record.death_time.strftime('%I:%M %p') if record.death_time else 'N/A' }}
                                         </p>
-                                        <p><strong>Location:</strong> {{ record.death_location or 'N/A' }}</p>
+                                        <p><strong>Place of Death:</strong> {{ record.place_of_death or 'N/A' }}</p>
+                                        <p><strong>Relationship:</strong> {{ record.relationship or 'N/A' }}</p>
                                         <p><strong>Cause of Death:</strong>
                                             <span class="badge bg-danger bg-opacity-10 text-danger">{{ record.cause_of_death }}</span>
                                         </p>
@@ -206,6 +214,21 @@
                                     <div class="card-body">
                                         <p><strong>Guardian/Relative:</strong> {{ record.guardian_name or 'N/A' }}</p>
                                         <p><strong>Contact Number:</strong> {{ record.contact_number or 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-group-line"></i>Certificate Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>
+                                            <strong>Certificate Issue Date:</strong> {{ record.certificate_issue_date or 'N/A' }}
+                                        </p>
+                                        <p>
+                                            <strong>Death Certificate Issued:</strong> {{ record.death_certificate_issued or 'N/A' }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -282,12 +305,18 @@
                                         </select>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Birth Date</label>
-                                        <input type="date" class="form-control" name="birth_date"
-                                               value="{{ record.birth_date.strftime('%Y-%m-%d') if record.birth_date else '' }}">
+                                    <div class="row">
+                                        <div class=" mb-3">
+                                            <label class="form-label">Birth Date</label>
+                                            <input type="date" class="form-control" name="birth_date"
+                                                   value="{{ record.birth_date.strftime('%Y-%m-%d') if record.birth_date else '' }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="email">Enter Email</label>
+                                            <input type="email" class="form-control" name="email" id="email"
+                                                   value="{{ record.email }}">
+                                        </div>
                                     </div>
-
                                     <div class="mb-3">
                                         <label class="form-label">Address</label>
                                         <textarea class="form-control" name="address"
@@ -329,6 +358,20 @@
                                                 </option>
                                             {% endfor %}
                                         </select>
+                                    </div>
+                                    <div class="row">
+                                        <div class=" mb-3">
+                                            <label class="form-label" for="relationship">Relationship</label>
+                                            <input type="text" class="form-control" name="relationship"
+                                                   id="relationship"
+                                                   value="{{ record.relationship }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="place_of_death">place_of_death</label>
+                                            <input type="text" class="form-control" name="place_of_death"
+                                                   id="place_of_death"
+                                                   value="{{ record.place_of_death }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

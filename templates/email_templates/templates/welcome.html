@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to HealthTrack Hospital</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Header */
+        .header {
+            background-color: #1a73e8;
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .hospital-logo {
+            height: 50px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* Content */
+        .content {
+            padding: 30px;
+        }
+
+        h2 {
+            color: #1a73e8;
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        /* Credentials Box */
+        .credentials-box {
+            background-color: #f8f9fc;
+            border-left: 4px solid #1a73e8;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 25px 0;
+        }
+
+        .credential-row {
+            margin-bottom: 15px;
+        }
+
+        .credential-label {
+            font-weight: 600;
+            color: #5a5c69;
+            display: inline-block;
+            width: 100px;
+        }
+
+        .credential-value {
+            font-family: 'Courier New', monospace;
+            background-color: #f1f3f9;
+            padding: 6px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Button */
+        .login-btn {
+            display: inline-block;
+            background-color: #1a73e8;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eeeeee;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .header {
+                padding: 20px 15px;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .credential-label {
+                width: 100%;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .credential-value {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Header -->
+    <div class="header">
+        <h1>Welcome to HealthTrack Hospital</h1>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <h2>Your Account Has Been Created</h2>
+
+        <p>Dear {{ user_name }},</p>
+
+        <p>Welcome to Healthcare Hospital's patient portal. Below are your login credentials to access our system:</p>
+
+        <div class="credentials-box">
+            <div class="credential-row">
+                <span class="credential-label">Email:</span>
+                <span class="credential-value">{{ new_user.email }}</span>
+            </div>
+            <div class="credential-row">
+                <span class="credential-label">Password:</span>
+                <span class="credential-value">{{ temp_password }}</span>
+            </div>
+            <div class="credential-row">
+                <span class="credential-label">Login URL:</span>
+                <span class="credential-value">{{ login_url }}</span>
+            </div>
+        </div>
+
+        <p>For your security, we recommend:</p>
+        <ul>
+            <li>Logging in immediately to change your password</li>
+            <li>Not sharing these credentials with anyone</li>
+            <li>Enabling two-factor authentication in your account settings</li>
+        </ul>
+
+        <div style="text-align: center;">
+            <a href="{{ login_url }}" class="login-btn">Login to Your Account</a>
+        </div>
+
+        <p>If you have any questions or need assistance, please contact our support team at <a
+                href="mailto:support@healthcarehospital.com">support@healthcarehospital.com</a> or call (123) 456-7890.
+        </p>
+
+        <p>Thank you for choosing Healthcare Hospital for your medical needs.</p>
+
+        <p>Best regards,<br>
+            <strong>Healthcare Hospital Team</strong></p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>This is an automated message. Please do not reply to this email.</p>
+        <p>&copy; {{ current_year }} Healthcare Hospital. All rights reserved.</p>
+        <p>
+            <a href="{{ privacy_policy_url }}" style="color: #1a73e8; text-decoration: none;">Privacy Policy</a> |
+            <a href="{{ contact_url }}" style="color: #1a73e8; text-decoration: none;">Contact Us</a>
+        </p>
+        <p>Healthcare Hospital, 123 Medical Center Drive, City, State 12345</p>
+    </div>
+</div>
+</body>
+</html>

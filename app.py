@@ -18,6 +18,9 @@ app.config['MAIL_USERNAME'] = 'shubhamlathiya2021@gmail.com'  # Your email
 app.config['MAIL_PASSWORD'] = 'tqerujnjzuvgdjho'  # Your email password
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = 'shubhamlathiya2021@gmail.com'
+app.config['MAIL_DEBUG'] = True  # Enable SMTP debug output
+app.config['MAIL_SUPPRESS_SEND'] = False  # Actually send emails
 
 # Initialize the mail object
 mail = Mail(app)

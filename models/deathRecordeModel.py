@@ -14,11 +14,16 @@ class DeathRecord(db.Model):
     birth_date = db.Column(db.Date)
     death_date = db.Column(db.Date, nullable=False)
     death_time = db.Column(db.Time)
+    email = db.Column(db.String(100), nullable=False)
+    place_of_death = db.Column(db.String(255), nullable=True)
+    relationship = db.Column(db.String(255), nullable=True)
     address = db.Column(db.String(200))
     cause_of_death = db.Column(db.String(100), nullable=False)
     guardian_name = db.Column(db.String(100))
     contact_number = db.Column(db.String(20))
     notes = db.Column(db.Text)
+    certificate_issue_date = db.Column(db.DateTime, nullable=True)
+    death_certificate_issued = db.Column(db.Boolean, default=False)
 
     # Doctor relationship
     pronounced_by = db.Column(db.Integer, db.ForeignKey('doctor.id'), index=True)
