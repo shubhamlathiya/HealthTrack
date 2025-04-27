@@ -1,17 +1,19 @@
-from flask import render_template, request, flash, redirect
-from datetime import date
-from sqlalchemy import func, cast, Date
 import os
+from datetime import date
+
+from flask import render_template, request, flash, redirect
+from sqlalchemy import func, cast, Date
+
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import INSURANCE_PATIENT, ADMIN, \
     INSURANCE_PATIENT_ADD_RECORDS, INSURANCE_PATIENT_RESTORE_RECORDS, INSURANCE_PATIENT_DELETE_RECORDS, \
     INSURANCE_PATIENT_EDIT_RECORDS
 from middleware.auth_middleware import token_required
-from models.patientModel import Patient
 from models.insuranceProviderModel import (
     InsuranceProvider,
     InsuranceRecord
 )
+from models.patientModel import Patient
 from utils.config import db
 
 # File upload configuration

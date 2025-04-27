@@ -1,15 +1,15 @@
-from controllers.auth_controllers import auth
-from controllers.constant.adminPathConstant import REGISTER
-from models.patientModel import Patient
-from utils.config import db
-from utils.email_utils import send_email
-
-from models.userModel import User
+import random
+from datetime import datetime
 
 from flask import request, jsonify, render_template
 from werkzeug.security import generate_password_hash
-from datetime import datetime
-import random
+
+from controllers.auth_controllers import auth
+from controllers.constant.adminPathConstant import REGISTER
+from models.patientModel import Patient
+from models.userModel import User
+from utils.config import db
+from utils.email_utils import send_email
 
 
 # Assuming Patient and User models are already imported from your models

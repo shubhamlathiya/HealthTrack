@@ -1,15 +1,14 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
 from datetime import datetime
-from sqlalchemy.exc import IntegrityError
+
+from flask import render_template, redirect, url_for, flash, request
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import INSURANCE_PROVIDER, ADMIN, INSURANCE_EDIT_INSURANCE_PROVIDER, \
-    INSURANCE_DELETE_INSURANCE_PROVIDER, INSURANCE_RESTORE_INSURANCE_PROVIDER, INSURANCE_ADD_INSURANCE_PROVIDER, \
-    INSURANCE_CONVERAGE_TYPE, INSURANCE_ADD_CONVERAGE_TYPE, INSURANCE_EDIT_CONVERAGE_TYPE, \
-    INSURANCE_DELETE_CONVERAGE_TYPE, INSURANCE_RESTORE_CONVERAGE_TYPE
+    INSURANCE_DELETE_INSURANCE_PROVIDER, INSURANCE_RESTORE_INSURANCE_PROVIDER, INSURANCE_ADD_INSURANCE_PROVIDER
 from middleware.auth_middleware import token_required
-from models.insuranceProviderModel import InsuranceProvider, CoverageType, provider_coverage
+from models.insuranceProviderModel import InsuranceProvider, CoverageType
 from utils.config import db
 
 

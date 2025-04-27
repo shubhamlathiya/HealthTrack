@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import request, flash, redirect, render_template, jsonify
+from flask import request, flash, redirect, render_template
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import ROOM_ADD_BAD, ADMIN, ROOM_DELETE_BAD, ROOM

@@ -1,17 +1,16 @@
-import uuid
-from click import DateTime
-from flask import flash, render_template, redirect, request, jsonify
-from controllers.admin_controllers import admin
-from middleware.auth_middleware import token_required
-from utils.config import db
-from werkzeug.utils import secure_filename
-from models.patientModel import Patient
-from models.insuranceProviderModel import InsuranceProvider, InsuranceClaim, InsuranceRecord
 import os
 
+import uuid
+from flask import flash, render_template, redirect, request, jsonify
+from werkzeug.utils import secure_filename
+
+from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import INSURANCE_CLAIM_STATUS, GET_PATIENT, ADMIN, INSURANCE_NEW_CLAIM, \
     INSURANCE_CLAIM_STATUS_EDIT, INSURANCE_CLAIM_STATUS_PROCESS, INSURANCE_CLAIM_STATUS_APPEAL, \
     INSURANCE_CLAIM_STATUS_PRINT, INSURANCE_CLAIM_STATUS_DELETE, INSURANCE_CLAIM_STATUS_RESTORE
+from middleware.auth_middleware import token_required
+from models.insuranceProviderModel import InsuranceProvider, InsuranceClaim, InsuranceRecord
+from utils.config import db
 
 # File upload configuration
 UPLOAD_FOLDER = 'static/uploads/claims'

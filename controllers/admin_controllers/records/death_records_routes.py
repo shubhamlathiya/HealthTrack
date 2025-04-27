@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import render_template, request, flash, redirect, make_response, jsonify
+from fpdf import FPDF
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import RECORDS_DEATH, ADMIN, \
@@ -10,8 +11,6 @@ from middleware.auth_middleware import token_required
 from models.deathRecordeModel import DeathRecord
 from models.doctorModel import Doctor
 from utils.config import db
-from fpdf import FPDF
-
 from utils.email_utils import send_email_with_attachment
 
 

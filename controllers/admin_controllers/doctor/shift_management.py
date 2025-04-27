@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from flask import request, flash, redirect, render_template, jsonify
+from flask import request, render_template, jsonify
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DOCTOR_SHIFT_MANAGEMENT, DOCTOR_UPDATE_SHIFT_MANAGEMENT, ADMIN

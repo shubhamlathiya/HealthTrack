@@ -1,14 +1,16 @@
-from datetime import datetime
 import random
 import string
+from datetime import datetime
+
 from flask import render_template, request, flash, redirect
+
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import (
     BLOOD_BANK_STOCK, ADMIN, BLOOD_BANK_EDIT_STOCK,
     BLOOD_BANK_ADD_STOCK, BLOOD_BANK_RESTORE_STOCK,
     BLOOD_BANK_DELETE_STOCK
 )
-from models.bloodModel import BloodProduct, BloodDonor
+from models.bloodModel import BloodProduct
 from utils.config import db
 
 

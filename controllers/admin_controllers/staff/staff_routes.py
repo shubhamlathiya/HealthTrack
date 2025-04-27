@@ -1,11 +1,10 @@
+import os
+from datetime import datetime
 from sqlite3 import IntegrityError
 
 from flask import render_template, request, redirect, flash
-from datetime import datetime
-
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-import os
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import STAFF, STAFF_ADD, ADMIN, STAFF_EDIT, STAFF_DELETE, STAFF_RESTORE
@@ -83,8 +82,20 @@ def add_staff():
         db.session.add(staff)
         db.session.commit()
 
+        body_html = render_template("email_templates/templates/welcome.html",
+                                    user_name=staff.first_name,
+                                    new_user=staff,
+                                    temp_password=request.form['password'],
+                                    login_url="http://localhost:5000/")
+
+        send_email('Welcome to HealthTrack Hospital', user.email, body_html)
+
         verification_link = f"http://localhost:5000/auth/verify-email/{user.id}"
-        send_email('Verify Your Email', user.email, verification_link)
+        body_html = render_template("email_templates/templates/verification_mail.html",
+                                    verification_link=verification_link,
+                                    user_name=staff.first_name)
+
+        send_email('Verify Your Email', user.email, body_html)
 
         flash('Staff member added successfully! Verification email sent.', 'success')
     except ValueError as e:

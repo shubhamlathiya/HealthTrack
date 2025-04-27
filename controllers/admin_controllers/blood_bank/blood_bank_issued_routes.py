@@ -1,3 +1,5 @@
+import random
+import string
 from datetime import datetime, timedelta
 from sqlite3 import IntegrityError
 
@@ -15,10 +17,8 @@ from models.bloodModel import BloodIssuance, BloodProduct
 from models.patientModel import Patient, PatientPayment
 from models.userModel import User
 from utils.config import db
-import random
-import string
-
 from utils.email_utils import send_email
+
 
 def calculate_expiry_date(component_type):
     today = datetime.utcnow().date()

@@ -1,8 +1,6 @@
-import datetime
-import jwt
-from flask import jsonify, request, render_template, flash, redirect, url_for
+from flask import jsonify, request, render_template, flash, redirect
 from itsdangerous import URLSafeTimedSerializer
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
 from controllers.auth_controllers import auth
 from controllers.constant.adminPathConstant import FORGOT_PASSWORD, RESET_PASSWORD

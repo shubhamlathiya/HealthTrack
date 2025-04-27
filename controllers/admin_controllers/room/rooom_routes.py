@@ -2,18 +2,16 @@ from datetime import datetime, timedelta
 
 from flask import render_template, request, redirect, flash, jsonify
 from sqlalchemy import select, or_, and_
-from sqlalchemy.util import methods_equivalent
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import ROOM_ADD_ROOM, ROOM_AVAILABLE_ROOM, ROOM_BOOK_ROOM, \
     ROOM_ROOM_STATISTICS, \
     ROOM_ROOM_ALLOTTED, ROOM_ROOM_BY_DEPT, ADMIN, ROOM, ROOM_EDIT_ROOM, ROOM_DELETE_ROOM, ROOM_RESTORE_ROOM, \
-    GET_PATIENT, ROOM_DISCHARGE_ROOM, ROOM_CLEANING_LOGS, GET_ROOM_DEPARTMENT, ROOM_COMPLETE_CLEANING_LOGS
+    ROOM_DISCHARGE_ROOM, ROOM_CLEANING_LOGS, GET_ROOM_DEPARTMENT, ROOM_COMPLETE_CLEANING_LOGS
 from middleware.auth_middleware import token_required
 from models.departmentModel import Department
 from models.patientModel import Patient, PatientPayment
 from models.roomModel import Room, Bed, BedAllocation, RoomCharge, BedCleaningLog
-from models.userModel import User
 from utils.config import db
 
 

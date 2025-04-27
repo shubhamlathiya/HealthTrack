@@ -1,7 +1,9 @@
+import os
+
 from flask import render_template, request, jsonify, redirect, flash
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-import os
+
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DOCTOR_ADD_DOCTOR, DOCTOR_LIST, ADMIN
 from middleware.auth_middleware import token_required
