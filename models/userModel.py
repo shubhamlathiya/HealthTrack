@@ -1,5 +1,6 @@
-from utils.config import db
 from datetime import datetime
+
+from utils.config import db
 
 
 # Define the User model
@@ -18,6 +19,9 @@ class User(db.Model):
 
     staff = db.relationship('Staff', backref='user', uselist=False)
 
+    notifications = db.relationship('Notification', backref='user', lazy=True)
+    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
+    received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
     # Relationships
     insurance_records = db.relationship(
         'InsuranceRecord',

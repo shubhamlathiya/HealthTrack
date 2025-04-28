@@ -1,5 +1,7 @@
 from flask import Flask, render_template, session, jsonify, redirect, send_from_directory
 from flask_mail import Mail
+from flask_socketio import SocketIO
+
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
 from utils.config import init_app, db
@@ -7,9 +9,6 @@ from utils.config import init_app, db
 app = Flask(__name__, static_folder="static")
 
 init_app(app)
-
-with app.app_context():
-    db.create_all()
 
 # Flask-Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -24,11 +23,17 @@ app.config['MAIL_SUPPRESS_SEND'] = False  # Actually send emails
 
 # Initialize the mail object
 mail = Mail(app)
-
+socketio = SocketIO(app, cors_allowed_origins="*")
 app.config['SECRET_KEY'] = 'your_secure_random_key'
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(admin, url_prefix='/admin')
 
+from controllers.chat_controllers.chat_routes import chat_routes
+
+app.register_blueprint(chat_routes, url_prefix='/chat_routes')
+
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
 def index():  # put application's code here
@@ -50,9 +55,12 @@ UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory('uploads', filename)
+
+
 @app.route('/logout', methods=['GET'])
 def logout():
     session.clear()
