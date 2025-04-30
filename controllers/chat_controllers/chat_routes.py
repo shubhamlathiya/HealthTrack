@@ -1,17 +1,16 @@
 from datetime import datetime
 
-from flask import Blueprint, jsonify, render_template, redirect, url_for, request
+from flask import jsonify, render_template, redirect, url_for, request
 from flask_socketio import emit, join_room, leave_room
 
 from app import socketio
+from controllers.chat_controllers import chat
 from middleware.auth_middleware import token_required
 from models.chatModel import Message, Notification, CommunicationRequest
 from models.doctorModel import Doctor
 from models.patientModel import Patient
 from models.userModel import User
 from utils.config import db
-
-chat_routes = Blueprint("chat_routes", __name__)
 
 
 # Helper function
@@ -139,7 +138,7 @@ def handle_send_message(data):
 
 
 # HTTP Routes
-@chat_routes.route("/send-message", methods=["POST"])
+@chat.route("/send-message", methods=["POST"])
 def send_message():
     data = request.json
     sender_id = data.get("sender_id")
@@ -163,7 +162,7 @@ def send_message():
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route('/mark-messages-read', methods=['POST'])
+@chat.route('/mark-messages-read', methods=['POST'])
 @token_required
 def mark_messages_read(current_user):
     sender_id = request.args.get('sender_id')
@@ -175,7 +174,7 @@ def mark_messages_read(current_user):
     return jsonify({"message": "Messages marked as read"}), 200
 
 
-@chat_routes.route("/get-conversation", methods=["GET"])
+@chat.route("/get-conversation", methods=["GET"])
 def get_conversation():
     sender_id = request.args.get("sender_id")
     receiver_id = request.args.get("receiver_id")
@@ -209,7 +208,7 @@ def get_conversation():
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route("/get-users-for-communication", methods=["GET"])
+@chat.route("/get-users-for-communication", methods=["GET"])
 @token_required
 def get_users_for_communication(current_user):
     try:
@@ -281,7 +280,7 @@ def get_users_for_communication(current_user):
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route("/get-notifications", methods=["GET"])
+@chat.route("/get-notifications", methods=["GET"])
 @token_required
 def get_notifications(current_user):
     try:
@@ -302,7 +301,7 @@ def get_notifications(current_user):
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route("/mark-notification-as-read/<int:notification_id>", methods=["PUT"])
+@chat.route("/mark-notification-as-read/<int:notification_id>", methods=["PUT"])
 def mark_notification_as_read(notification_id):
     try:
         notification = Notification.query.get(notification_id)
@@ -318,7 +317,7 @@ def mark_notification_as_read(notification_id):
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route("/start-conversation/<int:receiver_id>", methods=["GET"])
+@chat.route("/start-conversation/<int:receiver_id>", methods=["GET"])
 @token_required
 def start_conversation(current_user, receiver_id):
     try:
@@ -354,7 +353,7 @@ def start_conversation(current_user, receiver_id):
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route("/send-communication-request", methods=["POST"])
+@chat.route("/send-communication-request", methods=["POST"])
 @token_required
 def send_communication_request(current_user):
     """Send a communication request to another user"""
@@ -409,7 +408,7 @@ def send_communication_request(current_user):
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route("/respond-to-request/<int:request_id>", methods=["POST"])
+@chat.route("/respond-to-request/<int:request_id>", methods=["POST"])
 @token_required
 def respond_to_communication_request(current_user, request_id):
     try:
@@ -476,7 +475,7 @@ def get_user_full_name(user_id, role):
     return "admin"
 
 
-@chat_routes.route("/get-pending-requests", methods=["GET"])
+@chat.route("/get-pending-requests", methods=["GET"])
 @token_required
 def get_pending_requests(current_user):
     """Get pending communication requests for current user"""
@@ -518,7 +517,7 @@ def get_pending_requests(current_user):
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route("/get-unread-notification-count", methods=["GET"])
+@chat.route("/get-unread-notification-count", methods=["GET"])
 @token_required
 def get_unread_notification_count(current_user):
     """Get the count of unread notifications and messages for the current user"""
@@ -552,7 +551,7 @@ def get_unread_notification_count(current_user):
         }), 500
 
 
-@chat_routes.route("/get-potential-recipients", methods=["GET"])
+@chat.route("/get-potential-recipients", methods=["GET"])
 @token_required
 def get_potential_recipients(current_user):
     """Get a list of users that the current user can potentially start a conversation with"""
@@ -624,7 +623,7 @@ def get_potential_recipients(current_user):
         return jsonify({"error": str(e)}), 500
 
 
-@chat_routes.route("/chat", methods=["GET"])
+@chat.route("/chat", methods=["GET"])
 @token_required
 def chat_ui(current_user):
     print("Current User ID:", current_user)

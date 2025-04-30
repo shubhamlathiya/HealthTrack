@@ -1,9 +1,6 @@
 from datetime import datetime
-import random
-import string
 
 from flask import render_template, request, redirect, flash
-from werkzeug.security import generate_password_hash
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import BLOOD_BANK_DONOR, ADMIN, BLOOD_BANK_ADD_DONOR, BLOOD_BANK_EDIT_DONOR, \
@@ -12,7 +9,7 @@ from models.bloodModel import BloodDonor
 from models.patientModel import Patient
 from models.userModel import User
 from utils.config import db
-from utils.email_utils import send_email
+from utils.create_new_patient import create_new_patient
 
 
 @admin.route(BLOOD_BANK_DONOR, methods=['GET'], endpoint='blood_bank_donor')
@@ -66,57 +63,18 @@ def add_blood_donor():
                 if existing_user:
                     flash('Email already exists in the system', 'danger')
                     return redirect(request.url)
+                data = request.form
 
-                digits = random.choices(string.digits, k=2)
-                specials = random.choices('!@#$%^&*', k=2)
-                letters = random.choices(string.ascii_letters, k=4)
-                temp_password = ''.join(random.sample(digits + specials + letters, 8))
-
-                # Create new user
-                new_user = User(
-                    email=request.form['email'],
-                    password=generate_password_hash(temp_password),  # Set a default password that should be changed
-                    role='patient',
-                    status=True,
-                    verified=False
-                )
-                db.session.add(new_user)
-                db.session.flush()  # To get the user ID
-
-                # Generate patient ID (you might have your own logic for this)
-                last_patient = Patient.query.order_by(Patient.id.desc()).first()
-                new_patient_id = last_patient.patient_id + 1 if last_patient else 1000
-
-                # Create new patient
-                new_patient = Patient(
-                    user_id=new_user.id,
-                    patient_id=new_patient_id,
-                    first_name=request.form['first_name'],
-                    last_name=request.form['last_name'],
-                    age=(datetime.now().year - datetime.strptime(request.form['date_of_birth'],
-                                                                 '%Y-%m-%d').date().year),
-                    address=request.form.get('address'),
-                    phone=request.form['phone'],
-                    gender=request.form['gender']
-                )
-                db.session.add(new_patient)
-                db.session.flush()
-
-                patient_id = new_patient.patient_id
-                body_html = render_template("email_templates/templates/welcome.html",
-                                            user_name=new_patient.patient_id,
-                                            new_user=new_user,
-                                            temp_password=temp_password,
-                                            login_url="http://localhost:5000/")
-
-                send_email('Welcome to HealthTrack Hospital', new_user.email, body_html)
-
-                verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
-                body_html = render_template("email_templates/templates/verification_mail.html",
-                                            verification_link=verification_link,
-                                            user_name=new_patient.patient_id)
-
-                send_email('Verify Your Email', new_user.email, body_html)
+                patient = create_new_patient({
+                    'first_name': data['first_name'],
+                    'last_name': data['last_name'],
+                    'email': data['email'],
+                    'phone': data['phone'],
+                    'age': datetime.now().year - datetime.strptime(request.form['date_of_birth'],
+                                                                   '%Y-%m-%d').date().year,
+                    'gender': data.get('gender')
+                })
+                patient_id = patient.patient_id
 
         # Create new donor
         new_donor = BloodDonor(
