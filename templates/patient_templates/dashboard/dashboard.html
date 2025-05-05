@@ -1,0 +1,837 @@
+{% extends 'base.html' %}
+
+{% block title %}Item Stock List{% endblock %}
+{% block page %}Inventory Management - Item Stock List{% endblock %}
+
+{% block body %}
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <div class="card-body">
+
+                    <div class="d-flex">
+                        <!-- Stats starts -->
+                        <div class="d-flex align-items-center flex-wrap gap-4">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box lg bg-primary-subtle rounded-5 me-2">
+                                    <i class="ri-account-circle-line fs-3 text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">Juana</h4>
+                                    <p class="m-0">Name</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box lg bg-primary-subtle rounded-5 me-2">
+                                    <i class="ri-women-line fs-3 text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">Female</h4>
+                                    <p class="m-0">Gender</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box lg bg-primary-subtle rounded-5 me-2">
+                                    <i class="ri-arrow-right-up-line fs-3 text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">24</h4>
+                                    <p class="m-0">Age</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box lg bg-primary-subtle rounded-5 me-2">
+                                    <i class="ri-contrast-drop-2-line fs-3 text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">O+</h4>
+                                    <p class="m-0">Blood Type</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Stats ends -->
+
+                        <img src="../../../static/assets/images/patient2.png"
+                             class="img-7x rounded-circle ms-auto border border-primary border-2"
+                             alt="Dentit Admin Template">
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex flex-row flex-wrap gap-3">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box sm bg-primary-subtle rounded-5 me-2">
+                                <i class="ri-stethoscope-line fs-5 text-primary"></i>
+                            </div>
+                            <div>
+                                Consulting Doctor: <span class="text-primary">Dr. Elina</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box sm bg-primary-subtle rounded-5 me-2">
+                                <i class="ri-building-2-line fs-5 text-primary"></i>
+                            </div>
+                            <div>
+                                Recent Visit: <span class="text-primary">28/08/2024</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box sm bg-primary-subtle rounded-5 me-2">
+                                <i class="ri-calendar-2-line fs-5 text-primary"></i>
+                            </div>
+                            <div>
+                                Upcoming Visit: <span class="text-primary">08/09/2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Visits</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="table-outer">
+                        <div class="table-responsive">
+                            <table class="table align-middle truncate m-0">
+                                <thead>
+                                <tr>
+                                    <th>Consulting Doctor</th>
+                                    <th>Visit Date</th>
+                                    <th>Department</th>
+                                    <th>Fee Paid</th>
+                                    <th>Lab Reports</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <img src="../../../static/assets/images/doctor1.png" class="img-3x rounded-2"
+                                             alt="Dentist Dashboard">
+                                        Dr.
+                                        Hector
+                                    </td>
+                                    <td>20/05/2024</td>
+                                    <td>
+                                        Orthopaedics
+                                    </td>
+                                    <td>$200</td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#viewReportsModal1">
+                                                View Reports
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Download Report">
+                                                <i class="ri-file-download-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <h6>Prescription</h6>
+                                        <p class="text-wrap m-0">The prescriptions featured in the dataset exhibit
+                                            illegible
+                                            handwriting, commonly encountered in medical practices. These images serve
+                                            as
+                                            invaluable resources for developing and evaluating algorithms aimed at
+                                            enhancing
+                                            handwriting recognition technologies within the medical domain.
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <h6>Reports</h6>
+                                        <ul class="list-unstyled d-flex m-0">
+                                            <li class="pe-2 border-end">Weight: 48lbs</li>
+                                            <li class="px-2 border-end">Blood Pressure: 120</li>
+                                            <li class="px-2 border-end">Sugar Levels Before: 90</li>
+                                            <li class="px-2 border-end">Sugar Levels After: 180</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <h6>Medicines</h6>
+                                        <p>For 10 Days</p>
+                                        <div class="d-flex gap-3">
+                                            <ul class="d-flex gap-5 m-0">
+                                                <li>
+                                                    <div>
+                                                        <h6>Aricep Tablet</h6>
+                                                        <ul class="list-unstyled d-flex mb-3">
+                                                            <li class="pe-2 border-end">Morning: 1</li>
+                                                            <li class="px-2 border-end">Afternoon: 0</li>
+                                                            <li class="px-2">Night: 1</li>
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div>
+                                                        <h6>Cresemba Capsule</h6>
+                                                        <ul class="list-unstyled d-flex mb-3">
+                                                            <li class="pe-2 border-end">Morning: 0</li>
+                                                            <li class="px-2 border-end">Afternoon: 1</li>
+                                                            <li class="px-2">Night: 1</li>
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div>
+                                                        <h6>Justoza Tablet</h6>
+                                                        <ul class="list-unstyled d-flex mb-3">
+                                                            <li class="pe-2 border-end">Morning: 1</li>
+                                                            <li class="px-2 border-end">Afternoon: 1</li>
+                                                            <li class="px-2">Night: 0</li>
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-xxl-3 col-sm-6 col-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-center flex-column">
+                        <div class="icon-box md rounded-5 border mb-3">
+                            <i class="ri-capsule-line fs-4 text-primary"></i>
+                        </div>
+                        <div class="mb-4 text-center">
+                            <h5>BP Levels</h5>
+                            <span class="badge bg-primary">Recent five visits</span>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div id="bpLevels" class="mb-3"></div>
+                    </div>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>24/04/2024</div>
+                            <div>140</div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>16/04/2024</div>
+                            <div>190</div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>10/04/2024</div>
+                            <div>230</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-3 col-sm-6 col-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-center flex-column">
+                        <div class="icon-box md rounded-5 border mb-3">
+                            <i class="ri-contrast-drop-2-line fs-4 text-primary"></i>
+                        </div>
+                        <div class="mb-4 text-center">
+                            <h5>Sugar Levels</h5>
+                            <span class="badge bg-primary">Recent five visits</span>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div id="sugarLevels" class="mb-3"></div>
+                    </div>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>24/04/2024</div>
+                            <div>140</div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>16/04/2024</div>
+                            <div>190</div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>10/04/2024</div>
+                            <div>230</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-3 col-sm-6 col-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-center flex-column">
+                        <div class="icon-box md rounded-5 border mb-3">
+                            <i class="ri-heart-pulse-line fs-4 text-primary"></i>
+                        </div>
+                        <div class="mb-4 text-center">
+                            <h5>Heart Rate</h5>
+                            <span class="badge bg-primary">Recent five visits</span>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div id="heartRate" class="mb-3"></div>
+                    </div>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>24/04/2024</div>
+                            <div>110</div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>16/04/2024</div>
+                            <div>120</div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>10/04/2024</div>
+                            <div>100</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-3 col-sm-6 col-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-center flex-column">
+                        <div class="icon-box md rounded-5 border mb-3">
+                            <i class="ri-flask-line fs-4 text-primary"></i>
+                        </div>
+                        <div class="mb-4 text-center">
+                            <h5>Clolesterol</h5>
+                            <span class="badge bg-primary">Recent five visits</span>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div id="clolesterolLevels" class="mb-3"></div>
+                    </div>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>24/04/2024</div>
+                            <div>180</div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>16/04/2024</div>
+                            <div>220</div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>10/04/2024</div>
+                            <div>230</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-xl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Insurance Claims</h5>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-hidden">
+                        <div id="insuranceClaims"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Medical Expenses</h5>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-hidden">
+                        <div id="medicalExpenses"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Doctor Visits</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-outer">
+                        <div class="table-responsive">
+                            <table class="table align-middle truncate m-0">
+                                <thead>
+                                <tr>
+                                    <th>Doctor</th>
+                                    <th>Date</th>
+                                    <th>Department</th>
+                                    <th>Reports</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <img src="../../../static/assets/images/doctor1.png" class="img-3x rounded-2"
+                                             alt="Dentist Dashboard">
+                                        Dr.
+                                        Hector
+                                    </td>
+                                    <td>20/05/2024</td>
+                                    <td>
+                                        Dentist
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#viewReportsModal1">
+                                                View Reports
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Download Report">
+                                                <i class="ri-file-download-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <img src="../../../static/assets/images/doctor5.png" class="img-3x rounded-2"
+                                             alt="Dentist Dashboard">
+                                        Dr.
+                                        Mitchel
+                                    </td>
+                                    <td>20/05/2024</td>
+                                    <td>
+                                        Urologist
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#viewReportsModal1">
+                                                View Reports
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Download Report">
+                                                <i class="ri-file-download-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <img src="../../../static/assets/images/doctor3.png" class="img-3x rounded-2"
+                                             alt="Dentist Dashboard">
+                                        Dr.
+                                        Fermin
+                                    </td>
+                                    <td>18/03/2024</td>
+                                    <td>
+                                        Surgeon
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#viewReportsModal1">
+                                                View Reports
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Download Report">
+                                                <i class="ri-file-download-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Reports</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-outer">
+                        <div class="table-responsive">
+                            <table class="table align-middle truncate m-0">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>File</th>
+                                    <th>Reports Link</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>
+                                        <div class="icon-box md bg-primary rounded-2">
+                                            <i class="ri-file-excel-2-line"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="#!" class="link-primary text-truncate">Reports 1 clinical
+                                            documentation</a>
+                                    </td>
+                                    <td>May-28, 2024</td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#delRow">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Download Report">
+                                                <i class="ri-file-download-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>
+                                        <div class="icon-box md bg-primary rounded-2">
+                                            <i class="ri-file-excel-2-line"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="#!" class="link-primary text-truncate">Reports 2 random files
+                                            documentation</a>
+                                    </td>
+                                    <td>Mar-20, 2024</td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#delRow">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Download Report">
+                                                <i class="ri-file-download-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>
+                                        <div class="icon-box md bg-primary rounded-2">
+                                            <i class="ri-file-excel-2-line"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="#!" class="link-primary text-truncate">Reports 3 glucose level
+                                            complete report</a>
+                                    </td>
+                                    <td>Feb-18, 2024</td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#delRow">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Download Report">
+                                                <i class="ri-file-download-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Health Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="scroll350">
+                        <div class="overflow-hidden">
+                            <div id="healthActivity"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Pharmacy</h5>
+                </div>
+                <div class="card-body">
+                    <div class="scroll350">
+                        <div class="text-center">
+                            <img class="img-fluid mb-3" src="../../../static/assets/images/reports.svg"
+                                 style="width: 180px;"
+                                 alt="Dentist Admin Templates">
+                            <h2>$980</h2>
+                            <span class="d-block mb-1">Average Spending</span>
+                            <span class="d-block mb-2"><b>+20%</b> vs last month</span>
+                            <p class="m-0 opacity-75">You can choose from over 1600 admin dashboard templates on
+                                Bootstrap
+                                Gallery.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Timeline</h5>
+                </div>
+                <div class="card-body">
+
+                    <!-- Activity starts -->
+                    <div class="scroll350">
+                        <div class="activity-feed px-2 pt-2">
+                            <div class="feed-item">
+                          <span class="feed-date pb-1" data-bs-toggle="tooltip" data-bs-title="Today 05:32:35">An
+                            Hour Ago</span>
+                                <div class="mb-1">
+                                    <a href="#" class="text-primary">Dr. Janie Mcdonald</a> - sent a new prescription.
+                                </div>
+                                <div class="mb-1">Medecine Name - <a href="#" class="text-danger">Amocvmillin</a></div>
+                                <a href="#!" class="text-dark">Payment Link <i class="ri-arrow-right-up-line"></i> </a>
+                            </div>
+                            <div class="feed-item">
+                          <span class="feed-date pb-1" data-bs-toggle="tooltip" data-bs-title="Today 05:32:35">An
+                            Hour Ago</span>
+                                <div class="mb-1">
+                                    <a href="#" class="text-primary">Dr. Hector Banks</a> - uploaded a report.
+                                </div>
+                                <div class="mb-1">Report Name - <a href="#" class="text-danger">Lisymorpril</a></div>
+                                <a href="#!" class="text-dark">Payment Link <i class="ri-arrow-right-up-line"></i> </a>
+                            </div>
+                            <div class="feed-item">
+                          <span class="feed-date pb-1" data-bs-toggle="tooltip" data-bs-title="Today 05:32:35">An
+                            Hour Ago</span>
+                                <div class="mb-1">
+                                    <a href="#" class="text-primary">Dr. Deena Cooley</a> - sent medecine details.
+                                </div>
+                                <div class="mb-1">Medecine Name - <a href="#" class="text-danger">Predeymsone</a></div>
+                                <a href="#!" class="text-dark">Payment Link <i class="ri-arrow-right-up-line"></i> </a>
+                            </div>
+                            <div class="feed-item">
+                          <span class="feed-date pb-1" data-bs-toggle="tooltip" data-bs-title="Today 05:32:35">An
+                            Hour Ago</span>
+                                <div class="mb-1">
+                                    <a href="#" class="text-primary">Dr. Mitchel Alvarez</a> - added import files.
+                                </div>
+                                <div class="mb-1">File Name - <a href="#" class="text-danger">Naverreone</a></div>
+                                <a href="#!" class="text-dark">Payment Link <i class="ri-arrow-right-up-line"></i> </a>
+                            </div>
+                            <div class="feed-item">
+                          <span class="feed-date pb-1" data-bs-toggle="tooltip" data-bs-title="Today 05:32:35">An
+                            Hour Ago</span>
+                                <div class="mb-1">
+                                    <a href="#" class="text-primary">Dr. Owen Scott</a> - reviewed your file.
+                                </div>
+                                <div class="mb-1">File Name - <a href="#" class="text-danger">Gabateyntin</a></div>
+                                <a href="#!" class="text-dark">Payment Link <i class="ri-arrow-right-up-line"></i> </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Activity ends -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Modal Delete Row -->
+    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="delRowLabel">
+                        Confirm
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this report?
+                </div>
+                <div class="modal-footer">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal" aria-label="Close">No</button>
+                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal View All Reports -->
+    <div class="modal fade" id="viewReportsModal1" tabindex="-1" aria-labelledby="viewReportsModalLabel1"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewReportsModalLabel1">
+                        View Reports
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <!-- Row starts -->
+                    <div class="row g-4">
+                        <div class="col-sm-2">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center"
+                               data-bs-target="#viewReportsModal2" data-bs-toggle="modal">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">Clinical Report</h6>
+                                <p class="m-0 small">10/05/2024</p>
+                            </a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center"
+                               data-bs-target="#viewReportsModal2" data-bs-toggle="modal">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">Dentist Report</h6>
+                                <p class="m-0 small">20/06/2024</p>
+                            </a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center"
+                               data-bs-target="#viewReportsModal2" data-bs-toggle="modal">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">Glucose Report</h6>
+                                <p class="m-0 small">30/06/2024</p>
+                            </a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center"
+                               data-bs-target="#viewReportsModal2" data-bs-toggle="modal">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">X-ray Report</h6>
+                                <p class="m-0 small">26/08/2024</p>
+                            </a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center"
+                               data-bs-target="#viewReportsModal2" data-bs-toggle="modal">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">Ultrasound Report</h6>
+                                <p class="m-0 small">21/08/2024</p>
+                            </a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center"
+                               data-bs-target="#viewReportsModal2" data-bs-toggle="modal">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">Hypothermia Report</h6>
+                                <p class="m-0 small">15/04/2024</p>
+                            </a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center"
+                               data-bs-target="#viewReportsModal2" data-bs-toggle="modal">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">Discharge Report</h6>
+                                <p class="m-0 small">22/07/2024</p>
+                            </a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center"
+                               data-bs-target="#viewReportsModal2" data-bs-toggle="modal">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">Diabetes Report</h6>
+                                <p class="m-0 small">17/05/2024</p>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Row ends -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal View Single Report -->
+    <div class="modal fade" id="viewReportsModal2" tabindex="-1" aria-labelledby="viewReportsModalLabel2"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewReportsModalLabel2">
+                        <div class="d-flex align-items-center">
+                            <a href="#!" class="btn btn-sm btn-outline-primary me-2" data-bs-target="#viewReportsModal1"
+                               data-bs-toggle="modal">
+                                <i class="ri-arrow-left-wide-fill"></i>
+                            </a>
+                            Clinical Report
+                        </div>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <!-- Row starts -->
+                    <div class="row g-4">
+                        <div class="col-sm-12">
+                            <a href="#" class="d-flex flex-column bg-light p-2 rounded-2 text-center">
+                                <img src="../../../static/assets/images/report.svg" class="img-fluid rounded-2"
+                                     alt="Dentist Dashboards">
+                                <h6 class="mt-3 mb-1 text-truncate">Clinical Report</h6>
+                                <p class="m-0 small">10/05/2024</p>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Row ends -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock body %}
+
+{% block footerLink %}
+    <!-- Apex js -->
+    <script src="{{ url_for('static', filename='assets/vendor/apex/apexcharts.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/patients/sparklines.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/patients/insuranceClaims.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/patients/medicalExpenses.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/patients/healthActivity.js') }}"></script>
+{% endblock footerLink %}

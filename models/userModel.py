@@ -22,6 +22,7 @@ class User(db.Model):
     notifications = db.relationship('Notification', backref='user', lazy=True)
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
     received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
+
     # Relationships
     insurance_records = db.relationship(
         'InsuranceRecord',
@@ -34,6 +35,9 @@ class User(db.Model):
         back_populates='creator',
         cascade='all, delete-orphan'
     )
+
+    patient = db.relationship('Patient', back_populates='user', uselist=False, cascade='all, delete-orphan')
+    doctor = db.relationship('Doctor', back_populates='user', uselist=False, cascade='all, delete-orphan')
 
     # Constructor to easily create a User object
     def __init__(self, email, password, role, status, verified):

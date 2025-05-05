@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital ID Card</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .id-card {
+            width: 350px;
+            background: linear-gradient(135deg, #ffffff, #f0f8ff);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background-color: #005b96;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 12px;
+        }
+
+        .logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #005b96;
+        }
+
+        .photo {
+            width: 100px;
+            height: 120px;
+            margin: 20px auto;
+            background-color: #e0e0e0;
+            border: 3px solid #005b96;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+
+        .name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .position {
+            color: #005b96;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .details {
+            text-align: left;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            width: 120px;
+            color: #555;
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .barcode {
+            margin: 20px auto 10px;
+            height: 40px;
+            background-color: #333;
+            width: 80%;
+        }
+
+        .footer {
+            background-color: #f0f0f0;
+            padding: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .id-number {
+            background-color: #005b96;
+            color: white;
+            padding: 5px 0;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+
+        .hospital-logo {
+            height: 50px;
+            margin: 10px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="id-card">
+    <div class="header">
+
+        <h1>HealthTrack</h1>
+        <p>State, Maval (PMRDA), Dist: Pune - 412106, Maharashtra</p>
+    </div>
+
+    <div class="photo">
+        <!-- Replace with actual photo -->
+        <img src="../../static/assets/images/doctor1.png" alt="Staff Photo">
+    </div>
+
+    <div class="user-info">
+        <div class="name">LATHIYA SHUBHAM</div>
+        <div class="position">Medical IT Specialist</div>
+
+        <div class="details">
+            <div class="detail-row">
+                <span class="detail-label">Department:</span>
+                <span class="detail-value">Medical Informatics</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Employee ID:</span>
+                <span class="detail-value">HSCA24801030058</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Valid Until:</span>
+                <span class="detail-value">31-Dec-2025</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Blood Group:</span>
+                <span class="detail-value">O+</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Emergency Contact:</span>
+                <span class="detail-value">+91 9876543210</span>
+            </div>
+        </div>
+
+        <div class="barcode"></div>
+        <div class="id-number">HSCA24801030058</div>
+    </div>
+
+    <div class="footer">
+        <img src="https://pcu.edu.in/wp-content/uploads/2022/03/PCU-Logo.png" alt="Hospital Logo" class="hospital-logo">
+        <div>This ID must be displayed at all times while on duty</div>
+        <div>Website: https://hospital.pcu.edu.in/</div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard{% endblock %}
+
+{% block body %}
+    <!-- App body starts -->
+    {#    <div class="app-body">#}
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <!-- Week tabs starts -->
+                <div class="d-flex justify-content-center gap-1 flex-wrap week-days-btn-group">
+                    {% for day, appointments in appointments_by_day.items() %}
+                        <a href="javascript:void(0)"
+                           class="btn {% if loop.first %}btn-primary{% else %}btn-light{% endif %}">
+                            {{ day }}
+                        </a>
+                    {% endfor %}
+                </div>
+                <!-- Week tabs ends -->
+
+                <div class="card-body">
+                    <h5 class="text-center my-4">Today's Appointments</h5>
+
+                    <div class="mt-4">
+                        <!-- Row starts -->
+                        <div class="row g-2 justify-content-center">
+                            {% for appointment in appointments %}
+                                <div class="col-xl-3 col-sm-6 col-12">
+                                    <a href="{{ appointment.patient.id }}"
+                                       class="d-flex align-items-center gap-3 appointment-card p-3 border rounded">
+                                        <img src="{{ url_for('static', filename='images/patient' + loop.cycle('1', '2', '3', '4', '5') + '.png') }}"
+                                             class="img-3x rounded-5" alt="Patient">
+                                        <div class="d-flex flex-column flex-fill">
+                                            <div class="fw-semibold text-truncate">
+                                                {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                                            </div>
+                                            <div class="text-muted small">{{ appointment.reason|truncate(20) }}</div>
+                                        </div>
+                                        <span class="badge
+                                        {% if appointment.status == 'completed' %}bg-success
+                                        {% elif appointment.status == 'canceled' %}bg-danger
+                                        {% else %}bg-primary{% endif %}">
+                                        {{ appointment.start_time.strftime('%I:%M %p') }}
+                                    </span>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <!-- Row ends -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <div class="card-body mh-190">
+                    <h5 class="card-title mb-4">Available Treatments</h5>
+                    <div class="d-flex justify-content-center gap-4 flex-wrap">
+                        {% for treatment in treatments %}
+                            <a href="{{ url_for('doctor.treatment_details', treatment_id=treatment.id) }}"
+                               class="text-center">
+                                <div class="icon-box xl primary rounded-3 mb-1">
+                                    <img src="{{ url_for('static', filename='images/icons/' + treatment.icon + '.svg') }}"
+                                         class="img-2x" alt="{{ treatment.name }}">
+                                </div>
+                                {{ treatment.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Clinic Earnings</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <!-- Row start -->
+                    <div class="row g-4">
+                        <div class="col-xl-3 col-sm-6 col-12">
+                            <div class="border rounded-2 d-flex align-items-center flex-row p-2">
+                                <div class="me-2">
+                                    <div id="sparkline1"></div>
+                                </div>
+                                <div class="m-0">
+                                    <div class="d-flex align-items-center lh-1">
+                                        <h4 class="m-0 fw-bold">
+                                            ${{ earnings.online_consultation|default('0') }}</h4>
+                                        <div class="ms-2 text-primary d-flex">
+                                            <small>{{ earnings.online_consultation_percent|default('0') }}%</small>
+                                            <i class="ri-arrow-right-up-line ms-1 fw-bold"></i>
+                                        </div>
+                                    </div>
+                                    <small>Online Consultation</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-sm-6 col-12">
+                            <div class="border rounded-2 d-flex align-items-center flex-row p-2">
+                                <div class="me-2">
+                                    <div id="sparkline2"></div>
+                                </div>
+                                <div class="m-0">
+                                    <div class="d-flex align-items-center lh-1">
+                                        <div class="fs-4 fw-bold">
+                                            ${{ earnings.overall_purchases|default('0') }}</div>
+                                        <div class="ms-2 text-warning d-flex">
+                                            <small>{{ earnings.overall_purchases_percent|default('0') }}%</small>
+                                            <i class="ri-arrow-right-down-line ms-1 fw-bold"></i>
+                                        </div>
+                                    </div>
+                                    <small class="text-dark">Overall Purchases</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-sm-6 col-12">
+                            <div class="border rounded-2 d-flex align-items-center flex-row p-2">
+                                <div class="me-2">
+                                    <div id="sparkline3"></div>
+                                </div>
+                                <div class="m-0">
+                                    <div class="d-flex align-items-center lh-1">
+                                        <div class="fs-4 fw-bold">
+                                            ${{ earnings.pending_invoices|default('0') }}</div>
+                                        <div class="ms-2 text-primary d-flex">
+                                            <small>{{ earnings.pending_invoices_percent|default('0') }}%</small>
+                                            <i class="ri-arrow-right-up-line ms-1 fw-bold"></i>
+                                        </div>
+                                    </div>
+                                    <small class="text-dark">Pending Invoices</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-sm-6 col-12">
+                            <div class="border rounded-2 d-flex align-items-center flex-row p-2">
+                                <div class="me-2">
+                                    <div id="sparkline4"></div>
+                                </div>
+                                <div class="m-0">
+                                    <div class="d-flex align-items-center lh-1">
+                                        <div class="fs-4 fw-bold">${{ earnings.monthly_billing|default('0') }}</div>
+                                        <div class="ms-2 text-primary d-flex">
+                                            <small>{{ earnings.monthly_billing_percent|default('0') }}%</small>
+                                            <i class="ri-arrow-right-up-line ms-1 fw-bold"></i>
+                                        </div>
+                                    </div>
+                                    <small class="text-dark">Monthly Billing</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Row ends -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Income</h5>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-hidden">
+                        <div id="income" class="chart-height-xl"></div>
+                    </div>
+                    <div class="my-3 text-center">
+                        <span class="badge bg-primary">{{ income_increase }}%</span> income has increased since last
+                        year.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-xxl-4 col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Recent Appointments</h5>
+                </div>
+                <div class="card-body">
+                    <div class="scroll300">
+                        <div class="d-flex flex-column gap-2">
+                            {% for appointment in recent_appointments %}
+                                <div class="d-flex flex-column p-3 border rounded-2">
+                                    <div class="d-flex align-items-center flex-row">
+                                        <img src="{{ url_for('static', filename='images/patient' + loop.cycle('1', '2', '3', '4', '5') + '.png') }}"
+                                             class="img-4x rounded-5 me-3" alt="Patient">
+                                        <div>
+                                            <h6 class="mb-1">{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</h6>
+                                            <p class="mb-1 small">Last
+                                                Appointment {{ appointment.date.strftime('%d %b %Y') }}</p>
+                                            <span class="badge bg-primary-subtle text-primary">Patient ID: {{ appointment.patient.id }}</span>
+                                            <p class="mb-3 mt-1">{{ appointment.reason|truncate(50) }}</p>
+                                            <div class="d-flex gap-2">
+                                                <a href="{{ url_for('appointment.approve', appointment_id=appointment.id) }}"
+                                                   class="btn btn-primary btn-sm">Approve</a>
+                                                <a href="{{ url_for('appointment.decline', appointment_id=appointment.id) }}"
+                                                   class="btn btn-outline-secondary btn-sm">Decline</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="scroll300">
+                        <div class="activity-feed px-2 pt-2">
+                            {% for activity in activities %}
+                                <div class="feed-item">
+                                <span class="feed-date pb-1" data-bs-toggle="tooltip"
+                                      data-bs-title="{{ activity.timestamp.strftime('%d %b %Y %I:%M %p') }}">
+                                    {{ activity.timestamp|humanize }}
+                                </span>
+                                    <div class="mb-1">
+                                        <a href="#">{{ activity.doctor }}</a> - {{ activity.action }}
+                                    </div>
+                                    {% if activity.patient %}
+                                        <div class="mb-1">Patient Name - <a href="#"
+                                                                            class="text-primary">{{ activity.patient }}</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Insurance Claims</h5>
+                </div>
+                <div class="card-body">
+                    <div class="scroll300 auto-align-graph">
+                        <div class="overflow-hidden">
+                            <div id="claims"></div>
+                        </div>
+                        <div class="mt-2 text-center">
+                            Anytime you make a claim whether partial or total of <span
+                                class="text-primary fw-semibold">${{ insurance_base_cover }}</span>
+                            base cover, it gets 100% restored for any subsequent claims in the same year.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts -->
+    <div class="row gx-4">
+        <div class="col-xxl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Patients</h5>
+                </div>
+                <div class="card-body">
+                    <div class="card-info bg-primary-subtle lh-1">
+                        {{ patient_growth }}% higher than last year.
+                    </div>
+                    <div class="overflow-hidden">
+                        <div id="patients"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Appointments</h5>
+                </div>
+                <div class="card-body">
+                    <div class="card-info bg-primary-subtle lh-1">
+                        {{ appointment_growth }}% higher than last year.
+                    </div>
+                    <div class="overflow-hidden">
+                        <div id="appointments"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    {#    </div>#}
+    <!-- App body ends -->
+{% endblock %}
+
+{% block footerLink %}
+    <script src="{{ url_for('static', filename='assets/vendor/apex/apexcharts.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/dentist/patients.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/dentist/appointments.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/dentist/income.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/dentist/earnings.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/apex/custom/dentist/claims.js') }}"></script>
+
+    <script>
+        // Initialize charts with dynamic data
+        document.addEventListener('DOMContentLoaded', function () {
+            // Patients chart
+            var patientsOptions = {
+                series: [{
+                    name: 'Patients',
+                    data: {{ patients_data|tojson }}
+                }],
+                chart: {
+                    height: 350,
+                    type: 'area'
+                },
+                // ... other chart options
+            };
+            var patientsChart = new ApexCharts(document.querySelector("#patients"), patientsOptions);
+            patientsChart.render();
+
+            // Appointments chart
+            var appointmentsOptions = {
+                series: [{
+                    name: 'Appointments',
+                    data: {{ appointments_data|tojson }}
+                }],
+                chart: {
+                    height: 350,
+                    type: 'bar'
+                },
+                // ... other chart options
+            };
+            var appointmentsChart = new ApexCharts(document.querySelector("#appointments"), appointmentsOptions);
+            appointmentsChart.render();
+
+            // Income chart
+            var incomeOptions = {
+                series: [{
+                    name: 'Income',
+                    data: {{ income_data|tojson }}
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line'
+                },
+                // ... other chart options
+            };
+            var incomeChart = new ApexCharts(document.querySelector("#income"), incomeOptions);
+            incomeChart.render();
+
+            // Claims chart
+            var claimsOptions = {
+                series: {{ claims_data|tojson }},
+                chart: {
+                    height: 350,
+                    type: 'donut'
+                },
+                // ... other chart options
+            };
+            var claimsChart = new ApexCharts(document.querySelector("#claims"), claimsOptions);
+            claimsChart.render();
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointment Management{% endblock %}
+{% block page %}Appointment Management{% endblock %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12 col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Appointments</h5>
+                    <a href="/" class="btn btn-primary ms-auto">Book
+                        Appointment</a>
+                </div>
+                <div class="card-body">
+                    <div id="appointmentsCal"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footerLink %}
+    <link rel="stylesheet" href="../../../static/assets/vendor/calendar/css/main.min.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/calendar/css/custom.css">
+    <script src="../../../static/assets/vendor/calendar/js/main.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var calendarEl = document.getElementById('appointmentsCal');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                    left: "prevYear,prev,next,nextYear today",
+                    center: "title",
+                    right: "dayGridMonth,dayGridWeek,dayGridDay"
+                },
+                initialDate: new Date(),
+                navLinks: true,
+                editable: false,
+                dayMaxEvents: true,
+                events: {
+                    url: "/doctor/calendar-events",
+                    failure: function () {
+                        alert('Error fetching appointments!');
+                    }
+                },
+                eventClick: function (info) {
+                    info.jsEvent.preventDefault();
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
+{% endblock %}

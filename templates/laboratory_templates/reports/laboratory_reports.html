@@ -1,0 +1,438 @@
+{% extends 'base.html' %}
+
+{% block title %}Laboratory Test Reports{% endblock %}
+{% block page %}Laboratory Test Reports Management{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <!-- Status Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary bg-opacity-10 border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-primary">Total Reports</h6>
+                                <h3>{{ reports|length }}</h3>
+                            </div>
+                            <i class="ri-file-text-fill fs-1 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success bg-opacity-10 border-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-success">Active Reports</h6>
+                                <h3>{{ reports|selectattr('is_active', 'equalto', True)|list|length }}</h3>
+                            </div>
+                            <i class="ri-checkbox-circle-fill fs-1 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning bg-opacity-10 border-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-warning">Archived Reports</h6>
+                                <h3>{{ deleted_reports|length }}</h3>
+                            </div>
+                            <i class="ri-archive-fill fs-1 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Laboratory Test Reports</h5>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReportModal">
+                        <i class="ri-add-line me-1"></i> Add Report
+                    </button>
+                    <button class="btn btn-outline-secondary ms-2" data-bs-toggle="modal"
+                            data-bs-target="#restoreModal">
+                        <i class="ri-archive-line me-1"></i> View Archive
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" id="reportsTable">
+                        <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for report in reports %}
+                            <tr class="{% if not report.is_active %}table-secondary{% endif %}">
+                                <td>{{ report.id }}</td>
+                                <td>{{ report.name }}</td>
+                                <td>{{ report.department.name }}</td>
+                                <td>{{ "%.2f"|format(report.price) }}</td>
+                                <td>
+                                    {% if report.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#viewModal{{ report.id }}">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-success" data-bs-toggle="modal"
+                                                data-bs-target="#editModal{{ report.id }}">
+                                            <i class="ri-edit-line"></i>
+                                        </button>
+                                        {% if report.is_active %}
+                                            <button class="btn btn-outline-warning" data-bs-toggle="modal"
+                                                    data-bs-target="#statusModal{{ report.id }}">
+                                                <i class="ri-toggle-line"></i>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-outline-success" data-bs-toggle="modal"
+                                                    data-bs-target="#statusModal{{ report.id }}">
+                                                <i class="ri-toggle-fill"></i>
+                                            </button>
+                                        {% endif %}
+                                        <button class="btn btn-outline-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal{{ report.id }}">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Report Modal -->
+    <div class="modal fade" id="addReportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="ri-add-line me-2"></i>Add New Laboratory Test</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + LAB_REPORTS_ADD }}">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Department <span class="text-danger">*</span></label>
+                                <select class="form-select" name="department_id" required>
+                                    {% for department in departments %}
+                                        <option value="{{ department.id }}">{{ department.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Price ($) <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control" name="price" min="0" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="is_active">
+                                    <option value="1" selected>Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modals -->
+    {% for report in reports %}
+        <!-- View Modal -->
+        <div class="modal fade" id="viewModal{{ report.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">Report Details: {{ report.name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card mb-3">
+                            <div class="card-header bg-info bg-opacity-10">
+                                <h6 class="mb-0"><i class="ri-information-line me-2"></i>Basic Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Report ID:</strong> {{ report.id }}</p>
+                                <p><strong>Name:</strong> {{ report.name }}</p>
+                                <p><strong>Department:</strong> {{ report.department.name }}</p>
+                                <p><strong>Price:</strong>{{ "%.2f"|format(report.price) }}</p>
+                                <p><strong>Status:</strong>
+                                    {% if report.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Created:</strong> {{ report.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                                <p><strong>Updated:</strong> {{ report.updated_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header bg-info bg-opacity-10">
+                                <h6 class="mb-0"><i class="ri-file-text-line me-2"></i>Description</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ report.description or 'No description available' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal{{ report.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Edit Report: {{ report.name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + LAB_REPORTS_EDIT }}/{{ report.id }}">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="name" value="{{ report.name }}"
+                                           required>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Department <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="department_id" required>
+                                        {% for department in departments %}
+                                            <option value="{{ department.id }}"
+                                                    {% if department.id == report.department_id %}selected{% endif %}>{{ department.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Price ($) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" name="price" min="0"
+                                           value="{{ report.price }}" required>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" name="is_active">
+                                        <option value="1" {% if report.is_active %}selected{% endif %}>Active</option>
+                                        <option value="0" {% if not report.is_active %}selected{% endif %}>Inactive
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" name="description"
+                                              rows="3">{{ report.description or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Update Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Toggle Modal -->
+        <div class="modal fade" id="statusModal{{ report.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header {% if report.is_active %}bg-warning{% else %}bg-success{% endif %} text-white">
+                        <h5 class="modal-title">Confirm Status Change</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to {% if report.is_active %}deactivate{% else %}activate{% endif %}
+                            this
+                            report?</p>
+                        <div class="card">
+                            <div class="card-body">
+                                <p><strong>Report:</strong> {{ report.name }}</p>
+                                <p><strong>Department:</strong> {{ report.department.name }}</p>
+                                <p><strong>Current Status:</strong>
+                                    {% if report.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN + LAB_REPORTS_TOGGLE }}/{{ report.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit"
+                                    class="btn {% if report.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                                {% if report.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal{{ report.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Confirm Archive</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to archive this report?</p>
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i>This will remove the report from active listings but
+                            preserve the record.
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <p><strong>Report:</strong> {{ report.name }}</p>
+                                <p><strong>Department:</strong> {{ report.department.name }}</p>
+                                <p><strong>Price:</strong>{{ "%.2f"|format(report.price) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN + LAB_REPORTS_DELETE }}/{{ report.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Archive Report</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Modal -->
+    <div class="modal fade" id="restoreModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="ri-archive-line me-2"></i>Archived Reports</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_reports %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Price</th>
+                                    <th>Archived On</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for report in deleted_reports %}
+                                    <tr>
+                                        <td>{{ report.id }}</td>
+                                        <td>{{ report.name }}</td>
+                                        <td>{{ report.department.name }}</td>
+                                        <td>{{ "%.2f"|format(report.price) }}</td>
+                                        <td>{{ report.deleted_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                        <td>
+                                            <form method="POST"
+                                                  action="{{ ADMIN + LAB_REPORTS_RESTORE }}/{{ report.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No archived reports found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footerLink %}
+    <!-- DataTables JS -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize DataTable
+            $('#reportsTable').DataTable({
+                responsive: true,
+                order: [[1, 'asc']] // Sort by name by default
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from utils.config import db
 
 
@@ -20,9 +18,10 @@ class Patient(db.Model):
     deleted_at = db.Column(db.DateTime, nullable=True)
 
     # Relationships
-    user = db.relationship('User', backref='patient', uselist=False)
-    allocations = db.relationship('BedAllocation', back_populates='patient')
-    charges = db.relationship('RoomCharge', back_populates='patient')
+    user = db.relationship('User', back_populates='patient')
+    appointments = db.relationship("Appointment", back_populates="patient")
+    allocations = db.relationship('BedAllocation', back_populates='patient', cascade='all, delete-orphan')
+    charges = db.relationship('RoomCharge', back_populates='patient', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<Patient {self.first_name} {self.last_name}>"

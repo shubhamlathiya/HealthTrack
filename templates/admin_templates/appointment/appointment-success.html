@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container text-center">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-success">Appointment Booked Successfully!</h2>
+                <div class="appointment-details mt-4">
+                    <h4>Appointment Details</h4>
+                    <p>
+                        <strong>Patient:</strong> {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                    </p>
+                    <p><strong>Date:</strong> {{ appointment.date.strftime('%B %d, %Y') }}</p>
+                    <p><strong>Time:</strong> {{ appointment.start_time.strftime('%I:%M %p') }}
+                        - {{ appointment.end_time.strftime('%I:%M %p') }}</p>
+                    <p><strong>Doctor:</strong> {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}
+                    </p>
+                    <p><strong>Reason:</strong> {{ appointment.reason }}</p>
+                </div>
+                <a href="/" class="btn btn-primary mt-4">Return to Home</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

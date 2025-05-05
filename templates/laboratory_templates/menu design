@@ -1,0 +1,79 @@
+LABORATORY TEST MENU
+
+HEMATOLOGY
+- Complete Blood Count (CBC)
+- Hemoglobin Test
+- Hematocrit Test
+- Platelet Count
+- Blood Smear
+- ESR Test
+- Coagulation Tests
+
+BIOCHEMISTRY
+- Blood Glucose
+- Lipid Profile
+- Liver Function Tests
+- Renal Function Tests
+- Electrolytes
+- Cardiac Markers
+- Thyroid Function Tests
+
+MICROBIOLOGY
+- Culture & Sensitivity
+- Gram Staining
+- AFB Testing
+- Malaria Parasite Test
+- Dengue Serology
+- Urine Culture
+
+PATHOLOGY
+- Pap Smear
+- Biopsy Analysis
+- Cytology Tests
+- Histopathology
+- Frozen Section
+
+SEROLOGY/IMMUNOLOGY
+- HIV Testing
+- Hepatitis Panel
+- RA Factor
+- ANA Test
+- CRP Test
+- Allergy Testing
+
+BLOOD BANK
+- Blood Typing
+- Cross Matching
+- Antibody Screening
+- Direct Coombs Test
+- Indirect Coombs Test
+
+SPECIAL TESTS
+- PCR Tests
+- Hormone Assays
+- Tumor Markers
+- Genetic Testing
+- Toxicology Screen
+
+Sample Management
+- Register Samples
+- Track Collection
+- Reject/Approve Samples
+- Priority Labeling
+
+Test Processing
+- Assign Tests
+    Batch Processing
+    QC Validation
+    Approve Results
+
+Results Reporting
+    Verify Results
+    Critical Alerts
+    Print Reports
+    EMR Integration
+
+Equipment
+    Maintenance Logs
+    Downtime Tracker
+    Calibration

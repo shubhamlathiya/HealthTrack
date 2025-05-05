@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from utils.config import db
 
 class Doctor(db.Model):
@@ -37,6 +35,12 @@ class Doctor(db.Model):
         back_populates='doctor',
         cascade='all, delete-orphan'
     )
+
+    appointments = db.relationship('Appointment', foreign_keys='Appointment.doctor_id', back_populates='doctor')
+    forwarded_appointments = db.relationship("Appointment", foreign_keys='Appointment.original_doctor_id',
+                                             back_populates="original_doctor")
+
+    user = db.relationship('User', back_populates='doctor')
 
 
     def __repr__(self):

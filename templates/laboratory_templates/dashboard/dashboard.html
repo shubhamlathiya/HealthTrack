@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+
+{% block title %}Laboratory Dashboard{% endblock title %}
+{% block page %}Laboratory Dashboard{% endblock page %}
+{% block body %}
+
+    <!-- Row starts - Lab Overview -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4 bg-3">
+                <div class="card-body">
+                    <div class="mh-190">
+                        <div class="py-3 px-2">
+                            <div class="text-primary">
+                                <h6>Good Morning,</h6>
+                                <h3 class="mb-1">Lab Technician</h3>
+                                <p class="fw-normal">Today's lab workload overview.</p>
+                            </div>
+                            <div class="mt-4 d-flex gap-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-box bg-white lg rounded-5">
+                                        <i class="ri-flask-line fs-3 text-primary"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <h2 class="m-0 lh-1">{{ pending_tests }}</h2>
+                                        <p class="m-0">Pending Tests</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-box bg-white lg rounded-5">
+                                        <i class="ri-time-line fs-3 text-primary"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <h2 class="m-0 lh-1">{{ urgent_tests }}</h2>
+                                        <p class="m-0">Urgent Tests</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-box bg-white lg rounded-5">
+                                        <i class="ri-checkbox-circle-line fs-3 text-primary"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <h2 class="m-0 lh-1">{{ completed_tests }}</h2>
+                                        <p class="m-0">Completed Today</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts - Test Status -->
+    <div class="row gx-4">
+        <div class="col-xxl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Test Status</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <div class="test-card bg-primary-subtle">
+                            <i class="ri-blood-test-line fs-2 text-primary"></i>
+                            <div class="text-truncate">Hematology</div>
+                            <div class="badge bg-primary small">{{ hematology_pending }} pending</div>
+                        </div>
+                        <div class="test-card bg-success-subtle">
+                            <i class="ri-microscope-line fs-2 text-success"></i>
+                            <div class="text-truncate">Microbiology</div>
+                            <div class="badge bg-success small">{{ microbiology_pending }} pending</div>
+                        </div>
+                        <div class="test-card bg-info-subtle">
+                            <i class="ri-test-tube-line fs-2 text-info"></i>
+                            <div class="text-truncate">Biochemistry</div>
+                            <div class="badge bg-info small">{{ biochemistry_pending }} pending</div>
+                        </div>
+                        <div class="test-card bg-warning-subtle">
+                            <i class="ri-dna-line fs-2 text-warning"></i>
+                            <div class="text-truncate">Pathology</div>
+                            <div class="badge bg-warning small">{{ pathology_pending }} pending</div>
+                        </div>
+                        <div class="test-card bg-danger-subtle">
+                            <i class="ri-virus-line fs-2 text-danger"></i>
+                            <div class="text-truncate">Serology</div>
+                            <div class="badge bg-danger small">{{ serology_pending }} pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Urgent Tests</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Test ID</th>
+                                <th>Patient</th>
+                                <th>Test Type</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for test in urgent_tests_list %}
+                                <tr>
+                                    <td>#{{ test.id }}</td>
+                                    <td>{{ test.patient_name }}</td>
+                                    <td>{{ test.test_type }}</td>
+                                    <td><span class="badge bg-danger">STAT</span></td>
+                                    <td><span class="badge bg-warning">Processing</span></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts - Lab Metrics -->
+    <div class="row gx-4">
+        <div class="col-xxl-4 col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Daily Tests</h5>
+                    <div class="d-flex align-items-center gap-1">
+                        <div class="fs-2 fw-semibold">{{ daily_tests_count }}</div>
+                        <div class="d-flex">
+                            <div>{{ daily_tests_percentage }}%</div>
+                            <i class="ri-arrow-right-up-line text-success"></i>
+                        </div>
+                    </div>
+                    <span class="monthDisplay badge bg-primary-subtle text-primary border border-primary small">{{ current_date }}</span>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="overflow-hidden">
+                        <div id="dailyTestsChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Turnaround Time</h5>
+                    <div class="d-flex align-items-center gap-1">
+                        <div class="fs-2 fw-semibold">{{ avg_turnaround_time }}h</div>
+                        <div class="d-flex">
+                            <div>{{ turnaround_improvement }}%</div>
+                            <i class="ri-arrow-right-down-line text-success"></i>
+                        </div>
+                    </div>
+                    <span class="monthDisplay badge bg-primary-subtle text-primary border border-primary small">Avg Time</span>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="overflow-hidden">
+                        <div id="turnaroundTimeChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-4 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Test Distribution</h5>
+                    <div class="d-flex align-items-center gap-1">
+                        <div class="fs-2 fw-semibold">{{ total_tests_month }}</div>
+                        <div class="d-flex">
+                            <div>{{ monthly_growth }}%</div>
+                            <i class="ri-arrow-right-up-line text-success"></i>
+                        </div>
+                    </div>
+                    <span class="monthDisplay badge bg-primary-subtle text-primary border border-primary small">This Month</span>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="overflow-hidden">
+                        <div id="testDistributionChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts - Recent Tests -->
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Recent Test Orders</h5>
+                    <div class="card-actions">
+                        <button class="btn btn-primary btn-sm">New Test Entry</button>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Patient</th>
+                                <th>Test Type</th>
+                                <th>Ordering Doctor</th>
+                                <th>Collection Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for test in recent_tests %}
+                                <tr>
+                                    <td>#{{ test.order_number }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ test.patient_image }}" class="img-2x rounded-circle me-2"
+                                                 alt="Patient">
+                                            {{ test.patient_name }}
+                                        </div>
+                                    </td>
+                                    <td>{{ test.test_type }}</td>
+                                    <td>Dr. {{ test.doctor_name }}</td>
+                                    <td>{{ test.collection_time }}</td>
+                                    <td>
+                                        {% if test.status == 'Pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif test.status == 'In Progress' %}
+                                            <span class="badge bg-info">In Progress</span>
+                                        {% elif test.status == 'Completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif test.status == 'Critical' %}
+                                            <span class="badge bg-danger">Critical</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="View Details">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-success btn-sm"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Enter Results">
+                                                <i class="ri-edit-line"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" data-bs-title="Print Report">
+                                                <i class="ri-printer-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+    <!-- Row starts - Equipment Status -->
+    <div class="row gx-4">
+        <div class="col-xxl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Equipment Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-3">
+                        {% for equipment in lab_equipment %}
+                            <div class="equipment-card {% if equipment.status == 'Operational' %}bg-success-subtle{% elif equipment.status == 'Maintenance' %}bg-warning-subtle{% else %}bg-danger-subtle{% endif %}">
+                                <div class="equipment-icon">
+                                    <i class="{{ equipment.icon }} fs-3 {% if equipment.status == 'Operational' %}text-success{% elif equipment.status == 'Maintenance' %}text-warning{% else %}text-danger{% endif %}"></i>
+                                </div>
+                                <div class="equipment-info">
+                                    <h6>{{ equipment.name }}</h6>
+                                    <p class="mb-1 small">{{ equipment.model }}</p>
+                                    <span class="badge {% if equipment.status == 'Operational' %}bg-success{% elif equipment.status == 'Maintenance' %}bg-warning{% else %}bg-danger{% endif %}">
+                    {{ equipment.status }}
+                  </span>
+                                </div>
+                                <div class="equipment-last-calibration">
+                                    <small>Last Calibration:</small>
+                                    <strong>{{ equipment.last_calibration }}</strong>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-6 col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Quality Control</h5>
+                </div>
+                <div class="card-body">
+                    <div id="qualityControlChart"></div>
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>QC Pass Rate</span>
+                            <strong>{{ qc_pass_rate }}%</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: {{ qc_pass_rate }}%" aria-valuenow="{{ qc_pass_rate }}"
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-3">
+                            <div>
+                                <span class="badge bg-success me-2"></span>
+                                <span>Within Range: {{ qc_within_range }}%</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-danger me-2"></span>
+                                <span>Out of Range: {{ qc_out_of_range }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row ends -->
+
+{% endblock body %}

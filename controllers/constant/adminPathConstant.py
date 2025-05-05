@@ -8,6 +8,8 @@ RESET_PASSWORD = "/reset-password"
 # admin
 ADMIN = "/admin"
 
+ADMIN_DASHBOARD = f"{ADMIN}/dashboard"
+
 # blood-bank
 BLOOD_BANK = "/blood-bank"
 BLOOD_BANK_DONOR = f"{BLOOD_BANK}/donor"
@@ -183,3 +185,12 @@ STAFF_ADD = f"{STAFF}/add-staff"
 STAFF_EDIT = f"{STAFF}/edit-staff"
 STAFF_DELETE = f"{STAFF}/delete-staff"
 STAFF_RESTORE = f"{STAFF}/restore-staff"
+
+
+# treatments
+TREATMENTS = "/treatments"
+TREATMENTS_ADD = f"{TREATMENTS}/add-treatments"
+TREATMENTS_EDIT = f"{TREATMENTS}/edit-treatments"
+TREATMENTS_TOGGLE_STATUS = f"{TREATMENTS}/toggle-status"
+TREATMENTS_DELETE = f"{TREATMENTS}/delete-treatments"
+TREATMENTS_RESTORE = f"{TREATMENTS}/restore-treatments"

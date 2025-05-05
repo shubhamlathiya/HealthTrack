@@ -5,7 +5,12 @@ from flask import jsonify, request, session
 from werkzeug.security import check_password_hash
 
 from controllers.auth_controllers import auth
-from controllers.constant.adminPathConstant import LOGIN
+from controllers.constant.adminPathConstant import LOGIN, ADMIN_DASHBOARD
+from controllers.constant.doctorPathConstant import DOCTOR_DASHBOARD
+from controllers.constant.laboratoryPathConstant import LABORATORY_DASHBOARD
+from controllers.constant.nursePathConstant import NURSE_DASHBOARD
+from controllers.constant.patientPathConstant import PATIENT_DASHBOARD
+from controllers.constant.staffPathConstant import STAFF_DASHBOARD
 from models.userModel import User
 
 
@@ -40,17 +45,17 @@ def login():
 
             # Redirect based on user role
             if user.role == 'patient':
-                redirect_url = '/patients/dashboard'
+                redirect_url = PATIENT_DASHBOARD
             elif user.role == 'admin':
-                redirect_url = '/admin/dashboard'
+                redirect_url = ADMIN_DASHBOARD
             elif user.role == 'doctor':
-                redirect_url = '/doctor/dashboard'
+                redirect_url = DOCTOR_DASHBOARD
             elif user.role == 'staff':
-                redirect_url = '/staff/dashboard'
+                redirect_url = STAFF_DASHBOARD
             elif user.role == 'nurse':
-                redirect_url = '/nurse/dashboard'
+                redirect_url = NURSE_DASHBOARD
             elif user.role == 'laboratory':
-                redirect_url = '/laboratory/dashboard'
+                redirect_url = LABORATORY_DASHBOARD
             else:
                 return jsonify({'message': 'Invalid role. Please contact dashboard.'}), 400
 

@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container-fluid">
+        <!-- Status Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary bg-opacity-10 border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-primary">Available Treatments</h6>
+                                <h3>{{ treatments|length }}</h3>
+                            </div>
+                            <i class="ri-heart-fill fs-1 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success bg-opacity-10 border-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-success">Available Doctors</h6>
+                                <h3>{{ doctors|length }}</h3>
+                            </div>
+                            <i class="ri-user-fill fs-1 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info bg-opacity-10 border-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-info">Departments</h6>
+                                <h3>{{ departments|length }}</h3>
+                            </div>
+                            <i class="ri-building-fill fs-1 text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Book New Appointment</h5>
+            </div>
+            <div class="card-body">
+                <form id="appointmentForm">
+                    <!-- Patient Lookup -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">Patient Information</div>
+                        <div class="card-body">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Is this an existing patient?</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="patient_type" id="existingPatient"
+                                           value="existing" checked>
+                                    <label class="form-check-label" for="existingPatient">
+                                        Existing Patient
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="patient_type" id="newPatient"
+                                           value="new">
+                                    <label class="form-check-label" for="newPatient">
+                                        New Patient
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="existingPatientFields">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Patient ID</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="patientId" name="patient_id"
+                                                       placeholder="Enter patient ID">
+                                                <button type="button" class="btn btn-primary" id="lookupPatient">
+                                                    <i class="ri-search-line me-1"></i> Lookup
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="patientLookupResult" class="alert mt-3" style="display:none;"></div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="firstName" name="first_name" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="lastName" name="last_name" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="gender" id="gender" required>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Age <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="age" name="age" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Appointment Details -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">Appointment Details</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Department <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="departmentSelect" required>
+                                            <option value="">Select Department</option>
+                                            {% for dept in departments %}
+                                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Doctor <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="doctorSelect" name="doctor_id" required disabled>
+                                            <option value="">Select Doctor</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="appointmentDate" name="date" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Time Slot <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="timeSlotSelect" name="time" required disabled>
+                                            <option value="">Select Time Slot</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Reason for Visit <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="reason" rows="3" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Treatment Selection -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">Select Treatments</div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-2"></i> Select one or more treatments for this appointment
+                            </div>
+
+                            <div class="row">
+                                {% for treatment in treatments %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card treatment-card h-100">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input treatment-checkbox" type="checkbox"
+                                                       name="treatment_ids" value="{{ treatment.id }}"
+                                                       id="treatment{{ treatment.id }}">
+                                                <label class="form-check-label" for="treatment{{ treatment.id }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="ri-{{ treatment.icon }}-fill me-2 fs-4 text-primary"></i>
+                                                        <h6 class="mb-0">{{ treatment.name }}</h6>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="ri-time-line me-1"></i> {{ treatment.duration_minutes }} mins
+                                                </small>
+                                                <span class="float-end">
+                                                    <strong>${{ "%.2f"|format(treatment.base_price) }}</strong>
+                                                </span>
+                                            </div>
+                                            <p class="mt-2 small text-muted">{{ treatment.description|truncate(100) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="ri-close-line me-1"></i> Reset Form
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-calendar-check-line me-1"></i> Book Appointment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize form with existing patient selected
+            $('#firstName, #lastName, #email, #phone, #age').prop('disabled', true);
+
+            // Toggle between new/existing patient
+            $('input[name="patient_type"]').change(function () {
+                if ($(this).val() === 'existing') {
+                    $('#existingPatientFields').show();
+                    // Clear and disable patient info fields when switching to existing patient
+                    $('#firstName, #lastName, #email, #phone, #age').val('').prop('disabled', true);
+                } else {
+                    $('#existingPatientFields').hide();
+                    $('#patientLookupResult').hide();
+                    // Enable patient info fields for new patient
+                    $('#firstName, #lastName, #email, #phone, #age').prop('disabled', false);
+                }
+            });
+
+            // Lookup patient by ID
+            $('#lookupPatient').click(function () {
+                const patientId = $('#patientId').val();
+                if (!patientId) {
+                    $('#patientLookupResult').removeClass('alert-success').addClass('alert-danger')
+                        .text('Please enter a patient ID').show();
+                    return;
+                }
+
+                $.get(`/admin/get-patient/${patientId}`, function (patient) {
+                    if (patient.error) {
+                        $('#patientLookupResult').removeClass('alert-success').addClass('alert-danger')
+                            .text(patient.error).show();
+                    } else {
+                        $('#patientLookupResult').removeClass('alert-danger').addClass('alert-success')
+                            .html(`<i class="ri-check-line me-1"></i> Patient found: <strong>${patient.first_name} ${patient.last_name}</strong>`).show();
+
+                        // Autofill patient info
+                        $('#firstName').val(patient.first_name).prop('disabled', false);
+                        $('#lastName').val(patient.last_name).prop('disabled', false);
+                        $('#email').val(patient.email).prop('disabled', false);
+                        $('#phone').val(patient.phone).prop('disabled', false);
+                        $('#age').val(patient.age).prop('disabled', false);
+                        $('#gender').val(patient.gender);
+                    }
+                }).fail(function () {
+                    $('#patientLookupResult').removeClass('alert-success').addClass('alert-danger')
+                        .html('<i class="ri-close-line me-1"></i> Error looking up patient').show();
+                });
+            });
+
+            // Load doctors when department is selected
+            $('#departmentSelect').change(function () {
+                const deptId = $(this).val();
+                if (deptId) {
+                    $.get(`/admin/get-doctors/${deptId}`, function (doctors) {
+                        const doctorSelect = $('#doctorSelect');
+                        doctorSelect.empty().append('<option value="">Select Doctor</option>');
+                        doctors.forEach(doctor => {
+                            doctorSelect.append(`<option value="${doctor.id}">Dr. ${doctor.name} - ${doctor.specialties}</option>`);
+                        });
+                        doctorSelect.prop('disabled', false);
+                    });
+                } else {
+                    $('#doctorSelect').empty().append('<option value="">Select Doctor</option>').prop('disabled', true);
+                    $('#timeSlotSelect').empty().append('<option value="">Select Time Slot</option>').prop('disabled', true);
+                }
+            });
+
+            // Load available slots when doctor and date are selected
+            $('#doctorSelect, #appointmentDate').change(function () {
+                const doctorId = $('#doctorSelect').val();
+                const date = $('#appointmentDate').val();
+
+                if (doctorId && date) {
+                    $.get(`/admin/get-available-slots/${doctorId}/${date}`, function (response) {
+                        console.log(response)
+                        const timeSlotSelect = $('#timeSlotSelect');
+                        timeSlotSelect.empty().append('<option value="">Select Time Slot</option>');
+                        if (response.slots && response.slots.length > 0) {
+                            response.slots.forEach(slot => {
+                                timeSlotSelect.append(`<option value="${slot.start}">${slot.display}</option>`);
+                            });
+                            timeSlotSelect.prop('disabled', false);
+                        } else {
+                            timeSlotSelect.append('<option value="">No available slots</option>');
+                            timeSlotSelect.prop('disabled', true);
+                        }
+                    });
+                } else {
+                    $('#timeSlotSelect').empty().append('<option value="">Select Time Slot</option>').prop('disabled', true);
+                }
+            });
+
+            // Handle form submission
+            $('#appointmentForm').submit(function (e) {
+                e.preventDefault();
+
+                // Validate at least one treatment is selected
+                if ($('.treatment-checkbox:checked').length === 0) {
+                    alert('Please select at least one treatment');
+                    return;
+                }
+
+                const formData = $(this).serialize();
+
+                $.post('/admin/book-appointment', formData, function (response) {
+                    window.location.href = `/admin/appointment-success/${response.appointment_id}`;
+                }).fail(function (error) {
+                    alert('Error booking appointment: ' + (error.responseJSON?.error || 'Please try again'));
+                });
+            });
+
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            $('#appointmentDate').attr('min', today);
+        });
+    </script>
+
+    <style>
+        .treatment-card {
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+        }
+        .treatment-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .treatment-checkbox:checked + label .treatment-card {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+        .form-check-input {
+            margin-top: 0.3rem;
+        }
+    </style>
+{% endblock %}

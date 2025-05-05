@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Test Report #{{ test_report.id }}{% endblock %}
+{% block page %}Test Report #{{ test_report.id }}{% endblock %}
+
+{% block body %}
+<div class="row gx-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Test Report Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6>Patient Information</h6>
+                        <p><strong>Name:</strong> {{ test_report.prescription.patient.first_name }} {{ test_report.prescription.patient.last_name }}</p>
+                        <p><strong>Patient ID:</strong> {{ test_report.prescription.patient.id }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Doctor Information</h6>
+                        <p><strong>Name:</strong> Dr. {{ test_report.prescription.doctor.first_name }} {{ test_report.prescription.doctor.last_name }}</p>
+                        <p><strong>Specialty:</strong> {{ test_report.prescription.doctor.specialty }}</p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <h6>Test Information</h6>
+                    <p><strong>Test Name:</strong> {{ test_report.report_name }}</p>
+                    <p><strong>Notes:</strong> {{ test_report.report_notes or 'None' }}</p>
+                    <p><strong>Price:</strong> ${{ "%.2f"|format(test_report.price) }}</p>
+                    <p><strong>Status:</strong>
+                        <span class="badge bg-{% if test_report.status == 'Completed' %}success{% else %}warning{% endif %}">
+                            {{ test_report.status }}
+                        </span>
+                    </p>
+                </div>
+
+                {% if test_report.file_path %}
+                <div class="mb-3">
+                    <h6>Uploaded Report</h6>
+                    <a href="{{ url_for('laboratory.download_test_report', report_id=test_report.id) }}"
+                       class="btn btn-sm btn-success">
+                        <i class="ri-download-line"></i> Download Report
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Update Report</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('laboratory.update_test_report', report_id=test_report.id) }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="status">
+                            <option value="Pending" {% if test_report.status == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="Completed" {% if test_report.status == 'Completed' %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Upload Report (PDF only)</label>
+                        <input type="file" class="form-control" name="report_file" accept=".pdf">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ri-save-line"></i> Update Report
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,534 @@
+{% extends 'base.html' %}
+
+{% block title %}Treatment Management{% endblock %}
+{% block page %}Treatments Management{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <!-- Status Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary bg-opacity-10 border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-primary">Total Treatments</h6>
+                                <h3>{{ treatments|length }}</h3>
+                            </div>
+                            <i class="ri-heart-fill fs-1 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success bg-opacity-10 border-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-success">Active Treatments</h6>
+                                <h3>{{ treatments|selectattr('active', 'equalto', True)|list|length }}</h3>
+                            </div>
+                            <i class="ri-checkbox-circle-fill fs-1 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning bg-opacity-10 border-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-warning">Inactive Treatments</h6>
+                                <h3>{{ treatments|selectattr('active', 'equalto', False)|list|length }}</h3>
+                            </div>
+                            <i class="ri-alert-fill fs-1 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info bg-opacity-10 border-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-info">Departments</h6>
+                                <h3>{{ departments|length }}</h3>
+                            </div>
+                            <i class="ri-building-fill fs-1 text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Treatments List</h5>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTreatmentModal">
+                        <i class="ri-add-line me-1"></i> Add Treatment
+                    </button>
+                    <button class="btn btn-outline-secondary ms-2" data-bs-toggle="modal"
+                            data-bs-target="#restoreModal">
+                        <i class="ri-archive-line me-1"></i> View Archive
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" id="treatmentsTable">
+                        <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Duration</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for treatment in treatments %}
+                            <tr class="{% if not treatment.active %}table-secondary{% endif %}">
+                                <td>{{ treatment.id }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="ri-{{ treatment.icon }}-fill me-2 fs-4 text-primary"></i>
+                                        {{ treatment.name }}
+                                    </div>
+                                </td>
+                                <td>{{ treatment.department.name }}</td>
+                                <td>{{ treatment.duration_minutes }} mins</td>
+                                <td>{{ "%.2f"|format(treatment.base_price) }}</td>
+                                <td>
+                                    {% if treatment.active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#viewModal{{ treatment.id }}">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-success" data-bs-toggle="modal"
+                                                data-bs-target="#editModal{{ treatment.id }}">
+                                            <i class="ri-edit-line"></i>
+                                        </button>
+                                        {% if treatment.active %}
+                                            <button class="btn btn-outline-warning" data-bs-toggle="modal"
+                                                    data-bs-target="#statusModal{{ treatment.id }}">
+                                                <i class="ri-toggle-line"></i>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-outline-success" data-bs-toggle="modal"
+                                                    data-bs-target="#statusModal{{ treatment.id }}">
+                                                <i class="ri-toggle-fill"></i>
+                                            </button>
+                                        {% endif %}
+                                        <button class="btn btn-outline-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal{{ treatment.id }}">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Treatment Modal -->
+    <div class="modal fade" id="addTreatmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="ri-add-line me-2"></i>Add New Treatment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN  + TREATMENTS_ADD }}">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Department <span class="text-danger">*</span></label>
+                                <select class="form-select" name="department_id" required>
+                                    {% for department in departments %}
+                                        <option value="{{ department.id }}">{{ department.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Duration (minutes) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="duration_minutes" min="1" value="30"
+                                       required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Base Price ($) <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control" name="base_price" min="0"
+                                       required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Icon <span class="text-danger">*</span></label>
+                                <select class="form-select" name="icon" required>
+                                    <option value="emergency">Emergency</option>
+                                    <option value="heart">Heart</option>
+                                    <option value="stethoscope">Stethoscope</option>
+                                    <option value="capsule">Capsule</option>
+                                    <option value="syringe">Syringe</option>
+                                    <option value="microscope">Microscope</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="active">
+                                    <option value="1" selected>Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Treatment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Treatment Modals -->
+    {% for treatment in treatments %}
+        <!-- View Modal -->
+        <div class="modal fade" id="viewModal{{ treatment.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">Treatment Details: {{ treatment.name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-information-line me-2"></i>Basic Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Treatment ID:</strong> {{ treatment.id }}</p>
+                                        <p><strong>Name:</strong> {{ treatment.name }}</p>
+                                        <p><strong>Department:</strong> {{ treatment.department.name }}</p>
+                                        <p><strong>Duration:</strong> {{ treatment.duration_minutes }} minutes</p>
+                                        <p><strong>Base Price:</strong>{{ "%.2f"|format(treatment.base_price) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-settings-line me-2"></i>Settings</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Status:</strong>
+                                            {% if treatment.active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Icon:</strong> <i
+                                                class="ri-{{ treatment.icon }}-fill me-2"></i>{{ treatment.icon }}</p>
+                                        <p>
+                                            <strong>At:</strong> {{ treatment.created_at.strftime('%d/%m/%Y %H:%M') if treatment.created_at else 'N/A' }}
+                                        </p>
+
+                                        <p>
+                                            <strong>Updated:</strong> {{ treatment.updated_at.strftime('%d/%m/%Y %H:%M') if treatment.updated_at else 'N/A' }}
+                                        </p>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-file-text-line me-2"></i>Description</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>{{ treatment.description or 'No description available' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal{{ treatment.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Edit Treatment: {{ treatment.name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN  + TREATMENTS_EDIT }}/{{ treatment.id }}">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="name" value="{{ treatment.name }}"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Department <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="department_id" required>
+                                        {% for department in departments %}
+                                            <option value="{{ department.id }}"
+                                                    {% if department.id == treatment.department_id %}selected{% endif %}>{{ department.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Duration (minutes) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="duration_minutes" min="1"
+                                           value="{{ treatment.duration_minutes }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Base Price ($) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" name="base_price" min="0"
+                                           value="{{ treatment.base_price }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Icon <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="icon" required>
+                                        <option value="emergency"
+                                                {% if treatment.icon == 'emergency' %}selected{% endif %}>Emergency
+                                        </option>
+                                        <option value="heart" {% if treatment.icon == 'heart' %}selected{% endif %}>
+                                            Heart
+                                        </option>
+                                        <option value="stethoscope"
+                                                {% if treatment.icon == 'stethoscope' %}selected{% endif %}>Stethoscope
+                                        </option>
+                                        <option value="capsule" {% if treatment.icon == 'capsule' %}selected{% endif %}>
+                                            Capsule
+                                        </option>
+                                        <option value="syringe" {% if treatment.icon == 'syringe' %}selected{% endif %}>
+                                            Syringe
+                                        </option>
+                                        <option value="microscope"
+                                                {% if treatment.icon == 'microscope' %}selected{% endif %}>Microscope
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" name="active">
+                                        <option value="1" {% if treatment.active %}selected{% endif %}>Active</option>
+                                        <option value="0" {% if not treatment.active %}selected{% endif %}>Inactive
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" name="description"
+                                              rows="3">{{ treatment.description or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Update Treatment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Toggle Modal -->
+        <div class="modal fade" id="statusModal{{ treatment.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header {% if treatment.active %}bg-warning{% else %}bg-success{% endif %} text-white">
+                        <h5 class="modal-title">Confirm Status Change</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to {% if treatment.active %}deactivate{% else %}activate{% endif %}this
+                            treatment?</p>
+                        <div class="card">
+                            <div class="card-body">
+                                <p><strong>Treatment:</strong> {{ treatment.name }}</p>
+                                <p><strong>Department:</strong> {{ treatment.department.name }}</p>
+                                <p><strong>Current Status:</strong>
+                                    {% if treatment.active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN +  TREATMENTS_TOGGLE_STATUS }}/{{ treatment.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit"
+                                    class="btn {% if treatment.active %}btn-warning{% else %}btn-success{% endif %}">
+                                {% if treatment.active %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal{{ treatment.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to archive this treatment?</p>
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i>This will remove the treatment from active listings but
+                            preserve the record.
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <p><strong>Treatment:</strong> {{ treatment.name }}</p>
+                                <p><strong>Department:</strong> {{ treatment.department.name }}</p>
+                                <p><strong>Price:</strong>{{ "%.2f"|format(treatment.base_price) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN  + TREATMENTS_DELETE }}/{{ treatment.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Archive Treatment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Modal -->
+    <div class="modal fade" id="restoreModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="ri-archive-line me-2"></i>Archived Treatments</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_treatments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Price</th>
+                                    <th>Archived On</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for treatment in deleted_treatments %}
+                                    <tr>
+                                        <td>{{ treatment.id }}</td>
+                                        <td>{{ treatment.name }}</td>
+                                        <td>{{ treatment.department.name }}</td>
+                                        <td>{{ "%.2f"|format(treatment.base_price) }}</td>
+                                        <td>{{ treatment.deleted_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                        <td>
+                                            <form method="POST"
+                                                  action="{{ ADMIN  + TREATMENTS_RESTORE }}/{{ treatment.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No archived treatments found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block heardLink %}
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- DataTables JS -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize DataTable
+            $('#treatmentsTable').DataTable({
+                responsive: true,
+                order: [[1, 'asc']] // Sort by name by default
+            });
+        });
+    </script>
+{% endblock %}

@@ -41,11 +41,28 @@
                     </a>
                 </li>
                 <li class="{% if request.path == '/patients/book-Appointment' %}active current-page{% endif %}">
-                    <a href="/patients/book-Appointment">
+                    <a href="/patient/book-appointment">
                         <i class="ri-calendar-2-line"></i>
                         <span class="menu-text">Book Appointment</span>
                     </a>
+                    <a href="/patient/appointment">
+                        <i class="ri-calendar-2-line"></i>
+                        <span class="menu-text">Appointment</span>
+                    </a>
                 </li>
+                <li class="treeview {% if request.path.startswith('/admin/appointment') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-drop-line"></i>
+                        <span class="menu-text">Appointment</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/admin/appointment"
+                               class="{% if request.path == '/admin/appointment' %}active-sub{% endif %}">appointment</a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="{% if request.path == '/patients/upload-patient-reports' or request.path.startswith('/patients/reports') %}active current-page{% endif %}">
                     <a href="/patients/upload-patient-reports">
                         <i class="ri-file-text-line"></i>
@@ -296,6 +313,23 @@
                         </li>
                     </ul>
                 </li>
+                <li class="treeview {% if request.path.startswith('/admin/appointments') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-drop-line"></i>
+                        <span class="menu-text">Appointment</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/admin/appointments"
+                               class="{% if request.path == '/admin/appointments' %}active-sub{% endif %}">Appointment</a>
+                        </li>
+                        <li>
+                            <a href="/admin/appointment/book-appointment"
+                               class="{% if request.path == '/admin/appointment/book-appointment' %}active-sub{% endif %}">Book
+                                Appointment</a>
+                        </li>
+                    </ul>
+                </li>
 
                 <li class="treeview {% if request.path.startswith('/admin/inventory') %}active current-page{% endif %}">
                     <a href="#!">
@@ -474,6 +508,25 @@
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
+                <li class="treeview {% if request.path.startswith('/doctor/appointment') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-shopping-bag-line"></i>
+                        <span class="menu-text">Appointment</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/doctor/appointment"
+                               class="{% if request.path == '/doctor/appointment' %}active-sub{% endif %}">Appointment
+                                Calendar</a>
+                        </li>
+                        <li>
+                            <a href="/doctor/appointment"
+                               class="{% if request.path == '/doctor/appointment' %}active-sub{% endif %}">View
+                                Appointment</a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">
                     <a href="/admin/search">
                         <i class="ri-search-line"></i>
@@ -531,11 +584,26 @@
 
             {% elif session['role'] == 'laboratory' %}
                 <li class="{% if request.path == '/doctor/dashboard' %}active current-page{% endif %}">
-                    <a href="/doctor/dashboard">
+                    <a href="/laboratory/dashboard">
                         <i class="ri-home-6-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
+                <li class="treeview {% if request.path.startswith('/laboratory/laboratory-reports') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-shopping-bag-line"></i>
+                        <span class="menu-text">Test Reports</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/laboratory/laboratory-report"
+                               class="{% if request.path == '/laboratory/laboratory-reports' %}active-sub{% endif %}">Test
+                                Reports</a>
+                        </li>
+
+                    </ul>
+                </li>
+
                 <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">
                     <a href="/admin/search">
                         <i class="ri-search-line"></i>

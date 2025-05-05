@@ -1,0 +1,82 @@
+<div class="modal fade" id="forwardModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Forward Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forwardForm">
+                    <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                    <div class="mb-3">
+                        <label class="form-label">Current Doctor</label>
+                        <input type="text" class="form-control"
+                               value="{{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}"
+                               readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Patient</label>
+                        <input type="text" class="form-control"
+                               value="{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}"
+                               readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <select class="form-control" id="forwardDeptSelect" required>
+                            <option value="">Select Department</option>
+                            {% for dept in departments %}
+                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Forward To Doctor</label>
+                        <select class="form-control" id="forwardDoctorSelect" name="doctor_id" required disabled>
+                            <option value="">Select Doctor</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmForward">Forward</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Load doctors when department is selected
+        $('#forwardDeptSelect').change(function () {
+            const deptId = $(this).val();
+            if (deptId) {
+                $.get(`/get-doctors-by-department/${deptId}`, function (doctors) {
+                    const doctorSelect = $('#forwardDoctorSelect');
+                    doctorSelect.empty().append('<option value="">Select Doctor</option>');
+                    doctors.forEach(doctor => {
+                        doctorSelect.append(`<option value="${doctor.id}">${doctor.name}</option>`);
+                    });
+                    doctorSelect.prop('disabled', false);
+                });
+            } else {
+                $('#forwardDoctorSelect').empty().append('<option value="">Select Doctor</option>').prop('disabled', true);
+            }
+        });
+
+        // Handle forward confirmation
+        $('#confirmForward').click(function () {
+            const formData = $('#forwardForm').serialize();
+
+            $.post('/forward-appointment/{{ appointment.id }}', formData, function (response) {
+                if (response.success) {
+                    window.location.reload();
+                }
+            });
+        });
+    });
+</script>

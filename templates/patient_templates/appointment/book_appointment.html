@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}Book Appointment{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <!-- Welcome Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body py-3">
+                        <h4 class="mb-0">
+                            <i class="ri-calendar-2-line me-2"></i> Book a New Appointment
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Info Summary -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0"><i class="ri-user-line me-2"></i> Your Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Name:</strong><br> {{ current_user.first_name }}</p>
+                                <p><strong>Email:</strong><br> {{ current_user.email }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Phone:</strong><br> {{ current_user.phone or 'Not provided' }}</p>
+                                <p><strong>Age:</strong><br> {{ current_user.age or 'Not provided' }}</p>
+                            </div>
+                        </div>
+                        <a href="/patient" class="btn btn-sm btn-outline-primary">
+                            <i class="ri-edit-line me-1"></i> Update Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="ri-history-line me-2"></i> Recent Appointments</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_appointments %}
+                            <ul class="list-group list-group-flush">
+                                {% for appt in recent_appointments[:3] %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <strong>Dr. {{ appt.doctor.first_name }} {{ appt.doctor.last_name }}</strong><br>
+                                                <small class="text-muted">
+                                                    {{ appt.date.strftime('%b %d, %Y') }}
+                                                    {{ appt.start_time.strftime('%I:%M %p') }}
+                                                    - {{ appt.end_time.strftime('%I:%M %p') }}
+                                                </small>
+                                            </div>
+                                            <span class="badge bg-{{ 'success' if appt.status == 'Completed' else 'warning' }}">
+                                        {{ appt.status }}
+                                    </span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No recent appointments</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Booking Form -->
+        <div class="card">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0">Appointment Details</h5>
+            </div>
+            <div class="card-body">
+                <form id="appointmentForm">
+                    <input type="hidden" name="patient_id" id="patient_id" value="{{ current_user.id }}">
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Department <span class="text-danger">*</span></label>
+                                <select class="form-select" id="departmentSelect" required>
+                                    <option value="">Select Department</option>
+                                    {% for dept in departments %}
+                                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Doctor <span class="text-danger">*</span></label>
+                                <select class="form-select" id="doctorSelect" name="doctor_id" required disabled>
+                                    <option value="">Select Doctor</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="appointmentDate" name="date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Time Slot <span class="text-danger">*</span></label>
+                                <select class="form-select" id="timeSlotSelect" name="time" required disabled>
+                                    <option value="">Select Time Slot</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="form-label">Reason for Visit <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="reason" id="reason" rows="3"
+                                  placeholder="Please describe the reason for your visit"></textarea>
+                    </div>
+
+                    <!-- Treatment Selection -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Select Treatments</h5>
+                            <small class="text-muted">Select one or more</small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>
+                            Treatment costs will be calculated after doctor's consultation
+                        </div>
+
+                        <div class="row">
+                            {% for treatment in treatments %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card treatment-card h-100">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input treatment-checkbox" type="checkbox"
+                                                       name="treatment_ids" value="{{ treatment.id }}"
+                                                       id="treatment{{ treatment.id }}">
+                                                <label class="form-check-label w-100" for="treatment{{ treatment.id }}">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="ri-{{ treatment.icon }}-fill me-2 fs-4 text-primary"></i>
+                                                        <h6 class="mb-0">{{ treatment.name }}</h6>
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <small class="text-muted">
+                                                            <i class="ri-time-line me-1"></i> {{ treatment.duration_minutes }}
+                                                            mins
+                                                        </small>
+                                                        <span class="float-end">
+                                                    <strong>${{ "%.2f"|format(treatment.base_price) }}</strong>
+                                                </span>
+                                                    </div>
+                                                    <p class="mt-2 small text-muted">{{ treatment.description|truncate(100) }}</p>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between border-top pt-4">
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="ri-close-line me-1"></i> Clear Form
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-calendar-check-line me-1"></i> Book Appointment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal Template -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="ri-checkbox-circle-line me-2"></i>Appointment Booked</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center py-4">
+                        <i class="ri-checkbox-circle-fill text-success display-4 mb-3"></i>
+                        <h4>Your appointment has been booked!</h4>
+                        <p class="mb-0" id="appointmentDetails"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="#" id="viewAppointmentBtn" class="btn btn-success">
+                        <i class="ri-eye-line me-1"></i> View Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            $('#appointmentDate').attr('min', today);
+
+            // Load doctors when department is selected
+            $('#departmentSelect').change(function () {
+                const deptId = $(this).val();
+                if (deptId) {
+                    $.get(`/admin/get-doctors/${deptId}`, function (doctors) {
+                        const doctorSelect = $('#doctorSelect');
+                        doctorSelect.empty().append('<option value="">Select Doctor</option>');
+                        doctors.forEach(doctor => {
+                            doctorSelect.append(
+                                `<option value="${doctor.id}"
+                         data-img="${doctor.profile_image || '/static/images/default-doctor.png'}">
+                         Dr. ${doctor.name} - ${doctor.specialty}
+                         </option>`
+                            );
+                        });
+                        doctorSelect.prop('disabled', false);
+                    });
+                } else {
+                    $('#doctorSelect').empty().append('<option value="">Select Doctor</option>').prop('disabled', true);
+                    $('#timeSlotSelect').empty().append('<option value="">Select Time Slot</option>').prop('disabled', true);
+                }
+            });
+
+            // Load available slots when doctor and date are selected
+            $('#doctorSelect, #appointmentDate').change(function () {
+                const doctorId = $('#doctorSelect').val();
+                const date = $('#appointmentDate').val();
+
+                if (doctorId && date) {
+                    $('#timeSlotSelect').empty().append('<option value="">Loading...</option>').prop('disabled', true);
+
+                    $.get(`/admin/get-available-slots/${doctorId}/${date}`, function (response) {
+                        const timeSlotSelect = $('#timeSlotSelect');
+                        timeSlotSelect.empty().append('<option value="">Select Time Slot</option>');
+
+                        if (response.slots && response.slots.length > 0) {
+                            response.slots.forEach(slot => {
+                                timeSlotSelect.append(
+                                    `<option value="${slot.start}"
+                             data-end="${slot.end}">
+                             ${slot.display}
+                             </option>`
+                                );
+                            });
+                            timeSlotSelect.prop('disabled', false);
+                        } else {
+                            timeSlotSelect.append('<option value="">No available slots</option>');
+                            timeSlotSelect.prop('disabled', true);
+                        }
+                    }).fail(function () {
+                        $('#timeSlotSelect').empty()
+                            .append('<option value="">Error loading slots</option>')
+                            .prop('disabled', true);
+                    });
+                } else {
+                    $('#timeSlotSelect').empty().append('<option value="">Select Time Slot</option>').prop('disabled', true);
+                }
+            });
+
+            // Handle form submission
+            $('#appointmentForm').submit(function (e) {
+                e.preventDefault();
+                const selectedTreatmentIds = [];
+                $('.treatment-checkbox:checked').each(function () {
+                    selectedTreatmentIds.push($(this).val());
+                });
+                const formData = {
+                    patient_id: $('#patient_id').val(),
+                    doctor_id: $('#doctorSelect').val(),
+                    start_time: $('#timeSlotSelect').val(),
+                    date: $('#appointmentDate').val(),
+                    reason: $('#reason').val(),
+                    treatment_ids: selectedTreatmentIds,
+                };
+                console.log(formData)
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<i class="ri-loader-4-line me-1"></i> Booking...');
+
+                $.ajax({
+                    url: '/patient/book-appointment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        $('#viewAppointmentBtn').attr('href', `/patient/appointment`);
+                        $('#successModal').modal('show');
+                        submitBtn.prop('disabled', false).html('<i class="ri-calendar-check-line me-1"></i> Book Appointment');
+                    },
+                    error: function (error) {
+                        alert('Error booking appointment: ' + (error.responseJSON?.error || 'Please try again'));
+                        submitBtn.prop('disabled', false).html('<i class="ri-calendar-check-line me-1"></i> Book Appointment');
+                    }
+                });
+            });
+
+        });
+    </script>
+
+    <style>
+        .treatment-card {
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+        }
+
+        .treatment-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .treatment-checkbox:checked + label .treatment-card {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        .form-check-input {
+            margin-top: 0.3rem;
+        }
+    </style>
+{% endblock %}

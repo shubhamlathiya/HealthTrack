@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Cancellation Confirmation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .email-container {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .appointment-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            min-width: 120px;
+            color: #6c757d;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4a6fa5;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .cancellation-notice {
+            background-color: #fff3f3;
+            border: 1px solid #ffdddd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .reschedule-option {
+            background-color: #f0f7ff;
+            border: 1px solid #d0e3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <h1>Appointment Cancellation Confirmed</h1>
+        <p>We're sorry to see you go</p>
+    </div>
+
+    <div class="content">
+        <p>Dear {{ patient.first_name }},</p>
+
+        <p>This email confirms that your appointment has been successfully canceled.</p>
+
+        <div class="cancellation-notice">
+            <h3 style="margin-top: 0; color: #dc3545;">Cancellation Details</h3>
+            <p>Your appointment scheduled for <strong>{{ appointment.date }}</strong> at
+                <strong>{{ appointment.start_time }} - {{ appointment.end_time }}</strong> with
+                <strong>Dr. {{ appointment.doctor.first_name }}</strong> has been canceled.</p>
+        </div>
+
+        <div class="reschedule-option">
+            <h3 style="margin-top: 0; color: #4a6fa5;">Need to Reschedule?</h3>
+            <p>If you'd like to book a new appointment, you can easily do so through our online booking system.</p>
+            <a href="{{ booking_link }}" class="button">Book New Appointment</a>
+        </div>
+
+        <p>If you canceled by mistake or have any questions, please contact our office at or reply to this email.</p>
+
+        <p>We hope to see you again soon!</p>
+
+        <p>Best regards,<br>
+            The Health Track Team</p>
+    </div>
+</div>
+</body>
+</html>

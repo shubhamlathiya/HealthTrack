@@ -1,0 +1,11 @@
+
+LABORATORY = "/laboratory"
+
+LABORATORY_DASHBOARD = f"{LABORATORY}/dashboard"
+
+LAB_REPORTS = '/laboratory-reports'
+LAB_REPORTS_ADD = LAB_REPORTS + '/add'
+LAB_REPORTS_EDIT = LAB_REPORTS + '/edit'
+LAB_REPORTS_DELETE = LAB_REPORTS + '/delete'
+LAB_REPORTS_RESTORE = LAB_REPORTS + '/restore'
+LAB_REPORTS_TOGGLE = LAB_REPORTS + '/toggle-status'

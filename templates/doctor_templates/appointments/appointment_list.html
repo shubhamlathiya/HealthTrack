@@ -1,0 +1,1508 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointments for {{ selected_date }}{% endblock %}
+{% block page %}Appointments for {{ selected_date.strftime('%B %d, %Y') }}{% endblock %}
+
+{% block body %}
+    <!-- Appointment List Table (unchanged from your original) -->
+    <div class="row gx-4">
+        <div class="col-sm-12 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Appointment List</h5>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Patient</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>{{ appointment.start_time.strftime('%I:%M %p') }}
+                                        - {{ appointment.end_time.strftime('%I:%M %p') }}</td>
+                                    <td>{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</td>
+                                    <td>{{ appointment.reason or 'Not specified' }}</td>
+                                    <td>
+                  <span class="badge
+                    {% if appointment.status == 'completed' %}bg-success
+                    {% elif appointment.status == 'canceled' %}bg-danger
+                    {% else %}bg-primary{% endif %}">
+                    {{ appointment.status }}
+                  </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#viewAppointmentModal{{ appointment.id }}">
+                                            View
+                                        </button>
+                                        {% if appointment.status == 'scheduled' %}
+                                            <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                                    data-bs-target="#prescriptionModal{{ appointment.id }}">
+                                                Prescription
+                                            </button>
+                                            <button class="btn btn-sm btn-info" data-bs-toggle="modal"
+                                                    data-bs-target="#forwardModal{{ appointment.id }}">
+                                                <i class="ri-share-forward-line me-1"></i> Forward
+                                            </button>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#rebookModal{{ appointment.id }}">
+                                            <i class="ri-calendar-event-line me-1"></i> Rebook
+                                        </button>
+                                        {% if appointment.prescriptions %}
+                                            <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                                                    data-bs-target="#viewPrescriptionModal{{ appointment.prescriptions[0].id }}">
+                                                <i class="ri-file-text-line me-1"></i> View Prescription
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No appointments scheduled for this day</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- View Appointment Modals (unchanged from your original) -->
+    {% for appointment in appointments %}
+        <div class="modal fade" id="viewAppointmentModal{{ appointment.id }}" tabindex="-1"
+             aria-labelledby="viewAppointmentModalLabel{{ appointment.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewAppointmentModalLabel{{ appointment.id }}">
+                            <i class="ri-calendar-event-line me-2"></i>Appointment Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary mb-3">
+                                            <i class="ri-user-line me-2"></i>Patient Information
+                                        </h6>
+                                        <div class="mb-3">
+                                            <strong>Name:</strong> {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Patient ID:</strong> {{ appointment.patient.id }}
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Phone:</strong> {{ appointment.patient.phone }}
+                                        </div>
+                                        <div>
+                                            <strong>Email:</strong> {{ appointment.patient.email }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary mb-3">
+                                            <i class="ri-user-star-line me-2"></i>Doctor Information
+                                        </h6>
+                                        <div class="mb-3">
+                                            <strong>Name:</strong>
+                                            Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Specialty:</strong> {{ appointment.doctor.specialty }}
+                                        </div>
+                                        {% if appointment.original_doctor %}
+                                            <div class="mb-3">
+                                                <strong>Originally with:</strong>
+                                                Dr. {{ appointment.original_doctor.first_name }} {{ appointment.original_doctor.last_name }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary mb-3">
+                                            <i class="ri-calendar-event-line me-2"></i>Appointment Details
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-3 mb-3">
+                                                <strong>Date:</strong> {{ appointment.date.strftime('%d/%m/%Y') }}
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <strong>Time:</strong> {{ appointment.start_time.strftime('%H:%M') }}
+                                                - {{ appointment.end_time.strftime('%H:%M') }}
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <strong>Status:</strong>
+                                                <span class="badge {% if appointment.status == 'completed' %}bg-success{% elif appointment.status == 'canceled' %}bg-danger{% elif appointment.status == 'forwarded' %}bg-warning{% else %}bg-info{% endif %}">
+                                   {{ appointment.status|title }}
+                               </span>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <strong>Duration:</strong>
+                                                {{ ((appointment.end_time.hour * 60 + appointment.end_time.minute) - (appointment.start_time.hour * 60 + appointment.start_time.minute)) }}
+                                                minutes
+                                            </div>
+                                            <div class="col-12">
+                                                <strong>Reason:</strong> {{ appointment.reason or 'N/A' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Treatment Information Section - Only shown if treatments exist -->
+                            {% if appointment.appointment_treatments %}
+                                <div class="col-12">
+                                    <div class="card border-0 shadow-sm mb-4">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary mb-3">
+                                                <i class="ri-heart-pulse-line me-2"></i>Treatment Information
+                                            </h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Treatment</th>
+                                                        <th>Duration</th>
+                                                        <th>Price</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for at in appointment.appointment_treatments %}
+                                                        <tr>
+                                                            <td>
+                                                                <div class="d-flex align-items-center">
+                                                                    <i class="ri-{{ at.treatment.icon }}-fill me-2 text-primary"></i>
+                                                                    {{ at.treatment.name }}
+                                                                </div>
+                                                            </td>
+                                                            <td>{{ at.treatment.duration_minutes }} mins</td>
+                                                            <td>${{ "%.2f"|format(at.price) }}</td>
+                                                            <td>
+                                               <span class="badge
+                                                   {% if at.status == 'completed' %}bg-success
+                                                   {% elif at.status == 'canceled' %}bg-danger
+                                                   {% else %}bg-info{% endif %}">
+                                                   {{ at.status|title }}
+                                               </span>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                    <tfoot>
+                                                    <tr class="table-active">
+                                                        <td colspan="2"><strong>Total</strong></td>
+                                                        <td>
+                                                            <strong>${{ "%.2f"|format(appointment.appointment_treatments|sum(attribute='price')) }}</strong>
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if appointment.notes %}
+                                <div class="col-12">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary mb-3">
+                                                <i class="ri-file-text-line me-2"></i>Notes
+                                            </h6>
+                                            <p>{{ appointment.notes }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if appointment.prescriptions %}
+            <!-- View Prescription Modal -->
+            <div class="modal fade" id="viewPrescriptionModal{{ appointment.prescriptions[0].id }}" tabindex="-1"
+                 aria-labelledby="viewPrescriptionModalLabel{{ appointment.prescriptions[0].id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-secondary text-white">
+                            <h5 class="modal-title"
+                                id="viewPrescriptionModalLabel{{ appointment.prescriptions[0].id }}">
+                                <i class="ri-file-text-line me-2"></i>Prescription Details
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="prescriptionContent{{ appointment.prescriptions[0].id }}">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p>Loading prescription details...</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Close
+                            </button>
+                            <button type="button" class="btn btn-primary"
+                                    onclick="printPrescription('viewPrescriptionModal{{ appointment.prescriptions[0].id }}')">
+                                <i class="ri-printer-line me-1"></i> Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+
+    {% for appointment in appointments %}
+        <!-- Prescription Modals -->
+        <div class="modal fade" id="prescriptionModal{{ appointment.id }}" tabindex="-1"
+             aria-labelledby="prescriptionModalLabel{{ appointment.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="prescriptionModalLabel{{ appointment.id }}">
+                            <i class="ri-file-text-line me-2"></i>Prescription for {{ appointment.patient.first_name }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="prescriptionForm{{ appointment.id }}" class="needs-validation" novalidate>
+                            <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+
+                            <!-- Medications Section -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-success mb-3">
+                                        <i class="ri-medicine-bottle-line me-2"></i>Medications
+                                    </h6>
+                                    <div id="medicationsContainer{{ appointment.id }}">
+                                        <!-- Initial medication field -->
+                                        <div class="card border-0 shadow-sm mb-3 medication-row">
+                                            <div class="card-body">
+                                                <div class="row g-3">
+                                                    <div class="col-md-5">
+                                                        <label class="form-label">Medicine Name <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control medicine-search"
+                                                               name="medications[0][name]"
+                                                               id="medicine-search-0-{{ appointment.id }}"
+                                                               data-dosage-field="dosage-0-{{ appointment.id }}"
+                                                               required>
+                                                        <div class="autocomplete-results"
+                                                             id="medicine-results-0-{{ appointment.id }}"></div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Dosage </label>
+                                                        <input type="text" class="form-control medicine-dosage"
+                                                               name="medications[0][dosage]"
+                                                               id="dosage-0-{{ appointment.id }}"
+                                                        >
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Meal Instructions <span
+                                                                class="text-danger">*</span></label>
+                                                        <select class="form-select"
+                                                                name="medications[0][meal_instructions]" required>
+                                                            <option value="Before Meal">Before Meal</option>
+                                                            <option value="After Meal">After Meal</option>
+                                                            <option value="With Meal">With Meal</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-1 d-flex align-items-end">
+                                                        <button type="button" class="btn btn-danger btn-sm remove-btn"
+                                                                onclick="removeRow(this, 'medication')">
+                                                            <i class="ri-close-line"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label class="form-label">Timing <span
+                                                                class="text-danger">*</span></label>
+                                                        <div class="row">
+                                                            {% for timing in ['Morning', 'Afternoon', 'Evening', 'Night'] %}
+                                                                <div class="col-md-3">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox"
+                                                                               name="medications[0][timing][]"
+                                                                               value="{{ timing }}"
+                                                                               id="timing-0-{{ timing|lower }}-{{ appointment.id }}">
+                                                                        <label class="form-check-label"
+                                                                               for="timing-0-{{ timing|lower }}-{{ appointment.id }}">
+                                                                            {{ timing }}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                            onclick="addMedicationField({{ appointment.id }})">
+                                        <i class="ri-add-line me-1"></i> Add Medication
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Test Reports Section -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-success mb-3">
+                                        <i class="ri-file-text-line me-2"></i>Test Reports
+                                    </h6>
+                                    <div id="testReportsContainer{{ appointment.id }}">
+                                        <!-- Initial test report field -->
+                                        <div class="card border-0 shadow-sm mb-3 test-report-row">
+                                            <div class="card-body">
+                                                <div class="row g-3">
+                                                    <div class="col-md-5">
+                                                        <label class="form-label">Report Name <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control report-search"
+                                                               name="test_reports[0][report_name]"
+                                                               id="report-search-0-{{ appointment.id }}"
+                                                               data-price-field="price-0-{{ appointment.id }}"
+                                                        >
+                                                        <div class="autocomplete-results"
+                                                             id="report-results-0-{{ appointment.id }}"></div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Notes</label>
+                                                        <input type="text" class="form-control"
+                                                               name="test_reports[0][report_notes]">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Price <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="number" step="0.01"
+                                                               class="form-control report-price"
+                                                               name="test_reports[0][price]"
+                                                               id="price-0-{{ appointment.id }}"
+                                                        >
+                                                    </div>
+                                                    <div class="col-md-1 d-flex align-items-end">
+                                                        <button type="button" class="btn btn-danger btn-sm remove-btn"
+                                                                onclick="removeRow(this, 'test-report')">
+                                                            <i class="ri-close-line"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                            onclick="addTestReportField({{ appointment.id }})">
+                                        <i class="ri-add-line me-1"></i> Add Test Report
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Additional Notes</label>
+                                    <textarea class="form-control" name="notes" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="button" class="btn btn-success"
+                                onclick="submitPrescription({{ appointment.id }})">
+                            <i class="ri-save-line me-1"></i> Generate Prescription
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Rebook Modal -->
+        <div class="modal fade" id="rebookModal{{ appointment.id }}" tabindex="-1"
+             aria-labelledby="rebookModalLabel{{ appointment.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-white">
+                        <h5 class="modal-title" id="rebookModalLabel{{ appointment.id }}">
+                            <i class="ri-calendar-event-line me-2"></i>Rebook Appointment
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form id="rebookForm{{ appointment.id }}" method="POST"
+                          action="/doctor/appointments/rebook/{{ appointment.id }}">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Patient</label>
+                                        <input type="text" class="form-control"
+                                               value="{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}"
+                                               readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Doctor</label>
+                                        <input type="text" class="form-control"
+                                               value="Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}"
+                                               readonly>
+                                        <input type="hidden" name="doctor_id" value="{{ appointment.doctor.id }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Appointment</label>
+                                        <input type="text" class="form-control"
+                                               value="{{ appointment.date.strftime('%B %d, %Y') }} at {{ appointment.start_time.strftime('%I:%M %p') }}"
+                                               readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="rebookDate{{ appointment.id }}" class="form-label">New Date
+                                            <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="rebookDate{{ appointment.id }}"
+                                               name="date" required min="{{ date.today().strftime('%Y-%m-%d') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="rebookTimeSlot{{ appointment.id }}" class="form-label">Time Slot
+                                            <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="rebookTimeSlot{{ appointment.id }}"
+                                                name="time_slot" required disabled>
+                                            <option value="">Select a date first</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="rebookReason{{ appointment.id }}" class="form-label">Reason for
+                                            Rebooking</label>
+                                        <textarea class="form-control" id="rebookReason{{ appointment.id }}"
+                                                  name="reason" rows="2">{{ appointment.reason }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="ri-calendar-event-line me-1"></i> Confirm Rebooking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forward Modal -->
+        <div class="modal fade" id="forwardModal{{ appointment.id }}" tabindex="-1"
+             aria-labelledby="forwardModalLabel{{ appointment.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="forwardModalLabel{{ appointment.id }}">
+                            <i class="ri-share-forward-line me-2"></i>Forward Appointment
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form id="forwardForm{{ appointment.id }}" method="POST"
+                          action="/doctor/appointments/forward/{{ appointment.id }}">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Patient</label>
+                                        <input type="text" class="form-control"
+                                               value="{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}"
+                                               readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Doctor</label>
+                                        <input type="text" class="form-control"
+                                               value="Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}"
+                                               readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Forwarding Details -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">Forwarding Details</div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">Department <span class="text-danger">*</span></label>
+                                                <select class="form-select" id="departmentSelect{{ appointment.id }}"
+                                                        required>
+                                                    <option value="">Select Department</option>
+                                                    {% for dept in departments %}
+                                                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">Forward To Doctor <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" id="doctorSelect{{ appointment.id }}"
+                                                        name="forward_to_doctor_id" required disabled>
+                                                    <option value="">Select Doctor</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">Date <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="date" class="form-control"
+                                                       id="forwardDate{{ appointment.id }}"
+                                                       name="date" required
+                                                       min="{{ date.today().strftime('%Y-%m-%d') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">Time Slot <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" id="forwardTimeSlot{{ appointment.id }}"
+                                                        name="time_slot" required disabled>
+                                                    <option value="">Select Time Slot</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Reason for Forwarding </label>
+                                        <textarea class="form-control" name="reason" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-share-forward-line me-1"></i> Confirm Forward
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block footerLink %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        // Global counters for each appointment
+        const medicationCounters = {};
+        const testReportCounters = {};
+
+        // Initialize modal
+        document.querySelectorAll('[id^="prescriptionModal"]').forEach(modal => {
+            const appointmentId = modal.id.replace('prescriptionModal', '');
+            medicationCounters[appointmentId] = 1;
+            testReportCounters[appointmentId] = 1;
+
+            modal.addEventListener('shown.bs.modal', function () {
+                setupSearchFields(appointmentId);
+            });
+        });
+
+        // Setup search fields for an appointment
+        function setupSearchFields(appointmentId) {
+            // Setup medicine search
+            document.querySelectorAll(`#medicationsContainer${appointmentId} .medicine-search`).forEach(input => {
+                setupMedicineSearch(input, appointmentId);
+            });
+
+            // Setup report search
+            document.querySelectorAll(`#testReportsContainer${appointmentId} .report-search`).forEach(input => {
+                setupReportSearch(input, appointmentId);
+            });
+        }
+
+        // Add medication field
+        function addMedicationField(appointmentId) {
+            const container = document.getElementById(`medicationsContainer${appointmentId}`);
+            const count = medicationCounters[appointmentId]++;
+
+            const newItem = document.createElement('div');
+            newItem.className = 'card border-0 shadow-sm mb-3 medication-row';
+            newItem.innerHTML = `
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Medicine Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control medicine-search"
+                                   name="medications[${count}][name]"
+                                   id="medicine-search-${count}-${appointmentId}"
+                                   data-dosage-field="dosage-${count}-${appointmentId}"
+                                  >
+                            <div class="autocomplete-results" id="medicine-results-${count}-${appointmentId}"></div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Dosage</label>
+                            <input type="text" class="form-control medicine-dosage"
+                                   name="medications[${count}][dosage]"
+                                   id="dosage-${count}-${appointmentId}"
+                                   >
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Meal Instructions <span class="text-danger">*</span></label>
+                            <select class="form-select" name="medications[${count}][meal_instructions]" required>
+                                <option value="Before Meal">Before Meal</option>
+                                <option value="After Meal">After Meal</option>
+                                <option value="With Meal">With Meal</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger btn-sm remove-btn"
+                                    onclick="removeRow(this, 'medication')">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Timing <span class="text-danger">*</span></label>
+                            <div class="row">
+                                ${['Morning', 'Afternoon', 'Evening', 'Night'].map(timing => `
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="medications[${count}][timing][]"
+                                                   value="${timing}"
+                                                   id="timing-${count}-${timing.toLowerCase()}-${appointmentId}">
+                                            <label class="form-check-label" for="timing-${count}-${timing.toLowerCase()}-${appointmentId}">
+                                                ${timing}
+                                            </label>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+            setupMedicineSearch(document.getElementById(`medicine-search-${count}-${appointmentId}`), appointmentId);
+        }
+
+        // Add test report field
+        function addTestReportField(appointmentId) {
+            const container = document.getElementById(`testReportsContainer${appointmentId}`);
+            const count = testReportCounters[appointmentId]++;
+
+            const newItem = document.createElement('div');
+            newItem.className = 'card border-0 shadow-sm mb-3 test-report-row';
+            newItem.innerHTML = `
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Report Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control report-search"
+                                   name="test_reports[${count}][report_name]"
+                                   id="report-search-${count}-${appointmentId}"
+                                   data-price-field="price-${count}-${appointmentId}"
+                                   required>
+                            <div class="autocomplete-results" id="report-results-${count}-${appointmentId}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Notes</label>
+                            <input type="text" class="form-control"
+                                   name="test_reports[${count}][report_notes]">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Price <span class="text-danger">*</span></label>
+                            <input type="number" step="0.01" class="form-control report-price"
+                                   name="test_reports[${count}][price]"
+                                   id="price-${count}-${appointmentId}"
+                                   required>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger btn-sm remove-btn"
+                                    onclick="removeRow(this, 'test-report')">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+            setupReportSearch(document.getElementById(`report-search-${count}-${appointmentId}`), appointmentId);
+        }
+
+        // Remove row (medication or test report)
+        function removeRow(button, type) {
+            const row = button.closest(`.${type}-row`);
+            if (document.querySelectorAll(`.${type}-row`).length > 1) {
+                row.remove();
+            } else {
+                alert(`At least one ${type.replace('-', ' ')} is required`);
+            }
+        }
+
+        // Setup medicine search
+        function setupMedicineSearch(inputElement, appointmentId) {
+            const resultsContainer = document.getElementById(`medicine-results-${inputElement.id.split('-')[2]}-${appointmentId}`);
+            const dosageField = document.getElementById(inputElement.dataset.dosageField);
+
+            inputElement.addEventListener('input', debounce(function (e) {
+                const searchTerm = e.target.value.trim();
+
+                if (searchTerm.length < 2) {
+                    resultsContainer.innerHTML = '';
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+
+                fetch(`/laboratory/api/medicines/search?q=${encodeURIComponent(searchTerm)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            resultsContainer.innerHTML = '';
+                            data.forEach(medicine => {
+                                const item = document.createElement('div');
+                                item.className = 'autocomplete-item';
+                                item.textContent = `${medicine.name} (${medicine.medicine_number})`;
+                                item.addEventListener('click', () => {
+                                    inputElement.value = medicine.name;
+                                    if (dosageField) {
+                                        dosageField.value = medicine.default_dosage || '';
+                                    }
+                                    resultsContainer.innerHTML = '';
+                                    resultsContainer.style.display = 'none';
+                                });
+                                resultsContainer.appendChild(item);
+                            });
+                            resultsContainer.style.display = 'block';
+                        } else {
+                            resultsContainer.innerHTML = '<div class="autocomplete-item">No results found</div>';
+                            resultsContainer.style.display = 'block';
+                        }
+                    });
+            }, 300));
+
+            // Hide results when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!inputElement.contains(e.target)) {
+                    resultsContainer.style.display = 'none';
+                }
+            });
+        }
+
+        // Setup report search
+        function setupReportSearch(inputElement, appointmentId) {
+            const resultsContainer = document.getElementById(`report-results-${inputElement.id.split('-')[2]}-${appointmentId}`);
+            const priceField = document.getElementById(inputElement.dataset.priceField);
+
+            inputElement.addEventListener('input', debounce(function (e) {
+                const searchTerm = e.target.value.trim();
+
+                if (searchTerm.length < 2) {
+                    resultsContainer.innerHTML = '';
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+
+                fetch(`/laboratory/api/lab-reports/search?q=${encodeURIComponent(searchTerm)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            resultsContainer.innerHTML = '';
+                            data.forEach(report => {
+                                const item = document.createElement('div');
+                                item.className = 'autocomplete-item';
+                                item.textContent = `${report.name} (${report.price})`;
+                                item.addEventListener('click', () => {
+                                    inputElement.value = report.name;
+                                    priceField.value = report.price;
+                                    resultsContainer.innerHTML = '';
+                                    resultsContainer.style.display = 'none';
+                                });
+                                resultsContainer.appendChild(item);
+                            });
+                            resultsContainer.style.display = 'block';
+                        } else {
+                            resultsContainer.innerHTML = '<div class="autocomplete-item">No results found</div>';
+                            resultsContainer.style.display = 'block';
+                        }
+                    });
+            }, 300));
+
+            // Hide results when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!inputElement.contains(e.target)) {
+                    resultsContainer.style.display = 'none';
+                }
+            });
+        }
+
+        // Submit prescription
+        function submitPrescription(appointmentId) {
+            const form = document.getElementById(`prescriptionForm${appointmentId}`);
+
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const data = {
+                appointment_id: formData.get('appointment_id'),
+                notes: formData.get('notes'),
+                medications: [],
+                test_reports: []
+            };
+
+            // Collect medications
+            const medInputs = form.querySelectorAll('input[name^="medications["][name$="][name]"]');
+            medInputs.forEach((input, index) => {
+                const baseName = input.name.replace('[name]', '');
+                const timingInputs = form.querySelectorAll(`input[name="${baseName}[timing][]"]:checked`);
+
+                if (timingInputs.length > 0) {
+                    data.medications.push({
+                        name: input.value,
+                        dosage: formData.get(`${baseName}[dosage]`),
+                        meal_instructions: formData.get(`${baseName}[meal_instructions]`),
+                        timing: Array.from(timingInputs).map(i => i.value)
+                    });
+                }
+            });
+
+            // Collect test reports
+            const reportInputs = form.querySelectorAll('input[name^="test_reports["][name$="][report_name]"]');
+            reportInputs.forEach(input => {
+                const baseName = input.name.replace('[report_name]', '');
+                data.test_reports.push({
+                    report_name: input.value,
+                    report_notes: formData.get(`${baseName}[report_notes]`) || '',
+                    price: parseFloat(formData.get(`${baseName}[price]`))
+                });
+            });
+
+            // Validate at least one medication
+            if (data.medications.length === 0) {
+                alert('Please add at least one medication');
+                return;
+            }
+
+            // Submit to server
+            fetch('/doctor/add-generate-prescriptions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect_url || '/doctor/appointments';
+                    } else {
+                        alert(data.error || 'Failed to save prescription');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the prescription');
+                });
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Add this to your footerLink block or existing JavaScript
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize all rebook modals
+            document.querySelectorAll('[id^="rebookModal"]').forEach(modal => {
+                const appointmentId = modal.id.replace('rebookModal', '');
+                const dateInput = document.getElementById(`rebookDate${appointmentId}`);
+                const timeSlotSelect = document.getElementById(`rebookTimeSlot${appointmentId}`);
+
+                const doctorId = document.querySelector(`#rebookModal${appointmentId} input[name="doctor_id"]`).value;
+                dateInput.addEventListener('change', function () {
+                    const date = this.value;
+
+                    if (!date) {
+                        timeSlotSelect.innerHTML = '<option value="">Select a date first</option>';
+                        timeSlotSelect.disabled = true;
+                        return;
+                    }
+
+                    timeSlotSelect.innerHTML = '<option value="">Loading available slots...</option>';
+                    timeSlotSelect.disabled = true;
+
+                    fetch(`/admin/get-available-slots/${doctorId}/${date}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            timeSlotSelect.innerHTML = '';
+
+                            if (data.slots && data.slots.length > 0) {
+                                data.slots.forEach(slot => {
+                                    const option = document.createElement('option');
+                                    option.value = slot.start;
+                                    option.textContent = slot.display;
+                                    option.dataset.end = slot.end;
+                                    timeSlotSelect.appendChild(option);
+                                });
+                                timeSlotSelect.disabled = false;
+                            } else {
+                                const option = document.createElement('option');
+                                option.value = '';
+                                option.textContent = 'No available slots';
+                                timeSlotSelect.appendChild(option);
+                                timeSlotSelect.disabled = true;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading slots:', error);
+                            timeSlotSelect.innerHTML = '<option value="">Error loading slots</option>';
+                            timeSlotSelect.disabled = true;
+                        });
+                });
+
+                // Handle form submission
+                const form = document.getElementById(`rebookForm${appointmentId}`);
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    if (!form.checkValidity()) {
+                        form.classList.add('was-validated');
+                        return;
+                    }
+
+                    const formData = new FormData(form);
+                    const data = {
+                        date: formData.get('date'),
+                        time_slot: formData.get('time_slot'),
+                        reason: formData.get('reason')
+                    };
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.href = data.redirect_url || '/doctor/appointments';
+                            } else {
+                                alert(data.error || 'Failed to rebook appointment');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while rebooking');
+                        });
+                });
+            });
+        });
+
+        // Add this to your existing JavaScript
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize all forward modals
+            document.querySelectorAll('[id^="forwardModal"]').forEach(modal => {
+                const appointmentId = modal.id.replace('forwardModal', '');
+                const departmentSelect = document.getElementById(`departmentSelect${appointmentId}`);
+                const doctorSelect = document.getElementById(`doctorSelect${appointmentId}`);
+                const dateInput = document.getElementById(`forwardDate${appointmentId}`);
+                const timeSlotSelect = document.getElementById(`forwardTimeSlot${appointmentId}`);
+
+                // Load doctors when department is selected
+                departmentSelect.addEventListener('change', function () {
+                    const departmentId = this.value;
+
+                    if (!departmentId) {
+                        doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+                        doctorSelect.disabled = true;
+                        return;
+                    }
+
+                    doctorSelect.innerHTML = '<option value="">Loading doctors...</option>';
+
+                    fetch(`/admin/get-doctors/${departmentId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+
+                            if (data && data.length > 0) {
+                                data.forEach(doctor => {
+                                    console.log(doctor)
+                                    const option = document.createElement('option');
+                                    option.value = doctor.id;
+                                    option.textContent = `Dr. ${doctor.name} (${doctor.specialties})`;
+                                    doctorSelect.appendChild(option);
+                                });
+                                doctorSelect.disabled = false;
+                            } else {
+                                doctorSelect.innerHTML = '<option value="">No doctors available</option>';
+                                doctorSelect.disabled = true;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading doctors:', error);
+                            doctorSelect.innerHTML = '<option value="">Error loading doctors</option>';
+                            doctorSelect.disabled = true;
+                        });
+                });
+
+                // Load time slots when date is selected
+                dateInput.addEventListener('change', function () {
+                    const doctorId = doctorSelect.value;
+                    const date = this.value;
+
+                    if (!doctorId || !date) {
+                        timeSlotSelect.innerHTML = '<option value="">Select doctor and date first</option>';
+                        timeSlotSelect.disabled = true;
+                        return;
+                    }
+
+                    timeSlotSelect.innerHTML = '<option value="">Loading available slots...</option>';
+                    timeSlotSelect.disabled = true;
+
+                    fetch(`/admin/get-available-slots/${doctorId}/${date}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            timeSlotSelect.innerHTML = '';
+                            console.log(data)
+                            if (data.slots && data.slots.length > 0) {
+                                data.slots.forEach(slot => {
+                                    const option = document.createElement('option');
+                                    option.value = slot.start;
+                                    option.textContent = slot.display;
+                                    option.dataset.end = slot.end;
+                                    timeSlotSelect.appendChild(option);
+                                });
+                                timeSlotSelect.disabled = false;
+                            } else {
+                                const option = document.createElement('option');
+                                option.value = '';
+                                option.textContent = 'No available slots';
+                                timeSlotSelect.appendChild(option);
+                                timeSlotSelect.disabled = true;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading slots:', error);
+                            timeSlotSelect.innerHTML = '<option value="">Error loading slots</option>';
+                            timeSlotSelect.disabled = true;
+                        });
+                });
+
+                // Also load time slots when doctor changes
+                doctorSelect.addEventListener('change', function () {
+                    if (dateInput.value) {
+                        dateInput.dispatchEvent(new Event('change'));
+                    }
+                });
+
+                // Handle form submission
+                const form = document.getElementById(`forwardForm${appointmentId}`);
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    if (!form.checkValidity()) {
+                        form.classList.add('was-validated');
+                        return;
+                    }
+
+                    const formData = new FormData(form);
+                    const data = {
+                        forward_to_doctor_id: formData.get('forward_to_doctor_id'),
+                        date: formData.get('date'),
+                        time_slot: formData.get('time_slot'),
+                        reason: formData.get('reason')
+                    };
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.href = data.redirect_url || '/doctor/appointments';
+                            } else {
+                                alert(data.error || 'Failed to forward appointment');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while forwarding');
+                        });
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', initializePrescriptionModals);
+
+        function initializePrescriptionModals() {
+            document.querySelectorAll('[id^="viewPrescriptionModal"]').forEach(modal => {
+                modal.addEventListener('shown.bs.modal', function () {
+                    const prescriptionId = extractPrescriptionId(this.id);
+                    loadPrescriptionDetails(prescriptionId);
+                });
+            });
+        }
+
+        function extractPrescriptionId(modalId) {
+            return modalId.replace('viewPrescriptionModal', '');
+        }
+
+        async function loadPrescriptionDetails(prescriptionId) {
+            const contentDiv = document.getElementById(`prescriptionContent${prescriptionId}`);
+            showLoadingState(contentDiv);
+
+            try {
+                const response = await fetchPrescriptionData(prescriptionId);
+                if (!response.ok) throw new Error('Failed to load prescription');
+
+                const data = await response.json();
+                renderPrescriptionData(contentDiv, data);
+            } catch (error) {
+                showErrorState(contentDiv, error.message);
+            }
+        }
+
+        async function fetchPrescriptionData(prescriptionId) {
+            return await fetch(`/doctor/prescriptions/${prescriptionId}`);
+        }
+
+        function showLoadingState(container) {
+            container.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading prescription details...</p>
+        </div>
+    `;
+        }
+
+        function showErrorState(container, message) {
+            container.innerHTML = `
+        <div class="alert alert-danger">
+            <i class="ri-error-warning-line me-2"></i>
+            ${message}
+        </div>
+    `;
+        }
+
+        function renderPrescriptionData(container, data) {
+            const sections = [
+                createPatientInfoSection(data),
+                createMedicationsSection(data.medications),
+                createTestReportsSection(data.test_reports),
+                createNotesSection(data.notes)
+            ].filter(Boolean).join('');
+
+            container.innerHTML = `
+        <div class="prescription-details">
+            ${sections}
+        </div>
+    `;
+        }
+
+        function createPatientInfoSection(data) {
+            return `
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5><i class="ri-user-line me-2"></i>Patient Information</h5>
+                <p><strong>Name:</strong> ${data.patient_name || 'Not available'}</p>
+                <p><strong>Date of Birth:</strong> ${data.patient_dob || 'Not available'}</p>
+            </div>
+            <div class="col-md-6">
+                <h5><i class="ri-hospital-line me-2"></i>Clinic Information</h5>
+                <p><strong>Doctor:</strong> Dr. ${data.doctor_name || 'Not available'}</p>
+                <p><strong>Date:</strong> ${formatDate(data.created_at)}</p>
+            </div>
+        </div>
+    `;
+        }
+
+        function createMedicationsSection(medications) {
+            if (!Array.isArray(medications) || medications.length === 0) return '';
+
+            const medicationRows = medications.map(med => `
+        <tr>
+            <td>${med.name}</td>
+            <td>${med.dosage || '-'}</td>
+            <td>${med.meal_instructions || '-'}</td>
+            <td>${formatTiming(med.timing)}</td>
+        </tr>
+    `).join('');
+
+            return `
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5><i class="ri-medicine-bottle-line me-2"></i>Medications</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Medication</th>
+                                <th>Dosage</th>
+                                <th>Instructions</th>
+                                <th>Timing</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${medicationRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+        }
+
+        function createTestReportsSection(testReports) {
+            if (!Array.isArray(testReports) || testReports.length === 0) return '';
+
+            const reportRows = testReports.map(report => `
+        <tr>
+            <td>${report.report_name}</td>
+            <td>${report.report_notes || '-'}</td>
+            <td>$${formatPrice(report.price)}</td>
+            <td><span class="badge bg-${getStatusBadgeClass(report.status)}">${report.status}</span></td>
+        </tr>
+    `).join('');
+
+            return `
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5><i class="ri-file-text-line me-2"></i>Test Reports</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Test Name</th>
+                                <th>Notes</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${reportRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+        }
+
+        function createNotesSection(notes) {
+            if (!notes) return '';
+
+            return `
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5><i class="ri-file-text-line me-2"></i>Additional Notes</h5>
+            </div>
+            <div class="card-body">
+                <p>${notes}</p>
+            </div>
+        </div>
+    `;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Not available';
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        function formatTiming(timing) {
+            if (!Array.isArray(timing)) return '-';
+            return timing.join(', ') || '-';
+        }
+
+        function formatPrice(price) {
+            return parseFloat(price).toFixed(2);
+        }
+
+        function getStatusBadgeClass(status) {
+            return status === 'completed' ? 'success' : 'warning';
+        }
+
+        function printPrescription(modalId) {
+            const modalElement = document.getElementById(modalId);
+            const prescriptionDetails = modalElement?.querySelector('.prescription-details');
+            if (!prescriptionDetails) return;
+
+            const doctorName = extractDoctorName(prescriptionDetails);
+            const printContent = generatePrintContent(prescriptionDetails.outerHTML, doctorName);
+
+            openPrintWindow(printContent);
+        }
+
+        function extractDoctorName(prescriptionElement) {
+            const doctorNameElement = prescriptionElement.querySelector('.col-md-6 p strong');
+            return doctorNameElement?.textContent.replace('Doctor:', '').trim() || 'Doctor';
+        }
+
+        function generatePrintContent(content, doctorName) {
+            return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Prescription</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+            <style>
+                body { padding: 20px; }
+                .prescription-header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    border-bottom: 2px solid #333;
+                    padding-bottom: 15px;
+                }
+                table { width: 100%; }
+                th { background-color: #f8f9fa; }
+                .signature-area {
+                    margin-top: 50px;
+                    text-align: right;
+                }
+                @media print {
+                    body { font-size: 12px; }
+                    .no-print { display: none !important; }
+                }
+            </style>
+        </head>
+        <body>
+            ${content}
+            <div class="signature-area">
+                <p>_________________________</p>
+                <p>Dr. ${doctorName}</p>
+            </div>
+        </body>
+        </html>
+    `;
+        }
+
+        function openPrintWindow(content) {
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write(content);
+            printWindow.document.close();
+            printWindow.focus();
+
+            // Delay print to ensure content is loaded
+            setTimeout(() => {
+                printWindow.print();
+                setTimeout(() => printWindow.close(), 1000);
+            }, 500);
+        }
+    </script>
+
+
+{% endblock %}
+
+{% block heardLink %}
+    <style>
+        .autocomplete-results {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            z-index: 1000;
+            width: calc(100% - 30px);
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .remove-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+    </style>
+{% endblock %}

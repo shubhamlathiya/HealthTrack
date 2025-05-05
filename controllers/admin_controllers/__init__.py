@@ -7,11 +7,11 @@ admin = Blueprint(ADMIN, __name__)
 
 from controllers.admin_controllers.department.department_routes import *
 from .dashboard_routes import *
-from .resources_routes import *
-from .leave_management_routes import *
-from .search_routes import *
-from .patient_routes import *
 from controllers.admin_controllers.operations.operation_routes import *
+
+# appointment
+from controllers.admin_controllers.appointment.appointment import *
+from controllers.admin_controllers.appointment.treatment import *
 
 # Staff
 from controllers.admin_controllers.staff.staff_routes import *
@@ -20,7 +20,7 @@ from controllers.admin_controllers.staff.staff_routes import *
 from controllers.admin_controllers.room.rooom_routes import *
 from controllers.admin_controllers.room.bad_routes import *
 
-from .ambulance_routes import *
+from controllers.admin_controllers.ambulance.ambulance_routes import *
 from controllers.admin_controllers.human_resources.human_resources_routes import *
 from controllers.admin_controllers.accounts.accounts_routes import *
 
@@ -55,18 +55,21 @@ from controllers.admin_controllers.doctor.doctor_routes import *
 
 @admin.route(GET_PATIENT + '/<patient_id>', methods=['GET'])
 def get_patient(patient_id):
-    patient = Patient.query.filter_by(patient_id=patient_id).first()  # <-- fixed here
+    try:
+        patient = Patient.query.filter_by(patient_id=patient_id, is_deleted=False).first()  # <-- fixed here
 
-    if not patient:
-        return jsonify({'error': 'Patient not found'}), 404
+        if not patient:
+            return jsonify({'error': 'Patient not found'}), 404
 
-    return jsonify({
-        'id': patient.id,
-        'name': patient.first_name,
-        'first_name': patient.first_name,
-        'last_name': patient.last_name,
-        'email': patient.user.email,  # If this is really email, fix the field name
-        'phone': patient.phone,
-        'gender': patient.gender,
-        'age': patient.age
-    }), 200
+        return jsonify({
+            'id': patient.id,
+            'name': patient.first_name,
+            'first_name': patient.first_name,
+            'last_name': patient.last_name,
+            'email': patient.user.email,  # If this is really email, fix the field name
+            'phone': patient.phone,
+            'gender': patient.gender,
+            'age': patient.age
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
