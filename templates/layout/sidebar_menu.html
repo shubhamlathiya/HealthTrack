@@ -203,29 +203,19 @@
                     </a>
                     <ul class="treeview-menu">
                         <li>
+                            <a href="/admin/ambulance/driver-list"
+                               class="{% if request.path == '/admin/ambulance/driver-list' %}active-sub{% endif %}">Driver
+                                List</a>
+                        </li>
+                        <li>
                             <a href="/admin/ambulance/ambulance-list"
                                class="{% if request.path == '/admin/ambulance/ambulance-list' %}active-sub{% endif %}">Ambulance
                                 List</a>
                         </li>
                         <li>
-                            <a href="/admin/ambulance/add-ambulance"
-                               class="{% if request.path == '/admin/ambulance/add-ambulance' %}active-sub{% endif %}">Add
-                                Ambulance</a>
-                        </li>
-                        <li>
                             <a href="/admin/ambulance/ambulance-call-list"
                                class="{% if request.path == '/admin/ambulance/ambulance-call-list' %}active-sub{% endif %}">Ambulance
                                 Call List</a>
-                        </li>
-                        <li>
-                            <a href="/admin/ambulance/add-driver"
-                               class="{% if request.path == '/admin/ambulance/add-driver' %}active-sub{% endif %}">Add
-                                Driver</a>
-                        </li>
-                        <li>
-                            <a href="/admin/ambulance/driver-list"
-                               class="{% if request.path == '/admin/ambulance/driver-list' %}active-sub{% endif %}">Driver
-                                List</a>
                         </li>
                     </ul>
                 </li>

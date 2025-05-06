@@ -1,267 +1,570 @@
 {% extends 'base.html' %}
 
-{% block title %}Ambulance Call{% endblock title %}
-{% block page %}Ambulance Call{% endblock page %}
-{% block body %}
+{% block title %}Ambulance Call Management{% endblock title %}
+{% block page %}Ambulance Call Management{% endblock page %}
 
-    <!-- Row starts -->
+{% block body %}
     <div class="row gx-4">
         <div class="col-sm-12">
             <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Ambulance Call Records</h5>
+                    <div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#addCallModal">
+                            <i class="ri-add-line me-1"></i> New Call
+                        </button>
+                        <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal"
+                                data-bs-target="#restoreCallsModal">
+                            <i class="ri-refresh-line me-1"></i> Restore Deleted
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
 
-                    <!-- Table starts -->
                     <div class="table-responsive">
-                        <table id="basicExample" class="table m-0 align-middle">
-                            <thead>
+                        <table id="callTable" class="table m-0 align-middle">
+                            <thead class="table-light">
                             <tr>
-                                <th>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="checkAll">
-                                    </div>
-                                </th>
-                                <th>Case No.</th>
-                                <th>Patient Name</th>
-                                <th>Gender</th>
-                                <th>Age</th>
-                                <th>Date & Time</th>
-                                <th>Location</th>
-                                <th>Driver ID</th>
-                                <th>Vehicle No</th>
+                                <th>Call No.</th>
+                                <th>Patient</th>
+                                <th>Pickup Location</th>
+                                <th>Destination</th>
+                                <th>Call Time</th>
+                                <th>Ambulance</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
+                            {% for call in calls %}
                             <tr>
+                                <td>{{ call.call_number }}</td>
                                 <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check1">
-                                    </div>
+                                    {{ call.patient_name }}<br>
+                                    <small>{{ call.patient_age }} yrs, {{ call.patient_gender }}</small>
                                 </td>
-                                <td>#89990</td>
-                                <td>Deena Cooley</td>
+                                <td>{{ call.pickup_location }}</td>
+                                <td>{{ call.destination or 'N/A' }}</td>
+                                <td>{{ call.call_time.strftime('%Y-%m-%d %H:%M') }}</td>
                                 <td>
-                                    <span class="badge bg-warning-subtle text-warning">Female</span>
+                                    {% if call.ambulance %}
+                                        {{ call.ambulance.vehicle_number }}<br>
+                                        <small>{{ call.ambulance.vehicle_name }}</small>
+                                    {% else %}
+                                        <span class="text-muted">Not assigned</span>
+                                    {% endif %}
                                 </td>
-                                <td>35</td>
-                                <td>24/06/2024 - 2:30PM</td>
-                                <td>Glucksman</td>
-                                <td>DRV-24</td>
-                                <td>AMB-67CG</td>
                                 <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-primary">Paid</span>
+                                    {% if call.status == 'Pending' %}
+                                        <span class="badge bg-secondary">Pending</span>
+                                    {% elif call.status == 'Dispatched' %}
+                                        <span class="badge bg-primary">Dispatched</span>
+                                    {% elif call.status == 'In Progress' %}
+                                        <span class="badge bg-warning">In Progress</span>
+                                    {% elif call.status == 'Completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% elif call.status == 'Cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#viewCallModal{{ call.id }}">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#editCallModal{{ call.id }}">
+                                            <i class="ri-edit-box-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#deleteCallModal{{ call.id }}">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#updateStatusModal{{ call.id }}">
+                                            <i class="ri-refresh-line"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check2">
-                                    </div>
-                                </td>
-                                <td>#89991</td>
-                                <td>Cara Fowler</td>
-                                <td>
-                                    <span class="badge bg-warning-subtle text-warning">Female</span>
-                                </td>
-                                <td>56</td>
-                                <td>24/06/2024 - 2:32PM</td>
-                                <td>Kaufman</td>
-                                <td>DRV-31</td>
-                                <td>AMB-334X</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-primary">Paid</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check3">
-                                    </div>
-                                </td>
-                                <td>#89992</td>
-                                <td>Helene Stone</td>
-                                <td>
-                                    <span class="badge bg-info-subtle text-info">Male</span>
-                                </td>
-                                <td>67</td>
-                                <td>24/06/2024 - 2:35PM</td>
-                                <td>Palladium</td>
-                                <td>DRV-42</td>
-                                <td>AMB-BV56</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-info">Free</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check4">
-                                    </div>
-                                </td>
-                                <td>#89995</td>
-                                <td>Royce Joseph</td>
-                                <td>
-                                    <span class="badge bg-warning-subtle text-warning">Female</span>
-                                </td>
-                                <td>35</td>
-                                <td>24/06/2024 - 2:40PM</td>
-                                <td>Rufus</td>
-                                <td>DRV-39</td>
-                                <td>AMB-YT50</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-primary">Paid</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check5">
-                                    </div>
-                                </td>
-                                <td>#89996</td>
-                                <td>Betty Knapp</td>
-                                <td>
-                                    <span class="badge bg-info-subtle text-info">Male</span>
-                                </td>
-                                <td>22</td>
-                                <td>24/06/2024 - 2:48PM</td>
-                                <td>Tikvah</td>
-                                <td>DRV-10</td>
-                                <td>AMB-MN68</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-primary">Paid</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check6">
-                                    </div>
-                                </td>
-                                <td>#89996</td>
-                                <td>Ingrid Andersen</td>
-                                <td>
-                                    <span class="badge bg-warning-subtle text-warning">Female</span>
-                                </td>
-                                <td>95</td>
-                                <td>24/06/2024 - 2:51PM</td>
-                                <td>Weinstein</td>
-                                <td>DRV-24</td>
-                                <td>AMB-67CG</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-info">Free</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check7">
-                                    </div>
-                                </td>
-                                <td>#89998</td>
-                                <td>Alfreda Crosby</td>
-                                <td>
-                                    <span class="badge bg-warning-subtle text-warning">Female</span>
-                                </td>
-                                <td>49</td>
-                                <td>24/06/2024 - 2:58PM</td>
-                                <td>Lafayette</td>
-                                <td>DRV-08</td>
-                                <td>AMB-CDG5</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-primary">Paid</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check8">
-                                    </div>
-                                </td>
-                                <td>#89999</td>
-                                <td>Whitney Riley</td>
-                                <td>
-                                    <span class="badge bg-info-subtle text-info">Male</span>
-                                </td>
-                                <td>75</td>
-                                <td>24/06/2024 - 3:31PM</td>
-                                <td>Kevorkian</td>
-                                <td>DRV-03</td>
-                                <td>AMB-MRS5</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-primary">Paid</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check9">
-                                    </div>
-                                </td>
-                                <td>#89978</td>
-                                <td>Nadia Pierce</td>
-                                <td>
-                                    <span class="badge bg-info-subtle text-info">Male</span>
-                                </td>
-                                <td>86</td>
-                                <td>24/06/2024 - 3:47PM</td>
-                                <td>Steinhardt</td>
-                                <td>DRV-33</td>
-                                <td>AMB-VC83</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-primary">Paid</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input" type="checkbox" value="" id="check10">
-                                    </div>
-                                </td>
-                                <td>#89934</td>
-                                <td>Elvis Morales</td>
-                                <td>
-                                    <span class="badge bg-info-subtle text-info">Male</span>
-                                </td>
-                                <td>86</td>
-                                <td>24/06/2024 - 3:52PM</td>
-                                <td>Kimmel</td>
-                                <td>DRV-17</td>
-                                <td>AMB-67DG</td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-secondary text-body">Cancelled</span>
-                                    </div>
-                                </td>
-                            </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <!-- Table ends -->
-
                 </div>
             </div>
         </div>
     </div>
-    <!-- Row ends -->
 
-{% endblock body %}
+    <!-- Add Call Modal -->
+    <div class="modal fade" id="addCallModal" tabindex="-1" aria-labelledby="addCallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addCallModalLabel">
+                        <i class="ri-add-line me-2"></i>New Ambulance Call
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + AMBULANCE_AMBULANCE_ADD_CALL }}">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Call Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="call_number" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Call Time <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control" name="call_time" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Patient Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="patient_name" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Patient Age <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="patient_age" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Patient Gender <span class="text-danger">*</span></label>
+                                <select class="form-select" name="patient_gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Pickup Location <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="pickup_location" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Destination</label>
+                                <input type="text" class="form-control" name="destination">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ambulance</label>
+                                <select class="form-select" name="ambulance_id">
+                                    <option value="">Select Ambulance</option>
+                                    {% for ambulance in ambulances %}
+                                        <option value="{{ ambulance.id }}">{{ ambulance.vehicle_number }}
+                                            ({{ ambulance.vehicle_name }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" required>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Dispatched">Dispatched</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Call
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
+
+    <!-- Modals for each call -->
+    {% for call in calls %}
+        <!-- View Call Modal -->
+        <div class="modal fade" id="viewCallModal{{ call.id }}" tabindex="-1"
+             aria-labelledby="viewCallModalLabel{{ call.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewCallModalLabel{{ call.id }}">
+                            <i class="ri-information-line me-2"></i>Call Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Call Number:</strong> {{ call.call_number }}</p>
+                                        <p><strong>Call Time:</strong> {{ call.call_time.strftime('%Y-%m-%d %H:%M') }}
+                                        </p>
+                                        <p><strong>Patient:</strong> {{ call.patient_name }}</p>
+                                        <p><strong>Age/Gender:</strong> {{ call.patient_age }}
+                                            yrs, {{ call.patient_gender }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Pickup Location:</strong> {{ call.pickup_location }}</p>
+                                        <p><strong>Destination:</strong> {{ call.destination or 'N/A' }}</p>
+                                        <p><strong>Ambulance:</strong>
+                                            {% if call.ambulance %}
+                                                {{ call.ambulance.vehicle_number }} ({{ call.ambulance.vehicle_name }})
+                                            {% else %}
+                                                <span class="text-muted">Not assigned</span>
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Status:</strong>
+                                            {% if call.status == 'Pending' %}
+                                                <span class="badge bg-secondary">Pending</span>
+                                            {% elif call.status == 'Dispatched' %}
+                                                <span class="badge bg-primary">Dispatched</span>
+                                            {% elif call.status == 'In Progress' %}
+                                                <span class="badge bg-warning">In Progress</span>
+                                            {% elif call.status == 'Completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif call.status == 'Cancelled' %}
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <p><strong>Notes:</strong> {{ call.notes or 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Call Modal -->
+        <div class="modal fade" id="editCallModal{{ call.id }}" tabindex="-1"
+             aria-labelledby="editCallModalLabel{{ call.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="editCallModalLabel{{ call.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Call
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + AMBULANCE_AMBULANCE_EDIT_CALL }}/{{ call.id }}">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Call Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="call_number"
+                                           value="{{ call.call_number }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Call Time <span class="text-danger">*</span></label>
+                                    <input type="datetime-local" class="form-control" name="call_time"
+                                           value="{{ call.call_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Patient Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="patient_name"
+                                           value="{{ call.patient_name }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Patient Age <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="patient_age"
+                                           value="{{ call.patient_age }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Patient Gender <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="patient_gender" required>
+                                        <option value="Male" {% if call.patient_gender == 'Male' %}selected{% endif %}>
+                                            Male
+                                        </option>
+                                        <option value="Female"
+                                                {% if call.patient_gender == 'Female' %}selected{% endif %}>Female
+                                        </option>
+                                        <option value="Other"
+                                                {% if call.patient_gender == 'Other' %}selected{% endif %}>Other
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Pickup Location <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="pickup_location"
+                                           value="{{ call.pickup_location }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Destination</label>
+                                    <input type="text" class="form-control" name="destination"
+                                           value="{{ call.destination or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Ambulance</label>
+                                    <select class="form-select" name="ambulance_id">
+                                        <option value="">Select Ambulance</option>
+                                        {% for ambulance in ambulances %}
+                                            <option value="{{ ambulance.id }}"
+                                                    {% if call.ambulance and call.ambulance.id == ambulance.id %}selected{% endif %}>
+                                                {{ ambulance.vehicle_number }} ({{ ambulance.vehicle_name }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="status" required>
+                                        <option value="Pending" {% if call.status == 'Pending' %}selected{% endif %}>
+                                            Pending
+                                        </option>
+                                        <option value="Dispatched"
+                                                {% if call.status == 'Dispatched' %}selected{% endif %}>Dispatched
+                                        </option>
+                                        <option value="In Progress"
+                                                {% if call.status == 'In Progress' %}selected{% endif %}>In Progress
+                                        </option>
+                                        <option value="Completed"
+                                                {% if call.status == 'Completed' %}selected{% endif %}>Completed
+                                        </option>
+                                        <option value="Cancelled"
+                                                {% if call.status == 'Cancelled' %}selected{% endif %}>Cancelled
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" name="notes"
+                                              rows="2">{{ call.notes or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-save-line me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Status Modal -->
+        <div class="modal fade" id="updateStatusModal{{ call.id }}" tabindex="-1"
+             aria-labelledby="updateStatusModalLabel{{ call.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="updateStatusModalLabel{{ call.id }}">
+                            <i class="ri-refresh-line me-2"></i>Update Call Status
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + AMBULANCE_AMBULANCE_UPDATE_STATUS_CALL }}/{{ call.id }}">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Current Status</label>
+                                <input type="text" class="form-control" value="{{ call.status }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">New Status <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" required>
+                                    <option value="Pending" {% if call.status == 'Pending' %}selected{% endif %}>
+                                        Pending
+                                    </option>
+                                    <option value="Dispatched" {% if call.status == 'Dispatched' %}selected{% endif %}>
+                                        Dispatched
+                                    </option>
+                                    <option value="In Progress"
+                                            {% if call.status == 'In Progress' %}selected{% endif %}>In Progress
+                                    </option>
+                                    <option value="Completed" {% if call.status == 'Completed' %}selected{% endif %}>
+                                        Completed
+                                    </option>
+                                    <option value="Cancelled" {% if call.status == 'Cancelled' %}selected{% endif %}>
+                                        Cancelled
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Status Notes</label>
+                                <textarea class="form-control" name="status_notes" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="ri-save-line me-1"></i> Update Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Call Modal -->
+        <div class="modal fade" id="deleteCallModal{{ call.id }}" tabindex="-1"
+             aria-labelledby="deleteCallModalLabel{{ call.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteCallModalLabel{{ call.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this call record?</p>
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i>
+                            This action will mark the call as deleted but can be restored later.
+                        </div>
+                        <p><strong>Call Number:</strong> {{ call.call_number }}</p>
+                        <p><strong>Patient:</strong> {{ call.patient_name }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN + AMBULANCE_AMBULANCE_DELETE_CALL }}/{{ call.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-delete-bin-line me-1"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Calls Modal -->
+    <div class="modal fade" id="restoreCallsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Deleted Calls
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_calls %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Call No.</th>
+                                    <th>Patient</th>
+                                    <th>Call Time</th>
+                                    <th>Status</th>
+                                    <th>Deleted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for call in deleted_calls %}
+                                    <tr>
+                                        <td>{{ call.call_number }}</td>
+                                        <td>{{ call.patient_name }}</td>
+                                        <td>{{ call.call_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            {% if call.status == 'Pending' %}
+                                                <span class="badge bg-secondary">Pending</span>
+                                            {% elif call.status == 'Dispatched' %}
+                                                <span class="badge bg-primary">Dispatched</span>
+                                            {% elif call.status == 'In Progress' %}
+                                                <span class="badge bg-warning">In Progress</span>
+                                            {% elif call.status == 'Completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif call.status == 'Cancelled' %}
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ call.deleted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="text-end">
+                                            <form method="POST"
+                                                  action="{{ ADMIN + AMBULANCE_AMBULANCE_RESTORE_CALL }}/{{ call.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No deleted calls found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block heardLink %}
+    <!-- Data Tables CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables JS -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Enable tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+        $('#callTable').DataTable({
+            order: [[4, 'desc']] // Sort by call time descending by default
+        });
+    </script>
+{% endblock %}

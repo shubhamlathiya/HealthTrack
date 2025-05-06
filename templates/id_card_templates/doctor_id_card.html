@@ -141,6 +141,16 @@
             margin-top: 10px;
         }
 
+        .specialty {
+            background-color: #e6f2ff;
+            color: #005b96;
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
         .hospital-logo {
             height: 50px;
             margin: 10px auto;
@@ -162,17 +172,17 @@
     </div>
 
     <div class="user-info">
-        <div class="name">LATHIYA SHUBHAM</div>
-        <div class="position">Medical IT Specialist</div>
-
+        <div class="name">Dr. {{ doctors.first_name }} {{ doctors.last_name }}</div>
+        <div class="position">{{ doctors.department_assignments[0].experience_level }}</div>
+        <div class="specialty">{{ doctors.department_assignments[0].specialty }}</div>
         <div class="details">
             <div class="detail-row">
                 <span class="detail-label">Department:</span>
-                <span class="detail-value">Medical Informatics</span>
+                <span class="detail-value">{{ doctors.department_assignments[0].department.name }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Employee ID:</span>
-                <span class="detail-value">HSCA24801030058</span>
+                <span class="detail-value">{{ doctors.id }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Valid Until:</span>
@@ -180,20 +190,21 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Blood Group:</span>
-                <span class="detail-value">O+</span>
+                <span class="detail-value">{{ doctors.blood_group }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Emergency Contact:</span>
-                <span class="detail-value">+91 9876543210</span>
+                <span class="detail-value">{{ doctors.phone }}</span>
             </div>
         </div>
 
-        <div class="barcode"></div>
-        <div class="id-number">HSCA24801030058</div>
+        <div class="barcode"><img src="data:image/png;base64,{{ barcode_base64 }}" alt="Doctor Barcode" width="250"
+                                  height="50"/>
+        </div>
+        <div class="id-number">{{ doctors.id }}</div>
     </div>
 
     <div class="footer">
-        <img src="https://pcu.edu.in/wp-content/uploads/2022/03/PCU-Logo.png" alt="Hospital Logo" class="hospital-logo">
         <div>This ID must be displayed at all times while on duty</div>
         <div>Website: https://hospital.pcu.edu.in/</div>
     </div>

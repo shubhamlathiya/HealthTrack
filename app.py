@@ -8,6 +8,7 @@ from flask_socketio import SocketIO
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
 from controllers.doctor_controllers import doctors
+from controllers.every_one_controllers import idCard
 from controllers.laboratory_controllers import laboratory
 from controllers.patients_controllers import patients
 from utils.config import init_app, db
@@ -40,6 +41,8 @@ app.register_blueprint(chat, url_prefix='/chat')
 app.register_blueprint(patients, url_prefix='/patient')
 app.register_blueprint(doctors, url_prefix='/doctor')
 app.register_blueprint(laboratory , url_prefix='/laboratory')
+
+app.register_blueprint(idCard, url_prefix='/id-card')
 
 with app.app_context():
     db.create_all()

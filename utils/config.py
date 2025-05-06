@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 
 def init_app(app):
-    """Initialize the Flask app with MySQL and SQLAlchemy."""
+    """Initialize the Flask app with MySQL and SQLAlchemy. healthtrack_demo"""
     app.config[
         'SQLALCHEMY_DATABASE_URI'] = 'mysql://root:admin@localhost/healthtrack'  # Replace with your MySQL credentials and DB name
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable tracking modifications to avoid overhead

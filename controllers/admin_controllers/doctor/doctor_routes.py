@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+import random
 
 from flask import render_template, request, jsonify, redirect, flash
 from werkzeug.security import generate_password_hash
@@ -72,9 +74,21 @@ def register_doctor(current_user):
         db.session.add(new_user)
         db.session.commit()
 
+        current_date = datetime.utcnow()
+        year = current_date.year
+        month = f"{current_date.month:02d}"
+        day = f"{current_date.day:02d}"
+
+        # Generate random 2-digit number for uniqueness
+        random_digits = random.randint(10, 99)
+
+        # Create a unique user ID in the format of YYYYMMDDXX
+        new_doctor_id = f"{year}{month}{day}{random_digits}"
+
         # 2. Create Doctor without profile_picture for now
         new_doctor = Doctor(
             user_id=new_user.id,
+            doctor_id=new_doctor_id,
             first_name=data.get('a1'),
             last_name=data.get('a2'),
             age=data.get('a3'),

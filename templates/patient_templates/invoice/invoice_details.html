@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice Details{% endblock title %}
+{% block page %}Invoice Details{% endblock page %}
+{% block body %}
+
+    <!-- Row start -->
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Row start -->
+                    <div class="row">
+                        <div class="col-xxl-3 col-sm-3 col-12">
+                            <img src="../../../static/assets/images/logo.svg" alt="Hospital Logo"
+                                 class="img-fluid">
+                        </div>
+                        <div class="col-sm-9 col-12">
+                            <div class="text-end">
+                                <p class="mb-2">
+                                    Invoice - <span class="text-danger">#{{ payment.id }}</span>
+                                </p>
+                                <p class="mb-2">{{ payment.created_at.strftime('%B %d, %Y') }}</p>
+                                <span class="badge bg-{% if payment.status == 'paid' %}success{% elif payment.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                    {{ payment.status|capitalize }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-5"></div>
+                    </div>
+                    <!-- Row end -->
+
+                    <!-- Row start -->
+                    <div class="row justify-content-between">
+                        <div class="col-lg-6 col-12">
+                            <h6 class="fw-semibold">Billed To :</h6>
+                            <p class="m-0">
+                                {{ patient.full_name }},<br>
+                                {% if patient.address %}{{ patient.address }},<br>{% endif %}
+                                {% if patient.city %}{{ patient.city }}, {% endif %}
+                                {% if patient.state %}{{ patient.state }}, {% endif %}
+                                {% if patient.zip_code %}{{ patient.zip_code }}{% endif %}
+                            </p>
+                        </div>
+                        <div class="col-lg-6 col-12">
+                            <div class="text-end">
+                                <h6 class="fw-semibold">Hospital Address :</h6>
+                                <p class="text-end m-0">
+                                    Your Hospital Name,<br>
+                                    123 Hospital Street,<br>
+                                    City, State, ZIP Code
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3"></div>
+                    </div>
+                    <!-- Row end -->
+
+                    <!-- Row start -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if room_charge %}
+                                        <tr>
+                                            <td>
+                                                <h6>Room Charges</h6>
+                                                <p>
+                                                    Room type: {{ room_charge.room_type }}<br>
+                                                    Duration: {{ room_charge.duration_days }} days
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <h6>Accommodation</h6>
+                                            </td>
+                                            <td>
+                                                <h6>${{ "%.2f"|format(room_charge.amount) }}</h6>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td>
+                                            <h6>Medical Services</h6>
+                                            <p>
+                                                Various medical services and treatments
+                                            </p>
+                                        </td>
+                                        <td>
+                                            <h6>Services</h6>
+                                        </td>
+                                        <td>
+                                            <h6>
+                                                ${{ "%.2f"|format(payment.amount - (room_charge.amount if room_charge else 0)) }}</h6>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">&nbsp;</td>
+                                        <td>
+                                            <p>Subtotal</p>
+                                            <p>Tax</p>
+                                            <h5 class="mt-4 text-primary">Total USD</h5>
+                                        </td>
+                                        <td>
+                                            <p>${{ "%.2f"|format(payment.amount) }}</p>
+                                            <p>$0.00</p>
+                                            <h5 class="mt-4 text-primary">${{ "%.2f"|format(payment.amount) }}</h5>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <h6 class="text-danger">NOTES</h6>
+                                            <p class="small m-0">
+                                                {% if payment.remarks %}
+                                                    {{ payment.remarks }}
+                                                {% else %}
+                                                    Please make payment by the due date. For any questions regarding
+                                                    this invoice, please contact our billing department.
+                                                {% endif %}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Row end -->
+
+                    <!-- Row start -->
+                    <div class="row">
+                        <div class="col-sm-12 col-12">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button class="btn btn-outline-secondary">
+                                    Download
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="window.print()">
+                                    Print
+                                </button>
+                                {% if payment.status != 'paid' %}
+                                    <a href="{{ payment.id }}"
+                                       class="btn btn-primary">
+                                        Pay Now
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Row end -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row end -->
+
+{% endblock body %}

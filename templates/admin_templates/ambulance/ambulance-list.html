@@ -1,278 +1,505 @@
 {% extends 'base.html' %}
 
-{% block title %}Ambulance List{% endblock title %}
-{% block page %}Ambulance List{% endblock page %}
+{% block title %}Ambulance Management{% endblock title %}
+{% block page %}Ambulance Management{% endblock page %}
 
 {% block body %}
-
-    <!-- Row starts -->
     <div class="row gx-4">
         <div class="col-sm-12">
             <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Ambulance List</h5>
+                    <div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#addAmbulanceModal">
+                            <i class="ri-add-line me-1"></i> Add Ambulance
+                        </button>
+                        <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal"
+                                data-bs-target="#restoreAmbulancesModal">
+                            <i class="ri-refresh-line me-1"></i> Restore Deleted
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
 
-                    <!-- Table starts -->
                     <div class="table-responsive">
                         <table id="basicExample" class="table m-0 align-middle">
-                            <thead>
+                            <thead class="table-light">
                             <tr>
                                 <th>Vehicle No</th>
                                 <th>Vehicle Name</th>
+                                <th>Type</th>
                                 <th>Year</th>
+                                <th>Rates</th>
                                 <th>Driver</th>
-                                <th>Driver License</th>
-                                <th>Driver Contact</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td>AMB-675G</td>
-                                <td>Toyota Hiace</td>
-                                <td>2018</td>
-                                <td>Corinne Osborn</td>
-                                <td>LI-67654</td>
-                                <td>0987654321</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-439M</td>
-                                <td>AEV Traumahawk</td>
-                                <td>2015</td>
-                                <td>Corinne Osborn</td>
-                                <td>LI-54543</td>
-                                <td>0432198765</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-629H</td>
-                                <td>Chevrolet C-4500</td>
-                                <td>2022</td>
-                                <td>Richie Tucker</td>
-                                <td>LI-34890</td>
-                                <td>0436521987</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-398M</td>
-                                <td>Ford Type I AEV X-Series</td>
-                                <td>2014</td>
-                                <td>Kendra Perez</td>
-                                <td>LI-76D9</td>
-                                <td>0436527190</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-BX58</td>
-                                <td>AEV Traumahawk</td>
-                                <td>2017</td>
-                                <td>Isidro Mooney</td>
-                                <td>LI-8963G</td>
-                                <td>0419873652</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-GH69</td>
-                                <td>Toyota Hiace</td>
-                                <td>2020</td>
-                                <td>Corinne Osborn</td>
-                                <td>LI-56490</td>
-                                <td>0954321876</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-39MK</td>
-                                <td>AEV Traumahawk</td>
-                                <td>2021</td>
-                                <td>Ellen Martin</td>
-                                <td>LI-65908</td>
-                                <td>0476532198</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-BG82</td>
-                                <td>Chevrolet C-4500</td>
-                                <td>2016</td>
-                                <td>Hester Harper</td>
-                                <td>LI-22390</td>
-                                <td>0421987365</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-663S</td>
-                                <td>Ford Type I AEV X-Series</td>
-                                <td>2013</td>
-                                <td>Suzette Bond</td>
-                                <td>LI-GH36</td>
-                                <td>0437190652</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AMB-368Q</td>
-                                <td>AEV Traumahawk</td>
-                                <td>2017</td>
-                                <td>Vince Stewart</td>
-                                <td>LI-2980U</td>
-                                <td>0473652198</td>
-                                <td>
-                                    <div class="d-inline-flex gap-1">
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#delRow">
-                                            <i class="ri-delete-bin-line"></i>
-                                        </button>
-                                        <a href="edit-ambulance.html" class="btn btn-outline-success btn-sm"
-                                           data-bs-toggle="tooltip" data-bs-placement="top"
-                                           data-bs-title="Edit Ambulance Details">
-                                            <i class="ri-edit-box-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
+                            {% for ambulance in ambulances %}
+                                <tr>
+                                    <td>{{ ambulance.vehicle_number }}</td>
+                                    <td>{{ ambulance.vehicle_name }}</td>
+                                    <td>{{ ambulance.vehicle_type }}</td>
+                                    <td>{{ ambulance.year_made }}</td>
+                                    <td>
+                                        <small>Base: ₹{{ ambulance.base_rate }}</small><br>
+                                        <small>Per KM: ₹{{ ambulance.per_km_rate }}</small>
+                                    </td>
+                                    <td>
+                                        {% if ambulance.driver %}
+                                            {{ ambulance.driver.name }}<br>
+                                            <small>{{ ambulance.driver.contact }}</small>
+                                        {% else %}
+                                            <span class="text-muted">Not assigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if ambulance.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                        <br>
+                                        {% if ambulance.is_available %}
+                                            <span class="badge bg-info">Available</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">On Duty</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#viewAmbulanceModal{{ ambulance.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#editAmbulanceModal{{ ambulance.id }}">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteAmbulanceModal{{ ambulance.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <form method="POST"
+                                                  action="{{ ADMIN + AMBULANCE_TOGGLE_STATUS_AMBULANCE }}/{{ ambulance.id }}">
+                                                <button type="submit"
+                                                        class="btn btn-sm {% if ambulance.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                                    {% if ambulance.is_active %}
+                                                        <i class="ri-close-circle-line"></i>
+                                                    {% else %}
+                                                        <i class="ri-checkbox-circle-line"></i>
+                                                    {% endif %}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <!-- Table ends -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Modal Delete Row -->
-                    <div class="modal fade" id="delRow" tabindex="-1" aria-labelledby="delRowLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-sm">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="delRowLabel">
-                                        Are you sure?
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
+    <!-- Add Ambulance Modal -->
+    <div class="modal fade" id="addAmbulanceModal" tabindex="-1" aria-labelledby="addAmbulanceModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addAmbulanceModalLabel">
+                        <i class="ri-add-line me-2"></i>Add New Ambulance
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + AMBULANCE_ADD_AMBULANCE }}">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Vehicle Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="vehicle_number" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Vehicle Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="vehicle_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Vehicle Type <span class="text-danger">*</span></label>
+                                <select class="form-select" name="vehicle_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Basic">Basic Ambulance</option>
+                                    <option value="Advanced">Advanced Ambulance</option>
+                                    <option value="Mobile ICU">Mobile ICU</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Year Made <span class="text-danger">*</span></label>
+                                <select class="form-select" name="year_made" required>
+                                    <option value="">Select Year</option>
+                                    {% for year in range(current_year, current_year-20, -1) %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Base Rate (₹) <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control" name="base_rate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Per KM Rate (₹) <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control" name="per_km_rate" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Assign Driver</label>
+                                <select class="form-select" name="driver_id">
+                                    <option value="">Select Driver</option>
+                                    {% for driver in drivers %}
+                                        <option value="{{ driver.id }}">{{ driver.name }}
+                                            ({{ driver.license_number }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
+                                           checked>
+                                    <label class="form-check-label" for="is_active">Active</label>
                                 </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete this row?
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_available"
+                                           id="is_available" checked>
+                                    <label class="form-check-label" for="is_available">Available</label>
                                 </div>
-                                <div class="modal-footer">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
-                                            No
-                                        </button>
-                                        <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Yes
-                                        </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Ambulance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modals for each ambulance -->
+    {% for ambulance in ambulances %}
+        <!-- View Ambulance Modal -->
+        <div class="modal fade" id="viewAmbulanceModal{{ ambulance.id }}" tabindex="-1"
+             aria-labelledby="viewAmbulanceModalLabel{{ ambulance.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewAmbulanceModalLabel{{ ambulance.id }}">
+                            <i class="ri-information-line me-2"></i>Ambulance Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Vehicle Number:</strong> {{ ambulance.vehicle_number }}</p>
+                                        <p><strong>Vehicle Name:</strong> {{ ambulance.vehicle_name }}</p>
+                                        <p><strong>Vehicle Type:</strong> {{ ambulance.vehicle_type }}</p>
+                                        <p><strong>Year Made:</strong> {{ ambulance.year_made }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Base Rate:</strong> ₹{{ ambulance.base_rate }}</p>
+                                        <p><strong>Per KM Rate:</strong> ₹{{ ambulance.per_km_rate }}</p>
+                                        <p><strong>Status:</strong>
+                                            {% if ambulance.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Inactive</span>
+                                            {% endif %}
+                                            {% if ambulance.is_available %}
+                                                <span class="badge bg-info">Available</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">On Duty</span>
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Driver:</strong>
+                                            {% if ambulance.driver %}
+                                                {{ ambulance.driver.name }}<br>
+                                                <small>{{ ambulance.driver.contact }}</small>
+                                            {% else %}
+                                                <span class="text-muted">Not assigned</span>
+                                            {% endif %}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Edit Ambulance Modal -->
+        <div class="modal fade" id="editAmbulanceModal{{ ambulance.id }}" tabindex="-1"
+             aria-labelledby="editAmbulanceModalLabel{{ ambulance.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="editAmbulanceModalLabel{{ ambulance.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Ambulance
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + AMBULANCE_EDIT_AMBULANCE }}/{{ ambulance.id }}">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label">Vehicle Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="vehicle_number"
+                                           value="{{ ambulance.vehicle_number }}" required>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Vehicle Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="vehicle_name"
+                                           value="{{ ambulance.vehicle_name }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Vehicle Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="vehicle_type" required>
+                                        <option value="Basic"
+                                                {% if ambulance.vehicle_type == 'Basic' %}selected{% endif %}>Basic
+                                            Ambulance
+                                        </option>
+                                        <option value="Advanced"
+                                                {% if ambulance.vehicle_type == 'Advanced' %}selected{% endif %}>
+                                            Advanced Ambulance
+                                        </option>
+                                        <option value="Mobile ICU"
+                                                {% if ambulance.vehicle_type == 'Mobile ICU' %}selected{% endif %}>
+                                            Mobile ICU
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Year Made <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="year_made" required>
+                                        {% for year in range(current_year, current_year-20, -1) %}
+                                            <option value="{{ year }}"
+                                                    {% if ambulance.year_made == year %}selected{% endif %}>{{ year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Base Rate (₹) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" name="base_rate"
+                                           value="{{ ambulance.base_rate }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Per KM Rate (₹) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" name="per_km_rate"
+                                           value="{{ ambulance.per_km_rate }}" required>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Assign Driver</label>
+                                    <select class="form-select" name="driver_id">
+                                        <option value="">Select Driver</option>
+                                        {% for driver in drivers %}
+                                            <option value="{{ driver.id }}"
+                                                    {% if ambulance.driver and ambulance.driver.id == driver.id %}selected{% endif %}>
+                                                {{ driver.name }} ({{ driver.license_number }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_active"
+                                               id="is_active_{{ ambulance.id }}"
+                                               {% if ambulance.is_active %}checked{% endif %}>
+                                        <label class="form-check-label"
+                                               for="is_active_{{ ambulance.id }}">Active</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_available"
+                                               id="is_available_{{ ambulance.id }}"
+                                               {% if ambulance.is_available %}checked{% endif %}>
+                                        <label class="form-check-label"
+                                               for="is_available_{{ ambulance.id }}">Available</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-save-line me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Ambulance Modal -->
+        <div class="modal fade" id="deleteAmbulanceModal{{ ambulance.id }}" tabindex="-1"
+             aria-labelledby="deleteAmbulanceModalLabel{{ ambulance.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteAmbulanceModalLabel{{ ambulance.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this ambulance?</p>
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i>
+                            This action will mark the ambulance as deleted but can be restored later.
+                        </div>
+                        <p><strong>Vehicle Number:</strong> {{ ambulance.vehicle_number }}</p>
+                        <p><strong>Vehicle Name:</strong> {{ ambulance.vehicle_name }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN + AMBULANCE_DELETE_AMBULANCE }}/{{ ambulance.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-delete-bin-line me-1"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Ambulances Modal -->
+    <div class="modal fade" id="restoreAmbulancesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Deleted Ambulances
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_ambulances %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Vehicle No</th>
+                                    <th>Vehicle Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Deleted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for ambulance in deleted_ambulances %}
+                                    <tr>
+                                        <td>{{ ambulance.vehicle_number }}</td>
+                                        <td>{{ ambulance.vehicle_name }}</td>
+                                        <td>{{ ambulance.vehicle_type }}</td>
+                                        <td>
+                                            {% if ambulance.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ ambulance.deleted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="text-end">
+                                            <form method="POST"
+                                                  action="{{ ADMIN + AMBULANCE_RESTORE_AMBULANCE }}/{{ ambulance.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No deleted ambulances found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Row ends -->
 
-{% endblock body %}
 
+{% endblock %}
+
+{% block heardLink %}
+    <!-- Data Tables CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables JS -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Enable tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+{% endblock %}

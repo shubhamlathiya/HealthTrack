@@ -1,76 +1,66 @@
-import qrcode
-from PIL import Image, ImageDraw, ImageFont
-from flask import Flask, jsonify, request, send_file
-import os
+import base64
 
-from api.every_one import idCard
+from flask import render_template, send_file
+
+from controllers.every_one_controllers import idCard
+from middleware.auth_middleware import token_required
+from models.doctorModel import Doctor
 
 
-#
-# app = Flask(__name__)
-#
-# Folder to store generated ID cards
-CARD_FOLDER = "id_cards"
-if not os.path.exists(CARD_FOLDER):
-    os.makedirs(CARD_FOLDER)
+def generate_barcode_image(code):
+    import barcode
+    from barcode.writer import ImageWriter
+    import io
 
-# Generate Barcode for ID Card
-def generate_barcode(data):
-    qr = qrcode.QRCode(version=1, box_size=10, border=4)
-    qr.add_data(data)
-    qr.make(fit=True)
-    barcode_image = qr.make_image(fill='black', back_color='white')
-    return barcode_image
+    # Ensure the code is numeric and 12 digits long for EAN13
+    code = code.zfill(12)
 
-# Generate ID Card
-def create_id_card(user):
-    card_width, card_height = 600, 400
-    card = Image.new("RGB", (card_width, card_height), "white")
-    draw = ImageDraw.Draw(card)
+    # Custom writer configuration to remove ALL text
+    class NoTextWriter(ImageWriter):
+        def _paint_text(self, xpos, ypos):
+            # Override to completely skip text rendering
+            pass
 
-    # Fonts (adjust paths for your system)
-    try:
-        font_bold = ImageFont.truetype("arialbd.ttf", 20)
-        font_regular = ImageFont.truetype("arial.ttf", 16)
-    except IOError:
-        font_bold = font_regular = ImageFont.load_default()
+    writer = NoTextWriter()
+    writer.set_options({
+        'write_text': False,
+        'quiet_zone': 2,
+        'module_width': 0.2,
+        'module_height': 15.0,
+        'background': 'white',
+        'foreground': 'black',
+        'font_size': 0,
+        'text_distance': 0,  # Remove space reserved for text
+    })
 
-    # Draw Header
-    draw.rectangle([(0, 0), (card_width, 80)], fill="blue")
-    draw.text((20, 25), "Hospital Staff ID", fill="white", font=font_bold)
+    ean = barcode.get('ean13', code, writer=writer)
 
-    # Add user details
-    draw.text((20, 100), f"Name: {user['name']}", fill="black", font=font_regular)
-    draw.text((20, 130), f"Department: {user['department']}", fill="black", font=font_regular)
-    draw.text((20, 160), f"Role: {user['role']}", fill="black", font=font_regular)
+    # Generate the barcode image in-memory
+    buffer = io.BytesIO()
+    ean.write(buffer)
+    buffer.seek(0)
 
-    # Add Barcode
-    barcode = generate_barcode(user['barcode'])
-    barcode = barcode.resize((150, 150))
-    card.paste(barcode, (400, 200))
+    return buffer
 
-    # Save ID Card
-    card_path = os.path.join(CARD_FOLDER, f"{user['user_id']}_id_card.png")
-    card.save(card_path)
-    return card_path
+@idCard.route("/patient", methods=["GET"], endpoint="idCard")
+def patientCard():
+    return render_template("id_card_templates/doctor_id_card.html")
 
-# Example User Data
-users = {
-    "U001": {
-        "user_id": "U001",
-        "name": "John Doe",
-        "department": "Radiology",
-        "role": "Technician",
-        "barcode": "U001-RAD"
-    }
-}
 
-# API to Generate and Retrieve ID Card
-@idCard.route('/id-card/<user_id>', methods=['GET'])
-def get_id_card(user_id):
-    user = users.get(user_id)
-    if not user:
-        return jsonify({"error": "User not found"}), 404
+@idCard.route("/doctor", methods=["GET"], endpoint="doctorIdCard")
+@token_required
+def doctorCard(current_user):
+    doctors = Doctor.query.filter_by(user_id=current_user).first()
 
-    card_path = create_id_card(user)
-    return send_file(card_path, mimetype="image/png")
+    if not doctors:
+        return "Doctor record not found for this user.", 404
+
+    # Generate barcode image buffer
+    buffer = generate_barcode_image(str(doctors.id))
+
+    # Encode image as base64 string
+    barcode_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+    return render_template("id_card_templates/doctor_id_card.html",
+                           doctors=doctors,
+                           barcode_base64=barcode_base64)

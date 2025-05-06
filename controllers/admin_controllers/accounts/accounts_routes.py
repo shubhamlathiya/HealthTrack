@@ -35,5 +35,5 @@ def accounts_create_invoice(current_user):
 
 @admin.route(ACCOUNTS_INVOICES_DETAILS, methods=['GET'], endpoint='invoice-details')
 @token_required
-def accoutsInvoiceDetails():
+def accoutsInvoiceDetails(current_user):
     return render_template("admin_templates/accounts/invoice-details.html")
