@@ -33,7 +33,7 @@ def records_death(current_user):
                            )
 
 
-@admin.route(RECORDS_ADD_DEATH, methods=['GET', 'POST'])
+@admin.route(RECORDS_ADD_DEATH, methods=['GET', 'POST'], endpoint="add_death_record")
 @token_required
 def add_death_record(current_user):
     doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
@@ -75,7 +75,7 @@ def add_death_record(current_user):
                            )
 
 
-@admin.route(RECORDS_DEATH_EDIT + '/<int:id>', methods=['POST'])
+@admin.route(RECORDS_DEATH_EDIT + '/<int:id>', methods=['POST'], endpoint="edit_death_record")
 @token_required
 def edit_death_record(current_user, id):
     record = DeathRecord.query.get_or_404(id)
@@ -107,7 +107,7 @@ def edit_death_record(current_user, id):
         flash(f'Error updating death record: {str(e)}', 'danger')
 
 
-@admin.route(RECORDS_DEATH_DELETE + '/<int:id>', methods=['POST'])
+@admin.route(RECORDS_DEATH_DELETE + '/<int:id>', methods=['POST'], endpoint="delete_death_record")
 @token_required
 def delete_death_record(current_user, id):
     record = DeathRecord.query.get_or_404(id)
@@ -271,7 +271,7 @@ def generate_death_certificate_pdf(record):
     return pdf
 
 
-@admin.route(RECORDS_DEATH_CERTIFICATE + '/<int:id>', methods=['GET'])
+@admin.route(RECORDS_DEATH_CERTIFICATE + '/<int:id>', methods=['GET'], endpoint="death_certificate")
 def death_certificate(id):
     record = DeathRecord.query.get_or_404(id)
     pdf = generate_death_certificate_pdf(record)
@@ -289,7 +289,8 @@ def death_certificate(id):
     return response
 
 
-@admin.route(RECORDS_DEATH_CERTIFICATE + '/send-email/<int:id>', methods=['GET'])
+@admin.route(RECORDS_DEATH_CERTIFICATE + '/send-email/<int:id>', methods=['GET'],
+             endpoint="send_death_certificate_email")
 def send_death_certificate_email(id):
     record = DeathRecord.query.get_or_404(id)
 

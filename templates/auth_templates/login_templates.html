@@ -46,7 +46,7 @@
                     <input type="password" id="password" name="password" class="form-control"
                            placeholder="Enter password">
                     <button class="btn btn-outline-secondary" type="button"    id="togglePassword1">
-                        <i class="ri-eye-line text-primary"></i>
+                        <i class="ri-eye-off-line text-primary"></i>
                     </button>
                 </div>
             </div>
@@ -75,8 +75,8 @@
         const passwordField = document.getElementById('password');
         const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordField.setAttribute('type', type);
-        this.querySelector('i').classList.toggle('ri-eye-line');
         this.querySelector('i').classList.toggle('ri-eye-off-line');
+        this.querySelector('i').classList.toggle('ri-eye-line');
     });
     async function loginPatient() {
         const email = document.getElementById('email').value;
