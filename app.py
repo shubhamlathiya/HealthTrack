@@ -4,6 +4,7 @@ import humanize
 from flask import Flask, render_template, session, redirect, send_from_directory, request
 from flask_mail import Mail
 from flask_socketio import SocketIO
+from werkzeug.security import generate_password_hash
 
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
@@ -11,6 +12,7 @@ from controllers.doctor_controllers import doctors
 from controllers.every_one_controllers import idCard
 from controllers.laboratory_controllers import laboratory
 from controllers.patients_controllers import patients
+from models.userModel import User
 from utils.config import init_app, db
 
 app = Flask(__name__, static_folder="static")
@@ -47,6 +49,17 @@ app.register_blueprint(idCard, url_prefix='/id-card')
 with app.app_context():
     db.create_all()
 
+    # Create admin user if not exists
+    if not User.query.filter_by(role='admin').first():
+        admin = User(
+            email='admin@hospital.com',
+            password=generate_password_hash('Shubham123'),
+            role='admin',
+            status=True,
+            verified=True
+        )
+        db.session.add(admin)
+        db.session.commit()
 
 @app.template_filter('humanize')
 def humanize_timestamp(value):
