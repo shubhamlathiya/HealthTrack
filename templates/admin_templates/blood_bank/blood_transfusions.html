@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Transfusions{% endblock %}
+{% block page %}Blood Bank - Transfusion Management{% endblock %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Blood Transfusions</h5>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#addTransfusionModal">
+                        <i class="ri-add-line me-1"></i> New Transfusion
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Units</th>
+                                <th>Reaction</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for trans in transfusions %}
+                                <tr>
+                                    <td>{{ trans.id }}</td>
+                                    <td>{{ trans.patient.first_name }} {{ trans.patient.last_name }}</td>
+                                    <td>{{ trans.doctor.first_name }} {{ trans.doctor.last_name }}</td>
+                                    <td>{{ trans.transfusion_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                                    <td>{{ trans.items|sum(attribute='units_used') }}</td>
+                                    <td>
+                                        {% if trans.adverse_reaction %}
+                                            <span class="badge bg-danger">Yes</span>
+                                        {% else %}
+                                            <span class="badge bg-success">No</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                                    data-bs-target="#viewTransfusionModal{{ trans.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                                                    data-bs-target="#editTransfusionModal{{ trans.id }}">
+                                                <i class="ri-edit-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteTransfusionModal{{ trans.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Transfusion Modal -->
+    <div class="modal fade" id="addTransfusionModal" tabindex="-1" aria-labelledby="addTransfusionModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addTransfusionModalLabel">
+                        <i class="ri-drop-line me-2"></i> New Blood Transfusion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="/admin">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <!-- Patient Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Patient <span class="text-danger">*</span></label>
+                                <select class="form-select" name="patient_id" required>
+                                    <option value="">Select Patient</option>
+                                    {% for patient in patients %}
+                                        <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}
+                                            ({{ patient.blood_type }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Doctor Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Doctor <span class="text-danger">*</span></label>
+                                <select class="form-select" name="doctor_id" required>
+                                    <option value="">Select Doctor</option>
+                                    {% for doctor in doctors %}
+                                        <option value="{{ doctor.id }}">
+                                            Dr. {{ doctor.first_name }} {{ doctor.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Transfusion Items -->
+                            <div class="col-12">
+                                <h6 class="mb-3 text-primary"><i class="ri-drop-line me-2"></i> Blood Components</h6>
+                                <div id="transfusionItemsContainer">
+                                    <div class="row g-3 transfusion-item">
+                                        <div class="col-md-5">
+                                            <label class="form-label">Blood Type <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select" name="items[0][blood_type]" required>
+                                                {% for bt in BloodType %}
+                                                    <option value="{{ bt.value }}">{{ bt.value }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="form-label">Units Used <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" step="0.1" min="0.1" class="form-control"
+                                                   name="items[0][units_used]" required>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="button" class="btn btn-danger btn-sm remove-transfusion-item"
+                                                    style="display: none;">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2"
+                                        id="addTransfusionItem">
+                                    <i class="ri-add-line me-1"></i> Add Another Component
+                                </button>
+                            </div>
+
+                            <!-- Notes and Reaction -->
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="adverse_reaction"
+                                           id="addAdverseReaction">
+                                    <label class="form-check-label" for="addAdverseReaction">
+                                        Adverse Reaction Occurred
+                                    </label>
+                                </div>
+                                <div id="addReactionDetails" style="display: none;">
+                                    <label class="form-label mt-2">Reaction Details</label>
+                                    <textarea class="form-control" name="reaction_details" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Record Transfusion
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Transfusion Modal -->
+    {% for trans in transfusions %}
+        <div class="modal fade" id="viewTransfusionModal{{ trans.id }}" tabindex="-1"
+             aria-labelledby="viewTransfusionModalLabel{{ trans.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="viewTransfusionModalLabel{{ trans.id }}">
+                            <i class="ri-drop-line me-2"></i> Transfusion #{{ trans.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6>Transfusion Information</h6>
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <p class="mb-2">
+                                            <strong>Date:</strong> {{ trans.transfusion_date.strftime('%d/%m/%Y %H:%M') }}
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Patient:</strong> {{ trans.patient.first_name }} {{ trans.patient.last_name }}
+                                        </p>
+                                        <p class="mb-2"><strong>Blood Type:</strong> {{ trans.patient.blood_type }}</p>
+                                        <p class="mb-2"><strong>Doctor:</strong>
+                                            Dr. {{ trans.doctor.first_name }} {{ trans.doctor.last_name }}</p>
+                                        <p class="mb-0"><strong>Adverse Reaction:</strong>
+                                            {% if trans.adverse_reaction %}
+                                                <span class="badge bg-danger">Yes</span>
+                                            {% else %}
+                                                <span class="badge bg-success">No</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <h6>Blood Components</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                        <tr>
+                                            <th>Blood Type</th>
+                                            <th>Units</th>
+                                            <th>From Inventory</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in trans.items %}
+                                            <tr>
+                                                <td>{{ item.blood_type }}</td>
+                                                <td>{{ item.units_used }}</td>
+                                                <td>
+                                                    {% if item.inventory %}
+                                                        Bag #{{ item.inventory.id }} (Exp:
+                                                        {{ item.inventory.expiration_date.strftime('%d/%m/%Y') }})
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {% if trans.notes or trans.reaction_details %}
+                                <div class="col-12">
+                                    <div class="row">
+                                        {% if trans.notes %}
+                                            <div class="col-md-6 mb-3">
+                                                <h6>Notes</h6>
+                                                <div class="card border-0 shadow-sm">
+                                                    <div class="card-body">
+                                                        {{ trans.notes }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if trans.reaction_details %}
+                                            <div class="col-md-6 mb-3">
+                                                <h6>Reaction Details</h6>
+                                                <div class="card border-0 shadow-sm">
+                                                    <div class="card-body">
+                                                        {{ trans.reaction_details }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Transfusion Modal -->
+        <div class="modal fade" id="editTransfusionModal{{ trans.id }}" tabindex="-1"
+             aria-labelledby="editTransfusionModalLabel{{ trans.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-white">
+                        <h5 class="modal-title" id="editTransfusionModalLabel{{ trans.id }}">
+                            <i class="ri-edit-line me-2"></i> Edit Transfusion #{{ trans.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{trans.id }}">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <!-- Patient Information -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Patient</label>
+                                    <input type="text" class="form-control"
+                                           value="{{ trans.patient.first_name }} {{ trans.patient.last_name }}"
+                                           readonly>
+                                </div>
+
+                                <!-- Doctor Information -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Doctor <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="doctor_id" required>
+                                        {% for doctor in doctors %}
+                                            <option value="{{ doctor.id }}"
+                                                    {% if doctor.id == trans.doctor_id %}selected{% endif %}>
+                                                Dr. {{ doctor.first_name }} {{ doctor.last_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Transfusion Items -->
+                                <div class="col-12">
+                                    <h6 class="mb-3 text-primary"><i class="ri-drop-line me-2"></i> Blood Components
+                                    </h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                            <tr>
+                                                <th>Blood Type</th>
+                                                <th>Units Used</th>
+                                                <th>From Inventory</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for item in trans.items %}
+                                                <tr>
+                                                    <td>{{ item.blood_type }}</td>
+                                                    <td>{{ item.units_used }}</td>
+                                                    <td>
+                                                        {% if item.inventory %}
+                                                            Bag #{{ item.inventory.id }}
+                                                        {% else %}
+                                                            N/A
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="alert alert-info mt-2">
+                                        <i class="ri-information-line me-2"></i> Blood components cannot be edited after
+                                        transfusion.
+                                    </div>
+                                </div>
+
+                                <!-- Notes and Reaction -->
+                                <div class="col-12">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" name="notes"
+                                              rows="3">{{ trans.notes or '' }}</textarea>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="adverse_reaction"
+                                               id="editAdverseReaction{{ trans.id }}"
+                                               {% if trans.adverse_reaction %}checked{% endif %}>
+                                        <label class="form-check-label" for="editAdverseReaction{{ trans.id }}">
+                                            Adverse Reaction Occurred
+                                        </label>
+                                    </div>
+                                    <div id="editReactionDetails{{ trans.id }}"
+                                         style="display: {% if trans.adverse_reaction %}block{% else %}none{% endif %};">
+                                        <label class="form-label mt-2">Reaction Details</label>
+                                        <textarea class="form-control" name="reaction_details"
+                                                  rows="2">{{ trans.reaction_details or '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="ri-save-line me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Transfusion Modal -->
+        <div class="modal fade" id="deleteTransfusionModal{{ trans.id }}" tabindex="-1"
+             aria-labelledby="deleteTransfusionModalLabel{{ trans.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteTransfusionModalLabel{{ trans.id }}">
+                            <i class="ri-delete-bin-line me-2"></i> Delete Transfusion #{{ trans.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i> Are you sure you want to delete this transfusion record?
+                        </div>
+                        <p>This action will return the blood units to inventory and cannot be undone.</p>
+
+                        <div class="card border-0 shadow-sm mt-3">
+                            <div class="card-body">
+                                <p class="mb-1">
+                                    <strong>Patient:</strong> {{ trans.patient.first_name }} {{ trans.patient.last_name }}
+                                </p>
+                                <p class="mb-1">
+                                    <strong>Date:</strong> {{ trans.transfusion_date.strftime('%d/%m/%Y %H:%M') }}</p>
+                                <p class="mb-0"><strong>Total
+                                    Units:</strong> {{ trans.items|sum(attribute='units_used') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST"
+                              action="{{ trans.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-delete-bin-line me-1"></i> Confirm Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}
+{% block footerLink %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add new transfusion item
+            let transfusionItemCount = 1;
+            document.getElementById('addTransfusionItem').addEventListener('click', function () {
+                const container = document.getElementById('transfusionItemsContainer');
+                const newItem = document.createElement('div');
+                newItem.className = 'row g-3 transfusion-item mt-2';
+                newItem.innerHTML = `
+            <div class="col-md-5">
+                <select class="form-select" name="items[${transfusionItemCount}][blood_type]" required>
+                    {% for bt in BloodType %}
+                    <option value="{{ bt.value }}">{{ bt.value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <input type="number" step="0.1" min="0.1" class="form-control" name="items[${transfusionItemCount}][units_used]" required>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-danger btn-sm remove-transfusion-item">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </div>
+        `;
+                container.appendChild(newItem);
+                transfusionItemCount++;
+
+                // Show remove buttons on all items
+                document.querySelectorAll('.remove-transfusion-item').forEach(btn => {
+                    btn.style.display = 'block';
+                });
+            });
+
+            // Remove transfusion item
+            document.addEventListener('click', function (e) {
+                if (e.target.classList.contains('remove-transfusion-item') || e.target.closest('.remove-transfusion-item')) {
+                    const btn = e.target.classList.contains('remove-transfusion-item') ? e.target : e.target.closest('.remove-transfusion-item');
+                    btn.closest('.transfusion-item').remove();
+                }
+            });
+
+            // Toggle reaction details in add modal
+            document.getElementById('addAdverseReaction').addEventListener('change', function () {
+                document.getElementById('addReactionDetails').style.display = this.checked ? 'block' : 'none';
+            });
+
+            // Toggle reaction details in edit modals
+            {% for trans in transfusions %}
+                document.getElementById('editAdverseReaction{{ trans.id }}')?.addEventListener('change', function () {
+                    document.getElementById('editReactionDetails{{ trans.id }}').style.display = this.checked ? 'block' : 'none';
+                });
+            {% endfor %}
+        });
+    </script>
+{% endblock %}

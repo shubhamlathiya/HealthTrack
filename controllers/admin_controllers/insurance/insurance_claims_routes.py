@@ -299,22 +299,3 @@ def delete_insurance_claim(current_user, claim_id):
         db.session.rollback()
         flash('Error deleting insurance claim', 'danger')
     return redirect(ADMIN + INSURANCE_CLAIM_STATUS)
-
-
-# @admin.route(GET_PATIENT + '/<string:patient_id>', methods=['GET'], endpoint='insurance_claims_patient')
-# def get_patient_claims(patient_id):
-#     try:
-#         claims = InsuranceClaim.query.filter_by(
-#             patient_id=patient_id,
-#             is_deleted=False
-#         ).order_by(InsuranceClaim.claim_date.desc()).all()
-#
-#         return jsonify({
-#             'success': True,
-#             'data': [claim.serialize() for claim in claims]
-#         })
-#     except Exception as e:
-#         return jsonify({
-#             'success': False,
-#             'message': 'Error fetching claims'
-#         }), 500

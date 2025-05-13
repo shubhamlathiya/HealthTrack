@@ -40,7 +40,7 @@ def add_ambulance_call():
         call_number = f"AMB-{today.year}-{today.month:02d}{today.day:02d}-{sequence_num:03d}"
 
         new_call = AmbulanceCall(
-            call_number=call_number,
+            call_number=request.form.get('call_number'),
             patient_name=request.form.get('patient_name'),
             patient_age=int(request.form.get('patient_age')),
             patient_gender=request.form.get('patient_gender'),

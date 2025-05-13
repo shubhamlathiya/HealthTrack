@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% block title %}Available Blood Donors{% endblock %}
+{% block page %}Blood Donors{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="ri-drop-line me-2"></i>Available Blood Donors
+                </h5>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri-search-line"></i></span>
+                            <input type="text" id="donorSearch" class="form-control" placeholder="Search donors...">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri-filter-line"></i></span>
+                            <select id="bloodTypeFilter" class="form-select">
+                                <option value="">All Blood Types</option>
+                                {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                    <option value="{{ bt }}">{{ bt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="donorsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Donor</th>
+                                <th>Blood Type</th>
+                                <th>Age/Gender</th>
+                                <th>Last Donation</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donor in donors %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-md me-3">
+                                            <span class="avatar-title bg-primary-light rounded-circle">
+                                                {{ donor.first_name[0] }}{{ donor.last_name[0] }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <strong>{{ donor.first_name }} {{ donor.last_name }}</strong>
+                                            <div class="text-muted small">{{ donor.city or 'Location not specified' }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger-light text-danger">{{ donor.blood_type }}</span>
+                                </td>
+                                <td>
+                                    {{ donor.calculate_age() }} / {{ donor.gender }}
+                                </td>
+                                <td>
+                                    {% if donor.last_donation %}
+                                        {{ donor.last_donation.strftime('%d %b %Y') }}
+                                    {% else %}
+                                        <span class="text-muted">Never</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if donor.status == 'Active' %}
+                                        {% if donor.next_eligible and donor.next_eligible > datetime.utcnow().date() %}
+                                            <span class="badge bg-warning">Available after {{ donor.next_eligible.strftime('%d %b') }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Available Now</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">Not Available</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if donor.status == 'Active' and (not donor.next_eligible or donor.next_eligible <= datetime.utcnow().date()) %}
+                                        <button class="btn btn-sm btn-primary request-btn"
+                                                data-donor-id="{{ donor.donor_id }}"
+                                                data-donor-name="{{ donor.first_name }} {{ donor.last_name }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#requestModal">
+                                            <i class="ri-calendar-line me-1"></i> Request
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                                            <i class="ri-calendar-line me-1"></i> Not Available
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if not donors %}
+                <div class="text-center py-5">
+                    <div class="avatar avatar-xl mb-3">
+                        <span class="avatar-title bg-light rounded-circle">
+                            <i class="ri-drop-line text-primary" style="font-size: 2rem;"></i>
+                        </span>
+                    </div>
+                    <h5>No Blood Donors Available</h5>
+                    <p class="text-muted">There are currently no active blood donors in the system.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Appointment Modal -->
+<div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="requestModalLabel">
+                    <i class="ri-calendar-line me-2"></i>Request Appointment
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="appointmentForm" method="POST" action="{{ url_for('patient.request_blood_donor', donor_id=0) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Donor</label>
+                        <input type="text" class="form-control" id="donorNameDisplay" readonly>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="appointment_date" id="appointmentDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Time <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control" name="appointment_time" id="appointmentTime" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reason <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="reason" rows="3" required placeholder="Please explain why you need this donor"></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="ri-information-line me-2"></i> The donor will be notified and must accept your request before the appointment is confirmed.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ri-send-plane-line me-1"></i> Send Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up search and filter functionality
+    const donorSearch = document.getElementById('donorSearch');
+    const bloodTypeFilter = document.getElementById('bloodTypeFilter');
+    const donorsTable = document.getElementById('donorsTable');
+
+    if (donorSearch && bloodTypeFilter && donorsTable) {
+        donorSearch.addEventListener('input', filterDonors);
+        bloodTypeFilter.addEventListener('change', filterDonors);
+    }
+
+    function filterDonors() {
+        const searchTerm = donorSearch.value.toLowerCase();
+        const bloodType = bloodTypeFilter.value;
+        const rows = donorsTable.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const name = row.cells[0].textContent.toLowerCase();
+            const donorBloodType = row.cells[1].textContent;
+            const shouldShow =
+                name.includes(searchTerm) &&
+                (bloodType === '' || donorBloodType.includes(bloodType));
+
+            row.style.display = shouldShow ? '' : 'none';
+        });
+    }
+
+    // Handle request button clicks
+    const requestButtons = document.querySelectorAll('.request-btn');
+    requestButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const donorId = this.getAttribute('data-donor-id');
+            const donorName = this.getAttribute('data-donor-name');
+
+            // Update the modal with donor info
+            document.getElementById('donorNameDisplay').value = donorName;
+
+            // Update form action URL with correct donor ID
+            const form = document.getElementById('appointmentForm');
+            form.action = form.action.replace('/0', `/${donorId}`);
+
+            // Set default date/time (next available slot)
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            document.getElementById('appointmentDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('appointmentDate').min = tomorrow.toISOString().split('T')[0];
+
+            // Set default time to 10:00 AM
+            document.getElementById('appointmentTime').value = '10:00';
+        });
+    });
+
+    // Set minimum date to tomorrow
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    document.getElementById('appointmentDate').min = tomorrow.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

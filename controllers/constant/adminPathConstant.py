@@ -18,6 +18,12 @@ BLOOD_BANK_EDIT_DONOR = f"{BLOOD_BANK}/edit-donor"
 BLOOD_BANK_DELETE_DONOR = f"{BLOOD_BANK}/delete-donor"
 BLOOD_BANK_RESTORE_DONOR = f"{BLOOD_BANK}/restore-donor"
 
+BLOOD_BANK_INVENTORY = f'{BLOOD_BANK}/inventory'
+BLOOD_BANK_ADD_INVENTORY = f'{BLOOD_BANK}/inventory/add'
+BLOOD_BANK_EDIT_INVENTORY = f'{BLOOD_BANK}/inventory/edit'
+BLOOD_BANK_DELETE_INVENTORY = f'{BLOOD_BANK}/inventory/delete'
+BLOOD_BANK_RESTORE_INVENTORY = f'{BLOOD_BANK}/inventory/restore'
+
 BLOOD_BANK_STOCK = f"{BLOOD_BANK}/stock"
 BLOOD_BANK_ADD_STOCK = f"{BLOOD_BANK}/add-stock"
 BLOOD_BANK_EDIT_STOCK = f"{BLOOD_BANK}/edit-stock"
@@ -29,6 +35,21 @@ BLOOD_BANK_ADD_ISSUED = f"{BLOOD_BANK}/add-issued"
 BLOOD_BANK_EDIT_ISSUED = f"{BLOOD_BANK}/edit-issued"
 BLOOD_BANK_DELETE_ISSUED = f"{BLOOD_BANK}/delete-issued"
 BLOOD_BANK_RESTORE_ISSUED = f"{BLOOD_BANK}/restore-issued"
+
+# Blood Request Routes
+BLOOD_BANK_REQUESTS = '/blood-bank/requests'
+BLOOD_BANK_ADD_REQUEST = '/blood-bank/requests/add'
+BLOOD_BANK_EDIT_REQUEST = '/blood-bank/requests/edit'
+BLOOD_BANK_DELETE_REQUEST = '/blood-bank/requests/delete'
+BLOOD_BANK_APPROVE_REQUEST = '/blood-bank/requests/approve'
+BLOOD_BANK_REJECT_REQUEST = '/blood-bank/requests/reject'
+BLOOD_BANK_COMPLETE_REQUEST = '/blood-bank/requests/complete'
+
+# Blood Transfusion Routes
+BLOOD_BANK_TRANSFUSIONS = '/blood-bank/transfusions'
+BLOOD_BANK_ADD_TRANSFUSION = '/blood-bank/transfusions/add'
+BLOOD_BANK_EDIT_TRANSFUSION = '/blood-bank/transfusions/edit'
+BLOOD_BANK_DELETE_TRANSFUSION = '/blood-bank/transfusions/delete'
 
 # inventory
 INVENTORY = "/inventory"

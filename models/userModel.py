@@ -38,7 +38,8 @@ class User(db.Model):
 
     patient = db.relationship('Patient', back_populates='user', uselist=False, cascade='all, delete-orphan')
     doctor = db.relationship('Doctor', back_populates='user', uselist=False, cascade='all, delete-orphan')
-
+    requests = db.relationship('BloodRequest', back_populates='requester')
+    
     # Constructor to easily create a User object
     def __init__(self, email, password, role, status, verified):
         self.email = email

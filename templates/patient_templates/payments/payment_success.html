@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Payment Successful</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="ri-checkbox-circle-fill text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h3 class="text-success mb-3">Thank You!</h3>
+                    <p class="lead">Your payment of ₹{{ request.payment_amount }} has been recorded.</p>
+
+                    <div class="card mb-4">
+                        <div class="card-body text-start">
+                            <h5 class="card-title">Order Details</h5>
+                            <p><strong>Request ID:</strong> {{ request.request_id }}</p>
+                            <p><strong>Blood Type:</strong> {{ request.blood_type }} {{ request.component_type }}</p>
+                            <p><strong>Quantity:</strong> {{ request.quantity }} units</p>
+                            <p><strong>Payment Method:</strong> {{ request.payment_method }}</p>
+                            <p><strong>Payment Date:</strong> {{ request.payment_date.strftime('%d/%m/%Y %H:%M') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Next Steps</h5>
+                        <p>Your blood has been reserved. Please visit the blood bank with this reference number to collect your order.</p>
+                    </div>
+
+                    <a href="{{ url_for('patient.my_blood_requests') }}" class="btn btn-primary">
+                        <i class="ri-list-check me-2"></i> View My Requests
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

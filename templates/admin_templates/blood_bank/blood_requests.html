@@ -1,0 +1,726 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Requests{% endblock %}
+{% block page %}Blood Bank - Request Management{% endblock %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Blood Requests</h5>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#addRequestModal">
+                        <i class="ri-add-line me-1"></i> New Request
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Patient</th>
+                                <th>Department</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for req in requests %}
+                                <tr>
+                                    <td>{{ req.id }}</td>
+                                    <td>
+                                        {% if req.patient %}
+                                            {{ req.patient.first_name }} {{ req.patient.last_name }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ req.department }}</td>
+                                    <td>{{ req.request_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                                    <td>
+                                    <span class="badge
+                                        {% if req.status == 'Pending' %}bg-warning
+                                        {% elif req.status == 'Approved' %}bg-success
+                                        {% elif req.status == 'Rejected' %}bg-danger
+                                        {% else %}bg-info{% endif %}">
+                                        {{ req.status }}
+                                    </span>
+                                    </td>
+                                    <td>
+                                    <span class="badge
+                                        {% if req.priority == 'Low' %}bg-secondary
+                                        {% elif req.priority == 'Normal' %}bg-primary
+                                        {% elif req.priority == 'High' %}bg-warning
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ req.priority }}
+                                    </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                                    data-bs-target="#viewRequestModal{{ req.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            {% if req.status == 'Pending' %}
+                                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
+                                                        data-bs-target="#approveRequestModal{{ req.id }}">
+                                                    <i class="ri-check-line"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#rejectRequestModal{{ req.id }}">
+                                                    <i class="ri-close-line"></i>
+                                                </button>
+                                            {% elif req.status == 'Approved' %}
+                                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#completeRequestModal{{ req.id }}">
+                                                    <i class="ri-check-double-line"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Request Modal -->
+    <div class="modal fade" id="addRequestModal" tabindex="-1" aria-labelledby="addRequestModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addRequestModalLabel">
+                        <i class="ri-drop-line me-2"></i> New Blood Request
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + BLOOD_BANK_ADD_REQUEST }}">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <!-- Patient Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Patient Selection</label>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="patient_selection_method"
+                                           id="selectPatientDropdown" value="dropdown" checked>
+                                    <label class="form-check-label" for="selectPatientDropdown">
+                                        Select from list
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="patient_selection_method"
+                                           id="selectPatientById" value="id">
+                                    <label class="form-check-label" for="selectPatientById">
+                                        Enter Patient ID
+                                    </label>
+                                </div>
+
+                                <!-- Dropdown Selection -->
+                                <div id="patientDropdownSection">
+                                    <select class="form-select" name="patient_id" id="patientDropdown">
+                                        <option value="">Select Patient</option>
+                                        {% for patient in patients %}
+                                            <option value="{{ patient.id }}"
+                                                    data-first-name="{{ patient.first_name }}"
+                                                    data-last-name="{{ patient.last_name }}"
+                                                    data-gender="{{ patient.gender }}"
+                                                    data-age="{{ patient.age }}"
+                                                    data-blood-type="{{ patient.blood_type }}"
+                                                    data-phone="{{ patient.phone }}"
+                                                    data-email="{{ patient.email }}">
+                                                {{ patient.first_name }} {{ patient.last_name }}
+                                                ({{ patient.patient_id }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- ID Search Section -->
+                                <div id="patientIdSection" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <label class="form-label">Patient ID*</label>
+                                            <input type="text" class="form-control" id="patientIdInput"
+                                                   name="patient_id_search" placeholder="Enter patient ID">
+                                        </div>
+                                        <div class="col-md-4 pt-4">
+                                            <button type="button" class="btn btn-outline-primary mt-2"
+                                                    id="fetchPatientBtn">
+                                                <i class="fas fa-search me-1"></i> Verify Patient
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="patientValidationMsg" class="small mt-2"></div>
+                                </div>
+                            </div>
+
+                            <!-- Personal Information Section (auto-filled) -->
+                            <div class="col-12">
+                                <h6 class="mb-3 text-primary"><i class="ri-user-line me-1"></i> Personal Information
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="first_name" id="patientName"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="last_name" id="patientLastName"
+                                               required>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="gender" id="patientGender" required>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Age <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="age" id="patientAge" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" name="phone" id="patientPhone" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" name="email" id="patientEmail">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Department -->
+                            <div class="col-md-6">
+                                <label class="form-label">Department <span class="text-danger">*</span></label>
+                                <select class="form-select" name="department" required>
+                                    <option value="">Select Department</option>
+                                    <option value="Emergency">Emergency</option>
+                                    <option value="Surgery">Surgery</option>
+                                    <option value="ICU">ICU</option>
+                                    <option value="Ward">Ward</option>
+                                    <option value="Laboratory">Laboratory</option>
+                                </select>
+                            </div>
+
+                            <!-- Priority -->
+                            <div class="col-md-6">
+                                <label class="form-label">Priority <span class="text-danger">*</span></label>
+                                <select class="form-select" name="priority" required>
+                                    <option value="Normal" selected>Normal</option>
+                                    <option value="Low">Low</option>
+                                    <option value="High">High</option>
+                                    <option value="Emergency">Emergency</option>
+                                </select>
+                            </div>
+
+                            <!-- Request Items -->
+                            <div class="col-12">
+                                <h6 class="mb-3 text-primary"><i class="ri-drop-line me-2"></i> Blood Components</h6>
+                                <div id="bloodItemsContainer">
+                                    <div class="row g-3 blood-item">
+                                        <div class="col-md-5">
+                                            <label class="form-label">Blood Type <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select blood-type" name="items[0][blood_type]" required>
+                                                {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                                    <option value="{{ bt }}">{{ bt }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="form-label">Units Requested <span class="text-danger">*</span></label>
+                                            <input type="number" step="0.1" min="0.1" class="form-control"
+                                                   name="items[0][units_requested]" required>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="button" class="btn btn-danger btn-sm remove-item"
+                                                    style="display: none;">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addBloodItem">
+                                    <i class="ri-add-line me-1"></i> Add Another Blood Type
+                                </button>
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Request Modal -->
+    {% for req in requests %}
+        <div class="modal fade" id="viewRequestModal{{ req.id }}" tabindex="-1"
+             aria-labelledby="viewRequestModalLabel{{ req.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewRequestModalLabel{{ req.id }}">
+                            <i class="ri-drop-line me-2"></i> Blood Request #{{ req.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6>Request Information</h6>
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <p class="mb-2"><strong>Request
+                                            Date:</strong> {{ req.request_date.strftime('%d/%m/%Y %H:%M') }}</p>
+                                        <p class="mb-2"><strong>Status:</strong>
+                                            <span class="badge
+                                        {% if req.status == 'Pending' %}bg-warning
+                                        {% elif req.status == 'Approved' %}bg-success
+                                        {% elif req.status == 'Rejected' %}bg-danger
+                                        {% else %}bg-info{% endif %}">
+                                        {{ req.status }}
+                                    </span>
+                                        </p>
+                                        <p class="mb-2"><strong>Priority:</strong>
+                                            <span class="badge
+                                        {% if req.priority == 'Low' %}bg-secondary
+                                        {% elif req.priority == 'Normal' %}bg-primary
+                                        {% elif req.priority == 'High' %}bg-warning
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ req.priority }}
+                                    </span>
+                                        </p>
+                                        <p class="mb-2"><strong>Department:</strong> {{ req.department }}</p>
+                                        <p class="mb-2"><strong>Requested
+                                            By:</strong> {{ req.requester.first_name }} {{ req.requester.last_name }}
+                                        </p>
+                                        {% if req.patient %}
+                                            <p class="mb-0">
+                                                <strong>Patient:</strong> {{ req.patient.first_name }} {{ req.patient.last_name }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <h6>Blood Components</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                        <tr>
+                                            <th>Blood Type</th>
+                                            <th>Requested</th>
+                                            <th>Approved</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in req.items %}
+                                            <tr>
+                                                <td>{{ item.blood_type }}</td>
+                                                <td>{{ item.units_requested }}</td>
+                                                <td>{{ item.units_approved }}</td>
+                                                <td>
+                                                    {% if item.units_approved == item.units_requested %}
+                                                        <span class="badge bg-success">Fulfilled</span>
+                                                    {% elif item.units_approved > 0 %}
+                                                        <span class="badge bg-warning">Partial</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Pending</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {% if req.notes %}
+                                <div class="col-12">
+                                    <h6>Notes</h6>
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body">
+                                            {{ req.notes }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approve Request Modal -->
+        <div class="modal fade" id="approveRequestModal{{ req.id }}" tabindex="-1"
+             aria-labelledby="approveRequestModalLabel{{ req.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="approveRequestModalLabel{{ req.id }}">
+                            <i class="ri-check-line me-2"></i> Approve Request #{{ req.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + BLOOD_BANK_APPROVE_REQUEST }}/{{ req.id }}">
+                        <div class="modal-body">
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-2"></i> Review and approve units for each blood type.
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Blood Type</th>
+                                        <th>Requested</th>
+                                        <th>Available</th>
+                                        <th>Approve</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in req.items %}
+                                        {% set available = inventory_summary.get(item.blood_type, 0) %}
+                                        <tr>
+                                            <td>{{ item.blood_type }}</td>
+                                            <td>{{ item.units_requested }}</td>
+                                            <td>
+                                                {{ available }}
+                                                {% if available < item.units_requested %}
+                                                    <span class="badge bg-warning ms-2">Low Stock</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <input type="number" step="0.1" min="0"
+                                                       max="{{ [item.units_requested, available]|min }}"
+                                                       class="form-control"
+                                                       name="items[{{ loop.index0 }}][units_approved]"
+                                                       value="{{ [item.units_requested, available]|min }}">
+                                                <input type="hidden" name="items[{{ loop.index0 }}][id]"
+                                                       value="{{ item.id }}">
+                                                <input type="hidden" name="items[{{ loop.index0 }}][blood_type]"
+                                                       value="{{ item.blood_type }}">
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Approval Notes</label>
+                                <textarea class="form-control" name="notes" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="ri-check-line me-1"></i> Approve Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reject Request Modal -->
+        <div class="modal fade" id="rejectRequestModal{{ req.id }}" tabindex="-1"
+             aria-labelledby="rejectRequestModalLabel{{ req.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="rejectRequestModalLabel{{ req.id }}">
+                            <i class="ri-close-line me-2"></i> Reject Request #{{ req.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + BLOOD_BANK_REJECT_REQUEST }}/{{ req.id }}">
+                        <div class="modal-body">
+                            <div class="alert alert-warning">
+                                <i class="ri-alert-line me-2"></i> Are you sure you want to reject this blood request?
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Reason for Rejection <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control" name="notes" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-close-line me-1"></i> Confirm Rejection
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete Request Modal -->
+        <div class="modal fade" id="completeRequestModal{{ req.id }}" tabindex="-1"
+             aria-labelledby="completeRequestModalLabel{{ req.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="completeRequestModalLabel{{ req.id }}">
+                            <i class="ri-check-double-line me-2"></i> Complete Request #{{ req.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + BLOOD_BANK_COMPLETE_REQUEST }}/{{ req.id }}">
+                        <div class="modal-body">
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-2"></i> Mark this request as completed after
+                                transfusion.
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Transfusion Performed By</label>
+                                <select class="form-select" name="doctor_id" required>
+                                    {% for doctor in doctors %}
+                                        <option value="{{ doctor.id }}">{{ doctor.first_name }} {{ doctor.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Transfusion Notes</label>
+                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="adverse_reaction"
+                                       id="adverseReaction{{ req.id }}">
+                                <label class="form-check-label" for="adverseReaction{{ req.id }}">
+                                    Adverse Reaction Occurred
+                                </label>
+                            </div>
+
+                            <div id="reactionDetails{{ req.id }}" style="display: none;">
+                                <label class="form-label">Reaction Details</label>
+                                <textarea class="form-control" name="reaction_details" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-check-double-line me-1"></i> Mark as Completed
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}
+{% block footerLink %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add new blood item row
+            let itemCount = 1;
+            document.getElementById('addBloodItem').addEventListener('click', function () {
+                const container = document.getElementById('bloodItemsContainer');
+                const newItem = document.createElement('div');
+                newItem.className = 'row g-3 blood-item mt-2';
+                newItem.innerHTML = `
+            <div class="col-md-5">
+                <select class="form-select blood-type" name="items[${itemCount}][blood_type]" required>
+                    {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                    <option value="{{ bt }}">{{ bt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <input type="number" step="0.1" min="0.1" class="form-control" name="items[${itemCount}][units_requested]" required>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-danger btn-sm remove-item">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </div>
+        `;
+                container.appendChild(newItem);
+                itemCount++;
+
+                // Show remove buttons on all items except first
+                document.querySelectorAll('.remove-item').forEach(btn => {
+                    btn.style.display = 'block';
+                });
+            });
+
+            // Remove blood item row
+            document.addEventListener('click', function (e) {
+                if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
+                    const btn = e.target.classList.contains('remove-item') ? e.target : e.target.closest('.remove-item');
+                    btn.closest('.blood-item').remove();
+
+                    // Hide remove button if only one item left
+                    if (document.querySelectorAll('.blood-item').length === 1) {
+                        document.querySelector('.remove-item').style.display = 'none';
+                    }
+                }
+            });
+
+            // Toggle reaction details
+            document.addEventListener('change', function (e) {
+                if (e.target.name === 'adverse_reaction') {
+                    const detailsDiv = document.getElementById('reactionDetails' + e.target.id.replace('adverseReaction', ''));
+                    detailsDiv.style.display = e.target.checked ? 'block' : 'none';
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownSection = document.getElementById('patientDropdownSection');
+            const idSection = document.getElementById('patientIdSection');
+            const dropdownRadio = document.getElementById('selectPatientDropdown');
+            const idRadio = document.getElementById('selectPatientById');
+            const patientDropdown = document.getElementById('patientDropdown');
+
+            // Toggle between selection methods
+            dropdownRadio.addEventListener('change', function () {
+                dropdownSection.style.display = 'block';
+                idSection.style.display = 'none';
+                document.getElementById('patientIdInput').value = '';
+                document.getElementById('patientValidationMsg').textContent = '';
+            });
+
+            idRadio.addEventListener('change', function () {
+                dropdownSection.style.display = 'none';
+                idSection.style.display = 'block';
+                patientDropdown.value = '';
+            });
+
+            // Auto-fill from dropdown selection
+            patientDropdown.addEventListener('change', function () {
+                if (this.value) {
+                    const selectedOption = this.options[this.selectedIndex];
+                    document.getElementById('patientName').value = selectedOption.dataset.firstName;
+                    document.getElementById('patientLastName').value = selectedOption.dataset.lastName;
+                    document.getElementById('patientGender').value = selectedOption.dataset.gender;
+                    document.getElementById('patientAge').value = selectedOption.dataset.age;
+                    document.getElementById('patientBloodType').value = selectedOption.dataset.bloodType;
+                    document.getElementById('patientPhone').value = selectedOption.dataset.phone;
+                    document.getElementById('patientEmail').value = selectedOption.dataset.email;
+                }
+            });
+
+            // Patient ID search functionality
+            document.getElementById('fetchPatientBtn').addEventListener('click', fetchPatientById);
+
+            async function fetchPatientById() {
+                const patientId = document.getElementById('patientIdInput').value.trim();
+                const validationMsg = document.getElementById('patientValidationMsg');
+
+                if (!patientId) {
+                    validationMsg.className = 'text-danger small mt-1';
+                    validationMsg.textContent = 'Please enter a patient ID';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/admin/get-patient/${patientId}`);
+
+                    if (!response.ok) {
+                        throw new Error('Patient not found');
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Auto-fill patient details
+                    document.getElementById('patientName').value = data.first_name || '';
+                    document.getElementById('patientLastName').value = data.last_name || '';
+                    document.getElementById('patientEmail').value = data.email || '';
+                    document.getElementById('patientGender').value = data.gender || '';
+                    document.getElementById('patientAge').value = data.age || '';
+
+                    document.getElementById('patientPhone').value = data.phone || '';
+
+                    validationMsg.textContent = '';
+                    validationMsg.className = 'text-success small mt-1';
+                    validationMsg.textContent = 'Patient verified successfully';
+
+                } catch (error) {
+                    console.error('Error fetching patient data:', error);
+                    validationMsg.className = 'text-danger small mt-1';
+                    validationMsg.textContent = error.message || 'Failed to fetch patient details';
+
+                    // Clear fields if patient not found
+                    document.getElementById('patientName').value = '';
+                    document.getElementById('patientLastName').value = '';
+                    document.getElementById('patientEmail').value = '';
+                    document.getElementById('patientGender').value = '';
+                    document.getElementById('patientAge').value = '';
+
+                    document.getElementById('patientPhone').value = '';
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

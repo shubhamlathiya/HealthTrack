@@ -38,6 +38,7 @@
                             <tr>
                                 <th>Vehicle No</th>
                                 <th>Vehicle Name</th>
+                                <th>Driver Name</th>
                                 <th>Type</th>
                                 <th>Year</th>
                                 <th>Rates</th>
@@ -51,8 +52,10 @@
                                 <tr>
                                     <td>{{ ambulance.vehicle_number }}</td>
                                     <td>{{ ambulance.vehicle_name }}</td>
+                                    <td>{{ ambulance.driver.name }}</td>
                                     <td>{{ ambulance.vehicle_type }}</td>
                                     <td>{{ ambulance.year_made }}</td>
+
                                     <td>
                                         <small>Base: ₹{{ ambulance.base_rate }}</small><br>
                                         <small>Per KM: ₹{{ ambulance.per_km_rate }}</small>

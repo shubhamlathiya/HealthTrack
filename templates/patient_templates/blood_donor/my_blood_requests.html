@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}My Blood Requests{% endblock %}
+{% block page %}Blood Bank - My Requests{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="ri-drop-fill me-2"></i>My Blood Requests
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="requestsTable">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Blood Type</th>
+                                    <th>Component</th>
+                                    <th>Quantity</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Request Date</th>
+                                    <th>Required Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for request in requests %}
+                                    <tr class="{% if request.status == 'Completed' %}table-success{% elif request.status == 'Rejected' %}table-danger{% elif request.status == 'Pending Approval' %}table-warning{% endif %}">
+                                        <td>{{ request.request_id }}</td>
+                                        <td>{{ request.blood_type }}</td>
+                                        <td>{{ request.component_type }}</td>
+                                        <td>{{ request.quantity }} units</td>
+                                        <td>₹{{ request.payment_amount }}</td>
+                                        <td>
+                                            {% if request.status == 'Completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif request.status == 'Approved' %}
+                                                <span class="badge bg-info">Approved</span>
+                                            {% elif request.status == 'Pending Approval' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif request.status == 'Rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% elif request.status == 'Payment Pending' %}
+                                                <span class="badge bg-primary">Payment Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ request.request_date.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ request.required_date.strftime('%d/%m/%Y') }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#detailsModal{{ request.id }}">
+                                                    <i class="ri-eye-line"></i> View
+                                                </button>
+                                                {% if request.status == 'Payment Pending' %}
+                                                    <a href="/patient/pay-request/{{ request.request_id }}"
+                                                       class="btn btn-outline-success">
+                                                        <i class="ri-money-dollar-circle-line"></i> Pay
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modals -->
+    {% for request in requests %}
+        <div class="modal fade" id="detailsModal{{ request.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Request Details: {{ request.request_id }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-primary bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-information-line me-2"></i>Request Information
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Patient:</strong> {{ request.patient_name }}</p>
+                                        <p><strong>Blood Type:</strong> {{ request.blood_type }}</p>
+                                        <p><strong>Component:</strong> {{ request.component_type }}</p>
+                                        <p><strong>Quantity:</strong> {{ request.quantity }} units</p>
+                                        <p><strong>Amount:</strong> ₹{{ request.payment_amount }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-primary bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-calendar-line me-2"></i>Dates & Status</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Request
+                                            Date:</strong> {{ request.request_date.strftime('%d/%m/%Y %H:%M') }}</p>
+                                        <p><strong>Required
+                                            Date:</strong> {{ request.required_date.strftime('%d/%m/%Y') }}</p>
+                                        <p><strong>Status:</strong>
+                                            {% if request.status == 'Completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif request.status == 'Approved' %}
+                                                <span class="badge bg-info">Approved</span>
+                                            {% elif request.status == 'Pending Approval' %}
+                                                <span class="badge bg-warning">Pending Approval</span>
+                                            {% elif request.status == 'Rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% elif request.status == 'Payment Pending' %}
+                                                <span class="badge bg-primary">Payment Pending</span>
+                                            {% endif %}
+                                        </p>
+                                        {% if request.payment_status %}
+                                            <p><strong>Payment Status:</strong>
+                                                <span class="badge bg-{% if request.payment_status == 'Paid' %}success{% else %}warning{% endif %}">
+                                        {{ request.payment_status }}
+                                    </span>
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-primary bg-opacity-10">
+                                        <h6 class="mb-0"><i class="ri-file-text-line me-2"></i>Additional Information
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Reason:</strong> {{ request.reason }}</p>
+                                        {% if request.doctor_note %}
+                                            <p><strong>Doctor's Note:</strong> {{ request.doctor_note }}</p>
+                                        {% endif %}
+                                        {% if request.is_urgent %}
+                                            <p class="text-danger"><i class="ri-alarm-warning-line me-2"></i><strong>Urgent
+                                                Request</strong></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        {% if request.status == 'Payment Pending' %}
+                            <a href="/patient/pay-request/{{ request.request_id }}"
+                               class="btn btn-primary">
+                                <i class="ri-money-dollar-circle-line me-1"></i> Make Payment
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
+
+{% block footerLink %}
+    <!-- DataTables JS -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize DataTable
+            $('#requestsTable').DataTable({
+                responsive: true,
+                order: [[6, 'desc']] // Sort by request date by default
+            });
+        });
+    </script>
+{% endblock %}

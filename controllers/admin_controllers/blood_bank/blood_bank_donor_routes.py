@@ -1,15 +1,16 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import render_template, request, redirect, flash
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import BLOOD_BANK_DONOR, ADMIN, BLOOD_BANK_ADD_DONOR, BLOOD_BANK_EDIT_DONOR, \
     BLOOD_BANK_DELETE_DONOR, BLOOD_BANK_RESTORE_DONOR
-from models.bloodModel import BloodDonor
+from models.bloodModel import BloodDonor, BloodType
 from models.patientModel import Patient
 from models.userModel import User
 from utils.config import db
 from utils.create_new_patient import create_new_patient
+from utils.update_blood_inventory import update_blood_inventory
 
 
 @admin.route(BLOOD_BANK_DONOR, methods=['GET'], endpoint='blood_bank_donor')
@@ -20,11 +21,13 @@ def blood_bank_donor():
                            donors=donors,
                            deleted_donors=deleted_donors,
                            datetime=datetime,
+                           BloodType=BloodType,
                            ADMIN=ADMIN,
                            BLOOD_BANK_ADD_DONOR=BLOOD_BANK_ADD_DONOR,
                            BLOOD_BANK_EDIT_DONOR=BLOOD_BANK_EDIT_DONOR,
                            BLOOD_BANK_DELETE_DONOR=BLOOD_BANK_DELETE_DONOR,
                            BLOOD_BANK_RESTORE_DONOR=BLOOD_BANK_RESTORE_DONOR)
+
 
 
 @admin.route(BLOOD_BANK_ADD_DONOR, methods=['POST'], endpoint="add_blood_donor")
@@ -33,10 +36,10 @@ def add_blood_donor():
         # Check if this is an existing patient
         is_existing_patient = request.form.get('is_existing_patient') == 'on'
         patient_id = request.form.get('patient_id') if is_existing_patient else None
-
+        print(request.form)
         # Validate required fields
         required_fields = ['first_name', 'last_name', 'blood_type', 'gender',
-                           'date_of_birth', 'phone', 'email']
+                           'patientAge', 'phone', 'email']
         if not all(request.form.get(field) for field in required_fields):
             flash('Please fill in all required fields', 'danger')
             return redirect(request.url)
@@ -48,13 +51,7 @@ def add_blood_donor():
                 flash('Patient not found with the provided ID', 'danger')
                 return redirect(request.url)
 
-            # Verify patient details match (optional security check)
-            if (patient.first_name != request.form['first_name'] or
-                    patient.last_name != request.form['last_name']):
-                flash('Patient details do not match the provided ID', 'warning')
-                return redirect(request.url)
-
-            patient_id = patient.patient_id
+            patient_id = patient.id
         else:
             # Create new user and patient if checkbox is checked
             if request.form.get('create_patient') == 'on':
@@ -70,45 +67,41 @@ def add_blood_donor():
                     'last_name': data['last_name'],
                     'email': data['email'],
                     'phone': data['phone'],
-                    'age': datetime.now().year - datetime.strptime(request.form['date_of_birth'],
-                                                                   '%Y-%m-%d').date().year,
+                    'age': data['patientAge'],
                     'gender': data.get('gender')
                 })
-                patient_id = patient.patient_id
+                patient_id = patient.id
 
+        next_eligible = datetime.strptime(request.form['last_donation'], '%Y-%m-%d').date() if request.form.get(
+            'last_donation') else None + timedelta(days=56)
         # Create new donor
         new_donor = BloodDonor(
-            first_name=request.form['first_name'],
-            last_name=request.form['last_name'],
-            blood_type=request.form['blood_type'],
-            gender=request.form['gender'],
-            date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d').date(),
-            phone=request.form['phone'],
-            email=request.form['email'],
-            address=request.form.get('address'),
-            city=request.form.get('city'),
-            state=request.form.get('state'),
-            postal_code=request.form.get('postal_code'),
-            country=request.form.get('country'),
+            patient_id=patient_id,
+            donation_date=datetime.utcnow(),
+            blood_type=BloodType(request.form['blood_type']),
+            units_donated=float(request.form['units_donated']),
             status=request.form.get('status', 'Active'),
             last_donation=datetime.strptime(request.form['last_donation'], '%Y-%m-%d').date() if request.form.get(
                 'last_donation') else None,
-            medical_history=request.form.get('medical_history'),
+            next_eligible=next_eligible,
             emergency_contact_name=request.form.get('emergency_contact_name'),
             emergency_contact_phone=request.form.get('emergency_contact_phone'),
             emergency_contact_relation=request.form.get('emergency_contact_relation'),
             notes=request.form.get('notes'),
-            patient_id=patient_id
-        )
 
-        # Calculate next eligible date
-        if new_donor.last_donation:
-            new_donor.calculate_next_eligible()
+        )
 
         db.session.add(new_donor)
         db.session.commit()
 
-        flash(f'Donor {new_donor.first_name} {new_donor.last_name} added successfully!', 'success')
+        # Update inventory
+        update_blood_inventory(
+            blood_type=BloodType(new_donor.blood_type),
+            units=float(new_donor.units_donated),
+            donation_id=new_donor.id
+        )
+
+        flash(f'Donor added successfully!', 'success')
 
         # If new patient was created, add additional flash message
         if not is_existing_patient and request.form.get('create_patient') == 'on':
@@ -128,41 +121,32 @@ def edit_blood_donor(donor_id):
     donor = BloodDonor.query.get_or_404(donor_id)
 
     try:
-        # Update only the fields that exist in the modal form
-        donor.blood_type = request.form['blood_type']
+        donor.blood_type = BloodType(request.form['blood_type'])
+        donor.units_donated = float(request.form['units_donated'])
         donor.status = request.form['status']
+        donor.notes = request.form.get('notes')
 
-        # Handle last donation date (optional field)
+        # Update dates
         last_donation = request.form.get('last_donation')
-        donor.last_donation = datetime.strptime(last_donation, '%Y-%m-%d').date() if last_donation else None
+        if last_donation:
+            donor.last_donation = datetime.strptime(last_donation, '%Y-%m-%d').date()
+            donor.next_eligible = donor.last_donation + timedelta(days=56)
 
-        # Handle next eligible date (optional field)
-        next_eligible = request.form.get('next_eligible')
-        donor.next_eligible = datetime.strptime(next_eligible, '%Y-%m-%d').date() if next_eligible else None
-
-        # Emergency contact info (optional fields)
+        # Emergency contact info
         donor.emergency_contact_name = request.form.get('emergency_contact_name')
         donor.emergency_contact_phone = request.form.get('emergency_contact_phone')
         donor.emergency_contact_relation = request.form.get('emergency_contact_relation')
 
-        # Notes (optional field)
-        donor.notes = request.form.get('notes')
-
-        donor.updated_at = datetime.now()
-
-        # Calculate next eligible date if last donation was updated
-        if last_donation:
-            donor.calculate_next_eligible()
-
+        donor.updated_at = datetime.utcnow()
         db.session.commit()
-        flash('Donor information updated successfully!', 'success')
+        flash('Donation record updated successfully!', 'success')
 
     except ValueError as e:
         db.session.rollback()
         flash(f'Invalid data format: {str(e)}', 'danger')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error updating donor: {str(e)}', 'danger')
+        flash(f'Error updating donation: {str(e)}', 'danger')
     return redirect(ADMIN + BLOOD_BANK_DONOR)
 
 

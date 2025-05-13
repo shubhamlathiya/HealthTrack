@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Blood{% endblock %}
+{% block page %}Blood Bank - Request Blood{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0"><i class="ri-drop-fill me-2"></i>Blood Request Form</h5>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form id="bloodRequestForm" method="POST" action="/patient/blood-request">
+                            <div class="row g-3">
+                                <!-- Patient Information -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Patient ID</label>
+                                    <input type="text" class="form-control" value="{{ patient.patient_id }}"
+                                           readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Patient Name</label>
+                                    <input type="text" class="form-control"
+                                           value="{{ patient.first_name }} {{ patient.last_name }}" readonly>
+                                </div>
+
+                                <!-- Blood Details -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Blood Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="blood_type" id="bloodTypeSelect" required>
+                                        <option value="">Select Blood Type</option>
+                                        {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                            <option value="{{ bt }}">{{ bt }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Component Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="component_type" id="componentTypeSelect" required>
+                                        <option value="">Select Component</option>
+                                        <option value="Whole Blood">Whole Blood</option>
+                                        <option value="Red Blood Cells">Red Blood Cells</option>
+                                        <option value="Plasma">Plasma</option>
+                                        <option value="Platelets">Platelets</option>
+                                        <option value="Cryoprecipitate">Cryoprecipitate</option>
+                                    </select>
+                                </div>
+
+                                <!-- Quantity and Dates -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Quantity (units) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="quantity" min="1" required
+                                           id="quantityInput" onchange="checkAvailability()">
+                                    <small class="text-muted">1 unit = approximately 350ml</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Required Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="required_date" required
+                                           min="{{ min_date }}">
+                                </div>
+
+                                <!-- Availability Indicator -->
+                                <div class="col-12">
+                                    <div class="card mb-3" id="availabilityCard" style="display: none;">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-information-line fs-4" id="availabilityIcon"></i>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h6 class="mb-0" id="availabilityTitle">Checking
+                                                        availability...</h6>
+                                                    <small class="text-muted" id="availabilityText"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Urgent Request -->
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_urgent" id="isUrgent">
+                                        <label class="form-check-label" for="isUrgent">This is an urgent request</label>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Reason -->
+                                <div class="col-12">
+                                    <label class="form-label">Reason for Request <span
+                                            class="text-danger">*</span></label>
+                                    <textarea class="form-control" name="reason" rows="3" required
+                                              placeholder="Please describe why you need this blood product"></textarea>
+                                </div>
+
+                                <!-- Cost Estimate -->
+                                <div class="col-12">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Estimated Cost</h6>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <p class="mb-1" id="costEstimateText">Select blood type and
+                                                        component to see cost</p>
+                                                    <small class="text-muted">Final amount will be confirmed after
+                                                        approval</small>
+                                                </div>
+                                                <h4 class="mb-0" id="costEstimateAmount">₹0</h4>
+                                                    <input type="hidden" class="form-control" name="amounts" id="amounts">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Terms and Submit -->
+                                <div class="col-12">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                        <label class="form-check-label" for="agreeTerms">
+                                            I agree to the <a href="#" data-bs-toggle="modal"
+                                                              data-bs-target="#termsModal">terms and conditions</a>
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                                        <i class="ri-send-plane-line me-2"></i>Submit Request
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms and Conditions Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Terms and Conditions</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Blood Request Terms</h6>
+                    <ol>
+                        <li>All blood requests require approval from the blood bank staff.</li>
+                        <li>Payment must be completed within 24 hours of approval.</li>
+                        <li>Blood products must be collected within 48 hours of payment confirmation.</li>
+                        <li>Cancellations must be made at least 6 hours before collection time.</li>
+                        <li>Refunds will be processed for cancellations made within the specified time.</li>
+                    </ol>
+
+                    <h6 class="mt-4">Privacy Policy</h6>
+                    <p>Your personal and medical information will be kept confidential and used only for processing your
+                        blood request and improving our services.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footerLink %}
+    <script>
+        // Base prices for blood components
+        const bloodPrices = {
+            'Whole Blood': 1000,
+            'Red Blood Cells': 1200,
+            'Plasma': 1500,
+            'Platelets': 1800,
+            'Cryoprecipitate': 2000
+        };
+
+        // Check blood availability
+        function checkAvailability() {
+            let bloodTypeSelect = document.getElementById('bloodTypeSelect').value;
+            console.log(bloodTypeSelect)
+            const componentType = document.getElementById('componentTypeSelect').value;
+            const quantity = document.getElementById('quantityInput').value;
+
+
+            // Show loading state
+            const availabilityCard = document.getElementById('availabilityCard');
+            availabilityCard.style.display = 'block';
+            document.getElementById('availabilityTitle').textContent = 'Checking availability...';
+            document.getElementById('availabilityText').textContent = 'Please wait while we check stock levels';
+            document.getElementById('availabilityIcon').className = 'ri-loader-4-line fs-4 animate-spin';
+
+
+            setTimeout(() => {
+                // Get the selected values properly
+                const bloodTypeSelect = document.getElementById('bloodTypeSelect');
+                const selectedBloodType = bloodTypeSelect.options[bloodTypeSelect.selectedIndex].value;
+                const selectedComponentType = document.getElementById('componentTypeSelect').value;
+                const quantity = document.getElementById('quantityInput').value;
+
+                // Create JSON payload
+                const requestData = {
+                    blood_type: selectedBloodType,
+                    component_type: selectedComponentType,
+                    quantity: parseInt(quantity) || 0
+                };
+
+                // Make the fetch request with JSON
+                fetch('/patient/api/blood-availability', {
+                    method: 'POST',  // Using POST for JSON data
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('API Response:', data);
+
+                        const available = data.is_available && data.quantity >= requestData.quantity;
+                        const icon = document.getElementById('availabilityIcon');
+                        const title = document.getElementById('availabilityTitle');
+                        const text = document.getElementById('availabilityText');
+
+                        if (available) {
+                            availabilityCard.className = 'card mb-3 bg-success bg-opacity-10';
+                            icon.className = 'ri-checkbox-circle-line fs-4 text-success';
+                            title.textContent = 'Available';
+                            title.className = 'mb-0 text-success';
+                            text.textContent = `${data.quantity} units available for ${data.component_type}`;
+                            document.getElementById('submitBtn').disabled = false;
+                        } else {
+                            availabilityCard.className = 'card mb-3 bg-danger bg-opacity-10';
+                            icon.className = 'ri-close-circle-line fs-4 text-danger';
+                            title.textContent = 'Not Available';
+                            title.className = 'mb-0 text-danger';
+
+                            if (data.quantity > 0) {
+                                text.textContent = `Only ${data.quantity} units available (need ${requestData.quantity})`;
+                            } else {
+                                text.textContent = 'No stock available for this blood type and component';
+                            }
+                            document.getElementById('submitBtn').disabled = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking availability:', error);
+                        availabilityCard.className = 'card mb-3 bg-warning bg-opacity-10';
+                        document.getElementById('availabilityIcon').className = 'ri-error-warning-line fs-4 text-warning';
+                        document.getElementById('availabilityTitle').textContent = 'Error checking availability';
+                        document.getElementById('availabilityTitle').className = 'mb-0 text-warning';
+                        document.getElementById('availabilityText').textContent = 'Please try again later';
+                        document.getElementById('submitBtn').disabled = true;
+                    });
+            }, 1000);
+            // Update cost estimate
+            updateCostEstimate();
+        }
+
+        // Update cost estimate
+        function updateCostEstimate() {
+            const componentType = document.getElementById('componentTypeSelect').value;
+            const quantity = document.getElementById('quantityInput').value || 0;
+
+            if (componentType && bloodPrices[componentType]) {
+                const totalCost = bloodPrices[componentType] * quantity;
+                document.getElementById('costEstimateText').textContent =
+                    `${quantity} unit(s) of ${componentType}`;
+                document.getElementById('costEstimateAmount').textContent = `₹${totalCost.toLocaleString()}`;
+                document.getElementById('amounts').value = totalCost;
+            } else {
+                document.getElementById('costEstimateText').textContent =
+                    'Select blood type and component to see cost';
+                document.getElementById('costEstimateAmount').textContent = '₹0';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('bloodTypeSelect').addEventListener('change', checkAvailability);
+        document.getElementById('componentTypeSelect').addEventListener('change', checkAvailability);
+        document.getElementById('quantityInput').addEventListener('input', checkAvailability);
+
+        // Initialize date picker
+        document.addEventListener('DOMContentLoaded', function () {
+            const today = new Date();
+            const minDate = new Date(today);
+            minDate.setDate(today.getDate() + 1);
+            document.querySelector('input[name="required_date"]').min = minDate.toISOString().split('T')[0];
+        });
+    </script>
+{% endblock %}

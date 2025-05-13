@@ -2,6 +2,8 @@ from utils.config import db
 
 
 class Patient(db.Model):
+    __tablename__ = 'patient'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign Key to User model
     patient_id = db.Column(db.Integer, nullable=False)
@@ -22,7 +24,9 @@ class Patient(db.Model):
     appointments = db.relationship("Appointment", back_populates="patient")
     allocations = db.relationship('BedAllocation', back_populates='patient', cascade='all, delete-orphan')
     charges = db.relationship('RoomCharge', back_populates='patient', cascade='all, delete-orphan')
-
+    donations = db.relationship("BloodDonor", back_populates="patient")
+    blood_requests = db.relationship('BloodRequest', back_populates='patient')
+    blood_transfusions = db.relationship("BloodTransfusion", back_populates="patient", cascade="all, delete-orphan")
     def __repr__(self):
         return f"<Patient {self.first_name} {self.last_name}>"
 

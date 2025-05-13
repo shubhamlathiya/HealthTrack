@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Payment{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Confirm Payment</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading">Payment Due: ₹{{ request.payment_amount }}</h5>
+                            <p>Request ID: {{ request.request_id }}</p>
+                            <p>Blood Type: {{ request.blood_type }} {{ request.component_type }}</p>
+                            <p>Quantity: {{ request.quantity }} units</p>
+                        </div>
+
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label class="form-label">Payment Method</label>
+                                <select class="form-select" name="payment_method" required>
+                                    <option value="">Select payment method</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Card">Card</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Transaction Reference (if any)</label>
+                                <input type="text" class="form-control" name="transaction_ref">
+                            </div>
+
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="confirmPayment" required>
+                                <label class="form-check-label" for="confirmPayment">
+                                    I confirm that I have made the payment
+                                </label>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="ri-check-line me-2"></i> Confirm Payment
+                                </button>
+                                <a href="{{ url_for('patient.my_blood_requests') }}" class="btn btn-outline-secondary">
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

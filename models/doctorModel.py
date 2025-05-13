@@ -42,7 +42,7 @@ class Doctor(db.Model):
                                              back_populates="original_doctor")
 
     user = db.relationship('User', back_populates='doctor')
-
+    transfusions = db.relationship('BloodTransfusion', back_populates='doctor')
 
     def __repr__(self):
         return f"<Doctor {self.first_name} {self.last_name}>"

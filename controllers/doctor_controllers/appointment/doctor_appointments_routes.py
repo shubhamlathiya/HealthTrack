@@ -1,6 +1,6 @@
 from datetime import datetime, date
 
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, redirect
 from sqlalchemy import func, and_
 
 from controllers.doctor_controllers import doctors
@@ -16,6 +16,21 @@ def appointment_calendar():
     """Render the appointment calendar view"""
     return render_template('doctor_templates/appointments/appointment_management.html')
 
+
+@doctors.route('/view-appointment', methods=['GET'], endpoint='viewAppointment')
+@token_required
+def viewAppointment(current_user):
+    doctors = Doctor.query.filter_by(user_id=current_user).first()
+    if not doctors:
+        return redirect(request.url)
+    departments = Department.query.filter_by(is_deleted=False).all()
+    appointments = Appointment.query.filter_by(doctor_id=doctors.id, is_deleted=False).all()
+    deleted_appointments = Appointment.query.filter_by(doctor_id=doctors.id, is_deleted=True).all()
+    return render_template('doctor_templates/appointments/appointment_list.html', appointments=appointments,
+                           deleted_appointments=deleted_appointments,
+                           departments=departments,
+                           date=date
+                           )
 
 @doctors.route('/calendar-events')
 @token_required

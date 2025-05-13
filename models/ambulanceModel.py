@@ -2,6 +2,21 @@ from datetime import datetime
 
 from utils.config import db
 
+class Driver(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    license_number = db.Column(db.String(50), unique=True, nullable=False)
+    contact = db.Column(db.String(20), nullable=False)
+    address = db.Column(db.Text, nullable=False)
+    date_of_birth = db.Column(db.Date)
+    gender = db.Column(db.String(10))
+    is_active = db.Column(db.Boolean, default=True)
+
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
+
 
 class Ambulance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,22 +31,6 @@ class Ambulance(db.Model):
     driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'))
 
     driver = db.relationship('Driver', backref='ambulances')
-
-    is_deleted = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
-    deleted_at = db.Column(db.DateTime, nullable=True)
-
-
-class Driver(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    license_number = db.Column(db.String(50), unique=True, nullable=False)
-    contact = db.Column(db.String(20), nullable=False)
-    address = db.Column(db.Text, nullable=False)
-    date_of_birth = db.Column(db.Date)
-    gender = db.Column(db.String(10))
-    is_active = db.Column(db.Boolean, default=True)
 
     is_deleted = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())

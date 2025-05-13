@@ -33,9 +33,11 @@ from controllers.admin_controllers.inventory.inventory_routes import *
 from controllers.admin_controllers.inventory.issued_item_routes import *
 
 # Blood Bank
-from controllers.admin_controllers.blood_bank.blood_bank_issued_routes import *
-from controllers.admin_controllers.blood_bank.blood_bank_stock_routes import *
+# from controllers.admin_controllers.blood_bank.blood_bank_issued_routes import *
+# from controllers.admin_controllers.blood_bank.blood_bank_stock_routes import *
 from controllers.admin_controllers.blood_bank.blood_bank_donor_routes import *
+from controllers.admin_controllers.blood_bank.blood_requests import *
+from controllers.admin_controllers.blood_bank.blood_bank_transfusions_routes import *
 
 # insurance
 from controllers.admin_controllers.insurance.coverage_types_routes import *
@@ -64,13 +66,13 @@ def get_patient(patient_id):
 
         if not patient:
             return jsonify({'error': 'Patient not found'}), 404
-
+        users = User.query.filter_by(id=patient.user_id).first()
         return jsonify({
             'id': patient.id,
             'name': patient.first_name,
             'first_name': patient.first_name,
             'last_name': patient.last_name,
-            'email': patient.user.email,  # If this is really email, fix the field name
+            'email': users.email,
             'phone': patient.phone,
             'gender': patient.gender,
             'age': patient.age
