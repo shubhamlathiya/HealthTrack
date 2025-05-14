@@ -1,11 +1,18 @@
+from datetime import datetime
+
 from flask import render_template
+from flask import request, redirect, flash
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import (
-    DEPARTMENT_MANAGE_HEADS,
-    DEPARTMENT_LIST
+    DEPARTMENT_LIST, DEPARTMENT_MANAGE_HEADS, DEPARTMENT_ADD_HEAD,
+    DEPARTMENT_REMOVE_HEAD, ADMIN
 )
 from middleware.auth_middleware import token_required
+from models.departmentModel import Department, DepartmentHead
+from models.doctorModel import Doctor
+from models.userModel import UserRole
+from utils.config import db
 
 
 @admin.route(DEPARTMENT_MANAGE_HEADS + '/<int:department_id>', methods=['GET'], endpoint='manage-department-heads')
@@ -40,18 +47,6 @@ def manage_department_heads(current_user, department_id):
                            )
 
 
-from datetime import datetime
-from flask import request, redirect, flash
-from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import (
-    DEPARTMENT_MANAGE_HEADS, DEPARTMENT_ADD_HEAD,
-    DEPARTMENT_REMOVE_HEAD, ADMIN
-)
-from middleware.auth_middleware import token_required
-from models.departmentModel import Department, DepartmentHead
-from models.doctorModel import Doctor
-from models.userModel import UserRole
-from utils.config import db
 
 
 @admin.route(DEPARTMENT_ADD_HEAD + '/<int:department_id>', methods=['POST'])
