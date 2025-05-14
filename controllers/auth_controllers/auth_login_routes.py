@@ -6,6 +6,7 @@ from werkzeug.security import check_password_hash
 
 from controllers.auth_controllers import auth
 from controllers.constant.adminPathConstant import LOGIN, ADMIN_DASHBOARD
+from controllers.constant.departmentPathConstant import DEPARTMENT_DASHBOARD
 from controllers.constant.doctorPathConstant import DOCTOR_DASHBOARD
 from controllers.constant.laboratoryPathConstant import LABORATORY_DASHBOARD
 from controllers.constant.nursePathConstant import NURSE_DASHBOARD
@@ -47,7 +48,7 @@ def login():
             if user.role == UserRole.PATIENT:
                 redirect_url = PATIENT_DASHBOARD
             elif user.role == UserRole.DEPARTMENT_HEAD:
-                redirect_url = PATIENT_DASHBOARD
+                redirect_url = DEPARTMENT_DASHBOARD
             elif user.role == UserRole.ADMIN:
                 redirect_url = ADMIN_DASHBOARD
             elif user.role == UserRole.DOCTOR:

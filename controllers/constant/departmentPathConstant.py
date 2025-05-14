@@ -1,0 +1,3 @@
+DEPARTMENT = "/department"
+
+DEPARTMENT_DASHBOARD = f"{DEPARTMENT}/dashboard"

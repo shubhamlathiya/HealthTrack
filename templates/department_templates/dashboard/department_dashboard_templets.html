@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+{% block title %}Department Head Dashboard{% endblock %}
+{% block page %}Department Head Dashboard{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <!-- Welcome Card -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="card-title mb-1">Welcome, {{ doctors.first_name }}!</h4>
+{#                                <p class="mb-0">Department of {{ current_department.name }}</p>#}
+                            </div>
+                            <div class="avatar avatar-lg">
+                                <img src="{{ url_for('static', filename='assets/images/doctor-avatar.png') }}"
+                                     class="rounded-circle border border-3 border-white"
+                                     alt="User Avatar">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-muted mb-1">Today's Appointments</h6>
+                                <h3 class="mb-0">24</h3>
+                            </div>
+                            <div class="avatar bg-primary bg-opacity-10 rounded-3 p-3">
+                                <i class="ri-calendar-check-fill fs-4 text-primary"></i>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-success me-2">+12%</span>
+                            <span>from yesterday</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-muted mb-1">Available Beds</h6>
+                                <h3 class="mb-0">18/32</h3>
+                            </div>
+                            <div class="avatar bg-info bg-opacity-10 rounded-3 p-3">
+                                <i class="ri-hotel-bed-fill fs-4 text-info"></i>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-danger me-2">-3%</span>
+                            <span>from last week</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-muted mb-1">Pending Lab Tests</h6>
+                                <h3 class="mb-0">9</h3>
+                            </div>
+                            <div class="avatar bg-warning bg-opacity-10 rounded-3 p-3">
+                                <i class="ri-flask-fill fs-4 text-warning"></i>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-success me-2">+3</span>
+                            <span>new today</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-muted mb-1">Blood Bank Stock</h6>
+                                <h3 class="mb-0">87%</h3>
+                            </div>
+                            <div class="avatar bg-danger bg-opacity-10 rounded-3 p-3">
+                                <i class="ri-drop-fill fs-4 text-danger"></i>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-success me-2">+5 units</span>
+                            <span>this week</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Modules Section -->
+        <div class="row">
+            <!-- Patient Records -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 hover-scale-up cursor-pointer">
+                    <div class="card-body text-center">
+                        <div class="avatar bg-blue bg-opacity-10 rounded-3 p-3 mb-3">
+                            <i class="ri-file-text-fill fs-2 text-blue"></i>
+                        </div>
+                        <h5 class="mb-1">Patient Records</h5>
+                        <p class="text-muted mb-3">Manage all patient medical records</p>
+                        <a href="/" class="btn btn-sm btn-outline-primary">
+                            Access Module <i class="ri-arrow-right-line ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 hover-scale-up cursor-pointer">
+                    <div class="card-body text-center">
+                        <div class="avatar bg-purple bg-opacity-10 rounded-3 p-3 mb-3">
+                            <i class="ri-calendar-todo-fill fs-2 text-purple"></i>
+                        </div>
+                        <h5 class="mb-1">Appointments</h5>
+                        <p class="text-muted mb-3">Schedule and manage appointments</p>
+                        <a href="/" class="btn btn-sm btn-outline-primary">
+                            Access Module <i class="ri-arrow-right-line ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 hover-scale-up cursor-pointer">
+                    <div class="card-body text-center">
+                        <div class="avatar bg-orange bg-opacity-10 rounded-3 p-3 mb-3">
+                            <i class="ri-store-2-fill fs-2 text-orange"></i>
+                        </div>
+                        <h5 class="mb-1">Inventory</h5>
+                        <p class="text-muted mb-3">Manage medical supplies and equipment</p>
+                        <a href="/" class="btn btn-sm btn-outline-primary">
+                            Access Module <i class="ri-arrow-right-line ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blood Bank -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 hover-scale-up cursor-pointer">
+                    <div class="card-body text-center">
+                        <div class="avatar bg-red bg-opacity-10 rounded-3 p-3 mb-3">
+                            <i class="ri-drop-fill fs-2 text-red"></i>
+                        </div>
+                        <h5 class="mb-1">Blood Bank</h5>
+                        <p class="text-muted mb-3">Manage blood inventory and requests</p>
+                        <a href="/" class="btn btn-sm btn-outline-primary">
+                            Access Module <i class="ri-arrow-right-line ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Management -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 hover-scale-up cursor-pointer">
+                    <div class="card-body text-center">
+                        <div class="avatar bg-teal bg-opacity-10 rounded-3 p-3 mb-3">
+                            <i class="ri-team-fill fs-2 text-teal"></i>
+                        </div>
+                        <h5 class="mb-1">Staff Management</h5>
+                        <p class="text-muted mb-3">Manage department staff and schedules</p>
+                        <a href="/" class="btn btn-sm btn-outline-primary">
+                            Access Module <i class="ri-arrow-right-line ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lab Reports -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 hover-scale-up cursor-pointer">
+                    <div class="card-body text-center">
+                        <div class="avatar bg-indigo bg-opacity-10 rounded-3 p-3 mb-3">
+                            <i class="ri-microscope-fill fs-2 text-indigo"></i>
+                        </div>
+                        <h5 class="mb-1">Lab Reports</h5>
+                        <p class="text-muted mb-3">View and manage laboratory tests</p>
+                        <a href="/" class="btn btn-sm btn-outline-primary">
+                            Access Module <i class="ri-arrow-right-line ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 hover-scale-up cursor-pointer">
+                    <div class="card-body text-center">
+                        <div class="avatar bg-green bg-opacity-10 rounded-3 p-3 mb-3">
+                            <i class="ri-money-dollar-circle-fill fs-2 text-green"></i>
+                        </div>
+                        <h5 class="mb-1">Billing</h5>
+                        <p class="text-muted mb-3">Manage patient billing and invoices</p>
+                        <a href="/" class="btn btn-sm btn-outline-primary">
+                            Access Module <i class="ri-arrow-right-line ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 hover-scale-up cursor-pointer">
+                    <div class="card-body text-center">
+                        <div class="avatar bg-pink bg-opacity-10 rounded-3 p-3 mb-3">
+                            <i class="ri-bar-chart-2-fill fs-2 text-pink"></i>
+                        </div>
+                        <h5 class="mb-1">Analytics</h5>
+                        <p class="text-muted mb-3">Department performance reports</p>
+                        <a href="/" class="btn btn-sm btn-outline-primary">
+                            Access Module <i class="ri-arrow-right-line ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Recent Department Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Activity</th>
+                                    <th>Staff</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Today, 10:30 AM</td>
+                                    <td>New patient admission</td>
+                                    <td>Dr. Smith</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Today, 09:15 AM</td>
+                                    <td>Lab test ordered</td>
+                                    <td>Nurse Johnson</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Yesterday, 3:45 PM</td>
+                                    <td>Inventory restocked</td>
+                                    <td>Admin</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block heardLink %}
+    <style>
+        .hover-scale-up {
+            transition: transform 0.2s ease;
+        }
+
+        .hover-scale-up:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-stats {
+            border-left: 4px solid;
+        }
+
+        .card-stats:nth-child(1) {
+            border-left-color: #566FE2;
+        }
+
+        .card-stats:nth-child(2) {
+            border-left-color: #17C1E8;
+        }
+
+        .card-stats:nth-child(3) {
+            border-left-color: #F2C94C;
+        }
+
+        .card-stats:nth-child(4) {
+            border-left-color: #F53939;
+        }
+    </style>
+{% endblock %}

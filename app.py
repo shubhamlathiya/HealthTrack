@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash
 
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
+from controllers.department_controllers import department
 from controllers.doctor_controllers import doctors
 from controllers.every_one_controllers import idCard
 from controllers.laboratory_controllers import laboratory
@@ -36,7 +37,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 app.config['SECRET_KEY'] = 'your_secure_random_key'
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(admin, url_prefix='/admin')
-
+app.register_blueprint(department, url_prefix='/department')
 from controllers.chat_controllers import chat
 
 app.register_blueprint(chat, url_prefix='/chat')
