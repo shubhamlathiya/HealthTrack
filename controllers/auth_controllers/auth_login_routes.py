@@ -11,7 +11,7 @@ from controllers.constant.laboratoryPathConstant import LABORATORY_DASHBOARD
 from controllers.constant.nursePathConstant import NURSE_DASHBOARD
 from controllers.constant.patientPathConstant import PATIENT_DASHBOARD
 from controllers.constant.staffPathConstant import STAFF_DASHBOARD
-from models.userModel import User
+from models.userModel import User, UserRole
 
 
 @auth.route(LOGIN, methods=['POST'] , endpoint='login')
@@ -41,20 +41,22 @@ def login():
             # Store user data in session
             session['user_id'] = str(user.id)
             session['email'] = user.email
-            session['role'] = user.role
-
+            session["role"] = user.role.name  # or user.role_id
+            print(user.role.name)
             # Redirect based on user role
-            if user.role == 'patient':
+            if user.role == UserRole.PATIENT:
                 redirect_url = PATIENT_DASHBOARD
-            elif user.role == 'admin':
+            elif user.role == UserRole.DEPARTMENT_HEAD:
+                redirect_url = PATIENT_DASHBOARD
+            elif user.role == UserRole.ADMIN:
                 redirect_url = ADMIN_DASHBOARD
-            elif user.role == 'doctor':
+            elif user.role == UserRole.DOCTOR:
                 redirect_url = DOCTOR_DASHBOARD
-            elif user.role == 'staff':
+            elif user.role == UserRole.STAFF:
                 redirect_url = STAFF_DASHBOARD
-            elif user.role == 'nurse':
+            elif user.role == UserRole.NURSE:
                 redirect_url = NURSE_DASHBOARD
-            elif user.role == 'laboratory':
+            elif user.role == UserRole.LABORATORY:
                 redirect_url = LABORATORY_DASHBOARD
             else:
                 return jsonify({'message': 'Invalid role. Please contact dashboard.'}), 400

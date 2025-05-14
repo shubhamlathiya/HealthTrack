@@ -1,6 +1,6 @@
 import os
-from datetime import datetime
 import random
+from datetime import datetime
 
 from flask import render_template, request, jsonify, redirect, flash
 from werkzeug.security import generate_password_hash
@@ -10,7 +10,7 @@ from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DOCTOR_ADD_DOCTOR, DOCTOR_LIST, ADMIN
 from middleware.auth_middleware import token_required
 from models.doctorModel import Availability, Doctor
-from models.userModel import User
+from models.userModel import User, UserRole
 from utils.config import db
 from utils.email_utils import send_email
 
@@ -67,7 +67,7 @@ def register_doctor(current_user):
         new_user = User(
             email=email,
             password=hashed_password,
-            role='doctor',
+            role=UserRole.DOCTOR,
             status=True,
             verified=False
         )

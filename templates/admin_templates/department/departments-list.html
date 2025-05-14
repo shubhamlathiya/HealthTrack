@@ -83,7 +83,7 @@
                                         <img src="../../../static/assets/images/doctor.png"
                                              class="img-2x rounded-5 me-1"
                                              alt="Department Head">
-                                        {{ department.department_head }}
+                                        Dr. {{ department.heads[0].doctor.first_name }} {{ department.heads[0].doctor.last_name }}
                                     </td>
                                     <td>
                                         {% if department.status == 'active' %}
@@ -123,6 +123,10 @@
                                                     data-bs-placement="top" data-bs-title="Edit Department">
                                                 <i class="ri-edit-box-line"></i>
                                             </button>
+                                            <a href="{{ ADMIN + DEPARTMENT_MANAGE_HEADS }}/{{ department.id }}"
+                                               class="btn btn-primary ms-auto">
+                                                <i class="ri-add-line"></i> department manage heads
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -214,7 +218,9 @@
                                                  class="img-3x rounded-5 me-3"
                                                  alt="Department Head">
                                             <div>
-                                                <h6 class="mb-0">{{ department.department_head }}</h6>
+                                                <h6 class="mb-0">
+                                                    Dr. {{ department.heads[0].doctor.first_name }} {{ department.heads[0].doctor.last_name }}
+                                                </h6>
                                                 <p class="text-muted small mb-0">Head of Department</p>
                                             </div>
                                         </div>
@@ -392,13 +398,6 @@
 
                                 <!-- Right Column -->
                                 <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Department Head <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="department_head"
-                                               value="{{ department.department_head }}" required>
-                                    </div>
-
                                     <div class="mb-3">
                                         <label class="form-label">Phone <span class="text-danger">*</span></label>
                                         <input type="tel" class="form-control" name="phone"

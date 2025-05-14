@@ -1,9 +1,19 @@
 from datetime import datetime
-
+from enum import Enum
+from sqlalchemy import Enum as SqlEnum
 from utils.config import db
 
+class UserRole(Enum):
+    ADMIN = 'admin'
+    DOCTOR = 'doctor'
+    DEPARTMENT_HEAD = 'department_head'
+    PATIENT = 'patient'
+    STAFF = 'staff'
+    NURSE = 'nurse'
+    LABORATORY = 'laboratory'
 
-# Define the User model
+
+
 class User(db.Model):
     __tablename__ = 'users'  # Table name
 
@@ -11,7 +21,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)  # Hash the password during registration
-    role = db.Column(db.String(50), nullable=True)  # Could be 'doctor', 'patient', etc.
+    role = db.Column(SqlEnum(UserRole), nullable=False)
     status = db.Column(db.Boolean, nullable=True)  # Active or inactive
     verified = db.Column(db.Boolean, nullable=True)  # Email verification status
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -44,9 +54,13 @@ class User(db.Model):
     def __init__(self, email, password, role, status, verified):
         self.email = email
         self.password = password
-        self.role = role
+        self.role = role if isinstance(role, UserRole) else UserRole(role)
         self.status = status
         self.verified = verified
 
     def __repr__(self):
         return f'<User {self.email}>'
+
+    def is_department_head(self):
+        return self.role == UserRole.DEPARTMENT_HEAD
+

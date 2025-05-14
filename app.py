@@ -12,7 +12,7 @@ from controllers.doctor_controllers import doctors
 from controllers.every_one_controllers import idCard
 from controllers.laboratory_controllers import laboratory
 from controllers.patients_controllers import patients
-from models.userModel import User
+from models.userModel import User, UserRole
 from utils.config import init_app, db
 
 app = Flask(__name__, static_folder="static")
@@ -50,7 +50,7 @@ with app.app_context():
     db.create_all()
 
     # Create admin user if not exists
-    if not User.query.filter_by(role='admin').first():
+    if not User.query.filter_by(role=UserRole.ADMIN).first():
         admin = User(
             email='admin@hospital.com',
             password=generate_password_hash('Shubham123'),

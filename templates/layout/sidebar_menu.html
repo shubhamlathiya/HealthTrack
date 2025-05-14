@@ -33,7 +33,7 @@
     <!-- Sidebar menu starts -->
     <div class="sidebarMenuScroll">
         <ul class="sidebar-menu">
-            {% if session['role'] == 'patient' %}
+            {% if session['role'] == 'PATIENT' %}
                 <li class="{% if request.path == '/patients/dashboard' %}active current-page{% endif %}">
                     <a href="/patients/dashboard">
                         <i class="ri-home-6-line"></i>
@@ -100,7 +100,7 @@
 {#                    </a>#}
 {#                </li>#}
 
-            {% elif session['role'] == 'admin' %}
+            {% elif session['role'] == 'ADMIN' %}
                 <li class="{% if request.path == '/admin/dashboard' %}active current-page{% endif %}">
                     <a href="/admin/dashboard">
                         <i class="ri-home-6-line"></i>
@@ -491,7 +491,7 @@
                     </a>
                 </li>
 
-            {% elif session['role'] == 'doctor' %}
+            {% elif session['role'] == 'DOCTOR' %}
                 <li class="{% if request.path == '/doctor/dashboard' %}active current-page{% endif %}">
                     <a href="/doctor/dashboard">
                         <i class="ri-home-6-line"></i>
@@ -572,7 +572,7 @@
                     </a>
                 </li>
 
-            {% elif session['role'] == 'laboratory' %}
+            {% elif session['role'] == 'LABORATORY' %}
                 <li class="{% if request.path == '/doctor/dashboard' %}active current-page{% endif %}">
                     <a href="/laboratory/dashboard">
                         <i class="ri-home-6-line"></i>

@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 from controllers.auth_controllers import auth
 from controllers.constant.adminPathConstant import REGISTER
 from models.patientModel import Patient
-from models.userModel import User
+from models.userModel import User, UserRole
 from utils.config import db
 from utils.email_utils import send_email
 
@@ -46,7 +46,7 @@ def register_patient():
             email=data['email'],
             password=hashed_password,
             status=True,  # Assuming 'true' means active
-            role="patient",  # Assuming it's a patient being registered
+            role=UserRole.PATIENT,  # Assuming it's a patient being registered
             verified=False,  # Set to False until verified
         )
 

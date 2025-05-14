@@ -6,7 +6,7 @@ from flask import render_template
 from werkzeug.security import generate_password_hash
 
 from models.patientModel import Patient
-from models.userModel import User
+from models.userModel import User, UserRole
 from utils.config import db
 from utils.email_utils import send_email
 
@@ -23,7 +23,7 @@ def create_new_patient(patient_data):
     new_user = User(
         email=patient_data['email'],
         password=generate_password_hash(temp_password),
-        role='patient',
+        role=UserRole.PATIENT,
         status=True,
         verified=False
     )

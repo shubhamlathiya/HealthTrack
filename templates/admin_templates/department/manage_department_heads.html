@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Department Heads{% endblock title %}
+{% block page %}Manage Department Heads{% endblock page %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">
+                        <i class="ri-user-star-line me-2"></i>Department Heads - {{ department.name }}
+                    </h5>
+                    <div>
+                        <a href="{{ ADMIN + DEPARTMENT_LIST }}" class="btn btn-secondary ms-auto">
+                            <i class="ri-arrow-left-line"></i> Back to Departments
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Current Heads Section -->
+                    <div class="mb-5">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">
+                                <i class="ri-user-fill text-success me-2"></i>Current Department Heads
+                            </h6>
+                            <span class="badge bg-success bg-opacity-10 text-success">
+                                {{ current_heads|length }} Active
+                            </span>
+                        </div>
+
+                        {% if current_heads %}
+                            <div class="row g-4">
+                                {% for head in current_heads %}
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="card border-success border-opacity-25">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <img src="../../../static/assets/images/doctor.png"
+                                                         class="img-3x rounded-5 me-3"
+                                                         alt="Department Head">
+                                                    <div>
+                                                        <h6 class="mb-0">{{ head.doctor.first_name }} {{ head.doctor.last_name }}</h6>
+                                                        <p class="text-muted small mb-0">Department Head</p>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <span class="text-muted small">Since</span>
+                                                        <div>{{ head.start_date.strftime('%Y-%m-%d') }}</div>
+                                                    </div>
+                                                    <form method="POST"
+                                                          action="{{ ADMIN + DEPARTMENT_REMOVE_HEAD }}/{{ head.id }}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="ri-user-unfollow-line"></i> Remove
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="ri-alert-line me-2"></i>No active department heads assigned
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Add New Head Section -->
+                    <div class="mb-5">
+                        <h6 class="mb-3">
+                            <i class="ri-user-add-line text-primary me-2"></i>Assign New Department Head
+                        </h6>
+
+                        {% if available_doctors %}
+                            <form method="POST" action="{{ ADMIN + DEPARTMENT_ADD_HEAD }}/{{ department.id }}"
+                                  class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label">Select Doctor</label>
+                                    <select class="form-select" name="doctor_id" required>
+                                        <option value="" selected disabled>Choose a doctor...</option>
+                                        {% for doctor in available_doctors %}
+                                            <option value="{{ doctor.id }}">
+                                                {{ doctor.first_name }} {{ doctor.last_name }}
+                                                ({{ doctor.qualification }} {{ doctor.designation }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ri-user-follow-line me-1"></i> Assign as Head
+                                    </button>
+                                </div>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-2"></i>
+                                No available doctors to assign as department head
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Past Heads Section -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">
+                                <i class="ri-history-line text-muted me-2"></i>Past Department Heads
+                            </h6>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                {{ past_heads|length }} Inactive
+                            </span>
+                        </div>
+
+                        {% if past_heads %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>Doctor</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for head in past_heads %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="../../../static/assets/images/doctor.png"
+                                                         class="img-2x rounded-5 me-2"
+                                                         alt="Past Head">
+                                                    <div>
+                                                        {{ head.doctor.first_name }} {{ head.doctor.last_name }}
+                                                        <div class="text-muted small">{{ head.doctor.specialization }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ head.start_date.strftime('%Y-%m-%d') }}</td>
+                                            <td>{{ head.end_date.strftime('%Y-%m-%d') if head.end_date else 'N/A' }}</td>
+                                            <td>
+                                                {% if head.end_date %}
+                                                    {{ (head.end_date - head.start_date).days }} days
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-2"></i>
+                                No past department heads recorded
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block heardLink %}
+    <!-- Additional CSS if needed -->
+    <style>
+        .img-2x {
+            width: 32px;
+            height: 32px;
+        }
+
+        .img-3x {
+            width: 48px;
+            height: 48px;
+        }
+
+        .border-opacity-25 {
+            border-opacity: 0.25;
+        }
+    </style>
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Additional JavaScript if needed -->
+    <script>
+        // You can add any specific JavaScript for this page here
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize tooltips if needed
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+{% endblock footerLink %}

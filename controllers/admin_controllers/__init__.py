@@ -5,7 +5,12 @@ from ..constant.adminPathConstant import ADMIN
 # Initialize the 'client' blueprint
 admin = Blueprint(ADMIN, __name__)
 
+
+# departments
 from controllers.admin_controllers.department.department_routes import *
+from controllers.admin_controllers.department.department_manage_heads_routes import *
+
+
 from .dashboard_routes import *
 from controllers.admin_controllers.operations.operation_routes import *
 

@@ -4,7 +4,7 @@ from flask import render_template, request, redirect, flash
 
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DEPARTMENT_LIST, DEPARTMENT_ADD_DEPARTMENT, ADMIN, \
-    DEPARTMENT_EDIT_DEPARTMENT, DEPARTMENT_DELETE_DEPARTMENT, DEPARTMENT_RESTORE_DEPARTMENT
+    DEPARTMENT_EDIT_DEPARTMENT, DEPARTMENT_DELETE_DEPARTMENT, DEPARTMENT_RESTORE_DEPARTMENT, DEPARTMENT_MANAGE_HEADS
 from middleware.auth_middleware import token_required
 from models.departmentModel import Department
 from utils.config import db
@@ -33,7 +33,8 @@ def department_list(current_user):
                            DEPARTMENT_ADD_DEPARTMENT=DEPARTMENT_ADD_DEPARTMENT,
                            DEPARTMENT_EDIT_DEPARTMENT=DEPARTMENT_EDIT_DEPARTMENT,
                            DEPARTMENT_DELETE_DEPARTMENT=DEPARTMENT_DELETE_DEPARTMENT,
-                           DEPARTMENT_RESTORE_DEPARTMENT=DEPARTMENT_RESTORE_DEPARTMENT
+                           DEPARTMENT_RESTORE_DEPARTMENT=DEPARTMENT_RESTORE_DEPARTMENT,
+                           DEPARTMENT_MANAGE_HEADS=DEPARTMENT_MANAGE_HEADS
                            )
 
 
@@ -50,7 +51,6 @@ def department_list(current_user):
 def add_department(current_user):
     name = request.form.get('name')
     email = request.form.get('email')
-    head = request.form.get('head')
     phone = request.form.get('phone')
     status = request.form.get('status')
     message = request.form.get('message')
@@ -59,7 +59,6 @@ def add_department(current_user):
     new_dept = Department(
         name=name,
         email=email,
-        department_head=head,
         phone=phone,
         status=status,
         message=message
@@ -84,7 +83,6 @@ def edit_department(current_user, id):
         # Update department data
         department.name = request.form.get('name')
         department.email = request.form.get('email')
-        department.department_head = request.form.get('department_head')
         department.phone = request.form.get('phone')
         department.status = request.form.get('status')
         department.message = request.form.get('message')
