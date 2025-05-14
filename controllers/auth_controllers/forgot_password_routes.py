@@ -32,7 +32,6 @@ def forgot_password():
                                     user_name = user.email,
                                     reset_link = reset_link)
         # Send reset email with the link
-
         send_email("Password Reset Request", user.email, body_html)
 
         return jsonify({"message": "Password reset link sent to your email"}), 200

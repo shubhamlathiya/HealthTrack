@@ -99,12 +99,12 @@ def register_patient():
 @auth.route('/verify-email/<int:patient_id>', methods=['GET'])
 def verify_email(patient_id):
     # Retrieve the patient using the patient_id from the database
-    patient = User.query.get(patient_id)
+    users = User.query.get(patient_id)
 
     # Check if the patient exists
-    if patient:
+    if users:
         # Set the 'verified' field to True
-        patient.verified = True
+        users.verified = True
 
         try:
             # Commit the change to the database
