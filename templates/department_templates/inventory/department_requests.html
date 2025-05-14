@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+
+{% block title %}Department Requests{% endblock %}
+{% block page %}Inventory Management - Department Requests{% endblock %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Department Item Requests</h5>
+                    <div>
+                        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal"
+                                data-bs-target="#newRequestModal">
+                            <i class="ri-add-line me-1"></i> New Request
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table  id="scrollVertical" class="table m-0 align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Item Name</th>
+                                <th>Quantity</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                                <th>Updated On</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for request in all_requests %}
+                                <tr>
+                                    <td>{{ request.id }}</td>
+                                    <td>{{ request.item.item_name }}</td>
+                                    <td>{{ request.quantity }}</td>
+                                    <td>{{ request.issue_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if request.status == 'Requested' %}
+                                            <span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
+                                        {% elif request.status == 'Approved' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success">Approved</span>
+                                        {% elif request.status == 'Rejected' %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+                                        {% elif request.status == 'Issued' %}
+                                            <span class="badge bg-info bg-opacity-10 text-info">Issued</span>
+                                        {% elif request.status == 'Returned' %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary">Returned</span>
+                                        {% elif request.status == 'Cancelled' %}
+                                            <span class="badge bg-dark bg-opacity-10 text-dark">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ request.updated_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewRequestModal{{ request.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            {% if request.status == 'Requested' %}
+                                                <button class="btn btn-outline-danger btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#cancelRequestModal{{ request.id }}">
+                                                    <i class="ri-close-line"></i>
+                                                </button>
+                                            {% endif %}
+                                            {% if request.status == 'Issued' %}
+                                                <button class="btn btn-outline-primary btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#requestReturnModal{{ request.id }}">
+                                                    <i class="ri-arrow-left-right-line"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No requests found</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Request Modal -->
+    <div class="modal fade" id="newRequestModal" tabindex="-1" aria-labelledby="newRequestModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="newRequestModalLabel">
+                        <i class="ri-add-line me-2"></i>New Item Request
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ DEPARTMENT + INVENTORY_DEPARTMENT_REQUESTS }}">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Item <span class="text-danger">*</span></label>
+                                <select class="form-select" name="item_id" required>
+                                    <option value="">Select an item</option>
+                                    {% for item in available_items %}
+                                        <option value="{{ item.id }}"
+                                                data-available="{{ item.quantity }}"
+                                                {% if item.quantity < 1 %}disabled{% endif %}>
+                                            {{ item.item_name }} ({{ item.quantity }} available)
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="quantity" min="1" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Need By Date</label>
+                                <input type="date" class="form-control" name="need_by_date">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Purpose <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="purpose" rows="3" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-send-plane-line me-1"></i> Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for Requests -->
+    {% for request in all_requests %}
+        <!-- View Request Modal -->
+        <div class="modal fade" id="viewRequestModal{{ request.id }}" tabindex="-1"
+             aria-labelledby="viewRequestModalLabel{{ request.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewRequestModalLabel{{ request.id }}">
+                            <i class="ri-information-line me-2"></i>Request Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p><strong>Request ID:</strong> {{ request.id }}</p>
+                                        <p><strong>Item Name:</strong> {{ request.item.item_name }}</p>
+                                        <p><strong>Quantity:</strong> {{ request.quantity }}</p>
+                                        <p><strong>Current Stock:</strong> {{ request.item.quantity }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Status:</strong>
+                                            {% if request.status == 'Requested' %}
+                                                <span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
+                                            {% elif request.status == 'Approved' %}
+                                                <span class="badge bg-success bg-opacity-10 text-success">Approved</span>
+                                            {% elif request.status == 'Rejected' %}
+                                                <span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+                                            {% elif request.status == 'Issued' %}
+                                                <span class="badge bg-info bg-opacity-10 text-info">Issued</span>
+                                            {% elif request.status == 'Returned' %}
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary">Returned</span>
+                                            {% elif request.status == 'Cancelled' %}
+                                                <span class="badge bg-dark bg-opacity-10 text-dark">Cancelled</span>
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Requested By:</strong> {{ request.requested_by }}</p>
+                                        <p><strong>Department:</strong> {{ request.department }}</p>
+                                        <p><strong>Request Date:</strong> {{ request.issue_date.strftime('%Y-%m-%d') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <p><strong>Purpose:</strong></p>
+                                    <p>{{ request.purpose }}</p>
+                                </div>
+                                {% if request.status == 'Approved' %}
+                                    <div class="alert alert-success">
+                                        <i class="ri-checkbox-circle-line me-2"></i>
+                                        Approved by {{ request.approved_by }}
+                                        on {{ request.updated_at.strftime('%Y-%m-%d') }}
+                                    </div>
+                                {% elif request.status == 'Rejected' %}
+                                    <div class="alert alert-danger">
+                                        <i class="ri-close-circle-line me-2"></i>
+                                        Rejected by {{ request.approved_by }}
+                                        on {{ request.updated_at.strftime('%Y-%m-%d') }}
+                                        {% if request.rejection_reason %}
+                                            <p class="mt-2"><strong>Reason:</strong> {{ request.rejection_reason }}</p>
+                                        {% endif %}
+                                    </div>
+                                {% elif request.status == 'Cancelled' %}
+                                    <div class="alert alert-secondary">
+                                        <i class="ri-close-circle-line me-2"></i>
+                                        Cancelled on {{ request.updated_at.strftime('%Y-%m-%d') }}
+                                        {% if request.cancel_reason %}
+                                            <p class="mt-2"><strong>Reason:</strong> {{ request.cancel_reason }}</p>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancel Request Modal (for pending requests only) -->
+        {% if request.status == 'Requested' %}
+            <div class="modal fade" id="cancelRequestModal{{ request.id }}" tabindex="-1"
+                 aria-labelledby="cancelRequestModalLabel{{ request.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="cancelRequestModalLabel{{ request.id }}">
+                                <i class="ri-close-line me-2"></i>Cancel Request
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <form method="POST" action="{{ DEPARTMENT + '/inventory/cancel-request/' + request.id|string }}">
+                            <div class="modal-body">
+                                <p>Are you sure you want to cancel this request for
+                                    <strong>{{ request.quantity }} {{ request.item.item_name }}</strong>?</p>
+                                <div class="mb-3">
+                                    <label class="form-label">Cancellation Reason (Optional)</label>
+                                    <textarea class="form-control" name="cancel_reason" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="ri-close-line me-1"></i> No, Keep Request
+                                </button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="ri-close-line me-1"></i> Yes, Cancel Request
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Request Return Modal (for issued items only) -->
+        {% if request.status == 'Issued' %}
+            <div class="modal fade" id="requestReturnModal{{ request.id }}" tabindex="-1"
+                 aria-labelledby="requestReturnModalLabel{{ request.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title" id="requestReturnModalLabel{{ request.id }}">
+                                <i class="ri-arrow-left-right-line me-2"></i>Request Item Return
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <form method="POST" action="{{ DEPARTMENT + '/inventory/request-return/' + request.id|string }}">
+                            <div class="modal-body">
+                                <p>You are requesting to return
+                                    <strong>{{ request.quantity }} {{ request.item.item_name }}</strong> that was issued
+                                    on {{ request.issue_date.strftime('%Y-%m-%d') }}.</p>
+                                <div class="mb-3">
+                                    <label class="form-label">Return Notes (Optional)</label>
+                                    <textarea class="form-control" name="return_notes" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="ri-close-line me-1"></i> Cancel
+                                </button>
+                                <button type="submit" class="btn btn-info">
+                                    <i class="ri-send-plane-line me-1"></i> Submit Return Request
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Quantity validation based on available items
+            const itemSelect = document.querySelector('select[name="item_id"]');
+            const quantityInput = document.querySelector('input[name="quantity"]');
+
+            if (itemSelect && quantityInput) {
+                itemSelect.addEventListener('change', function () {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const available = parseInt(selectedOption.getAttribute('data-available')) || 0;
+                    quantityInput.max = available;
+                    if (parseInt(quantityInput.value) > available) {
+                        quantityInput.value = available;
+                    }
+                });
+            }
+
+
+        });
+    </script>
+{% endblock %}

@@ -66,6 +66,10 @@ INVENTORY_DELETE_ISSUED_ITEM = f"{INVENTORY}/delete-issued-item"
 INVENTORY_RESTORE_ISSUED_ITEM = f"{INVENTORY}/restore-issued-item"
 INVENTORY_RETURN_ISSUED_ITEM = f"{INVENTORY}/return-issued-item"
 
+INVENTORY_ITEM_REQUESTS = f"{INVENTORY}/requests"
+INVENTORY_APPROVE_REQUEST = f"{INVENTORY}/approve-request"
+INVENTORY_REJECT_REQUEST = f"{INVENTORY}/reject-request"
+
 # accounts
 ACCOUNTS = "/accounts"
 ACCOUNTS_INCOME = f"{ACCOUNTS}/income"

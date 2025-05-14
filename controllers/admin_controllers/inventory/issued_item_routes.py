@@ -5,7 +5,9 @@ from flask import render_template, request, flash, redirect
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import INVENTORY_ISSUED_ITEM, INVENTORY_ADD_ISSUED_ITEM, ADMIN, \
     INVENTORY_EDIT_ISSUED_ITEM, INVENTORY_RETURN_ISSUED_ITEM, INVENTORY_DELETE_ISSUED_ITEM, \
-    INVENTORY_RESTORE_ISSUED_ITEM
+    INVENTORY_RESTORE_ISSUED_ITEM, INVENTORY_REJECT_REQUEST, INVENTORY_APPROVE_REQUEST
+from middleware.auth_middleware import token_required
+from models import Department
 from models.InventoryItemModel import IssuedItem, Item
 from utils.config import db
 
@@ -16,22 +18,28 @@ def issued_items():
     active_issued_items = IssuedItem.query.filter_by(is_deleted=False).all()
     deleted_issued_items = IssuedItem.query.filter_by(is_deleted=True).all()
     active_items = Item.query.filter_by(is_deleted=False).all()
+    department = Department.query.filter_by(is_deleted=False).all()
     return render_template('admin_templates/inventory/issued_items.html', issued_items=active_issued_items,
                            deleted_issued_items=deleted_issued_items,
                            items=active_items,
+                           departments=department,
                            ADMIN = ADMIN ,
                            INVENTORY_ADD_ISSUED_ITEM =INVENTORY_ADD_ISSUED_ITEM,
                            INVENTORY_EDIT_ISSUED_ITEM = INVENTORY_EDIT_ISSUED_ITEM,
                            INVENTORY_RETURN_ISSUED_ITEM = INVENTORY_RETURN_ISSUED_ITEM,
                            INVENTORY_DELETE_ISSUED_ITEM=INVENTORY_DELETE_ISSUED_ITEM,
-                           INVENTORY_RESTORE_ISSUED_ITEM=INVENTORY_RESTORE_ISSUED_ITEM)
+                           INVENTORY_RESTORE_ISSUED_ITEM=INVENTORY_RESTORE_ISSUED_ITEM,
+                           INVENTORY_APPROVE_REQUEST = INVENTORY_APPROVE_REQUEST,
+                           INVENTORY_REJECT_REQUEST= INVENTORY_REJECT_REQUEST)
 
 
 @admin.route(INVENTORY_ADD_ISSUED_ITEM, methods=['POST'], endpoint="inventory_add_item_issued")
-def add_issue_item():
+@token_required
+def add_issue_item(current_user):
     try:
         item_id = int(request.form['item_id'])
         quantity = int(request.form['quantity'])
+        department = request.form['department']
 
         # Check if item exists and has enough quantity
         item = Item.query.get_or_404(item_id)
@@ -47,6 +55,10 @@ def add_issue_item():
                 'return_date'] else None,
             issued_to=request.form['issued_to'],
             quantity=quantity,
+            department=department,
+            approved_by=current_user,
+            requested_by=current_user,
+            purpose=request.form['purpose'],
             status='Issued'
         )
 
@@ -59,6 +71,47 @@ def add_issue_item():
     except Exception as e:
         db.session.rollback()
         flash(f'Error issuing item: {str(e)}', 'danger')
+    return redirect(ADMIN + INVENTORY_ISSUED_ITEM)
+
+
+@admin.route(INVENTORY_APPROVE_REQUEST + '/<int:id>', methods=['POST'], endpoint='approve_request')
+def approve_request(id):
+    try:
+        request_item = IssuedItem.query.get_or_404(id)
+        item = request_item.item
+
+        # Check if enough quantity is available
+        if item.quantity < request_item.quantity:
+            flash('Not enough quantity in stock to approve this request!', 'danger')
+            return redirect(ADMIN + INVENTORY_ISSUED_ITEM)
+
+        # Update request status
+        request_item.status = 'Issued'
+        request_item.approved_by = 'AdminUser'  # Set to current admin username
+        request_item.issue_date = datetime.now().date()
+
+        # Deduct from inventory (or wait until actually issued)
+        item.quantity -= request_item.quantity
+
+        db.session.commit()
+        flash('Request approved successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error approving request: {str(e)}', 'danger')
+    return redirect(ADMIN + INVENTORY_ISSUED_ITEM)
+
+
+@admin.route(INVENTORY_REJECT_REQUEST + '/<int:id>', methods=['POST'], endpoint='reject_request')
+def reject_request(id):
+    try:
+        request_item = IssuedItem.query.get_or_404(id)
+        request_item.status = 'Rejected'
+        request_item.approved_by = 'AdminUser'  # Set to current admin username
+        db.session.commit()
+        flash('Request rejected!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error rejecting request: {str(e)}', 'danger')
     return redirect(ADMIN + INVENTORY_ISSUED_ITEM)
 
 

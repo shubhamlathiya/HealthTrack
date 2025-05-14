@@ -1,3 +1,8 @@
 DEPARTMENT = "/department"
 
 DEPARTMENT_DASHBOARD = f"{DEPARTMENT}/dashboard"
+
+INVENTORY = "/inventory"
+INVENTORY_DEPARTMENT_REQUESTS = f"{INVENTORY}/department-requests"
+INVENTORY_REQUEST_RETURN = f"{INVENTORY}/request-return"
+INVENTORY_CANCEL_REQUEST = f"{INVENTORY}/cancel-request"

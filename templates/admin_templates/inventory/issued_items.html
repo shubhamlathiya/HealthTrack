@@ -56,10 +56,18 @@
                                     <td>{{ issued_item.issue_date.strftime('%Y-%m-%d') }}</td>
                                     <td>{{ issued_item.return_date.strftime('%Y-%m-%d') if issued_item.return_date else 'N/A' }}</td>
                                     <td>
-                                        {% if issued_item.status == 'Issued' %}
-                                            <span class="badge bg-warning bg-opacity-10 text-warning">Issued</span>
-                                        {% else %}
-                                            <span class="badge bg-success bg-opacity-10 text-success">Returned</span>
+                                        {% if issued_item.status == 'Requested' %}
+                                            <span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
+                                        {% elif issued_item.status == 'Approved' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success">Approved</span>
+                                        {% elif issued_item.status == 'Rejected' %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+                                        {% elif issued_item.status == 'Issued' %}
+                                            <span class="badge bg-info bg-opacity-10 text-info">Issued</span>
+                                        {% elif issued_item.status == 'Returned' %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary">Returned</span>
+                                        {% elif issued_item.status == 'Cancelled' %}
+                                            <span class="badge bg-dark bg-opacity-10 text-dark">Cancelled</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -73,6 +81,23 @@
                                                     data-bs-target="#viewIssuedItemModal{{ issued_item.id }}">
                                                 <i class="ri-eye-line"></i>
                                             </button>
+                                            {% if issued_item.status == 'Requested' %}
+
+                                                <form method="POST"
+                                                      action="{{ ADMIN + INVENTORY_APPROVE_REQUEST }}/{{ issued_item.id }}">
+                                                    <button class="btn btn-outline-success btn-sm"
+                                                            type="submit">
+                                                        <i class="ri-check-line"></i> Approve
+                                                    </button>
+                                                </form>
+                                                <form method="POST"
+                                                      action="{{ ADMIN + INVENTORY_REJECT_REQUEST }}/{{ issued_item.id }}">
+                                                    <button class="btn btn-outline-danger btn-sm" type="submit">
+                                                        <i class="ri-close-line"></i> Reject
+                                                    </button>
+                                                </form>
+
+                                            {% endif %}
                                             {% if issued_item.status != 'Returned' %}
                                                 <button class="btn btn-outline-success btn-sm"
                                                         data-bs-toggle="modal"
@@ -126,6 +151,15 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label">Department <span class="text-danger">*</span></label>
+                                <select class="form-select" name="department">
+                                    <option value="">Select Department</option>
+                                    {% for department in departments %}
+                                        <option value="{{ department.id }}">{{ department.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Quantity <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" name="quantity" required>
                             </div>
@@ -147,6 +181,10 @@
                             <div class="col-12">
                                 <label class="form-label">Issued To <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="issued_to" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Purpose <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="purpose" rows="3" required></textarea>
                             </div>
                         </div>
                     </div>
