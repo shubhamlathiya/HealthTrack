@@ -49,19 +49,19 @@ def add_staff():
                 profile_pic = os.path.join('uploads', 'staff', filename)
 
         # Create user first
-        user = User(
+        new_user = User(
             email=request.form['email'],
             password=generate_password_hash(request.form['password']),
             role='staff',  # Default role for staff members
             status=True if request.form['status'] == 'Active' else False,
             verified=False  # Will be verified after email confirmation
         )
-        db.session.add(user)
+        db.session.add(new_user)
         db.session.flush()  # To get the user ID
 
         # Create staff profile
         staff = Staff(
-            user_id=user.id,
+            user_id=new_user.id,
             first_name=request.form['first_name'],
             last_name=request.form['last_name'],
             mobile=request.form['mobile'],
@@ -88,14 +88,15 @@ def add_staff():
                                     temp_password=request.form['password'],
                                     login_url="http://localhost:5000/")
 
-        send_email('Welcome to HealthTrack Hospital', user.email, body_html)
+        send_email('Welcome to HealthTrack Hospital', new_user.email, body_html)
 
-        verification_link = f"http://localhost:5000/auth/verify-email/{user.id}"
+        verification_token = new_user.generate_verification_token()
+        verification_link = f"http://localhost:5000/auth/verify-email/{verification_token}"
         body_html = render_template("email_templates/templates/verification_mail.html",
                                     verification_link=verification_link,
                                     user_name=staff.first_name)
 
-        send_email('Verify Your Email', user.email, body_html)
+        send_email('Verify Your Email', new_user.email, body_html)
 
         flash('Staff member added successfully! Verification email sent.', 'success')
     except ValueError as e:

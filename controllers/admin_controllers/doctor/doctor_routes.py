@@ -31,16 +31,18 @@ def doctor_list(current_user):
     # Query all doctors ordered by most recent first
     doctors = Doctor.query.order_by(Doctor.created_at.desc()).all()
 
-    # Preload department names for each doctor to avoid N+1 queries
     for doctor in doctors:
-        doctor.department_names = [dept.department.name for dept in doctor.department_assignments]
+        doctor.department_names = [
+            assignment.department.name
+            for assignment in doctor.department_assignments
+            if assignment.current_status == 'Active'
+        ]
 
     return render_template(
         "admin_templates/doctor/doctor_list.html",
         doctors=doctors,
         ADMIN=ADMIN,
         DOCTOR_ADD_DOCTOR=DOCTOR_ADD_DOCTOR,
-
     )
 
 
@@ -147,7 +149,8 @@ def register_doctor(current_user):
 
         send_email('Welcome to HealthTrack Hospital', new_user.email, body_html)
 
-        verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
+        verification_token = new_user.generate_verification_token()
+        verification_link = f"http://localhost:5000/auth/verify-email/{verification_token}"
         body_html = render_template("email_templates/templates/verification_mail.html",
                                     verification_link=verification_link,
                                     user_name=new_doctor.first_name)

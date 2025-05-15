@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, flash, current_app
 from werkzeug.security import generate_password_hash
 
 from controllers.auth_controllers import auth
@@ -10,6 +10,7 @@ from models.patientModel import Patient
 from models.userModel import User, UserRole
 from utils.config import db
 from utils.email_utils import send_email
+from utils.tokens import verify_token
 
 
 # Assuming Patient and User models are already imported from your models
@@ -78,7 +79,8 @@ def register_patient():
 
             send_email('Welcome to HealthTrack Hospital', new_user.email, body_html)
 
-            verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
+            verification_token = new_user.generate_verification_token()
+            verification_link = f"http://localhost:5000/auth/verify-email/{verification_token}"
             body_html = render_template("email_templates/templates/verification_mail.html",
                                         verification_link=verification_link,
                                         user_name=new_patient.patient_id)
@@ -96,22 +98,23 @@ def register_patient():
         return render_template('auth_templates/register_templates.html')
 
 
-@auth.route('/verify-email/<int:patient_id>', methods=['GET'])
-def verify_email(patient_id):
-    # Retrieve the patient using the patient_id from the database
-    users = User.query.get(patient_id)
+@auth.route('/verify-email/<token>' , methods=['GET'] ,endpoint='verify_email')
+def verify_email(token):
+    user_id = verify_token(token)
+    if not user_id:
+        flash('Invalid or expired verification link', 'error')
+        return render_template('auth_templates/email_verified.html')
 
-    # Check if the patient exists
-    if users:
-        # Set the 'verified' field to True
-        users.verified = True
+    user = User.query.get(user_id)
+    if not user:
+        flash('User not found', 'error')
+        return render_template('auth_templates/email_verified.html')
 
-        try:
-            # Commit the change to the database
-            db.session.commit()
-            return render_template('auth_templates/email_verified.html'), 200
-        except Exception as e:
-            db.session.rollback()  # Rollback in case of error
-            return jsonify({'error': str(e)}), 500
-    else:
-        return jsonify({'error': 'Invalid verification link'}), 400
+    if user.verified:
+        flash('Email already verified', 'info')
+        return render_template('auth_templates/email_verified.html')
+
+    user.verified = True
+    db.session.commit()
+    flash('Email Verified Successfully!', 'success')
+    return render_template('auth_templates/email_verified.html')

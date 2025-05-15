@@ -62,7 +62,8 @@ def create_new_patient(patient_data):
 
     send_email('Welcome to Our Hospital', new_user.email, body_html)
 
-    verification_link = f"http://localhost:5000/auth/verify-email/{new_user.id}"
+    verification_token = new_user.generate_verification_token()
+    verification_link = f"http://localhost:5000/auth/verify-email/{verification_token}"
     body_html = render_template("email_templates/templates/verification_mail.html",
                                 verification_link=verification_link,
                                 user_name=f"{new_patient.first_name} {new_patient.last_name}")

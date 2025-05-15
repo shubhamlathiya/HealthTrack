@@ -2,6 +2,8 @@ from datetime import datetime
 from enum import Enum
 from sqlalchemy import Enum as SqlEnum
 from utils.config import db
+from utils.tokens import generate_verification_token, verify_token
+
 
 class UserRole(Enum):
     ADMIN = 'admin'
@@ -64,3 +66,13 @@ class User(db.Model):
     def is_department_head(self):
         return self.role == UserRole.DEPARTMENT_HEAD
 
+    def generate_verification_token(self):
+        return generate_verification_token(self.id)
+
+    def verify_email(self, token):
+        user_id = verify_token(token)
+        if user_id == self.id:
+            self.verified = True
+            db.session.commit()
+            return True
+        return False

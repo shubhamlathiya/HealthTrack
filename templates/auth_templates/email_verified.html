@@ -26,7 +26,16 @@
     <!-- Error container starts -->
     <div class="error-container">
 
-        <h2 class="mb-2">Email Verified Successfully!</h2>
+        <h3 class="mb-2">  {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert  bg-white border-{{ category }} alert-dismissible fade show text-{{ category }}"
+                         id="flash-message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}</h3>
         <h4 class="fw-light mb-4">
             Thank you for verifying your email address. Your account is now fully activated.
             You'll be automatically redirected to your dashboard shortly.
