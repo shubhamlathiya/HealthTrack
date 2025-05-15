@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Prescription from {{ clinic_name }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 30px;
+        }
+
+        .clinic-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a73e8;
+            margin-bottom: 5px;
+        }
+
+        .clinic-info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .prescription-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1a73e8;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #1a73e8;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        .patient-info {
+            background-color: #f5f9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            width: 120px;
+        }
+
+        .medications-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .medications-table th {
+            background-color: #1a73e8;
+            color: white;
+            text-align: left;
+            padding: 8px;
+        }
+
+        .medications-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .medications-table tr:nth-child(even) {
+            background-color: #f5f9ff;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .important-note {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+
+        .doctor-signature {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="clinic-name">{{ clinic_name }}</div>
+    <div class="clinic-info">
+        {{ clinic_address }} | {{ clinic_phone }} | {{ clinic_email }}
+    </div>
+</div>
+
+<div class="prescription-title">PRESCRIPTION #{{ prescription.id }}</div>
+
+<div class="patient-info">
+    <div class="info-row">
+        <div class="info-label">Patient Name:</div>
+        <div>{{ patient_name }}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Date:</div>
+        <div>{{ prescription.created_at }}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Doctor:</div>
+        <div>Dr. {{ doctor_name }}</div>
+    </div>
+</div>
+
+{% if prescription.notes %}
+    <div class="section">
+        <div class="section-title">DOCTOR'S NOTES</div>
+        <div>{{ prescription.notes }}</div>
+    </div>
+{% endif %}
+
+<div class="section">
+    <div class="section-title">PRESCRIBED MEDICATIONS</div>
+    <table class="medications-table">
+        <thead>
+        <tr>
+            <th>Medication</th>
+            <th>Dosage</th>
+            <th>Instructions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for med in prescription.medications %}
+            <tr>
+                <td>{{ med.name }}</td>
+                <td>{{ med.dosage }}</td>
+                <td>
+                    {{ med.meal_instructions }}<br>
+                    <small>Timing: {{ med.timing|join(', ') }}</small>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if prescription.test_reports %}
+    <div class="section">
+        <div class="section-title">RECOMMENDED TESTS</div>
+        <table class="medications-table">
+            <thead>
+            <tr>
+                <th>Test Name</th>
+                <th>Notes</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for test in prescription.test_reports %}
+                <tr>
+                    <td>{{ test.report_name }}</td>
+                    <td>{{ test.report_notes }}</td>
+                    <td>{{ test.status|capitalize }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<div class="important-note">
+    <strong>Important:</strong>
+    Please take medications exactly as prescribed and contact your doctor if you experience any side effects.
+</div>
+
+<div class="doctor-signature">
+    <div>Digitally signed by:</div>
+    <div style="margin-top: 15px;">
+        <strong>Dr. {{ doctor_name }}</strong><br>
+        {{ prescription.doctor_specialization }}<br>
+        {{ clinic_name }}
+    </div>
+</div>
+
+<div class="footer">
+    <p>This is an automated message. Please do not reply directly to this email.</p>
+    <p>&copy; {{ current_year }} {{ clinic_name }}. All rights reserved.</p>
+</div>
+</body>
+</html>

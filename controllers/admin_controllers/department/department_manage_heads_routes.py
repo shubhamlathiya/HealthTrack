@@ -1,18 +1,9 @@
-from datetime import datetime
-
-from flask import render_template
-from flask import request, redirect, flash
-
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import (
-    DEPARTMENT_LIST, DEPARTMENT_MANAGE_HEADS, DEPARTMENT_ADD_HEAD,
-    DEPARTMENT_REMOVE_HEAD, ADMIN
+    DEPARTMENT_MANAGE_HEADS
 )
 from middleware.auth_middleware import token_required
-from models.departmentModel import Department, DepartmentHead
-from models.doctorModel import Doctor
-from models.userModel import UserRole
-from utils.config import db
+from models.departmentAssignmentModel import DepartmentAssignment
 
 
 @admin.route(DEPARTMENT_MANAGE_HEADS + '/<int:department_id>', methods=['GET'], endpoint='manage-department-heads')
@@ -28,8 +19,7 @@ def manage_department_heads(current_user, department_id):
         is_active=False
     ).order_by(DepartmentHead.end_date.desc()).all()
 
-    # You'll need to query available doctors that can be assigned as heads
-    from models.doctorModel import Doctor  # Import your Doctor model
+
     available_doctors = Doctor.query.filter(
         ~Doctor.id.in_([head.doctor_id for head in current_heads]),
         Doctor.is_deleted == False
@@ -47,18 +37,69 @@ def manage_department_heads(current_user, department_id):
                            )
 
 
+from datetime import datetime
+from flask import render_template, request, redirect, flash
+from controllers.admin_controllers import admin
+from controllers.constant.adminPathConstant import (
+    DEPARTMENT_LIST, DEPARTMENT_MANAGE_HEADS, DEPARTMENT_ADD_HEAD,
+    DEPARTMENT_REMOVE_HEAD, ADMIN
+)
+from middleware.auth_middleware import token_required
+from models.departmentModel import Department, DepartmentHead
+from models.doctorModel import Doctor
+from models.userModel import UserRole
+from utils.config import db
+
+
+@admin.route(DEPARTMENT_MANAGE_HEADS + '/<int:department_id>', methods=['GET'])
+@token_required
+def manage_department_heads(current_user, department_id):
+    department = Department.query.get_or_404(department_id)
+
+    current_heads = DepartmentHead.query.filter_by(
+        department_id=department_id,
+        is_active=True
+    ).all()
+
+    past_heads = DepartmentHead.query.filter_by(
+        department_id=department_id,
+        is_active=False
+    ).order_by(DepartmentHead.end_date.desc()).all()
+
+    # Get available doctors (not currently heads of any department)
+    current_head_ids = [head.doctor_id for head in current_heads]
+    available_doctors = Doctor.query.filter(
+        ~Doctor.id.in_(current_head_ids),
+        Doctor.is_deleted == False
+    ).all()
+
+    return render_template("admin_templates/department/manage_department_heads.html",
+                           department=department,
+                           current_heads=current_heads,
+                           past_heads=past_heads,
+                           available_doctors=available_doctors,
+                           ADMIN=ADMIN,
+                           DEPARTMENT_LIST=DEPARTMENT_LIST,
+                           DEPARTMENT_ADD_HEAD=DEPARTMENT_ADD_HEAD,
+                           DEPARTMENT_REMOVE_HEAD=DEPARTMENT_REMOVE_HEAD)
 
 
 @admin.route(DEPARTMENT_ADD_HEAD + '/<int:department_id>', methods=['POST'])
 @token_required
 def add_department_head(current_user, department_id):
-    doctor_id = request.form.get('doctor_id')
-
-    if not doctor_id:
-        flash('Please select a doctor', 'danger')
-        return redirect(ADMIN + DEPARTMENT_MANAGE_HEADS + f'/{department_id}')
-
     try:
+        # Get form data
+        doctor_id = request.form.get('doctor_id')
+        specialty = request.form.get('specialty')
+        experience_level = request.form.get('experience_level')
+        current_status = request.form.get('current_status', 'Active')
+        start_date = request.form.get('start_date')
+        notes = request.form.get('notes')
+
+        if not doctor_id:
+            flash('Please select a doctor', 'danger')
+            return redirect(ADMIN + DEPARTMENT_MANAGE_HEADS + f'/{department_id}')
+
         # Verify department exists
         department = Department.query.get_or_404(department_id)
 
@@ -98,6 +139,7 @@ def add_department_head(current_user, department_id):
         new_head = DepartmentHead(
             department_id=department_id,
             doctor_id=doctor_id,
+            start_date=datetime.strptime(start_date, '%Y-%m-%d') if start_date else datetime.utcnow(),
             is_active=True
         )
 
@@ -105,9 +147,29 @@ def add_department_head(current_user, department_id):
         doctor.user.role = UserRole.DEPARTMENT_HEAD
         db.session.add(doctor.user)
         db.session.add(new_head)
+
+        # Create department assignment
+        new_assignment = DepartmentAssignment(
+            doctor_id=doctor_id,
+            department_id=department_id,
+            specialty=specialty,
+            experience_level=experience_level,
+            current_status=current_status,
+            assigned_date=datetime.strptime(start_date, '%Y-%m-%d') if start_date else datetime.utcnow(),
+            notes=notes
+        )
+
+        # Deactivate any other active assignments for this doctor in this department
+        DepartmentAssignment.query.filter_by(
+            doctor_id=doctor_id,
+            department_id=department_id,
+            current_status='Active'
+        ).update({'current_status': 'Inactive'})
+
+        db.session.add(new_assignment)
         db.session.commit()
 
-        flash(f'Successfully assigned {doctor.user.email} as department head', 'success')
+        flash(f'Successfully assigned {doctor.first_name} {doctor.last_name} as department head', 'success')
     except Exception as e:
         db.session.rollback()
         flash(f'Error assigning department head: {str(e)}', 'danger')
@@ -132,6 +194,13 @@ def remove_department_head(current_user, head_id):
         if doctor.user:
             doctor.user.role = UserRole.DOCTOR
             db.session.add(doctor.user)
+
+        # Update any active assignments
+        DepartmentAssignment.query.filter_by(
+            doctor_id=doctor.id,
+            department_id=department_id,
+            current_status='Active'
+        ).update({'current_status': 'Inactive'})
 
         db.session.commit()
         flash('Department head removed and role reverted successfully', 'success')

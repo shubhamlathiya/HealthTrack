@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+
+{% block title %}My Prescriptions{% endblock title %}
+{% block page %}My Prescriptions{% endblock page %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">
+                        <i class="ri-file-text-line me-2"></i> My Prescriptions
+                    </h5>
+                    <div>
+                        <span class="badge bg-primary">{{ prescriptions|length }} prescriptions</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+
+                    {% if not prescriptions %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i> No prescriptions found.
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table id="prescriptionsTable" class="table m-0 align-middle">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Prescription ID</th>
+                                    <th>Date</th>
+                                    <th>Doctor</th>
+                                    <th>Status</th>
+                                    <th>Medications</th>
+                                    <th>Tests</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for prescription in prescriptions %}
+                                    <tr>
+                                        <td>#{{ prescription.id }}</td>
+                                        <td>{{ prescription.created_at }}</td>
+                                        <td>
+                                            <strong>{{ prescription.doctor_name }}</strong>
+                                            <div class="text-muted small">
+                                                {{ prescription.doctor_specialization }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if prescription.status == 'Issued' %}
+                                                <span class="badge bg-success bg-opacity-10 text-success">Issued</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary">Expired</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="text-primary">{{ prescription.medications|length }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-info">{{ prescription.test_reports|length }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-1">
+                                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                                        data-bs-target="#viewPrescriptionModal{{ prescription.id }}">
+                                                    <i class="ri-eye-line"></i> View
+                                                </button>
+                                                <button class="btn btn-outline-dark btn-sm"
+                                                        onclick="printPrescription('{{ prescription.id }}')">
+                                                    <i class="ri-printer-line"></i>
+                                                </button>
+                                                <a href="/patient/send-prescription-email/{{ prescription.id }}"
+                                                   class="btn btn-outline-success btn-sm">
+                                                    <i class="ri-mail-line"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for prescription in prescriptions %}
+        <!-- View Prescription Modal -->
+        <div class="modal fade" id="viewPrescriptionModal{{ prescription.id }}"
+             tabindex="-1"
+             aria-labelledby="viewPrescriptionModalLabel{{ prescription.id }}"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"
+                            id="viewPrescriptionModalLabel{{ prescription.id }}">
+                            <i class="ri-file-text-line me-2"></i>Prescription Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-user-line me-2"></i>Patient
+                                            Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Name:</strong> {{ patient_name }}</p>
+                                        <p>
+                                            <strong>Date:</strong> {{ prescription.created_at }}
+                                        </p>
+                                        <p><strong>Prescription ID:</strong>
+                                            #{{ prescription.id }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i
+                                                class="ri-user-star-line me-2"></i>Doctor
+                                            Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>
+                                            <strong>Name:</strong> Dr. {{ prescription.doctor_name }}
+                                        </p>
+                                        <p><strong>Status:</strong>
+                                            {% if prescription.status == 'Issued' %}
+                                                <span class="badge bg-success bg-opacity-10 text-success">Issued</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary">Expired</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if prescription.notes %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="ri-file-text-line me-2"></i>Doctor's
+                                        Notes</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p>{{ prescription.notes }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if prescription.medications %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i
+                                            class="ri-medicine-bottle-line me-2"></i>Medications
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Dosage</th>
+                                                <th>Instructions</th>
+                                                <th>Timing</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for med in prescription.medications %}
+                                                <tr>
+                                                    <td>{{ med.name }}</td>
+                                                    <td>{{ med.dosage }}</td>
+                                                    <td>{{ med.meal_instructions }}</td>
+                                                    <td>{{ med.timing|join(', ') }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if prescription.test_reports %}
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="ri-microscope-line me-2"></i>Recommended
+                                        Tests</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Test Name</th>
+                                                <th>Notes</th>
+                                                <th>Price</th>
+                                                <th>Status</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for test in prescription.test_reports %}
+                                                <tr>
+                                                    <td>{{ test.report_name }}</td>
+                                                    <td>{{ test.report_notes }}</td>
+                                                    <td>
+                                                        ${{ "%.2f"|format(test.price) }}</td>
+                                                    <td>{{ test.status|capitalize }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                        <button type="button" class="btn btn-primary"
+                                onclick="printPrescription('{{ prescription.id }}')">
+                            <i class="ri-printer-line me-1"></i> Print
+                        </button>
+                        <a href="/patient/send-prescription-email/{{ prescription.id }}"
+                           class="btn btn-outline-success btn-sm">
+                            <i class="ri-mail-line"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock body %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <style>
+        .badge {
+            font-size: 0.85em;
+            padding: 0.35em 0.65em;
+        }
+
+        #prescriptionsTable tbody tr {
+            cursor: pointer;
+        }
+
+        #prescriptionsTable tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+    </style>
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize DataTable
+            $('#prescriptionsTable').DataTable({
+                responsive: true,
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                pageLength: 10,
+                order: [[1, 'desc']] // Sort by date descending
+            });
+
+            // Print prescription function
+            function printPrescription(prescriptionId) {
+                const printContent = document.getElementById(`viewPrescriptionModal${prescriptionId}`).querySelector('.modal-body').innerHTML;
+                const originalContent = document.body.innerHTML;
+
+                document.body.innerHTML = printContent;
+                window.print();
+                document.body.innerHTML = originalContent;
+            }
+
+            window.printPrescription = printPrescription;
+
+        });
+    </script>
+{% endblock %}

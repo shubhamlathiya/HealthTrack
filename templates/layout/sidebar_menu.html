@@ -50,25 +50,25 @@
                         <span class="menu-text">Appointment</span>
                     </a>
                 </li>
-{#                <li class="treeview {% if request.path.startswith('/patient/appointment') %}active current-page{% endif %}">#}
-{#                    <a href="#!">#}
-{#                        <i class="ri-drop-line"></i>#}
-{#                        <span class="menu-text">Appointment</span>#}
-{#                    </a>#}
-{#                    <ul class="treeview-menu">#}
-{#                        <li>#}
-{#                            <a href="/patient/appointment"#}
-{#                               class="{% if request.path == '/patient/appointment' %}active-sub{% endif %}">appointment</a>#}
-{#                        </li>#}
-{#                    </ul>#}
-{#                </li>#}
+                <li class="treeview {% if request.path.startswith('/patient/appointment') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-drop-line"></i>
+                        <span class="menu-text">Appointment</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/patient/appointment"
+                               class="{% if request.path == '/patient/appointment' %}active-sub{% endif %}">appointment</a>
+                        </li>
+                    </ul>
+                </li>
 
-{#                <li class="{% if request.path == '/patients/upload-patient-reports' or request.path.startswith('/patients/reports') %}active current-page{% endif %}">#}
-{#                    <a href="/patients/upload-patient-reports">#}
-{#                        <i class="ri-file-text-line"></i>#}
-{#                        <span class="menu-text">View Reports</span>#}
-{#                    </a>#}
-{#                </li>#}
+                <li class="{% if request.path == '/patients/upload-patient-reports' or request.path.startswith('/patients/reports') %}active current-page{% endif %}">
+                    <a href="/patients/upload-patient-reports">
+                        <i class="ri-file-text-line"></i>
+                        <span class="menu-text">View Reports</span>
+                    </a>
+                </li>
                 <li class="{% if request.path == '/chat/chat' %}active current-page{% endif %}">
                     <a href="/chat/chat">
                         <i class="ri-chat-1-line"></i>
@@ -81,24 +81,24 @@
                         <span class="menu-text">Visitors</span>
                     </a>
                 </li>
-{#                <li class="{% if request.path == '/patients/get-appointments' or request.path.startswith('/patients/appointment') %}active current-page{% endif %}">#}
-{#                    <a href="/patients/get-appointments">#}
-{#                        <i class="ri-list-check-2"></i>#}
-{#                        <span class="menu-text">View Appointments</span>#}
-{#                    </a>#}
-{#                </li>#}
+                <li class="{% if request.path == '/patients/get-appointments' or request.path.startswith('/patients/appointment') %}active current-page{% endif %}">
+                    <a href="/patients/get-appointments">
+                        <i class="ri-list-check-2"></i>
+                        <span class="menu-text">View Appointments</span>
+                    </a>
+                </li>
                 <li class="{% if request.path == '/patients/operation-request' %}active current-page{% endif %}">
                     <a href="/patients/operation-request">
                         <i class="ri-scissors-line"></i>
-                        <span class="menu-text">Operation Request</span>
+                        <span class="menu-text">Prescriptions</span>
                     </a>
                 </li>
-{#                <li class="{% if request.path == '/patients/get-profile' or request.path.startswith('/patients/profile') %}active current-page{% endif %}">#}
-{#                    <a href="/patients/get-profile">#}
-{#                        <i class="ri-user-settings-line"></i>#}
-{#                        <span class="menu-text">Profile</span>#}
-{#                    </a>#}
-{#                </li>#}
+                <li class="{% if request.path == '/patients/get-profile' or request.path.startswith('/patients/profile') %}active current-page{% endif %}">
+                    <a href="/patients/get-profile">
+                        <i class="ri-user-settings-line"></i>
+                        <span class="menu-text">Profile</span>
+                    </a>
+                </li>
 
             {% elif session['role'] == 'ADMIN' %}
                 <li class="{% if request.path == '/admin/dashboard' %}active current-page{% endif %}">

@@ -1,3 +1,4 @@
+<!-- admin_templates/department/manage_department_heads.html -->
 {% extends 'base.html' %}
 
 {% block title %}Manage Department Heads{% endblock title %}
@@ -12,7 +13,10 @@
                         <i class="ri-user-star-line me-2"></i>Department Heads - {{ department.name }}
                     </h5>
                     <div>
-                        <a href="{{ ADMIN + DEPARTMENT_LIST }}" class="btn btn-secondary ms-auto">
+                        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#assignHeadModal">
+                            <i class="ri-user-add-line"></i> Assign Head
+                        </button>
+                        <a href="{{ ADMIN + DEPARTMENT_LIST }}" class="btn btn-secondary">
                             <i class="ri-arrow-left-line"></i> Back to Departments
                         </a>
                     </div>
@@ -79,41 +83,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- Add New Head Section -->
-                    <div class="mb-5">
-                        <h6 class="mb-3">
-                            <i class="ri-user-add-line text-primary me-2"></i>Assign New Department Head
-                        </h6>
-
-                        {% if available_doctors %}
-                            <form method="POST" action="{{ ADMIN + DEPARTMENT_ADD_HEAD }}/{{ department.id }}"
-                                  class="row g-3">
-                                <div class="col-md-8">
-                                    <label class="form-label">Select Doctor</label>
-                                    <select class="form-select" name="doctor_id" required>
-                                        <option value="" selected disabled>Choose a doctor...</option>
-                                        {% for doctor in available_doctors %}
-                                            <option value="{{ doctor.id }}">
-                                                {{ doctor.first_name }} {{ doctor.last_name }}
-                                                ({{ doctor.qualification }} {{ doctor.designation }})
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-4 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="ri-user-follow-line me-1"></i> Assign as Head
-                                    </button>
-                                </div>
-                            </form>
-                        {% else %}
-                            <div class="alert alert-info">
-                                <i class="ri-information-line me-2"></i>
-                                No available doctors to assign as department head
-                            </div>
-                        {% endif %}
-                    </div>
-
                     <!-- Past Heads Section -->
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -175,21 +144,90 @@
             </div>
         </div>
     </div>
+
+    <!-- Assign Head Modal -->
+    <div class="modal fade" id="assignHeadModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign New Department Head</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + DEPARTMENT_ADD_HEAD }}/{{ department.id }}">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="doctor_id">Doctor*</label>
+                                <select class="form-select" name="doctor_id" id="doctor_id" required>
+                                    <option value="" selected disabled>Select Doctor</option>
+                                    {% for doctor in available_doctors %}
+                                        <option value="{{ doctor.id }}">
+                                            {{ doctor.first_name }} {{ doctor.last_name }}
+                                            ({{ doctor.qualification }} {{ doctor.designation }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Department</label>
+                                <input type="text" class="form-control" value="{{ department.name }}" readonly>
+                                <input type="hidden" name="department_id" value="{{ department.id }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="specialty">Specialty</label>
+                                <input type="text" class="form-control" name="specialty" id="specialty"
+                                       placeholder="Doctor's specialty in this department">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="experience_level">Experience Level*</label>
+                                <select class="form-select" name="experience_level" id="experience_level" required>
+                                    <option value="">Select Level</option>
+                                    <option value="Junior">Junior</option>
+                                    <option value="Mid-level">Mid-level</option>
+                                    <option value="Senior">Senior</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="current_status">Status*</label>
+                                <select class="form-select" name="current_status" id="current_status" required>
+                                    <option value="Active" selected>Active</option>
+                                    <option value="On Leave">On Leave</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="start_date">Start Date*</label>
+                                <input type="date" class="form-control" name="start_date" id="start_date" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label" for="notes">Notes</label>
+                                <textarea class="form-control" name="notes" id="notes" rows="2"
+                                          placeholder="Any additional information about this assignment"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-user-follow-line me-1"></i> Assign as Head
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock body %}
 
 {% block heardLink %}
-    <!-- Additional CSS if needed -->
     <style>
         .img-2x {
             width: 32px;
             height: 32px;
         }
-
         .img-3x {
             width: 48px;
             height: 48px;
         }
-
         .border-opacity-25 {
             border-opacity: 0.25;
         }
@@ -197,14 +235,24 @@
 {% endblock %}
 
 {% block footerLink %}
-    <!-- Additional JavaScript if needed -->
     <script>
-        // You can add any specific JavaScript for this page here
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize tooltips if needed
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+            // Set today's date as default for start date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('start_date').value = today;
+
+            // Auto-fill specialty when doctor is selected
+            const doctorSelect = document.getElementById('doctor_id');
+            const specialtyInput = document.getElementById('specialty');
+
+            doctorSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.text.includes('(')) {
+                    const specialtyMatch = selectedOption.text.match(/\(([^)]+)\)/);
+                    if (specialtyMatch && specialtyMatch[1]) {
+                        specialtyInput.value = specialtyMatch[1].split(',')[0].trim();
+                    }
+                }
             });
         });
     </script>

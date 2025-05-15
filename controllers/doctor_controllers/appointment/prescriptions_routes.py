@@ -173,7 +173,7 @@ def create_prescription():
 
         return jsonify({
             'success': True,
-            'redirect_url': request.url,
+            'redirect_url': "/doctor/appointment",
             'message': 'Prescription created successfully',
             'prescription_id': prescription.id
         }), 201
