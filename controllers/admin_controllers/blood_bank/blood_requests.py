@@ -14,9 +14,6 @@ from models.bloodModel import (
 )
 from utils.config import db
 
-
-# ====================== BLOOD REQUEST ROUTES ======================
-
 @admin.route(BLOOD_BANK_REQUESTS, methods=['GET'])
 def blood_requests():
     requests = BloodRequest.query.filter_by(is_deleted=False).order_by(BloodRequest.request_date.desc()).all()

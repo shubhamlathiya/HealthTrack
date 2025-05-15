@@ -36,16 +36,16 @@ mail = Mail(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.config['SECRET_KEY'] = 'your_secure_random_key'
 app.register_blueprint(auth, url_prefix='/auth')
-app.register_blueprint(admin, url_prefix='/admin')
+# app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(department, url_prefix='/department')
 from controllers.chat_controllers import chat
 
-app.register_blueprint(chat, url_prefix='/chat')
-app.register_blueprint(patients, url_prefix='/patient')
-app.register_blueprint(doctors, url_prefix='/doctor')
-app.register_blueprint(laboratory , url_prefix='/laboratory')
+# app.register_blueprint(chat, url_prefix='/chat')
+# app.register_blueprint(patients, url_prefix='/patient')
+# app.register_blueprint(doctors, url_prefix='/doctor')
+# app.register_blueprint(laboratory , url_prefix='/laboratory')
 
-app.register_blueprint(idCard, url_prefix='/id-card')
+# app.register_blueprint(idCard, url_prefix='/id-card')
 
 with app.app_context():
     db.create_all()
@@ -55,7 +55,7 @@ with app.app_context():
         admin = User(
             email='admin@hospital.com',
             password=generate_password_hash('Shubham123'),
-            role='admin',
+            role=UserRole.ADMIN,
             status=True,
             verified=True
         )
@@ -74,12 +74,16 @@ def index():  # put application's code here
 
 @app.errorhandler(404)
 def handle_404_error(e):
-    return render_template('error_handler/error_404.html')
+    return render_template('error_handler/error_404.html'),404
 
 
 @app.errorhandler(500)
 def handle_500_error(e):
-    return render_template('error_handler/error_500.html')
+    return render_template('error_handler/error_500.html'),505
+
+@app.errorhandler(403)
+def forbidden_error(e):
+    return render_template("error_handler/error_403.html"), 403
 
 
 # Configure upload folder for profile pictures

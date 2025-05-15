@@ -62,7 +62,6 @@
                         </li>
                     </ul>
                 </li>
-
                 <li class="{% if request.path == '/patients/upload-patient-reports' or request.path.startswith('/patients/reports') %}active current-page{% endif %}">
                     <a href="/patients/upload-patient-reports">
                         <i class="ri-file-text-line"></i>
@@ -516,7 +515,6 @@
                         </li>
                     </ul>
                 </li>
-
                 <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">
                     <a href="/admin/search">
                         <i class="ri-search-line"></i>
@@ -593,7 +591,6 @@
 
                     </ul>
                 </li>
-
                 <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">
                     <a href="/admin/search">
                         <i class="ri-search-line"></i>
@@ -606,6 +603,116 @@
                         <span class="menu-text">Laboratory</span>
                     </a>
                 </li>
+
+            {% elif session['role'] == 'DEPARTMENT_HEAD' %}
+                <li class="treeview {% if request.path.startswith('/admin/inventory') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-shopping-bag-line"></i>
+                        <span class="menu-text">Inventory</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/admin/inventory/item-stock-list"
+                               class="{% if request.path == '/admin/inventory/item-stock-list' %}active-sub{% endif %}">Item
+                                Stock
+                                List</a>
+                        </li>
+                        <li>
+                            <a href="/admin/inventory/issued-item"
+                               class="{% if request.path == '/admin/inventory/issued-item' %}active-sub{% endif %}">Issued
+                                Items</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="treeview {% if request.path.startswith('/admin/doctor') or request.path.startswith('/admin/doctor') or request.path.startswith('/admin/edit-department') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-building-2-line"></i>
+                        <span class="menu-text">Doctors</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/admin/doctor/doctor-list"
+                               class="{% if request.path == '/admin/doctor/doctor-list' %}active-sub{% endif %}">All
+                                Doctors</a>
+                        </li>
+                        <li>
+                            <a href="/admin/doctor/add-doctor"
+                               class="{% if request.path == '/admin/doctor/add-doctor' %}active-sub{% endif %}">Add
+                                Doctors</a>
+                        </li>
+                        <li>
+                            <a href="/admin/doctor/assign-department"
+                               class="{% if request.path == '/admin/doctor/assign-department' %}active-sub{% endif %}">Assign
+                                Department</a>
+                        </li>
+                        <li>
+                            <a href="/admin/doctor/shift-management"
+                               class="{% if request.path == '/admin/doctor/shift-management' %}active-sub{% endif %}">Shift
+                                Management</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="treeview {% if request.path.startswith('/admin/room') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-hotel-bed-line"></i>
+                        <span class="menu-text">Rooms</span>
+
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/admin/room/room-statistics"
+                               class="{% if request.path == '/admin/room/room-statistics' %}active-sub{% endif %}">Statistics</a>
+                        </li>
+                        <li>
+                            <a href="/admin/room/rooms-allotted"
+                               class="{% if request.path == '/admin/room/rooms-allotted' %}active-sub{% endif %}">Rooms
+                                Allotted</a>
+                        </li>
+                        <li>
+                            <a href="/admin/room/rooms-by-dept"
+                               class="{% if request.path == '/admin/room/rooms-by-dept' %}active-sub{% endif %}">Rooms
+                                By Department</a>
+                        </li>
+                        <li>
+                            <a href="/admin/room/available-room"
+                               class="{% if request.path == '/admin/room/available-room' %}active-sub{% endif %}">Available
+                                Rooms</a>
+                        </li>
+                        <li>
+                            <a href="/admin/room"
+                               class="{% if request.path == '/admin/room' %}active-sub{% endif %}">Room List</a>
+                        </li>
+                        <li>
+                            <a href="/admin/room/cleaning-logs"
+                               class="{% if request.path == '/admin/room/cleaning-logs' %}active-sub{% endif %}">Cleaning
+                                Logs</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="treeview {% if request.path.startswith('/admin/blood-bank') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-drop-line"></i>
+                        <span class="menu-text">Blood Bank</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/admin/blood-bank/stock"
+                               class="{% if request.path == '/admin/blood-bank/stock' %}active-sub{% endif %}">Blood
+                                Stock</a>
+                        </li>
+                        <li>
+                            <a href="/admin/blood-bank/donor"
+                               class="{% if request.path == '/admin/blood-bank/donor' %}active-sub{% endif %}">Blood
+                                Donor</a>
+                        </li>
+                        <li>
+                            <a href="/admin/blood-bank/issued"
+                               class="{% if request.path == '/admin/blood-bank/issued' %}active-sub{% endif %}">Blood
+                                Issued</a>
+                        </li>
+                    </ul>
+                </li>
+
             {% endif %}
 
             <!-- Common Logout for all roles -->

@@ -4,11 +4,11 @@ from controllers.department_controllers import department
 from middleware.auth_middleware import token_required
 from models import DepartmentHead
 from models.doctorModel import Doctor
-from models.userModel import User
+from models.userModel import User, UserRole
 
 
 @department.route('/dashboard', methods=['GET'], endpoint='department_dashboard')
-@token_required
+@token_required(allowed_roles=[UserRole.DEPARTMENT_HEAD.name])
 def department_dashboard(current_user):
     users = User.query.filter(User.id == current_user).first()
     print(users)

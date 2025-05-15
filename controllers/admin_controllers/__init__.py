@@ -39,7 +39,7 @@ from controllers.admin_controllers.inventory.issued_item_routes import *
 
 # Blood Bank
 # from controllers.admin_controllers.blood_bank.blood_bank_issued_routes import *
-# from controllers.admin_controllers.blood_bank.blood_bank_stock_routes import *
+from controllers.admin_controllers.blood_bank.blood_bank_inventory_routes import *
 from controllers.admin_controllers.blood_bank.blood_bank_donor_routes import *
 from controllers.admin_controllers.blood_bank.blood_requests import *
 from controllers.admin_controllers.blood_bank.blood_bank_transfusions_routes import *

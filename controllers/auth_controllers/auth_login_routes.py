@@ -35,7 +35,7 @@ def login():
             # Generate a JWT token that expires in 1 hour
             token = jwt.encode({
                 'user_id': str(user.id),
-                # 'user' : user,
+                'role': user.role.name,
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=10)
             }, 'your_secret_key', algorithm='HS256')
 
@@ -43,7 +43,7 @@ def login():
             session['user_id'] = str(user.id)
             session['email'] = user.email
             session["role"] = user.role.name  # or user.role_id
-            print(user.role.name)
+            # print(user.role.name)
             # Redirect based on user role
             if user.role == UserRole.PATIENT:
                 redirect_url = PATIENT_DASHBOARD

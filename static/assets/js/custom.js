@@ -125,7 +125,7 @@ $(document).ready(function () {
 
 // Loading
 $(function () {
-    $("#loading-wrapper").fadeOut(3000);
+    $("#loading-wrapper").fadeOut(1000);
 });
 
 $(function () {
