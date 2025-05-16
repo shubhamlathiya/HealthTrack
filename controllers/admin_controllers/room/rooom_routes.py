@@ -12,11 +12,12 @@ from middleware.auth_middleware import token_required
 from models.departmentModel import Department
 from models.patientModel import Patient, PatientPayment
 from models.roomModel import Room, Bed, BedAllocation, RoomCharge, BedCleaningLog
+from models.userModel import UserRole
 from utils.config import db
 
 
 @admin.route(ROOM, methods=['GET'], endpoint="room")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def list_rooms(current_user):
     rooms = Room.query.filter_by(deleted_at=None).order_by(Room.room_number).all()
     departments = Department.query.all()
@@ -26,7 +27,7 @@ def list_rooms(current_user):
 
 
 @admin.route(ROOM_ADD_ROOM, methods=['POST'], endpoint='add-room')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_room(current_user):
     room_number = request.form.get('room_number')
     floor = request.form.get('floor')
@@ -74,7 +75,7 @@ def add_room(current_user):
 
 
 @admin.route(ROOM_EDIT_ROOM + '/<int:room_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_room(current_user, room_id):
     room = Room.query.get_or_404(room_id)
     try:
@@ -106,7 +107,7 @@ def edit_room(current_user, room_id):
 
 
 @admin.route(ROOM_DELETE_ROOM + '/<int:room_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_room(current_user, room_id):
     room = Room.query.get_or_404(room_id)
     try:
@@ -126,7 +127,7 @@ def delete_room(current_user, room_id):
 
 
 @admin.route(ROOM_RESTORE_ROOM + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def room_restore(current_user, id):
     room = Room.query.get_or_404(id)
     try:
@@ -148,7 +149,7 @@ def room_restore(current_user, id):
 
 
 @admin.route(ROOM_AVAILABLE_ROOM, methods=['GET'], endpoint='available-room')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def room_available_room(current_user):
     # Get all departments with their available rooms and beds
     departments_data = {}
@@ -192,7 +193,7 @@ def room_available_room(current_user):
 
 
 @admin.route(ROOM_BOOK_ROOM, methods=['POST'], endpoint="book-room")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def book_room(current_user):
     # Get form data
     patient_id = request.form.get('patient_id')
@@ -234,7 +235,7 @@ def book_room(current_user):
 
 
 @admin.route(ROOM_ROOM_STATISTICS, methods=['GET'], endpoint='room-statistics')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def room_room_statistics(current_user):
     # Fetch bed allocation statistics for the chart (last 12 months)
     current_date = datetime.utcnow()
@@ -357,7 +358,7 @@ def room_room_statistics(current_user):
 
 
 @admin.route(ROOM_ROOM_ALLOTTED, methods=['GET'], endpoint='rooms-allotted')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def room_rooms_allotted(current_user):
     # Get all occupied beds and include cleaning status
     results = db.session.execute(
@@ -403,7 +404,7 @@ def room_rooms_allotted(current_user):
 
 
 @admin.route(ROOM_DISCHARGE_ROOM + "/<int:allocation_id>", methods=["POST"], endpoint="room_discharge")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def discharge_patient(current_user, allocation_id):
     try:
         allocation = BedAllocation.query.get_or_404(allocation_id)
@@ -458,7 +459,7 @@ def discharge_patient(current_user, allocation_id):
 
 
 @admin.route(ROOM_COMPLETE_CLEANING_LOGS + "/<int:allocation_id>", methods=["GET"], endpoint="complete_cleaning")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def complete_cleaning(current_user, allocation_id):
     try:
         allocation = BedAllocation.query.get_or_404(allocation_id)
@@ -496,7 +497,7 @@ def complete_cleaning(current_user, allocation_id):
 
 
 @admin.route(ROOM_CLEANING_LOGS, methods=["GET"], endpoint="cleaning_logs")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def cleaning_logs(current_user):
     try:
         # Calculate cleaning stats
@@ -532,7 +533,7 @@ def cleaning_logs(current_user):
 
 
 @admin.route(ROOM_ROOM_BY_DEPT, methods=['GET'], endpoint='rooms-by-dept')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def room_room_by_dept(current_user):
     # Query all non-deleted departments with their rooms
     departments = Department.query.filter_by(deleted_at=None).all()

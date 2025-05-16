@@ -14,6 +14,7 @@ from models.insuranceProviderModel import (
     InsuranceRecord
 )
 from models.patientModel import Patient
+from models.userModel import UserRole
 from utils.config import db
 
 # File upload configuration
@@ -34,7 +35,7 @@ from datetime import datetime, timedelta
 
 
 @admin.route(INSURANCE_PATIENT, methods=['GET'], endpoint='insurance_patient')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def insurance_patient(current_user):
     try:
         today = date.today()
@@ -100,7 +101,7 @@ def insurance_patient(current_user):
 
 
 @admin.route(INSURANCE_PATIENT_ADD_RECORDS, methods=['POST'], endpoint="insurance_patient_add_records")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_record(current_user):
     try:
         print(request.form)
@@ -146,7 +147,7 @@ def add_record(current_user):
 
 
 @admin.route(INSURANCE_PATIENT_EDIT_RECORDS + '/<int:record_id>', methods=['POST'], endpoint='insurance_record_edit')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_record(current_user, record_id):
     try:
         # Get the existing record
@@ -181,7 +182,7 @@ def edit_record(current_user, record_id):
 
 
 @admin.route(INSURANCE_PATIENT_DELETE_RECORDS + '/<int:record_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_record(current_user, record_id):
     try:
         record = InsuranceRecord.query.get_or_404(record_id)
@@ -197,7 +198,7 @@ def delete_record(current_user, record_id):
 
 @admin.route(INSURANCE_PATIENT_RESTORE_RECORDS + '/<int:record_id>', methods=['POST'],
              endpoint="insurance_record_restore")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_record(current_user, record_id):
     try:
         record = InsuranceRecord.query.get_or_404(record_id)

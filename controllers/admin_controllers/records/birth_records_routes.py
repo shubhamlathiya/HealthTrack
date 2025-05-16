@@ -11,12 +11,13 @@ from controllers.constant.adminPathConstant import RECORDS_BIRTH, RECORDS_ADD_BI
 from middleware.auth_middleware import token_required
 from models.birthRecordeModel import ChildCase, MedicalVisit
 from models.doctorModel import Doctor
+from models.userModel import UserRole
 from utils.config import db
 from utils.email_utils import send_email_with_attachment
 
 
 @admin.route(RECORDS_BIRTH, methods=['GET'], endpoint='records_birth')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def records_birth(current_user):
     deleted_child_cases = ChildCase.query.filter_by(is_deleted=True).all()
     deleted_medical_visits = MedicalVisit.query.filter_by(is_deleted=True).all()
@@ -42,7 +43,7 @@ def records_birth(current_user):
 
 
 @admin.route(RECORDS_ADD_BIRTH, methods=['GET', 'POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_child_case(current_user):
     if request.method == 'POST':
         try:
@@ -80,7 +81,7 @@ def add_child_case(current_user):
 
 
 @admin.route(RECORDS_BIRTH_EDIT + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_child_case(current_user, id):
     case = ChildCase.query.get_or_404(id)
 
@@ -106,7 +107,7 @@ def edit_child_case(current_user, id):
 
 
 @admin.route(RECORDS_BIRTH_DELETE + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_child_case(current_user, id):
     case = ChildCase.query.get_or_404(id)
 
@@ -131,7 +132,7 @@ def delete_child_case(current_user, id):
 
 
 @admin.route(RECORDS_BIRTH_ADD_MEDICAL_VISIT + '/<int:case_id>', methods=['POST'], endpoint="add_medical_visit")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_medical_visit(current_user, case_id):
     try:
         print(request.form.get("visit_date"))
@@ -155,7 +156,7 @@ def add_medical_visit(current_user, case_id):
 
 
 @admin.route(RECORDS_BIRTH_EDIT_MEDICAL_VISIT + '/<int:visit_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_medical_visit(current_user, visit_id):
     try:
         visit = MedicalVisit.query.get_or_404(visit_id)
@@ -186,7 +187,7 @@ def edit_medical_visit(current_user, visit_id):
 
 
 @admin.route(RECORDS_BIRTH_MEDICAL_VISIT_DELETE + '/<int:visit_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_medical_visit(current_user, visit_id):
     visit = MedicalVisit.query.get_or_404(visit_id)
     try:
@@ -293,7 +294,7 @@ def send_birth_certificate_email(id):
 
 
 @admin.route(RESTORE_RECORDS_BIRTH + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_child_case(current_user, id):
     case = ChildCase.query.get_or_404(id)
     try:
@@ -318,7 +319,7 @@ def restore_child_case(current_user, id):
 
 
 @admin.route(RESTORE_BIRTH_MEDICAL_VISIT + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_medical_visit(current_user, id):
     visit = MedicalVisit.query.filter_by(id=id, is_deleted=True).first_or_404()
     try:

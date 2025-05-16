@@ -26,7 +26,7 @@ def allowed_file(filename):
 
 
 @admin.route(DOCTOR_LIST, methods=['GET'], endpoint='doctor_list')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def doctor_list(current_user):
     # Query all doctors ordered by most recent first
     doctors = Doctor.query.order_by(Doctor.created_at.desc()).all()
@@ -47,7 +47,7 @@ def doctor_list(current_user):
 
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['GET'], endpoint='add_doctor')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def department_list(current_user):
     return render_template("admin_templates/doctor/add-doctors.html",
                            ADMIN=ADMIN,
@@ -56,7 +56,7 @@ def department_list(current_user):
 
 
 @admin.route(DOCTOR_ADD_DOCTOR, methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def register_doctor(current_user):
     try:
         data = request.form

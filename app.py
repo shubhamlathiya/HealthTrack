@@ -36,16 +36,16 @@ mail = Mail(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.config['SECRET_KEY'] = 'your_secure_random_key'
 app.register_blueprint(auth, url_prefix='/auth')
-# app.register_blueprint(admin, url_prefix='/admin')
+app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(department, url_prefix='/department')
 from controllers.chat_controllers import chat
 
-# app.register_blueprint(chat, url_prefix='/chat')
-# app.register_blueprint(patients, url_prefix='/patient')
-# app.register_blueprint(doctors, url_prefix='/doctor')
-# app.register_blueprint(laboratory , url_prefix='/laboratory')
+app.register_blueprint(chat, url_prefix='/chat')
+app.register_blueprint(patients, url_prefix='/patient')
+app.register_blueprint(doctors, url_prefix='/doctor')
+app.register_blueprint(laboratory, url_prefix='/laboratory')
 
-# app.register_blueprint(idCard, url_prefix='/id-card')
+app.register_blueprint(idCard, url_prefix='/id-card')
 
 with app.app_context():
     db.create_all()

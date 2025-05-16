@@ -6,11 +6,12 @@ from middleware.auth_middleware import token_required
 from models.departmentAssignmentModel import DepartmentAssignment
 from models.departmentModel import Department
 from models.doctorModel import Doctor
+from models.userModel import UserRole
 from utils.config import db
 
 
 @admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['GET'], endpoint="department_assignments")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def department_assignments(current_user):
     try:
         doctors = Doctor.query.options(
@@ -41,7 +42,7 @@ def department_assignments(current_user):
 
 
 @admin.route(DOCTOR_ASSIGN_DEPARTMENT, methods=['POST'], endpoint="assign_doctor_department")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def assign_doctor_department(current_user):
     try:
         data = request.form
@@ -88,7 +89,7 @@ def assign_doctor_department(current_user):
 
 
 @admin.route(DOCTOR_UPDATE_ASSIGN_DEPARTMENT + '/<int:assignment_id>', methods=['POST'] ,endpoint="update_assignment")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def update_assignment(current_user, assignment_id):
     try:
         assignment = DepartmentAssignment.query.get_or_404(assignment_id)

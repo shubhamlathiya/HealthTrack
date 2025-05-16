@@ -8,12 +8,13 @@ from controllers.constant.adminPathConstant import INSURANCE_CONVERAGE_TYPE, INS
     INSURANCE_EDIT_CONVERAGE_TYPE, INSURANCE_DELETE_CONVERAGE_TYPE, INSURANCE_RESTORE_CONVERAGE_TYPE
 from middleware.auth_middleware import token_required
 from models.insuranceProviderModel import CoverageType
+from models.userModel import UserRole
 from utils.config import db
 
 
 # Coverage Type Management
 @admin.route(INSURANCE_CONVERAGE_TYPE, methods=['GET'], endpoint='coverage_types')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def list_coverage_types(current_user):
     try:
         coverage_types = CoverageType.query \
@@ -51,7 +52,7 @@ def list_coverage_types(current_user):
 
 
 @admin.route(INSURANCE_ADD_CONVERAGE_TYPE, methods=['POST'], endpoint="add_coverage_type")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_coverage_type(current_user):
     try:
         name = request.form.get('name')
@@ -85,7 +86,7 @@ def add_coverage_type(current_user):
 
 
 @admin.route(INSURANCE_EDIT_CONVERAGE_TYPE + '/<int:coverage_id>', methods=['POST'], endpoint='edit_coverage_type')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_coverage_type(current_user, coverage_id):
     coverage = CoverageType.query.get_or_404(coverage_id)
 
@@ -125,7 +126,7 @@ def edit_coverage_type(current_user, coverage_id):
 
 
 @admin.route(INSURANCE_DELETE_CONVERAGE_TYPE + '/<int:coverage_id>', methods=['POST'], endpoint='delete_coverage_type')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_coverage_type(current_user, coverage_id):
     coverage = CoverageType.query.get_or_404(coverage_id)
 
@@ -148,7 +149,7 @@ def delete_coverage_type(current_user, coverage_id):
 
 @admin.route(INSURANCE_RESTORE_CONVERAGE_TYPE + '/<int:coverage_id>', methods=['POST'],
              endpoint="restore_coverage_type")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_coverage_type(current_user, coverage_id):
     coverage = CoverageType.query.filter_by(id=coverage_id, is_deleted=True).first_or_404()
 

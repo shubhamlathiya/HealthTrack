@@ -9,11 +9,12 @@ from controllers.patients_controllers import patients
 from middleware.auth_middleware import token_required
 from models.bloodModel import BloodRequest, BloodDonor
 from models.patientModel import Patient
+from models.userModel import UserRole
 from utils.config import db
 
 
 @patients.route(PATIENT_BLOOD_REQUEST, methods=['GET', 'POST'], endpoint="request_blood")
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def request_blood(current_user):
     if request.method == 'POST':
         try:
@@ -149,7 +150,7 @@ def blood_availability():
 
 
 @patients.route(PATIENT_MY_REQUESTS, methods=['GET'], endpoint="my_blood_requests")
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def my_blood_requests(current_user):
     patient = Patient.query.filter_by(user_id=current_user).first()
     if not patient:
@@ -164,7 +165,7 @@ def my_blood_requests(current_user):
 
 
 @patients.route(PATIENT_PAY_REQUEST, methods=['GET', 'POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def pay_blood_request(current_user, request_id):
     patient = Patient.query.filter_by(user_id=current_user).first()
     if not patient:
@@ -214,7 +215,7 @@ def pay_blood_request(current_user, request_id):
 
 
 @patients.route(PAYMENT_CONFIRMATION, methods=['GET'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def payment_confirmation(current_user, request_id):
     patient = Patient.query.filter_by(user_id=current_user).first()
     if not patient:

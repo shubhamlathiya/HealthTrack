@@ -7,12 +7,12 @@ from middleware.auth_middleware import token_required
 from models import Prescription, Appointment
 from models.doctorModel import Doctor
 from models.patientModel import Patient
-from models.userModel import User
+from models.userModel import User, UserRole
 from utils.email_utils import send_email
 
 
 @patients.route('/prescriptions', methods=['GET'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def get_patient_prescriptions(current_user):
     try:
         # Get patient record
@@ -78,7 +78,7 @@ def get_patient_prescriptions(current_user):
 
 
 @patients.route('/send-prescription-email/<int:prescription_id>', methods=['GET'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def send_prescription_email(current_user, prescription_id):
     # try:
     users = User.query.filter_by(id=current_user).first()

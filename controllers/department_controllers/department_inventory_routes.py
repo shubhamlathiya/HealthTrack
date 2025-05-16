@@ -8,11 +8,12 @@ from controllers.department_controllers import department
 from middleware.auth_middleware import token_required
 from models import Department
 from models.InventoryItemModel import Item, IssuedItem
+from models.userModel import UserRole
 from utils.config import db
 
 
 @department.route(INVENTORY_DEPARTMENT_REQUESTS, methods=['GET', 'POST'], endpoint='department_requests')
-@token_required
+@token_required(allowed_roles=[UserRole.DEPARTMENT_HEAD.name])
 def department_requests(current_user):
     # Get current department (assuming it's stored in session or current_user)
     department_id = session.get('department_id')
@@ -73,7 +74,7 @@ def department_requests(current_user):
 
 
 @department.route(INVENTORY_REQUEST_RETURN + '/<int:item_id>', methods=['POST'], endpoint='request_item_return')
-@token_required
+@token_required(allowed_roles=[UserRole.DEPARTMENT_HEAD.name])
 def request_item_return(current_user, item_id):
     try:
         issued_item = IssuedItem.query.get_or_404(item_id)
@@ -102,7 +103,7 @@ def request_item_return(current_user, item_id):
 
 
 @department.route(INVENTORY_CANCEL_REQUEST + '/<int:request_id>', methods=['POST'], endpoint='cancel_request')
-@token_required
+@token_required(allowed_roles=[UserRole.DEPARTMENT_HEAD.name])
 def cancel_request(current_user, request_id):
     try:
         request_item = IssuedItem.query.get_or_404(request_id)

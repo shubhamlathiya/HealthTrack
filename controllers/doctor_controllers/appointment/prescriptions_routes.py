@@ -8,11 +8,12 @@ from middleware.auth_middleware import token_required
 from models.appointmentModel import Appointment
 from models.doctorModel import Doctor
 from models.prescriptionModel import Prescription, PrescriptionMedication, MedicationTiming, PrescriptionTestReport
+from models.userModel import UserRole
 from utils.config import db
 
 
 @doctors.route('/appointments/rebook/<int:appointment_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.DOCTOR.name])
 def rebook_appointment(current_user, appointment_id):
     try:
         appointment = Appointment.query.get_or_404(appointment_id)
@@ -67,7 +68,7 @@ def rebook_appointment(current_user, appointment_id):
 
 
 @doctors.route('/appointments/forward/<int:appointment_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.DOCTOR.name])
 def forward_appointment(current_user, appointment_id):
     try:
         appointment = Appointment.query.get_or_404(appointment_id)

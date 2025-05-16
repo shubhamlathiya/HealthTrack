@@ -8,6 +8,7 @@ from middleware.auth_middleware import token_required
 from models import Department
 from models.appointmentModel import Appointment
 from models.doctorModel import Doctor
+from models.userModel import UserRole
 from utils.config import db
 
 
@@ -18,7 +19,7 @@ def appointment_calendar():
 
 
 @doctors.route('/view-appointment', methods=['GET'], endpoint='viewAppointment')
-@token_required
+@token_required(allowed_roles=[UserRole.DOCTOR.name])
 def viewAppointment(current_user):
     doctors = Doctor.query.filter_by(user_id=current_user).first()
     if not doctors:
@@ -33,7 +34,7 @@ def viewAppointment(current_user):
                            )
 
 @doctors.route('/calendar-events')
-@token_required
+@token_required(allowed_roles=[UserRole.DOCTOR.name])
 def get_calendar_events(current_user):
     """Get appointment counts for calendar view"""
     doctor = Doctor.query.filter_by(user_id=current_user).first()
@@ -69,7 +70,7 @@ def get_calendar_events(current_user):
 
 
 @doctors.route('/appointments/list')
-@token_required
+@token_required(allowed_roles=[UserRole.DOCTOR.name])
 def appointment_list(current_user):
     """Show list of appointments for a specific date"""
     doctor = Doctor.query.filter_by(user_id=current_user).first()

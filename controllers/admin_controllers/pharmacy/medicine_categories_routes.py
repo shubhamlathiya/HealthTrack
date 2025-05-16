@@ -10,11 +10,12 @@ from controllers.constant.adminPathConstant import PHARMACY_MEDICINE_CATEGORIES,
     PHARMACY_MEDICINE_DELETE_COMPANIES, PHARMACY_MEDICINE_RESTORE_COMPANIES, ADMIN
 from middleware.auth_middleware import token_required
 from models.medicineModel import MedicineCategory, MedicineCompany
+from models.userModel import UserRole
 from utils.config import db
 
 
 @admin.route(PHARMACY_MEDICINE_CATEGORIES, methods=['GET'], endpoint='medicine-categories')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def medicine_categories(current_user):
     categories = MedicineCategory.query.filter_by(is_deleted=0).order_by(MedicineCategory.name).all()
     archived_categories = MedicineCategory.query.filter_by(is_deleted=1).order_by(
@@ -29,7 +30,7 @@ def medicine_categories(current_user):
 
 
 @admin.route(PHARMACY_MEDICINE_ADD_CATEGORIES, methods=['POST'], endpoint='medicine-categories/add')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_medicine_category(current_user):
     try:
         category = MedicineCategory(
@@ -47,7 +48,7 @@ def add_medicine_category(current_user):
 
 @admin.route(PHARMACY_MEDICINE_EDIT_CATEGORIES + '/<int:id>', methods=['POST'],
              endpoint='medicine-categories/<int:id>/edit')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_medicine_category(current_user, id):
     category = MedicineCategory.query.get_or_404(id)
     try:
@@ -62,7 +63,7 @@ def edit_medicine_category(current_user, id):
 
 
 @admin.route(PHARMACY_MEDICINE_DELETE_CATEGORIES + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_medicine_category(current_user, id):
     category = MedicineCategory.query.get_or_404(id)
     try:
@@ -79,7 +80,7 @@ def delete_medicine_category(current_user, id):
 
 @admin.route(PHARMACY_MEDICINE_RESTORE_CATEGORIES + '/<int:id>', methods=['POST'],
              endpoint='medicine-categories/<int:id>/restore')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_medicine_category(current_user, id):
     category = MedicineCategory.query.get_or_404(id)
     try:
@@ -95,7 +96,7 @@ def restore_medicine_category(current_user, id):
 
 # Companies Routes
 @admin.route(PHARMACY_MEDICINE_COMPANIES, methods=['GET'], endpoint='medicine-companies')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def medicine_companies(current_user):
     companies = MedicineCompany.query.filter_by(is_deleted=0).order_by(MedicineCompany.name).all()
     archived_companies = MedicineCompany.query.filter_by(is_deleted=1).order_by(MedicineCompany.deleted_at.desc()).all()
@@ -110,7 +111,7 @@ def medicine_companies(current_user):
 
 
 @admin.route(PHARMACY_MEDICINE_ADD_COMPANIES, methods=['POST'], endpoint='medicine-companies/add')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_medicine_company(current_user):
     try:
         company = MedicineCompany(
@@ -131,7 +132,7 @@ def add_medicine_company(current_user):
 
 @admin.route(PHARMACY_MEDICINE_EDIT_COMPANIES + '/<int:id>', methods=['POST'],
              endpoint='medicine-companies/<int:id>/edit')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_medicine_company(current_user, id):
     company = MedicineCompany.query.get_or_404(id)
     try:
@@ -150,7 +151,7 @@ def edit_medicine_company(current_user, id):
 
 @admin.route(PHARMACY_MEDICINE_DELETE_COMPANIES + '/<int:id>', methods=['POST'],
              endpoint='medicine-companies/<int:id>/delete')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_medicine_company(current_user, id):
     company = MedicineCompany.query.get_or_404(id)
     try:
@@ -166,7 +167,7 @@ def delete_medicine_company(current_user, id):
 
 @admin.route(PHARMACY_MEDICINE_RESTORE_COMPANIES + '/<int:id>', methods=['POST'],
              endpoint='medicine-companies/<int:id>/restore')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_medicine_company(current_user, id):
     company = MedicineCompany.query.get_or_404(id)
     try:

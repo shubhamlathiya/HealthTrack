@@ -4,11 +4,12 @@ from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import DOCTOR_SHIFT_MANAGEMENT, DOCTOR_UPDATE_SHIFT_MANAGEMENT, ADMIN
 from middleware.auth_middleware import token_required
 from models.doctorModel import Doctor, Availability
+from models.userModel import UserRole
 from utils.config import db
 
 
 @admin.route(DOCTOR_SHIFT_MANAGEMENT, methods=['GET'], endpoint='doctor-shifts')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def doctor_shifts(current_user):
     doctors = Doctor.query.options(db.joinedload(Doctor.availabilities)).all()
 
@@ -41,7 +42,7 @@ def doctor_shifts(current_user):
 
 
 @admin.route(DOCTOR_UPDATE_SHIFT_MANAGEMENT + '/<int:doctor_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def update_shifts(current_user, doctor_id):
     try:
         # Days map for lookup

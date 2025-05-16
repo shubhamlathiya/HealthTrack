@@ -9,12 +9,13 @@ from controllers.constant.adminPathConstant import INSURANCE_PROVIDER, ADMIN, IN
     INSURANCE_DELETE_INSURANCE_PROVIDER, INSURANCE_RESTORE_INSURANCE_PROVIDER, INSURANCE_ADD_INSURANCE_PROVIDER
 from middleware.auth_middleware import token_required
 from models.insuranceProviderModel import InsuranceProvider, CoverageType
+from models.userModel import UserRole
 from utils.config import db
 
 
 # List all insurance providers
 @admin.route(INSURANCE_PROVIDER, methods=['GET'], endpoint='admin_insurance_providers')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def list_providers(current_user):
     try:
         # Get active providers (not deleted) with their coverage types
@@ -73,7 +74,7 @@ def list_providers(current_user):
 
 
 @admin.route(INSURANCE_ADD_INSURANCE_PROVIDER, methods=['POST'], endpoint="add_provide")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_provider(current_user):
     try:
         # Get form data
@@ -161,7 +162,7 @@ def add_provider(current_user):
 
 
 @admin.route(INSURANCE_EDIT_INSURANCE_PROVIDER + '/<int:provider_id>', methods=['POST'], endpoint="edit_provider")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_provider(current_user, provider_id):
     provider = InsuranceProvider.query.get_or_404(provider_id)
 
@@ -254,7 +255,7 @@ def edit_provider(current_user, provider_id):
 
 @admin.route(INSURANCE_DELETE_INSURANCE_PROVIDER + '/<int:provider_id>', methods=['POST'],
              endpoint="delete_insurance_provider")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_provider(current_user, provider_id):
     provider = InsuranceProvider.query.get_or_404(provider_id)
 
@@ -275,7 +276,7 @@ def delete_provider(current_user, provider_id):
 
 @admin.route(INSURANCE_RESTORE_INSURANCE_PROVIDER + '/<int:provider_id>', methods=['POST'],
              endpoint="restore_insurance_provider")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_provider(current_user, provider_id):
     provider = InsuranceProvider.query.get_or_404(provider_id)
 

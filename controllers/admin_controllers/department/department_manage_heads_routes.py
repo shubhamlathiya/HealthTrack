@@ -1,13 +1,22 @@
+from datetime import datetime
+
+from flask import render_template, request, redirect, flash
+
 from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import (
-    DEPARTMENT_MANAGE_HEADS
+    DEPARTMENT_LIST, DEPARTMENT_MANAGE_HEADS, DEPARTMENT_ADD_HEAD,
+    DEPARTMENT_REMOVE_HEAD, ADMIN
 )
 from middleware.auth_middleware import token_required
 from models.departmentAssignmentModel import DepartmentAssignment
+from models.departmentModel import Department, DepartmentHead
+from models.doctorModel import Doctor
+from models.userModel import UserRole
+from utils.config import db
 
 
 @admin.route(DEPARTMENT_MANAGE_HEADS + '/<int:department_id>', methods=['GET'], endpoint='manage-department-heads')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def manage_department_heads(current_user, department_id):
     department = Department.query.get_or_404(department_id)
     current_heads = DepartmentHead.query.filter_by(
@@ -37,22 +46,8 @@ def manage_department_heads(current_user, department_id):
                            )
 
 
-from datetime import datetime
-from flask import render_template, request, redirect, flash
-from controllers.admin_controllers import admin
-from controllers.constant.adminPathConstant import (
-    DEPARTMENT_LIST, DEPARTMENT_MANAGE_HEADS, DEPARTMENT_ADD_HEAD,
-    DEPARTMENT_REMOVE_HEAD, ADMIN
-)
-from middleware.auth_middleware import token_required
-from models.departmentModel import Department, DepartmentHead
-from models.doctorModel import Doctor
-from models.userModel import UserRole
-from utils.config import db
-
-
 @admin.route(DEPARTMENT_MANAGE_HEADS + '/<int:department_id>', methods=['GET'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def manage_department_heads(current_user, department_id):
     department = Department.query.get_or_404(department_id)
 
@@ -85,7 +80,7 @@ def manage_department_heads(current_user, department_id):
 
 
 @admin.route(DEPARTMENT_ADD_HEAD + '/<int:department_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_department_head(current_user, department_id):
     try:
         # Get form data
@@ -178,7 +173,7 @@ def add_department_head(current_user, department_id):
 
 
 @admin.route(DEPARTMENT_REMOVE_HEAD + '/<int:head_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def remove_department_head(current_user, head_id):
     try:
         department_head = DepartmentHead.query.get_or_404(head_id)

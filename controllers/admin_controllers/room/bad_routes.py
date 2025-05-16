@@ -6,11 +6,12 @@ from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import ROOM_ADD_BAD, ADMIN, ROOM_DELETE_BAD, ROOM
 from middleware.auth_middleware import token_required
 from models.roomModel import Room, Bed
+from models.userModel import UserRole
 from utils.config import db
 
 
 @admin.route(ROOM_ADD_BAD + '/<int:room_id>', methods=['GET', 'POST'], endpoint='add_bed')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_bed(current_user , room_id):
     # Get the room or return 404 if not found
     room = Room.query.get_or_404(int(room_id))
@@ -49,7 +50,7 @@ def add_bed(current_user , room_id):
 
 
 @admin.route(ROOM_DELETE_BAD + '/<int:bed_id>', methods=['POST'], endpoint='delete_bed')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_bed(current_user ,bed_id):
     bed = Bed.query.get_or_404(bed_id)
     try:

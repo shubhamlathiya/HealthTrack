@@ -7,11 +7,12 @@ from controllers.constant.adminPathConstant import DEPARTMENT_LIST, DEPARTMENT_A
     DEPARTMENT_EDIT_DEPARTMENT, DEPARTMENT_DELETE_DEPARTMENT, DEPARTMENT_RESTORE_DEPARTMENT, DEPARTMENT_MANAGE_HEADS
 from middleware.auth_middleware import token_required
 from models.departmentModel import Department
+from models.userModel import UserRole
 from utils.config import db
 
 
 @admin.route(DEPARTMENT_LIST, methods=['GET'], endpoint='departments-list')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def department_list(current_user):
     departments = Department.query.filter_by(is_deleted=0).order_by(Department.name.desc()).all()
     deleted_departments = Department.query.filter_by(is_deleted=1).order_by(Department.name.desc()).all()
@@ -39,7 +40,7 @@ def department_list(current_user):
 
 
 @admin.route(DEPARTMENT_ADD_DEPARTMENT, methods=['GET'], endpoint='add-department')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def department_list(current_user):
     return render_template("admin_templates/department/add-department.html",
                            ADMIN=ADMIN,
@@ -47,7 +48,7 @@ def department_list(current_user):
 
 
 @admin.route(DEPARTMENT_ADD_DEPARTMENT, methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_department(current_user):
     name = request.form.get('name')
     email = request.form.get('email')
@@ -75,7 +76,7 @@ def add_department(current_user):
 
 
 @admin.route(DEPARTMENT_EDIT_DEPARTMENT + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_department(current_user, id):
     try:
         department = Department.query.get_or_404(id)
@@ -99,7 +100,7 @@ def edit_department(current_user, id):
 
 
 @admin.route(DEPARTMENT_DELETE_DEPARTMENT + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_department(current_user, id):
     try:
         department = Department.query.get_or_404(id)
@@ -116,7 +117,7 @@ def delete_department(current_user, id):
 
 
 @admin.route(DEPARTMENT_RESTORE_DEPARTMENT + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_department(current_user, id):
     try:
         Department.query.filter_by(id=id).update({

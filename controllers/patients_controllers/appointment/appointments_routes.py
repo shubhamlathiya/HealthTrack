@@ -10,13 +10,13 @@ from models.departmentModel import Department
 from models.doctorModel import Doctor
 from models.patientModel import Patient
 from models.treatmentModel import Treatment
-from models.userModel import User
+from models.userModel import User, UserRole
 from utils.config import db
 from utils.email_utils import send_email
 
 
 @patients.route('/appointment', methods=['GET'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def appointment(current_user):
     patients = Patient.query.filter_by(user_id=current_user).first()
 
@@ -34,7 +34,7 @@ def appointment(current_user):
 
 
 @patients.route('/book-appointment', methods=['GET'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def book_appointment(current_user):
     # Get all active departments
     departments = Department.query.filter_by(is_deleted=False).all()
@@ -60,7 +60,7 @@ def book_appointment(current_user):
 
 
 @patients.route('/book-appointment', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def create_appointment(current_user):
     try:
         data = request.get_json()  # Changed from request.form to request.get_json()
@@ -146,7 +146,7 @@ def create_appointment(current_user):
 
 
 @patients.route('/patient/appointments/reschedule/<int:appointment_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def reschedule_appointment(current_user, appointment_id):
     try:
         # Get the original appointment
@@ -234,7 +234,7 @@ def reschedule_appointment(current_user, appointment_id):
 
 
 @patients.route('/appointments/cancel/<int:appointment_id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def cancel_appointment(current_user, appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)
     user = User.query.filter_by(id=current_user).first()

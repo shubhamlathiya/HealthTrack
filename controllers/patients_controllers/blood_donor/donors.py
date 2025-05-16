@@ -6,11 +6,12 @@ from middleware.auth_middleware import token_required
 from models.bloodModel import BloodDonor
 from models.appointmentModel import Appointment
 from models.patientModel import Patient
+from models.userModel import UserRole
 from utils.config import db
 
 
 @patients.route('/blood-donors', methods=['GET'], endpoint='view_blood_donors')
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def view_blood_donors(current_user):
     # Get all active blood donors
     donors = BloodDonor.query.filter_by(is_deleted=False, status='Active').all()
@@ -20,7 +21,7 @@ def view_blood_donors(current_user):
 
 
 @patients.route('/request-donor/<int:donor_id>', methods=['GET', 'POST'], endpoint='request_blood_donor')
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def request_blood_donor(current_user, donor_id):
     donor = BloodDonor.query.get_or_404(donor_id)
 
@@ -77,7 +78,7 @@ def request_blood_donor(current_user, donor_id):
 
 
 @patients.route('/appointments', methods=['GET'], endpoint='view_appointments')
-@token_required
+@token_required(allowed_roles=[UserRole.PATIENT.name])
 def view_appointments(current_user):
     # Get current patient's appointments
     patient_id = request.args.get('patient_id')  # In real app, get from session

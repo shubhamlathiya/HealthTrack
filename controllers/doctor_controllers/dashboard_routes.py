@@ -3,13 +3,16 @@ from datetime import datetime, timedelta
 from flask import render_template, redirect, flash, session
 
 from controllers.doctor_controllers import doctors
+from middleware.auth_middleware import token_required
 from models.appointmentModel import Appointment
 from models.doctorModel import Doctor
 from models.treatmentModel import Treatment
+from models.userModel import UserRole
 
 
 @doctors.route('/dashboard')
-def dashboard():
+@token_required(allowed_roles=[UserRole.DOCTOR.name])
+def dashboard(current_user):
     # Ensure user is logged in
     user_id = session.get('user_id')
     if not user_id:

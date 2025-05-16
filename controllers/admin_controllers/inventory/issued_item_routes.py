@@ -9,6 +9,7 @@ from controllers.constant.adminPathConstant import INVENTORY_ISSUED_ITEM, INVENT
 from middleware.auth_middleware import token_required
 from models import Department
 from models.InventoryItemModel import IssuedItem, Item
+from models.userModel import UserRole
 from utils.config import db
 
 
@@ -34,7 +35,7 @@ def issued_items():
 
 
 @admin.route(INVENTORY_ADD_ISSUED_ITEM, methods=['POST'], endpoint="inventory_add_item_issued")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_issue_item(current_user):
     try:
         item_id = int(request.form['item_id'])

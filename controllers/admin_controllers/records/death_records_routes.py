@@ -10,12 +10,13 @@ from controllers.constant.adminPathConstant import RECORDS_DEATH, ADMIN, \
 from middleware.auth_middleware import token_required
 from models.deathRecordeModel import DeathRecord
 from models.doctorModel import Doctor
+from models.userModel import UserRole
 from utils.config import db
 from utils.email_utils import send_email_with_attachment
 
 
 @admin.route(RECORDS_DEATH, methods=['GET'], endpoint='records_death')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def records_death(current_user):
     records = DeathRecord.query.filter_by(is_deleted=0).order_by(DeathRecord.death_date.desc()).all()
     doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
@@ -34,7 +35,7 @@ def records_death(current_user):
 
 
 @admin.route(RECORDS_ADD_DEATH, methods=['GET', 'POST'], endpoint="add_death_record")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_death_record(current_user):
     doctors = Doctor.query.filter_by(is_deleted=0).order_by(Doctor.first_name).all()
     if request.method == 'POST':
@@ -76,7 +77,7 @@ def add_death_record(current_user):
 
 
 @admin.route(RECORDS_DEATH_EDIT + '/<int:id>', methods=['POST'], endpoint="edit_death_record")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_death_record(current_user, id):
     record = DeathRecord.query.get_or_404(id)
     try:
@@ -108,7 +109,7 @@ def edit_death_record(current_user, id):
 
 
 @admin.route(RECORDS_DEATH_DELETE + '/<int:id>', methods=['POST'], endpoint="delete_death_record")
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_death_record(current_user, id):
     record = DeathRecord.query.get_or_404(id)
     try:
@@ -124,7 +125,7 @@ def delete_death_record(current_user, id):
 
 
 @admin.route(RECORDS_RESTORE_DEATH + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_death_record(current_user, id):
     record = DeathRecord.query.filter_by(id=id, is_deleted=True).first_or_404()
     try:

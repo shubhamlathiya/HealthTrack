@@ -1,10 +1,11 @@
 import base64
 
-from flask import render_template, send_file
+from flask import render_template
 
 from controllers.every_one_controllers import idCard
 from middleware.auth_middleware import token_required
 from models.doctorModel import Doctor
+from models.userModel import UserRole
 
 
 def generate_barcode_image(code):
@@ -48,7 +49,7 @@ def patientCard():
 
 
 @idCard.route("/doctor", methods=["GET"], endpoint="doctorIdCard")
-@token_required
+@token_required(allowed_roles=[UserRole.DOCTOR.name])
 def doctorCard(current_user):
     doctors = Doctor.query.filter_by(user_id=current_user).first()
 

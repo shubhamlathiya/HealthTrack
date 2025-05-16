@@ -8,11 +8,12 @@ from controllers.constant.adminPathConstant import PHARMACY_MEDICINE_LIST, PHARM
     PHARMACY_MEDICINE_DISPENSE, PHARMACY_MEDICINE_RESTORE
 from middleware.auth_middleware import token_required
 from models.medicineModel import Medicine, StockTransaction, MedicineCategory, MedicineCompany
+from models.userModel import UserRole
 from utils.config import db
 
 
 @admin.route(PHARMACY_MEDICINE_LIST, methods=['GET'], endpoint='medicine-list')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def pharmacy_medicine_list(current_user):
     medicines = Medicine.query.filter_by(is_deleted=0).order_by(Medicine.name).all()
     categories = MedicineCategory.query.filter_by(is_deleted=0).order_by(MedicineCategory.name).all()
@@ -34,7 +35,7 @@ def pharmacy_medicine_list(current_user):
 
 
 @admin.route(PHARMACY_MEDICINE_ADD, methods=['POST'], endpoint='medicine-add')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_medicine(current_user):
     print(current_user)
     print(request.form)
@@ -82,7 +83,7 @@ def add_medicine(current_user):
 
 
 @admin.route(PHARMACY_MEDICINE_EDIT + '/<int:id>', methods=['POST'], endpoint='medicine-edit')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
     try:
@@ -107,7 +108,7 @@ def edit_medicine(current_user, id):
 
 
 @admin.route(PHARMACY_MEDICINE_DELETE + '/<int:id>', methods=['POST'], endpoint='medicine-delete')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
     try:
@@ -128,7 +129,7 @@ def delete_medicine(current_user, id):
 
 
 @admin.route(PHARMACY_MEDICINE_RESTOCK + '/<int:id>', methods=['POST'], endpoint='medicine-restock')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restock_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
     try:
@@ -159,7 +160,7 @@ def restock_medicine(current_user, id):
 
 
 @admin.route(PHARMACY_MEDICINE_TRANSACTIONS + '/<int:id>', methods=['POST'], endpoint='medicine-transactions123')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def transactions_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
 
@@ -231,7 +232,7 @@ def forward_to_post(id):
 
 
 @admin.route(PHARMACY_MEDICINE_DISPENSE + '/<int:id>', methods=['POST'], endpoint='medicine-dispense')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def dispense_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
     try:
@@ -266,7 +267,7 @@ def dispense_medicine(current_user, id):
 
 
 @admin.route(PHARMACY_MEDICINE_TRANSACTIONS, methods=['POST'], endpoint='medicine-transactions')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def medicine_transactions(current_user):
     medicine_id = request.form.get('medicine_id')
     medicine = Medicine.query.get_or_404(medicine_id)
@@ -278,7 +279,7 @@ def medicine_transactions(current_user):
 
 
 @admin.route(PHARMACY_MEDICINE_RESTORE + '/<int:id>', methods=['POST'])
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def restore_medicine(current_user, id):
     medicine = Medicine.query.get_or_404(id)
     try:

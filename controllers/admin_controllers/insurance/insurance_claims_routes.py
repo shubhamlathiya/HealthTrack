@@ -10,6 +10,7 @@ from controllers.constant.adminPathConstant import INSURANCE_CLAIM_STATUS, GET_P
     INSURANCE_CLAIM_STATUS_PRINT, INSURANCE_CLAIM_STATUS_DELETE, INSURANCE_CLAIM_STATUS_RESTORE
 from middleware.auth_middleware import token_required
 from models.insuranceProviderModel import InsuranceProvider, InsuranceClaim, InsuranceRecord
+from models.userModel import UserRole
 from utils.config import db
 
 # File upload configuration
@@ -30,7 +31,7 @@ from datetime import datetime
 
 
 @admin.route(INSURANCE_CLAIM_STATUS, methods=['GET'], endpoint='insurance_claims')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def list_claims(current_user):
     try:
         # Base query with explicit joins using select_from
@@ -82,7 +83,7 @@ def list_claims(current_user):
 
 
 @admin.route(INSURANCE_NEW_CLAIM, methods=['POST'], endpoint='claims_add')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_claim(current_user):
     try:
         print(request.form)
@@ -136,7 +137,7 @@ def add_claim(current_user):
 
 
 @admin.route(INSURANCE_CLAIM_STATUS_EDIT + '/<int:claim_id>', methods=['POST'], endpoint='claims_edit')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_claim(current_user, claim_id):
     try:
         claim = InsuranceClaim.query.get_or_404(claim_id)
@@ -177,7 +178,7 @@ def edit_claim(current_user, claim_id):
 
 
 @admin.route(INSURANCE_CLAIM_STATUS_PROCESS + '/<int:claim_id>', methods=['POST'], endpoint='insurance_claims_process')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def process_insurance_claim(current_user, claim_id):
     try:
         claim = InsuranceClaim.query.get_or_404(claim_id)
@@ -218,7 +219,7 @@ def process_insurance_claim(current_user, claim_id):
 
 
 @admin.route(INSURANCE_CLAIM_STATUS_APPEAL + '/<int:claim_id>', methods=['POST'], endpoint='insurance_claims_appeal')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def appeal_insurance_claim(current_user, claim_id):
     try:
         claim = InsuranceClaim.query.get_or_404(claim_id)
@@ -262,7 +263,7 @@ def print_insurance_claim(claim_id):
 
 
 @admin.route(INSURANCE_CLAIM_STATUS_DELETE + '/<int:claim_id>', methods=['POST'], endpoint='insurance_claims_delete')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_insurance_claim(current_user, claim_id):
     try:
         claim = InsuranceClaim.query.get_or_404(claim_id)
@@ -282,7 +283,7 @@ def delete_insurance_claim(current_user, claim_id):
 
 
 @admin.route(INSURANCE_CLAIM_STATUS_RESTORE + '/<int:claim_id>', methods=['POST'], endpoint='insurance_claims_restore')
-@token_required
+@token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_insurance_claim(current_user, claim_id):
     try:
         claim = InsuranceClaim.query.get_or_404(claim_id)

@@ -9,7 +9,7 @@ from middleware.auth_middleware import token_required
 from models.chatModel import Message, Notification, CommunicationRequest
 from models.doctorModel import Doctor
 from models.patientModel import Patient
-from models.userModel import User
+from models.userModel import User, UserRole
 from utils.config import db
 
 
@@ -163,7 +163,9 @@ def send_message():
 
 
 @chat.route('/mark-messages-read', methods=['POST'])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def mark_messages_read(current_user):
     sender_id = request.args.get('sender_id')
     if not sender_id:
@@ -209,7 +211,9 @@ def get_conversation():
 
 
 @chat.route("/get-users-for-communication", methods=["GET"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def get_users_for_communication(current_user):
     try:
         # Get users who have communicated with the current user via messages
@@ -281,7 +285,9 @@ def get_users_for_communication(current_user):
 
 
 @chat.route("/get-notifications", methods=["GET"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def get_notifications(current_user):
     try:
         notifications = Notification.query.filter_by(user_id=current_user).order_by(
@@ -318,7 +324,9 @@ def mark_notification_as_read(notification_id):
 
 
 @chat.route("/start-conversation/<int:receiver_id>", methods=["GET"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def start_conversation(current_user, receiver_id):
     try:
         receiver = User.query.get(receiver_id)
@@ -354,7 +362,9 @@ def start_conversation(current_user, receiver_id):
 
 
 @chat.route("/send-communication-request", methods=["POST"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def send_communication_request(current_user):
     """Send a communication request to another user"""
     data = request.json
@@ -409,7 +419,9 @@ def send_communication_request(current_user):
 
 
 @chat.route("/respond-to-request/<int:request_id>", methods=["POST"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def respond_to_communication_request(current_user, request_id):
     try:
         # Fetch incoming request data
@@ -476,7 +488,9 @@ def get_user_full_name(user_id, role):
 
 
 @chat.route("/get-pending-requests", methods=["GET"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def get_pending_requests(current_user):
     """Get pending communication requests for current user"""
     try:
@@ -518,7 +532,9 @@ def get_pending_requests(current_user):
 
 
 @chat.route("/get-unread-notification-count", methods=["GET"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def get_unread_notification_count(current_user):
     """Get the count of unread notifications and messages for the current user"""
     try:
@@ -552,7 +568,9 @@ def get_unread_notification_count(current_user):
 
 
 @chat.route("/get-potential-recipients", methods=["GET"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def get_potential_recipients(current_user):
     """Get a list of users that the current user can potentially start a conversation with"""
     try:
@@ -624,7 +642,9 @@ def get_potential_recipients(current_user):
 
 
 @chat.route("/chat", methods=["GET"])
-@token_required
+@token_required(
+    allowed_roles=[UserRole.DOCTOR.name, UserRole.ADMIN.name, UserRole.PATIENT.name, UserRole.DEPARTMENT_HEAD.name,
+                   UserRole.NURSE.name])
 def chat_ui(current_user):
     print("Current User ID:", current_user)
 
