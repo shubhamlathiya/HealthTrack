@@ -147,7 +147,7 @@
         messageDiv.classList.remove('alert-success', 'alert-danger');
 
         try {
-            const response = await fetch('/auth/register', {
+            const response = await fetch('{{ AUTH + REGISTER }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

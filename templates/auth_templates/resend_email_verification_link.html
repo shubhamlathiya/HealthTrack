@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clove Dental Care - Email Verification</title>
+    <meta name="description" content="Resend your email verification link">
+    <link rel="shortcut icon" href="../../static/assets/images/favicon.svg">
+    <link rel="stylesheet" href="../../static/assets/fonts/remix/remixicon.css">
+    <link rel="stylesheet" href="../../static/assets/css/main.min.css">
+    <style>
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .verification-icon {
+            font-size: 4rem;
+            color: #4e73df;
+            margin-bottom: 1.5rem;
+        }
+
+        .instruction-text {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+
+        .timer-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        #messageDiv {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="login-bg">
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<div class="container">
+    <div class="auth-wrapper">
+        <div class="auth-box text-center">
+            <a href="/" class="auth-logo mb-4">
+                <img src="../../static/assets/images/logo.svg" alt="Clove Dental Care">
+            </a>
+
+            <div class="verification-icon">
+                <i class="ri-mail-send-line"></i>
+            </div>
+
+            <h4 class="mb-3">Verify Your Email Address</h4>
+
+            <div id="emailInstructions">
+                <p class="instruction-text">
+                    We've sent a verification link to <span id="emailDisplay" class="fw-bold"></span>.
+                    Please check your inbox and click the link to verify your account.
+                </p>
+                <p class="instruction-text">
+                    Didn't receive the email? Check your spam folder or request a new verification link below.
+                </p>
+            </div>
+
+            <form id="resendVerificationForm">
+                <input type="hidden" id="email" name="email">
+                <div class="mb-3 d-grid">
+                    <button type="submit" class="btn btn-primary" id="resendBtn">
+                        <i class="ri-mail-send-line me-2"></i> Resend Verification Email
+                    </button>
+                </div>
+                <div class="timer-text" id="timerText">
+                    You can request a new link in <span id="countdown">30</span> seconds
+                </div>
+            </form>
+
+            <div id="messageDiv" class="alert d-none mt-3" role="alert"></div>
+
+            <div class="mt-4">
+                <a href="/" class="text-decoration-underline">
+                    <i class="ri-arrow-left-line me-1"></i> Back to Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DOM Elements
+    const elements = {
+        loadingOverlay: document.getElementById('loadingOverlay'),
+        emailDisplay: document.getElementById('emailDisplay'),
+        emailInput: document.getElementById('email'),
+        resendForm: document.getElementById('resendVerificationForm'),
+        resendBtn: document.getElementById('resendBtn'),
+        timerText: document.getElementById('timerText'),
+        countdown: document.getElementById('countdown'),
+        messageDiv: document.getElementById('messageDiv'),
+        emailInstructions: document.getElementById('emailInstructions')
+    };
+
+    // State management
+    const state = {
+        countdownInterval: null,
+        resendCooldown: 30 // seconds
+    };
+
+    // Initialize the page
+    async function init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email') || localStorage.getItem('verification_email');
+
+        if (!email) {
+            window.location.href = '/auth/login';
+            return;
+        }
+
+        // Set email in UI and storage
+        elements.emailDisplay.textContent = email;
+        elements.emailInput.value = email;
+        localStorage.setItem('verification_email', email);
+
+        // Attempt initial resend
+        await resendVerification(email);
+
+        // Start cooldown timer
+        startCountdown();
+    }
+
+    // Handle form submission
+    elements.resendForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await resendVerification(elements.emailInput.value);
+    });
+
+    // Resend verification email
+    async function resendVerification(email) {
+        showLoading(true);
+        clearMessage();
+
+        try {
+            const response = await fetch('{{ AUTH + VERIFY_EMAIL_RESEND }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email})
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showMessage(data.message, 'success');
+                startCountdown();
+            } else {
+                showMessage(data.error || 'Failed to resend verification email', 'danger');
+            }
+        } catch (error) {
+            showMessage('Network error. Please try again.', 'danger');
+            console.error('Error:', error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Countdown timer functions
+    function startCountdown() {
+        clearInterval(state.countdownInterval);
+        let remaining = state.resendCooldown;
+
+        elements.resendBtn.disabled = true;
+        elements.timerText.style.display = 'block';
+        elements.countdown.textContent = remaining;
+
+        state.countdownInterval = setInterval(() => {
+            remaining--;
+            elements.countdown.textContent = remaining;
+
+            if (remaining <= 0) {
+                clearInterval(state.countdownInterval);
+                elements.resendBtn.disabled = false;
+                elements.timerText.style.display = 'none';
+            }
+        }, 1000);
+    }
+
+    // UI Helper functions
+    function showLoading(show) {
+        elements.loadingOverlay.style.display = show ? 'flex' : 'none';
+        elements.resendBtn.innerHTML = show
+            ? '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Sending...'
+            : '<i class="ri-mail-send-line me-2"></i> Resend Verification Email';
+    }
+
+    function showMessage(text, type) {
+        elements.messageDiv.textContent = text;
+        elements.messageDiv.className = `alert alert-${type} mt-3`;
+        elements.messageDiv.classList.remove('d-none');
+    }
+
+    function clearMessage() {
+        elements.messageDiv.classList.add('d-none');
+    }
+
+    // Initialize the page when loaded
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

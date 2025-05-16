@@ -12,12 +12,26 @@
     <meta property="og:type" content="Website">
     <link rel="shortcut icon" href="../../static/assets/images/favicon.svg">
 
-    <!-- *************
-			************ CSS Files *************
-		************* -->
+    <!-- CSS Files -->
     <link rel="stylesheet" href="../../static/assets/fonts/remix/remixicon.css">
     <link rel="stylesheet" href="../../static/assets/css/main.min.css">
 
+    <style>
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .error-alert {
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="login-bg">
@@ -35,31 +49,41 @@
 
             <h4 class="mb-4">Login</h4>
 
-            <div class="mb-3">
-                <label class="form-label" for="email">Your email <span class="text-danger">*</span></label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email">
+            <!-- Error Alert (for general errors) -->
+            <div class="alert alert-danger error-alert mb-3" role="alert" id="generalError">
+                <i class="ri-error-warning-line me-2"></i>
+                <span id="generalErrorText"></span>
             </div>
 
-            <div class="mb-2">
-                <label class="form-label" for="password">Your password <span class="text-danger">*</span></label>
-                <div class="input-group">
-                    <input type="password" id="password" name="password" class="form-control"
-                           placeholder="Enter password">
-                    <button class="btn btn-outline-secondary" type="button"    id="togglePassword1">
-                        <i class="ri-eye-off-line text-primary"></i>
-                    </button>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label" for="email">Your email <span class="text-danger">*</span></label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email"
+                           required>
+                    <div class="error-message" id="emailError"></div>
                 </div>
-            </div>
 
-            <div class="d-flex justify-content-end mb-3">
-                <a href="/auth/forgot-password" class="text-decoration-underline">Forgot password?</a>
-            </div>
+                <div class="mb-2">
+                    <label class="form-label" for="password">Your password <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control"
+                               placeholder="Enter password" required>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword1">
+                            <i class="ri-eye-off-line text-primary"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
 
-            <div class="mb-3 d-grid gap-2">
-                <button type="submit" class="btn btn-primary" onclick="loginPatient()">Login</button>
-                <a href="/auth/register" class="btn btn-secondary">Not registered? Signup</a>
-            </div>
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="/auth/forgot-password" class="text-decoration-underline">Forgot password?</a>
+                </div>
 
+                <div class="mb-3 d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <a href="/auth/register" class="btn btn-secondary">Not registered? Signup</a>
+                </div>
+            </form>
         </div>
 
     </div>
@@ -69,7 +93,6 @@
 <!-- Container ends -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
     // Toggle password visibility
     document.getElementById('togglePassword1').addEventListener('click', function () {
         const passwordField = document.getElementById('password');
@@ -78,10 +101,34 @@
         this.querySelector('i').classList.toggle('ri-eye-off-line');
         this.querySelector('i').classList.toggle('ri-eye-line');
     });
-    async function loginPatient() {
+
+    // Form submission handler
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        // Reset error states
+        resetErrors();
+
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
 
+        // Basic client-side validation
+        let isValid = true;
+
+        if (!email) {
+            showError('email', 'Email is required');
+            isValid = false;
+        } else if (!/\S+@\S+\.\S+/.test(email)) {
+            showError('email', 'Please enter a valid email address');
+            isValid = false;
+        }
+
+        if (!password) {
+            showError('password', 'Password is required');
+            isValid = false;
+        }
+
+        if (!isValid) return;
 
         try {
             const response = await fetch('/auth/login', {
@@ -96,14 +143,57 @@
 
             if (response.ok) {
                 document.cookie = `token=${data.token}; path=/;`;
-                alert('Login successful!');
                 window.location.href = data.redirect_url;
             } else {
-                alert(data.message || 'Login failed!');
+                console.log(data.errors)
+                // Handle server-side errors
+                if (data.errors) {
+                    // Field-specific errors
+                    showGeneralError(data.errors);
+                } else if (data.message) {
+                    // General error
+                    showGeneralError(data.message);
+                    if (data.redirect_url){
+                        window.location.href = data.redirect_url;
+                    }
+                } else {
+                    showGeneralError('Login failed. Please try again.');
+                }
             }
         } catch (error) {
             console.error('Error:', error);
+            showGeneralError('An unexpected error occurred. Please try again later.');
         }
+    });
+
+    // Helper functions for error handling
+    function showError(field, message) {
+        const fieldElement = document.getElementById(field);
+        const errorElement = document.getElementById(`${field}Error`);
+
+        fieldElement.classList.add('is-invalid');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+
+    function showGeneralError(message) {
+        const generalError = document.getElementById('generalError');
+        const generalErrorText = document.getElementById('generalErrorText');
+
+        generalErrorText.textContent = message;
+        generalError.style.display = 'flex';
+    }
+
+    function resetErrors() {
+        // Reset field errors
+        document.getElementById('email').classList.remove('is-invalid');
+        document.getElementById('password').classList.remove('is-invalid');
+
+        document.getElementById('emailError').style.display = 'none';
+        document.getElementById('passwordError').style.display = 'none';
+
+        // Reset general error
+        document.getElementById('generalError').style.display = 'none';
     }
 </script>
 </body>

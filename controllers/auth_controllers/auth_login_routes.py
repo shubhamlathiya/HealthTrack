@@ -5,7 +5,8 @@ from flask import jsonify, request, session
 from werkzeug.security import check_password_hash
 
 from controllers.auth_controllers import auth
-from controllers.constant.adminPathConstant import LOGIN, ADMIN_DASHBOARD
+from controllers.constant.adminPathConstant import ADMIN_DASHBOARD
+from controllers.constant.authPathConstant import LOGIN
 from controllers.constant.departmentPathConstant import DEPARTMENT_DASHBOARD
 from controllers.constant.doctorPathConstant import DOCTOR_DASHBOARD
 from controllers.constant.laboratoryPathConstant import LABORATORY_DASHBOARD
@@ -26,10 +27,12 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if not user or not check_password_hash(user.password, password):
-            return jsonify({'error': 'Invalid email or password'}), 401
+            return jsonify({'errors': 'Invalid email or password'}), 401
 
         if not user.verified:
-            return jsonify({'message': 'Email not verified. Redirecting to verification page...'}), 403
+            redirect_url = f"/auth/verify-email/resend?email={email}"
+            return jsonify({'redirect_url': redirect_url,
+                            'message': 'Email not verified. Redirecting to verification page...'}), 403
 
         if user.status:  # Assuming 'status' is a boolean or a 1/0 value (active/inactive)
             # Generate a JWT token that expires in 1 hour

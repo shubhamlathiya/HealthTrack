@@ -28,7 +28,7 @@ class User(db.Model):
     verified = db.Column(db.Boolean, nullable=True)  # Email verification status
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    verification_sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     staff = db.relationship('Staff', backref='user', uselist=False)
 
     notifications = db.relationship('Notification', backref='user', lazy=True)

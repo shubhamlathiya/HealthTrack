@@ -1,11 +1,12 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from flask import request, jsonify, render_template, flash, current_app
+from flask import request, jsonify, render_template, flash
 from werkzeug.security import generate_password_hash
 
 from controllers.auth_controllers import auth
-from controllers.constant.adminPathConstant import REGISTER
+from controllers.constant.authPathConstant import REGISTER, AUTH, VERIFY_EMAIL_RESEND, VERIFY_EMAIL
+from models.doctorModel import Doctor
 from models.patientModel import Patient
 from models.userModel import User, UserRole
 from utils.config import db
@@ -13,10 +14,7 @@ from utils.email_utils import send_email
 from utils.tokens import verify_token
 
 
-# Assuming Patient and User models are already imported from your models
-# Also assuming send_email is a utility function to send emails
-
-@auth.route(REGISTER, methods=['GET', 'POST'])
+@auth.route(REGISTER, methods=['GET', 'POST'], endpoint="register_patient")
 def register_patient():
     if request.method == 'POST':
         data = request.get_json()  # Get JSON data from request body
@@ -87,6 +85,8 @@ def register_patient():
 
             send_email('Verify Your Email', new_user.email, body_html)
 
+            new_user.verification_sent_at = datetime.utcnow()
+            db.session.commit()
             return jsonify({'message': 'Patient registered successfully'})
 
         except Exception as e:
@@ -95,10 +95,72 @@ def register_patient():
 
     elif request.method == 'GET':
         # If GET request, render registration page
-        return render_template('auth_templates/register_templates.html')
+        return render_template('auth_templates/register_templates.html',
+                               AUTH=AUTH,
+                               REGISTER=REGISTER)
 
 
-@auth.route('/verify-email/<token>' , methods=['GET'] ,endpoint='verify_email')
+@auth.route(VERIFY_EMAIL_RESEND, methods=['GET', 'POST'], endpoint="resend_verification")
+def resend_verification():
+    if request.method == 'POST':
+        global data
+        email = request.json.get('email')
+
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            return jsonify({'error': 'No account found with this email'}), 404
+
+        if user.verified:
+            return jsonify({'message': 'Email is already verified'}), 200
+
+        # Prevent spamming - limit to 1 resend every 5 minutes
+        last_sent = getattr(user, 'verification_sent_at', None)
+        if last_sent and datetime.utcnow() < last_sent + timedelta(minutes=3):
+            return jsonify({
+                'error': 'Verification email already sent recently. Please check your inbox or wait 3 minutes.'
+            }), 429
+
+        if user.role == UserRole.PATIENT:
+            patients = Patient.query.filter_by(user_id=user.id).first()
+            data = patients.patient_id
+            if not data:
+                return jsonify({'error': "Patients Not Found"}), 404
+        elif user.role == UserRole.DOCTOR:
+            doctors = Doctor.query.filter_by(user_id=user.id).first()
+            data = doctors.doctor_id
+            if not data:
+                return jsonify({'error': "Patients Not Found"}), 404
+        elif user.role == UserRole.DEPARTMENT_HEAD:
+            data = "Department Head"
+
+        # Generate new token and send email
+        verification_token = user.generate_verification_token()
+        verification_link = f"http://localhost:5000/auth/verify-email/{verification_token}"
+        body_html = render_template("email_templates/templates/verification_mail.html",
+                                    verification_link=verification_link,
+                                    user_name=data)
+
+        send_email('Verify Your Email', user.email, body_html)
+
+        # Update last sent timestamp
+        user.verification_sent_at = datetime.utcnow()
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Verification email resent successfully',
+            'email': user.email  # Return masked email for display
+        }), 200
+
+    return render_template('auth_templates/resend_email_verification_link.html',
+                           AUTH=AUTH,
+                           VERIFY_EMAIL_RESEND=VERIFY_EMAIL_RESEND)
+
+
+@auth.route(VERIFY_EMAIL + '/<token>', methods=['GET'], endpoint='verify_email')
 def verify_email(token):
     user_id = verify_token(token)
     if not user_id:

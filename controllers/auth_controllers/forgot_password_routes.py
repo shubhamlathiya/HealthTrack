@@ -3,7 +3,7 @@ from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import generate_password_hash
 
 from controllers.auth_controllers import auth
-from controllers.constant.adminPathConstant import FORGOT_PASSWORD, RESET_PASSWORD
+from controllers.constant.authPathConstant import AUTH, FORGOT_PASSWORD, RESET_PASSWORD
 from models.userModel import User
 from utils.config import db  # Using SQLAlchemy for MySQL database
 from utils.email_utils import send_email
@@ -37,7 +37,9 @@ def forgot_password():
         return jsonify({"message": "Password reset link sent to your email"}), 200
 
     elif request.method == 'GET':
-        return render_template('auth_templates/forgot_password_templates.html')
+        return render_template('auth_templates/forgot_password_templates.html',
+                               AUTH=AUTH,
+                               FORGOT_PASSWORD=FORGOT_PASSWORD)
 
 # Reset Password Route
 @auth.route(RESET_PASSWORD + '/<token>', methods=['GET', 'POST'])

@@ -4,7 +4,6 @@ from controllers.admin_controllers import admin
 from controllers.constant.adminPathConstant import ACCOUNTS_INCOME, ACCOUNTS_EXPENSES, ACCOUNTS_INVOICES, \
     ACCOUNTS_PAYMENTS, \
     ACCOUNTS_CREATE_INVOICE, ACCOUNTS_INVOICES_DETAILS
-from middleware.auth_middleware import token_required
 
 
 @admin.route(ACCOUNTS_INCOME, methods=['GET'], endpoint='income')
@@ -28,12 +27,10 @@ def accountsPayments():
 
 
 @admin.route(ACCOUNTS_CREATE_INVOICE, methods=['GET'], endpoint='create-invoice')
-@token_required
-def accounts_create_invoice(current_user):
+def accounts_create_invoice():
     return render_template("admin_templates/accounts/create-invoice.html")
 
 
 @admin.route(ACCOUNTS_INVOICES_DETAILS, methods=['GET'], endpoint='invoice-details')
-@token_required
-def accoutsInvoiceDetails(current_user):
+def accoutsInvoiceDetails():
     return render_template("admin_templates/accounts/invoice-details.html")
