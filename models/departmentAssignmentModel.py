@@ -25,4 +25,4 @@ class DepartmentAssignment(db.Model):
     deleted_at = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
-        return f'<DepartmentAssignment {self.doctor.full_name} -> {self.department.name}>'
+        return f'<DepartmentAssignment {self.doctor.first_name} -> {self.department.name}>'

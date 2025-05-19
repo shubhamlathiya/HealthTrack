@@ -21,7 +21,9 @@ def department_list(current_user):
     all_doctors = []
     for department in departments:
         for assignment in department.assignments:
-            all_doctors.append(assignment.doctor)
+            if str(assignment.current_status) == 'Active':
+                print(assignment.current_status)
+                all_doctors.append(assignment.doctor)
 
     all_rooms = [room for dept in departments for room in dept.rooms]
 
