@@ -11,7 +11,6 @@ from models.InventoryItemModel import Item, IssuedItem
 from models.userModel import UserRole
 from utils.config import db
 
-
 @department.route(INVENTORY_DEPARTMENT_REQUESTS, methods=['GET', 'POST'], endpoint='department_requests')
 @token_required(allowed_roles=[UserRole.DEPARTMENT_HEAD.name])
 def department_requests(current_user):

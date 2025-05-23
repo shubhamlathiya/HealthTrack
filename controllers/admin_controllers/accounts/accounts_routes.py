@@ -11,9 +11,7 @@ def accountIncoms():
     return render_template("admin_templates/accounts/income.html")
 
 
-@admin.route(ACCOUNTS_EXPENSES, methods=['GET'], endpoint='expenses')
-def accountExpenss():
-    return render_template("admin_templates/accounts/expenses.html")
+
 
 
 @admin.route(ACCOUNTS_INVOICES, methods=['GET'], endpoint='invoices')
