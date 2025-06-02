@@ -27,6 +27,7 @@ class Patient(db.Model):
     donations = db.relationship("BloodDonor", back_populates="patient")
     blood_requests = db.relationship('BloodRequest', back_populates='patient')
     blood_transfusions = db.relationship("BloodTransfusion", back_populates="patient", cascade="all, delete-orphan")
+    # visitors = db.relationship('Visitor', backref='patient', lazy=True)
     def __repr__(self):
         return f"<Patient {self.first_name} {self.last_name}>"
 

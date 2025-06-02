@@ -3,6 +3,8 @@ from datetime import datetime, timedelta, date
 from flask import render_template, request, jsonify, flash, redirect
 from sqlalchemy import and_, or_, not_
 
+from controllers.constant.patientPathConstant import VIEW_APPOINTMENT, PATIENT, BOOK_APPOINTMENT, \
+    RESCHEDULE_APPOINTMENT, CANCEL_APPOINTMENT
 from controllers.patients_controllers import patients
 from middleware.auth_middleware import token_required
 from models.appointmentModel import Appointment, AppointmentTreatment
@@ -15,9 +17,9 @@ from utils.config import db
 from utils.email_utils import send_email
 
 
-@patients.route('/appointment', methods=['GET'])
+@patients.route(VIEW_APPOINTMENT, methods=['GET'], endpoint="view_appointment")
 @token_required(allowed_roles=[UserRole.PATIENT.name])
-def appointment(current_user):
+def view_appointment(current_user):
     patients = Patient.query.filter_by(user_id=current_user).first()
 
     appointments = Appointment.query.filter_by(
@@ -29,11 +31,13 @@ def appointment(current_user):
     return render_template("patient_templates/appointment/list_appointments.html",
                            appointments=appointments,
                            patient=patients,
-                           date=date
+                           date=date,
+                           PATIENT=PATIENT,
+                           BOOK_APPOINTMENT=BOOK_APPOINTMENT
                            )
 
 
-@patients.route('/book-appointment', methods=['GET'])
+@patients.route(BOOK_APPOINTMENT, methods=['GET'], endpoint="book_appointment")
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def book_appointment(current_user):
     # Get all active departments
@@ -59,7 +63,7 @@ def book_appointment(current_user):
     )
 
 
-@patients.route('/book-appointment', methods=['POST'])
+@patients.route(BOOK_APPOINTMENT, methods=['POST'], endpoint="create_appointment")
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def create_appointment(current_user):
     try:
@@ -145,7 +149,7 @@ def create_appointment(current_user):
         return jsonify({'error': str(e)}), 500
 
 
-@patients.route('/patient/appointments/reschedule/<int:appointment_id>', methods=['POST'])
+@patients.route(RESCHEDULE_APPOINTMENT + '/<int:appointment_id>', methods=['POST'])
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def reschedule_appointment(current_user, appointment_id):
     try:
@@ -233,7 +237,7 @@ def reschedule_appointment(current_user, appointment_id):
         return redirect("/patient/appointment")
 
 
-@patients.route('/appointments/cancel/<int:appointment_id>', methods=['POST'])
+@patients.route(CANCEL_APPOINTMENT + '/<int:appointment_id>', methods=['POST'])
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def cancel_appointment(current_user, appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)

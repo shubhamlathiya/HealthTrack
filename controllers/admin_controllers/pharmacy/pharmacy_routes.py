@@ -37,8 +37,8 @@ def pharmacy_medicine_list(current_user):
 @admin.route(PHARMACY_MEDICINE_ADD, methods=['POST'], endpoint='medicine-add')
 @token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_medicine(current_user):
-    print(current_user)
-    print(request.form)
+    # print(current_user)
+    # print(request.form)
     try:
         last_case = Medicine.query.order_by(Medicine.id.desc()).first()
         medicine_number = f"{int(last_case.id) + 1000 if last_case else 1000}"

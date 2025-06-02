@@ -40,16 +40,6 @@
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
-                <li class="{% if request.path == '/patients/book-Appointment' %}active current-page{% endif %}">
-                    <a href="/patient/book-appointment">
-                        <i class="ri-calendar-2-line"></i>
-                        <span class="menu-text">Book Appointment</span>
-                    </a>
-                    <a href="/patient/appointment">
-                        <i class="ri-calendar-2-line"></i>
-                        <span class="menu-text">Appointment</span>
-                    </a>
-                </li>
                 <li class="treeview {% if request.path.startswith('/patient/appointment') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-drop-line"></i>
@@ -58,7 +48,14 @@
                     <ul class="treeview-menu">
                         <li>
                             <a href="/patient/appointment"
-                               class="{% if request.path == '/patient/appointment' %}active-sub{% endif %}">appointment</a>
+                               class="{% if request.path == '/patient/appointment' %}active-sub{% endif %}">View
+                                Appointment</a>
+                        </li>
+                        <li>
+                            <a href="/patient/book-appointment"
+                               class="{% if request.path == '/patient/book-appointment' %}active-sub{% endif %}">
+                                <span class="menu-text">Book Appointment</span>
+                            </a>
                         </li>
                     </ul>
                 </li>
@@ -80,14 +77,8 @@
                         <span class="menu-text">Visitors</span>
                     </a>
                 </li>
-                <li class="{% if request.path == '/patients/get-appointments' or request.path.startswith('/patients/appointment') %}active current-page{% endif %}">
-                    <a href="/patients/get-appointments">
-                        <i class="ri-list-check-2"></i>
-                        <span class="menu-text">View Appointments</span>
-                    </a>
-                </li>
-                <li class="{% if request.path == '/patients/operation-request' %}active current-page{% endif %}">
-                    <a href="/patients/operation-request">
+                <li class="{% if request.path == '/patient/prescriptions' %}active current-page{% endif %}">
+                    <a href="/patient/prescriptions">
                         <i class="ri-scissors-line"></i>
                         <span class="menu-text">Prescriptions</span>
                     </a>
@@ -218,66 +209,66 @@
                         </li>
                     </ul>
                 </li>
-                <li class="treeview {% if request.path.startswith('/admin/accounts') %}active current-page{% endif %}">
-                    <a href="#!">
-                        <i class="ri-secure-payment-line"></i>
-                        <span class="menu-text">Accounts</span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li>
-                            <a href="/admin/accounts/income"
-                               class="{% if request.path == '/admin/accounts/income' %}active-sub{% endif %}">Income</a>
-                        </li>
-                        <li>
-                            <a href="/admin/accounts/payments"
-                               class="{% if request.path == '/admin/accounts/payments' %}active-sub{% endif %}">Payments</a>
-                        </li>
-                        <li>
-                            <a href="/admin/accounts/invoices"
-                               class="{% if request.path == '/admin/accounts/invoices' %}active-sub{% endif %}">Invoices</a>
-                        </li>
-                        <li>
-                            <a href="/admin/accounts/invoice-details"
-                               class="{% if request.path == '/admin/accounts/invoice-details' %}active-sub{% endif %}">Invoice
-                                Details</a>
-                        </li>
-                        <li>
-                            <a href="/admin/accounts/create-invoice"
-                               class="{% if request.path == '/admin/accounts/create-invoice' %}active-sub{% endif %}">Create
-                                Invoice</a>
-                        </li>
-                        <li>
-                            <a href="/admin/accounts/expenses"
-                               class="{% if request.path == '/admin/accounts/expenses' %}active-sub{% endif %}">Expenses</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="treeview {% if request.path.startswith('/admin/human_resources') %}active current-page{% endif %}">
-                    <a href="#!">
-                        <i class="ri-group-2-line"></i>
-                        <span class="menu-text">Human Resources</span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li>
-                            <a href="/admin/human-resources/hr-approvals"
-                               class="{% if request.path == '/admin/human_resources/hr-approvals' %}active-sub{% endif %}">HR
-                                Approvals</a>
-                        </li>
-                        <li>
-                            <a href="/admin/human-resources/staff-attendance"
-                               class="{% if request.path == '/admin/human_resources/staff-attendance' %}active-sub{% endif %}">Attendance</a>
-                        </li>
-                        <li>
-                            <a href="/admin/human-resources/staff-leaves"
-                               class="{% if request.path == '/admin/human_resources/staff-leaves' %}active-sub{% endif %}">Staff
-                                Leaves</a>
-                        </li>
-                        <li>
-                            <a href="/admin/human-resources/staff-holidays"
-                               class="{% if request.path == '/admin/human_resources/staff-holidays' %}active-sub{% endif %}">Holidays</a>
-                        </li>
-                    </ul>
-                </li>
+                {#                <li class="treeview {% if request.path.startswith('/admin/accounts') %}active current-page{% endif %}">#}
+                {#                    <a href="#!">#}
+                {#                        <i class="ri-secure-payment-line"></i>#}
+                {#                        <span class="menu-text">Accounts</span>#}
+                {#                    </a>#}
+                {#                    <ul class="treeview-menu">#}
+                {#                        <li>#}
+                {#                            <a href="/admin/accounts/income"#}
+                {#                               class="{% if request.path == '/admin/accounts/income' %}active-sub{% endif %}">Income</a>#}
+                {#                        </li>#}
+                {#                        <li>#}
+                {#                            <a href="/admin/accounts/payments"#}
+                {#                               class="{% if request.path == '/admin/accounts/payments' %}active-sub{% endif %}">Payments</a>#}
+                {#                        </li>#}
+                {#                        <li>#}
+                {#                            <a href="/admin/accounts/invoices"#}
+                {#                               class="{% if request.path == '/admin/accounts/invoices' %}active-sub{% endif %}">Invoices</a>#}
+                {#                        </li>#}
+                {#                        <li>#}
+                {#                            <a href="/admin/accounts/invoice-details"#}
+                {#                               class="{% if request.path == '/admin/accounts/invoice-details' %}active-sub{% endif %}">Invoice#}
+                {#                                Details</a>#}
+                {#                        </li>#}
+                {#                        <li>#}
+                {#                            <a href="/admin/accounts/create-invoice"#}
+                {#                               class="{% if request.path == '/admin/accounts/create-invoice' %}active-sub{% endif %}">Create#}
+                {#                                Invoice</a>#}
+                {#                        </li>#}
+                {#                        <li>#}
+                {#                            <a href="/admin/accounts/expenses"#}
+                {#                               class="{% if request.path == '/admin/accounts/expenses' %}active-sub{% endif %}">Expenses</a>#}
+                {#                        </li>#}
+                {#                    </ul>#}
+                {#                </li>#}
+                {#                <li class="treeview {% if request.path.startswith('/admin/human_resources') %}active current-page{% endif %}">#}
+                {#                    <a href="#!">#}
+                {#                        <i class="ri-group-2-line"></i>#}
+                {#                        <span class="menu-text">Human Resources</span>#}
+                {#                    </a>#}
+                {#                    <ul class="treeview-menu">#}
+                {#                        <li>#}
+                {#                            <a href="/admin/human-resources/hr-approvals"#}
+                {#                               class="{% if request.path == '/admin/human_resources/hr-approvals' %}active-sub{% endif %}">HR#}
+                {#                                Approvals</a>#}
+                {#                        </li>#}
+                {#                        <li>#}
+                {#                            <a href="/admin/human-resources/staff-attendance"#}
+                {#                               class="{% if request.path == '/admin/human_resources/staff-attendance' %}active-sub{% endif %}">Attendance</a>#}
+                {#                        </li>#}
+                {#                        <li>#}
+                {#                            <a href="/admin/human-resources/staff-leaves"#}
+                {#                               class="{% if request.path == '/admin/human_resources/staff-leaves' %}active-sub{% endif %}">Staff#}
+                {#                                Leaves</a>#}
+                {#                        </li>#}
+                {#                        <li>#}
+                {#                            <a href="/admin/human-resources/staff-holidays"#}
+                {#                               class="{% if request.path == '/admin/human_resources/staff-holidays' %}active-sub{% endif %}">Holidays</a>#}
+                {#                        </li>#}
+                {#                    </ul>#}
+                {#                </li>#}
                 <!-- Add this after the Human Resources menu item in the admin section -->
                 <li class="treeview {% if request.path.startswith('/admin/blood-bank') %}active current-page{% endif %}">
                     <a href="#!">
@@ -416,18 +407,6 @@
                                 List</a>
                         </li>
                     </ul>
-                </li>
-                <li class="{% if request.path == '/admin/get-resources' %}active current-page{% endif %}">
-                    <a href="/admin/get-resources">
-                        <i class="ri-database-line"></i>
-                        <span class="menu-text">Resources</span>
-                    </a>
-                </li>
-                <li class="{% if request.path == '/admin/view-doctors' %}active current-page{% endif %}">
-                    <a href="/admin/view-doctors">
-                        <i class="ri-stethoscope-line"></i>
-                        <span class="menu-text">Doctors</span>
-                    </a>
                 </li>
                 <li class="treeview {% if request.path.startswith('/admin/staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">
                     <a href="#!">

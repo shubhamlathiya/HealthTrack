@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import jsonify, render_template, redirect, flash
 
+from controllers.constant.patientPathConstant import VIEW_PRESCRIPTIONS, SEND_PRESCRIPTION_EMAIL
 from controllers.patients_controllers import patients
 from middleware.auth_middleware import token_required
 from models import Prescription, Appointment
@@ -11,9 +12,9 @@ from models.userModel import User, UserRole
 from utils.email_utils import send_email
 
 
-@patients.route('/prescriptions', methods=['GET'])
+@patients.route(VIEW_PRESCRIPTIONS, methods=['GET'],endpoint="view_patient_prescriptions")
 @token_required(allowed_roles=[UserRole.PATIENT.name])
-def get_patient_prescriptions(current_user):
+def view_patient_prescriptions(current_user):
     try:
         # Get patient record
         patient = Patient.query.filter_by(user_id=current_user).first()
@@ -77,7 +78,7 @@ def get_patient_prescriptions(current_user):
         return jsonify({'error': str(e)}), 500
 
 
-@patients.route('/send-prescription-email/<int:prescription_id>', methods=['GET'])
+@patients.route(SEND_PRESCRIPTION_EMAIL + '/<int:prescription_id>', methods=['GET'],endpoint="send_prescription_email")
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def send_prescription_email(current_user, prescription_id):
     # try:
@@ -136,4 +137,4 @@ def send_prescription_email(current_user, prescription_id):
     send_email(subject, users.email, html_content)
 
     flash('Prescription email sent successfully', 'success')
-    return redirect("/patient/prescriptions")
+    return redirect(VIEW_PRESCRIPTIONS)
