@@ -1,6 +1,8 @@
+import os
 from datetime import datetime
 
 import humanize
+from dotenv import load_dotenv
 from flask import Flask, render_template, session, redirect, send_from_directory, request
 from flask_mail import Mail
 from flask_socketio import SocketIO
@@ -13,28 +15,28 @@ from controllers.doctor_controllers import doctors
 from controllers.every_one_controllers import idCard
 from controllers.laboratory_controllers import laboratory
 from controllers.patients_controllers import patients
-from models.userModel import User, UserRole
+from models import User, UserRole
 from utils.config import init_app, db
 
 app = Flask(__name__, static_folder="static")
-
+load_dotenv()
 init_app(app)
 
 # Flask-Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'shubhamlathiya2021@gmail.com'  # Your email
-app.config['MAIL_PASSWORD'] = 'tqerujnjzuvgdjho'  # Your email password
+app.config['MAIL_PORT'] = os.getenv("MAIL_PORT")
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")  # Your email
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")  # Your email password
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_DEFAULT_SENDER'] = 'shubhamlathiya2021@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER")
 app.config['MAIL_DEBUG'] = True  # Enable SMTP debug output
 app.config['MAIL_SUPPRESS_SEND'] = False  # Actually send emails
 
 # Initialize the mail object
 mail = Mail(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
-app.config['SECRET_KEY'] = 'your_secure_random_key'
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(department, url_prefix='/department')
@@ -48,9 +50,9 @@ app.register_blueprint(laboratory, url_prefix='/laboratory')
 app.register_blueprint(idCard, url_prefix='/id-card')
 
 with app.app_context():
+    # db.drop_all()
     db.create_all()
 
-    # Create admin user if not exists
     if not User.query.filter_by(role=UserRole.ADMIN).first():
         admin = User(
             email='admin@hospital.com',

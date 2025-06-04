@@ -80,10 +80,17 @@
                                         <div class="text-muted small">{{ department.email }}</div>
                                     </td>
                                     <td>
-                                        <img src="../../../static/assets/images/doctor.png"
-                                             class="img-2x rounded-5 me-1"
-                                             alt="Department Head">
-                                        Dr. {{ department.heads[0].doctor.first_name }} {{ department.heads[0].doctor.last_name }}
+
+                                        {% if department.heads and department.heads[0].doctor %}
+                                            <img src="../../../static/assets/images/doctor.png"
+                                                 class="img-2x rounded-5 me-1"
+                                                 alt="Department Head">
+                                            Dr. {{ department.heads[0].doctor.first_name }}
+                                            {{ department.heads[0].doctor.last_name }}
+                                        {% else %}
+                                            <!-- Optional fallback message -->
+                                            <span class="text-muted">Not assigned</span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if department.status == 'active' %}
@@ -219,7 +226,13 @@
                                                  alt="Department Head">
                                             <div>
                                                 <h6 class="mb-0">
-                                                    Dr. {{ department.heads[0].doctor.first_name }} {{ department.heads[0].doctor.last_name }}
+                                                    {% if department.heads and department.heads[0].doctor %}
+                                                        Dr. {{ department.heads[0].doctor.first_name }}
+                                                        {{ department.heads[0].doctor.last_name }}
+                                                    {% else %}
+                                                        <!-- Optional fallback message -->
+                                                        <span class="text-muted">Not assigned</span>
+                                                    {% endif %}
                                                 </h6>
                                                 <p class="text-muted small mb-0">Head of Department</p>
                                             </div>

@@ -13,3 +13,11 @@ class Visitor(db.Model):
     check_out = db.Column(db.DateTime)
     qr_code = db.Column(db.String(100))  # Stores QR code filename
     is_active = db.Column(db.Boolean, default=True)
+
+class VisitLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    visitor_id = db.Column(db.Integer, db.ForeignKey('visitor.id'))
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'))
+    check_in = db.Column(db.DateTime, default=datetime.now)
+    check_out = db.Column(db.DateTime)
+    is_active = db.Column(db.Boolean, default=True)  # For real-time tracking

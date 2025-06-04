@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from utils.config import db, BaseModel
+from utils.config import db
 
 
 class BloodType(Enum):
@@ -15,7 +15,7 @@ class BloodType(Enum):
     O_NEGATIVE = 'O-'
 
 
-class BloodDonor(BaseModel):
+class BloodDonor(db.Model):
     __tablename__ = 'blood_donors'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -35,8 +35,12 @@ class BloodDonor(BaseModel):
     patient = db.relationship('Patient', back_populates='donations')
     inventory_items = db.relationship('BloodInventory', back_populates='donor', cascade='all, delete-orphan')
 
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
-class BloodInventory(BaseModel):
+class BloodInventory(db.Model):
     __tablename__ = 'blood_inventory'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -52,9 +56,13 @@ class BloodInventory(BaseModel):
     request_items = db.relationship('BloodRequestItem', back_populates='inventory', cascade='all, delete-orphan')
     transfusion_items = db.relationship('BloodTransfusionItem', back_populates='inventory',
                                         cascade='all, delete-orphan')
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
 
-class BloodRequest(BaseModel):
+class BloodRequest(db.Model):
     __tablename__ = 'blood_requests'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -71,8 +79,12 @@ class BloodRequest(BaseModel):
     patient = db.relationship('Patient', back_populates='blood_requests')
     items = db.relationship('BloodRequestItem', back_populates='request', cascade='all, delete-orphan')
 
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
-class BloodRequestItem(BaseModel):
+class BloodRequestItem(db.Model):
     __tablename__ = 'blood_request_items'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -86,8 +98,12 @@ class BloodRequestItem(BaseModel):
     request = db.relationship('BloodRequest', back_populates='items')
     inventory = db.relationship('BloodInventory', back_populates='request_items')
 
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
-class BloodTransfusion(BaseModel):
+class BloodTransfusion(db.Model):
     __tablename__ = 'blood_transfusions'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -105,8 +121,12 @@ class BloodTransfusion(BaseModel):
 
     items = db.relationship('BloodTransfusionItem', back_populates='transfusion', cascade='all, delete-orphan')
 
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
-class BloodTransfusionItem(BaseModel):
+class BloodTransfusionItem(db.Model):
     __tablename__ = 'blood_transfusion_items'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -118,3 +138,8 @@ class BloodTransfusionItem(BaseModel):
     # Relationships
     transfusion = db.relationship('BloodTransfusion', back_populates='items')
     inventory = db.relationship('BloodInventory', back_populates='transfusion_items')
+
+    is_deleted = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime, nullable=True)

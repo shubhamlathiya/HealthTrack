@@ -143,7 +143,7 @@ def register_doctor(current_user):
 
         body_html = render_template("email_templates/templates/welcome.html",
                                     user_name=new_doctor.first_name,
-                                    new_user=new_doctor,
+                                    new_user=new_user,
                                     temp_password=password,
                                     login_url="http://localhost:5000/")
 

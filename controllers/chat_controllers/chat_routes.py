@@ -272,7 +272,7 @@ def get_users_for_communication(current_user):
                 "id": user.id,
                 "name": full_name,
                 "email": user.email,
-                "role": user.role,
+                "role": user.role.value,
                 "last_message": last_message.message if last_message else None,
                 "last_message_time": last_message.sent_at.isoformat() if last_message else None,
                 "unread_count": unread_count  # Add unread message count
@@ -476,11 +476,11 @@ def respond_to_communication_request(current_user, request_id):
 
 
 def get_user_full_name(user_id, role):
-    if role == 'patient':
+    if role == UserRole.PATIENT:
         patient = Patient.query.filter_by(user_id=user_id).first()
         if patient:
             return f"{patient.first_name} {patient.last_name}"
-    elif role == 'doctor':
+    elif role == UserRole.DOCTOR:
         doctor = Doctor.query.filter_by(user_id=user_id).first()
         if doctor:
             return f"{doctor.first_name} {doctor.last_name}"
@@ -510,7 +510,7 @@ def get_pending_requests(current_user):
 
         for req in requests:
             sender_id = req.sender_id
-            role = req.role
+            role = req.role.value
 
             # Get sender name based on role
             sender_name = get_user_full_name(sender_id, role)
@@ -576,22 +576,23 @@ def get_potential_recipients(current_user):
     try:
         # Get the current user object
         current_user_obj = User.query.get(current_user)
-
+        print(current_user_obj.role)
         if not current_user_obj:
             return jsonify({"error": "User not found"}), 404
-
+        print("1")
         # Fetch users based on role
-        if current_user_obj.role == "admin":
+        if current_user_obj.role == UserRole.ADMIN:
             # Admin can see all users except themselves
+            print("2")
             potential_recipients = User.query.filter(User.id != current_user, User.status == True).all()
 
-        elif current_user_obj.role == "patient":
+        elif current_user_obj.role == UserRole.PATIENT:
             # Patient can only see doctors
             doctor_users = db.session.query(User).join(Doctor, Doctor.user_id == User.id) \
                 .filter(User.role == 'doctor', User.status == True, User.id != current_user).all()
             potential_recipients = doctor_users
 
-        elif current_user_obj.role == "doctor":
+        elif current_user_obj.role == UserRole.DOCTOR:
             # Doctor can see all users except themselves
             potential_recipients = User.query.filter(User.id != current_user, User.status == True).all()
 
@@ -605,11 +606,11 @@ def get_potential_recipients(current_user):
             user_data = {
                 "id": user.id,
                 "email": user.email,
-                "role": user.role,
+                "role": str(user.role),
             }
-
+            print(user.role)
             # Add doctor or patient specific details
-            if user.role == "doctor":
+            if user.role == UserRole.DOCTOR:
                 doctor = Doctor.query.filter_by(user_id=user.id).first()
                 if doctor:
                     user_data.update({
@@ -621,7 +622,7 @@ def get_potential_recipients(current_user):
                         "bio": doctor.bio,
                         "profile_picture": doctor.profile_picture,
                     })
-            elif user.role == "patient":
+            elif user.role == UserRole.PATIENT:
                 patient = Patient.query.filter_by(user_id=user.id).first()
                 if patient:
                     user_data.update({
@@ -632,6 +633,8 @@ def get_potential_recipients(current_user):
                         "address": patient.address,
                         "gender": patient.gender,
                     })
+            elif user.role == UserRole.DEPARTMENT_HEAD:
+                continue
 
             recipient_list.append(user_data)
 
@@ -657,7 +660,7 @@ def chat_ui(current_user):
         if receiver:
             # Use your helper function to get full name
             receiver_name = get_user_full_name(receiver.id, receiver.role)
-            receiver_role = receiver.role
+            receiver_role = receiver.role.value
         else:
             receiver_name = "Unknown"
             receiver_role = "Unknown"

@@ -505,10 +505,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Communication Requests</h5>
-                <button class="btn btn-primary" id="startNewChatBtn" data-bs-toggle="modal"
-                        data-bs-target="#newChatModal">
-                    <i class="fas fa-plus me-2"></i>Start New Chat
-                </button>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="requestsList">
@@ -674,8 +670,8 @@
             console.log('Received communication request response:', data);
             if (data.status === 'accepted') {
                 this.showToast('Your communication request was accepted!', 'success');
-                if (window.location.pathname !== `/chat_routes/chat?receiver_id=${data.receiver_id}`) {
-                    window.location.href = `/chat_routes/chat?receiver_id=${data.receiver_id}`;
+                if (window.location.pathname !== `/chat/chat?receiver_id=${data.receiver_id}`) {
+                    window.location.href = `/chat/chat?receiver_id=${data.receiver_id}`;
                 }
             } else {
                 this.showToast('Your communication request was rejected', 'warning');
@@ -691,7 +687,7 @@
         async loadUsers() {
             console.log('Loading users for communication...');
             try {
-                const response = await fetch('/chat_routes/get-users-for-communication');
+                const response = await fetch('/chat/get-users-for-communication');
                 const users = await response.json();
                 this.renderUserList(users);
             } catch (error) {
@@ -717,7 +713,7 @@
                 `;
                 userItem.addEventListener('click', () => {
                     console.log(`User clicked: ${user.name} (ID: ${user.id})`);
-                    window.location.href = `/chat_routes/chat?receiver_id=${user.id}`;
+                    window.location.href = `/chat/chat?receiver_id=${user.id}`;
                 });
                 this.userList.appendChild(userItem);
             });
@@ -731,7 +727,7 @@
 
             console.log(`Loading messages for conversation with ${this.currentReceiverId}`);
             try {
-                const response = await fetch(`/chat_routes/get-conversation?sender_id=${this.currentUserId}&receiver_id=${this.currentReceiverId}`);
+                const response = await fetch(`/chat/get-conversation?sender_id=${this.currentUserId}&receiver_id=${this.currentReceiverId}`);
                 const data = await response.json();
                 this.renderMessages(data.conversation);
                 this.updateReceiverInfo();
@@ -841,7 +837,7 @@
 
         async markMessagesAsRead() {
             try {
-                await fetch(`/chat_routes/mark-messages-read?sender_id=${this.currentReceiverId}`, {
+                await fetch(`/chat/mark-messages-read?sender_id=${this.currentReceiverId}`, {
                     method: 'POST'
                 });
                 console.log('Messages marked as read successfully.');
@@ -914,6 +910,7 @@
 
         // Request and Notification Functions
         async loadPotentialRecipients() {
+            console.log("start")
             try {
                 const response = await fetch('/chat/get-potential-recipients');
                 const users = await response.json();
