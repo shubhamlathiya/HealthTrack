@@ -8,11 +8,13 @@ from utils.tokens import generate_verification_token, verify_token
 class UserRole(Enum):
     ADMIN = 'admin'
     DOCTOR = 'doctor'
+    ACCOUNTANT = 'accountant'
     DEPARTMENT_HEAD = 'department_head'
     PATIENT = 'patient'
     STAFF = 'staff'
     NURSE = 'nurse'
-    LABORATORY = 'laboratory'
+    LABORATORIST = 'laboratorist'
+    RECEPTIONIST = 'receptionist'
 
 
 

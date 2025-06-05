@@ -15,7 +15,7 @@ from models.userModel import User, UserRole
 from utils.config import db
 from utils.email_utils import send_email
 
-UPLOAD_FOLDER = 'uploads/profile_pictures'  # Base folder
+UPLOAD_FOLDER = 'static/uploads/profile_pictures'  # Base folder
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}

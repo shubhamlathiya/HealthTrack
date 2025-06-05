@@ -2,7 +2,7 @@ from .userModel import *
 from .staffModel import *
 from .patientModel import *
 from .departmentModel import *
-from .LaboratoryTestReport import *
+from .laboratoryTestReportModel import *
 from .prescriptionModel import *
 from .appointmentModel import *
 

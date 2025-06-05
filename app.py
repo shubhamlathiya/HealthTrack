@@ -54,15 +54,27 @@ with app.app_context():
     db.create_all()
 
     if not User.query.filter_by(role=UserRole.ADMIN).first():
-        admin = User(
-            email='admin@hospital.com',
-            password=generate_password_hash('Shubham123'),
-            role=UserRole.ADMIN,
-            status=True,
-            verified=True
-        )
-        db.session.add(admin)
+        for role in UserRole:
+            if not User.query.filter_by(role=role).first():
+                user = User(
+                    email=f'{role.value}@hospital.com',
+                    password=generate_password_hash('Shubham123'),
+                    role=role,
+                    status=True,
+                    verified=True
+                )
+                db.session.add(user)
+
         db.session.commit()
+        # admin = User(
+        #     email='admin@hospital.com',
+        #     password=generate_password_hash('Shubham123'),
+        #     role=UserRole.ADMIN,
+        #     status=True,
+        #     verified=True
+        # )
+        # db.session.add(admin)
+        # db.session.commit()
 
 @app.template_filter('humanize')
 def humanize_timestamp(value):

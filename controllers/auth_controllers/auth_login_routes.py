@@ -60,7 +60,7 @@ def login():
                 redirect_url = STAFF_DASHBOARD
             elif user.role == UserRole.NURSE:
                 redirect_url = NURSE_DASHBOARD
-            elif user.role == UserRole.LABORATORY:
+            elif user.role == UserRole.LABORATORIST:
                 redirect_url = LABORATORY_DASHBOARD
             else:
                 return jsonify({'message': 'Invalid role. Please contact dashboard.'}), 400

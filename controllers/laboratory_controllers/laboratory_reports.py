@@ -6,7 +6,7 @@ from sqlalchemy import or_
 from controllers.constant.laboratoryPathConstant import LAB_REPORTS, LAB_REPORTS_ADD, LAB_REPORTS_EDIT, \
     LAB_REPORTS_TOGGLE, LAB_REPORTS_DELETE, LAB_REPORTS_RESTORE, LABORATORY
 from controllers.laboratory_controllers import laboratory
-from models.LaboratoryTestReport import LaboratoryTestReport
+from models.laboratoryTestReportModel import LaboratoryTestReport
 from models.departmentModel import Department
 from models.medicineModel import Medicine
 from utils.config import db

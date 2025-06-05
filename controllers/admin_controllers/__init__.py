@@ -33,6 +33,9 @@ from controllers.admin_controllers.ambulance.ambulance_call_routes import *
 from controllers.admin_controllers.human_resources.human_resources_routes import *
 from controllers.admin_controllers.accounts.accounts_routes import *
 
+# noticeboard
+from controllers.admin_controllers.noticeboard.noticeboard_routes import *
+
 # inventory
 from controllers.admin_controllers.inventory.inventory_routes import *
 from controllers.admin_controllers.inventory.issued_item_routes import *

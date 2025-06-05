@@ -1,0 +1,622 @@
+{% extends 'base.html' %}
+
+{% block title %}Notice Board{% endblock %}
+{% block page %}Notice Board Management{% endblock %}
+
+{% block body %}
+    <div class="row gx-4">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title">Notice Board</h5>
+                    <div>
+                        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal"
+                                data-bs-target="#addNoticeModal">
+                            <i class="ri-add-line me-1"></i> Add New Notice
+                        </button>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreNoticesModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table m-0 align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Target</th>
+                                <th>Priority</th>
+                                <th>Post Date</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for notice in notices %}
+                                <tr class="{% if not notice.is_active %}table-secondary{% endif %}">
+                                    <td>{{ notice.id }}</td>
+                                    <td>{{ notice.title }}</td>
+                                    <td>
+                                        {% if notice.target_type == 'department' %}
+                                            Departments:
+                                            {{ notice.departments|map(attribute='name')|join(', ') if notice.departments else 'All Departments' }}
+                                        {% else %}
+                                            Roles: {{ notice.roles|join(', ') if notice.roles else 'All Roles' }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                <span class="badge bg-{% if notice.priority == 'high' %}danger
+                                      {% elif notice.priority == 'medium' %}warning
+                                      {% else %}success{% endif %}">
+                    {{ notice.priority|capitalize }}
+                </span>
+                                    </td>
+                                    <td>{{ notice.post_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ notice.expiry_date.strftime('%Y-%m-%d') if notice.expiry_date else 'N/A' }}</td>
+                                    <td>
+                <span class="badge bg-{% if notice.is_active %}success{% else %}secondary{% endif %}">
+                    {{ 'Active' if notice.is_active else 'Inactive' }}
+                </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteNoticeModal{{ notice.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewNoticeModal{{ notice.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editNoticeModal{{ notice.id }}"
+                                                    data-bs-placement="top" data-bs-title="Edit Notice">
+                                                <i class="ri-edit-box-line"></i>
+                                            </button>
+                                            {% if notice.attachment %}
+                                                <a href="{{ url_for('static', filename='uploads/notices/' + notice.attachment) }}"
+                                                   class="btn btn-outline-primary btn-sm" download>
+                                                    <i class="ri-download-line"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Notice Modal -->
+    <div class="modal fade" id="addNoticeModal" tabindex="-1" aria-labelledby="addNoticeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addNoticeModalLabel">
+                        <i class="ri-add-line me-2"></i>Add New Notice
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + NOTICEBOARD_ADD_NOTICE }}" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="title" required>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Content <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="content" rows="5" required></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Priority <span class="text-danger">*</span></label>
+                                <select class="form-select" name="priority" required>
+                                    <option value="high">High</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Expiry Date</label>
+                                <input type="date" class="form-control" name="expiry_date">
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Attachment (PDF only)</label>
+                                <input type="file" class="form-control" name="attachment" accept=".pdf">
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive"
+                                           checked>
+                                    <label class="form-check-label" for="isActive">Active Notice</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>Notice Target</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="target_type"
+                                                           id="targetRoles" value="roles" checked>
+                                                    <label class="form-check-label" for="targetRoles">
+                                                        Role-based Notice
+                                                    </label>
+                                                </div>
+                                                <div id="rolesSection" class="mt-2">
+                                                    <select class="form-select" name="roles" multiple>
+                                                        {% for role in all_roles %}
+                                                            <option value="{{ role.value }}">{{ role.value|capitalize }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <small class="text-muted">Hold Ctrl to select multiple roles</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="target_type"
+                                                           id="targetDepartments" value="departments">
+                                                    <label class="form-check-label" for="targetDepartments">
+                                                        Department-based Notice
+                                                    </label>
+                                                </div>
+                                                <div id="departmentsSection" class="mt-2" style="display:none;">
+                                                    <select class="form-select" name="departments" multiple>
+                                                        {% for dept in all_departments %}
+                                                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <small class="text-muted">Hold Ctrl to select multiple
+                                                        departments</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Publish Notice
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for each notice -->
+    {% for notice in notices %}
+        <!-- View Notice Modal -->
+        <div class="modal fade" id="viewNoticeModal{{ notice.id }}" tabindex="-1"
+             aria-labelledby="viewNoticeModalLabel{{ notice.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewNoticeModalLabel{{ notice.id }}">
+                            <i class="ri-information-line me-2"></i>Notice Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h4 class="card-title">{{ notice.title }}</h4>
+                                <div class="d-flex justify-content-between mb-3">
+                            <span class="badge bg-{% if notice.priority == 'high' %}danger
+                                              {% elif notice.priority == 'medium' %}warning
+                                              {% else %}success{% endif %}">
+                                {{ notice.priority|capitalize }} Priority
+                            </span>
+                                    <span>Posted on: {{ notice.post_date.strftime('%Y-%m-%d') }}</span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6>Target:</h6>
+                                    <p>
+                                        {% if notice.target_type == 'department' %}
+                                            <strong>Departments:</strong>
+                                            {{ notice.departments|map(attribute='name')|join(', ') if notice.departments else 'All Departments' }}
+                                        {% else %}
+                                            <strong>Roles:</strong>
+                                            {{ notice.roles|join(', ') if notice.roles else 'All Roles' }}
+                                        {% endif %}
+                                    </p>
+                                    <small class="text-muted">
+                                        ({{ notice.target_type|capitalize }}-based notice)
+                                    </small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6>Content:</h6>
+                                    <div class="border p-3 bg-light">{{ notice.content|safe }}</div>
+                                </div>
+
+                                {% if notice.expiry_date %}
+                                    <div class="mb-3">
+                                        <h6>Expiry Date:</h6>
+                                        <p>{{ notice.expiry_date.strftime('%Y-%m-%d') }}</p>
+                                    </div>
+                                {% endif %}
+
+                                {% if notice.attachment %}
+                                    <div class="mb-3">
+                                        <h6>Attachment:</h6>
+                                        <a href="{{ url_for('static', filename='uploads/notices/' + notice.attachment) }}"
+                                           class="btn btn-outline-primary" download>
+                                            <i class="ri-download-line me-2"></i>Download PDF
+                                        </a>
+                                        <small class="text-muted d-block mt-1">{{ notice.attachment }}</small>
+                                    </div>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between mt-3">
+                                    <small class="text-muted">
+                                        Posted by: {{ notice.poster.role.value if notice.poster else 'System' }}
+                                    </small>
+                                    <div>
+                                <span class="badge bg-{% if notice.is_active %}success{% else %}secondary{% endif %}">
+                                    {{ 'Active' if notice.is_active else 'Inactive' }}
+                                </span>
+                                        <span class="badge bg-info ms-1">
+                                    {{ notice.target_type|capitalize }}
+                                </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Notice Modal -->
+        <div class="modal fade" id="editNoticeModal{{ notice.id }}" tabindex="-1"
+             aria-labelledby="editNoticeModalLabel{{ notice.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="editNoticeModalLabel{{ notice.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Notice
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + NOTICEBOARD_EDIT_NOTICE }}/{{ notice.id }}"
+                          enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label">Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="title" value="{{ notice.title }}"
+                                           required>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Content <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" name="content" rows="5"
+                                              required>{{ notice.content }}</textarea>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Priority <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="priority" required>
+                                        <option value="high" {% if notice.priority == 'high' %}selected{% endif %}>
+                                            High
+                                        </option>
+                                        <option value="medium" {% if notice.priority == 'medium' %}selected{% endif %}>
+                                            Medium
+                                        </option>
+                                        <option value="low" {% if notice.priority == 'low' %}selected{% endif %}>Low
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Expiry Date</label>
+                                    <input type="date" class="form-control" name="expiry_date"
+                                           value="{{ notice.expiry_date.strftime('%Y-%m-%d') if notice.expiry_date else '' }}">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Attachment (PDF only)</label>
+                                    <input type="file" class="form-control" name="attachment" accept=".pdf">
+                                    {% if notice.attachment %}
+                                        <div class="mt-2">
+                                            <span>Current file: {{ notice.attachment }}</span>
+                                            <a href="{{ url_for('static', filename='uploads/notices/' + notice.attachment) }}"
+                                               class="btn btn-sm btn-outline-primary ms-2" download>
+                                                <i class="ri-download-line"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    onclick="document.getElementById('removeAttachment{{ notice.id }}').value = '1'">
+                                                <i class="ri-delete-bin-line"></i> Remove
+                                            </button>
+                                            <input type="hidden" id="removeAttachment{{ notice.id }}"
+                                                   name="remove_attachment" value="0">
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_active"
+                                               id="isActive{{ notice.id }}" {% if notice.is_active %}checked{% endif %}>
+                                        <label class="form-check-label" for="isActive{{ notice.id }}">Active
+                                            Notice</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6>Notice Target</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input target-type" type="radio"
+                                                               name="target_type" id="targetRoles{{ notice.id }}"
+                                                               value="roles"
+                                                               {% if not notice.departments %}checked{% endif %}>
+                                                        <label class="form-check-label"
+                                                               for="targetRoles{{ notice.id }}">
+                                                            Role-based Notice
+                                                        </label>
+                                                    </div>
+                                                    <div id="rolesSection{{ notice.id }}" class="mt-2"
+                                                         {% if notice.departments %}style="display:none;"{% endif %}>
+                                                        <select class="form-select" name="roles" multiple>
+                                                            {% for role in all_roles %}
+                                                                <option value="{{ role.value }}"
+                                                                        {% if notice.roles and role.value in notice.roles %}selected{% endif %}>
+                                                                    {{ role.value|capitalize }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <small class="text-muted">Hold Ctrl to select multiple
+                                                            roles</small>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input target-type" type="radio"
+                                                               name="target_type" id="targetDepartments{{ notice.id }}"
+                                                               value="departments"
+                                                               {% if notice.departments %}checked{% endif %}>
+                                                        <label class="form-check-label"
+                                                               for="targetDepartments{{ notice.id }}">
+                                                            Department-based Notice
+                                                        </label>
+                                                    </div>
+                                                    <div id="departmentsSection{{ notice.id }}" class="mt-2"
+                                                         {% if not notice.departments %}style="display:none;"{% endif %}>
+                                                        <select class="form-select" name="departments" multiple>
+                                                            {% for dept in all_departments %}
+                                                                <option value="{{ dept.id }}"
+                                                                        {% if dept in notice.departments %}selected{% endif %}>
+                                                                    {{ dept.name }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <small class="text-muted">Hold Ctrl to select multiple
+                                                            departments</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-info">
+                                <i class="ri-save-line me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Notice Modal -->
+        <div class="modal fade" id="deleteNoticeModal{{ notice.id }}" tabindex="-1"
+             aria-labelledby="deleteNoticeModalLabel{{ notice.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteNoticeModalLabel{{ notice.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete <b>{{ notice.title }}</b>?</p>
+                        <div class="alert alert-warning">
+                            <i class="ri-alert-line me-2"></i>This action will mark the notice as deleted and remove it
+                            from active listings.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{{ ADMIN + NOTICEBOARD_DELETE_NOTICE }}/{{ notice.id }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-delete-bin-line me-1"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Restore Notices Modal -->
+    <div class="modal fade" id="restoreNoticesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Restore Deleted Notices
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if deleted_notices %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Target</th>
+                                    <th>Post Date</th>
+                                    <th>Deleted On</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for notice in deleted_notices %}
+                                    <tr>
+                                        <td>{{ notice.id }}</td>
+                                        <td>{{ notice.title }}</td>
+                                        <td>
+                                            {% if notice.departments %}
+                                                Departments: {{ notice.departments|map(attribute='name')|join(', ') }}
+                                            {% else %}
+                                                Roles: {{ notice.roles or 'All' }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ notice.post_date.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ notice.deleted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="text-end">
+                                            <form method="POST"
+                                                  action="{{ ADMIN + NOTICEBOARD_RESTORE_NOTICE }}/{{ notice.id }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>No deleted notices found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block heardLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Enable tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // Set default date for new notice
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="expiry_date"]').value = today;
+
+            // Toggle between role and department selection
+            document.querySelectorAll('input[name="target_type"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const noticeId = this.id.replace('targetRoles', '').replace('targetDepartments', '');
+                    const isRole = this.value === 'roles';
+
+                    if (noticeId) {
+                        document.getElementById(`rolesSection${noticeId}`).style.display = isRole ? 'block' : 'none';
+                        document.getElementById(`departmentsSection${noticeId}`).style.display = isRole ? 'none' : 'block';
+                    } else {
+                        document.getElementById('rolesSection').style.display = isRole ? 'block' : 'none';
+                        document.getElementById('departmentsSection').style.display = isRole ? 'none' : 'block';
+                    }
+                });
+            });
+
+            // Initialize the target type display for edit modals
+            document.querySelectorAll('.target-type').forEach(radio => {
+                if (radio.checked) {
+                    radio.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    </script>
+{% endblock %}
