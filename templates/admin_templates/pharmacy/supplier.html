@@ -1,0 +1,716 @@
+{% extends 'base.html' %}
+
+{% block title %}Suppliers Management{% endblock title %}
+
+{% block page %}Suppliers Management{% endblock page %}
+
+{% block body %}
+    <!-- Main Suppliers List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-truck-line me-2"></i>Suppliers List
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                            <i class="ri-add-line me-1"></i>Add Supplier
+                        </button>
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                                data-bs-target="#importExportModal">
+                            <i class="ri-import-export-line me-1"></i> Import/Export
+                        </button>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                data-bs-target="#archivedSuppliersModal">
+                            <i class="ri-archive-line me-1"></i> Archived
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table id="suppliersTable" class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Contact Info</th>
+                                <th>Purchases</th>
+                                <th>Last Order</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for supplier in suppliers %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-primary bg-opacity-10 text-primary rounded-circle">
+                                                    <i class="ri-truck-line"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ supplier.name }}</h6>
+                                                <small class="text-muted">{{ supplier.tax_id or 'Tax ID not provided' }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <i class="ri-user-line me-1 text-muted"></i> {{ supplier.contact_person or 'N/A' }}<br>
+                                            <i class="ri-phone-line me-1 text-muted"></i> {{ supplier.phone or 'N/A' }}<br>
+                                            <i class="ri-mail-line me-1 text-muted"></i> {{ supplier.email or 'N/A' }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary rounded-pill">
+                                            {{ supplier.purchases|length }} orders
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if supplier.purchases %}
+                                            {{ supplier.purchases[-1].purchase_date.strftime('%Y-%m-%d') }}
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-primary rounded-pill"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewSupplierModal{{ supplier.id }}">
+                                                <i class="ri-eye-line me-1"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success rounded-pill"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editSupplierModal{{ supplier.id }}">
+                                                <i class="ri-edit-line me-1"></i> Edit
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger rounded-pill"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteSupplierModal{{ supplier.id }}">
+                                                <i class="ri-delete-bin-line me-1"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="ri-truck-line text-muted" style="font-size: 3rem;"></i>
+                                            <h5 class="mt-3">No suppliers found</h5>
+                                            <p class="text-muted">Add your first supplier to get started</p>
+                                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#addSupplierModal">
+                                                <i class="ri-add-line me-1"></i> Add Supplier
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Supplier Modal -->
+    <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-add-line me-2"></i>Add New Supplier
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + SUPPLIERS_ADD }}">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" required>
+                                <div class="form-text">Official business name</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tax ID</label>
+                                <input type="text" class="form-control" name="tax_id">
+                                <div class="form-text">VAT, GST, or other tax identifier</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Contact Person</label>
+                                <input type="text" class="form-control" name="contact_person">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" name="phone">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" name="address" rows="2"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Payment Terms</label>
+                            <textarea class="form-control" name="payment_terms" rows="2"
+                                      placeholder="Net 30 days, etc."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" name="notes" rows="2"
+                                      placeholder="Any special conditions or notes..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Supplier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import/Export Modal -->
+    <div class="modal fade" id="importExportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-import-export-line me-2"></i>Supplier Data Transfer
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs nav-tabs-custom" id="importExportTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="export-tab" data-bs-toggle="tab"
+                                    data-bs-target="#export-pane" type="button" role="tab">
+                                <i class="ri-download-line me-1"></i> Export
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="import-tab" data-bs-toggle="tab"
+                                    data-bs-target="#import-pane" type="button" role="tab">
+                                <i class="ri-upload-line me-1"></i> Import
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-4 border border-top-0 rounded-bottom" id="importExportTabsContent">
+                        <!-- Export Tab -->
+                        <div class="tab-pane fade show active" id="export-pane" role="tabpanel">
+                            <div class="alert alert-info bg-info bg-opacity-10 border-info">
+                                <i class="ri-information-line me-2"></i>
+                                Export supplier data for record keeping or analysis
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <a href="{{ ADMIN + SUPPLIERS_EXPORT }}/csv"
+                                       class="btn btn-outline-primary w-100">
+                                        <i class="ri-file-excel-2-line me-1"></i> CSV Format
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{{ ADMIN + SUPPLIERS_EXPORT }}/excel"
+                                       class="btn btn-outline-success w-100">
+                                        <i class="ri-file-excel-line me-1"></i> Excel Format
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{{ ADMIN + SUPPLIERS_EXPORT }}/pdf"
+                                       class="btn btn-outline-danger w-100">
+                                        <i class="ri-file-pdf-line me-1"></i> PDF Format
+                                    </a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <a href="{{ ADMIN + SUPPLIERS_SAMPLE_IMPORT }}"
+                                   class="btn btn-link text-decoration-none">
+                                    <i class="ri-download-line me-1"></i> Download Sample Import File
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Import Tab -->
+                        <div class="tab-pane fade" id="import-pane" role="tabpanel">
+                            <div class="alert alert-warning bg-warning bg-opacity-10 border-warning">
+                                <i class="ri-alert-line me-2"></i>
+                                Ensure your file matches the required format.
+                                <a href="{{ ADMIN + SUPPLIERS_SAMPLE_IMPORT }}"
+                                   class="alert-link">Download sample</a> for reference.
+                            </div>
+                            <form method="POST" action="{{ ADMIN + SUPPLIERS_IMPORT }}"
+                                  enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="importFile" class="form-label">Select File</label>
+                                    <input class="form-control" type="file" id="importFile" name="file"
+                                           accept=".xlsx,.xls,.csv" required>
+                                    <div class="form-text">Accepted formats: .xlsx, .xls, .csv</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox" class="form-check-input" id="overwriteData"
+                                                   name="overwrite">
+                                            <label class="form-check-label" for="overwriteData">Overwrite existing
+                                                data</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox" class="form-check-input" id="skipErrors"
+                                                   name="skip_errors" checked>
+                                            <label class="form-check-label" for="skipErrors">Skip rows with
+                                                errors</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ri-upload-line me-1"></i> Upload and Import Data
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for each supplier -->
+    {% for supplier in suppliers %}
+        <!-- View Supplier Modal -->
+        <div class="modal fade" id="viewSupplierModal{{ supplier.id }}" tabindex="-1"
+             aria-labelledby="viewSupplierModalLabel{{ supplier.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewSupplierModalLabel{{ supplier.id }}">
+                            <i class="ri-truck-line me-2"></i>Supplier Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-information-line"></i> Basic Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-4">Supplier Name</dt>
+                                            <dd class="col-sm-8">{{ supplier.name }}</dd>
+
+                                            <dt class="col-sm-4">Tax ID</dt>
+                                            <dd class="col-sm-8">{{ supplier.tax_id or 'N/A' }}</dd>
+
+                                            <dt class="col-sm-4">Total Orders</dt>
+                                            <dd class="col-sm-8">
+                                                <span class="badge bg-primary rounded-pill">
+                                                    {{ supplier.purchases|length }}
+                                                </span>
+                                            </dd>
+
+                                            <dt class="col-sm-4">Last Order</dt>
+                                            <dd class="col-sm-8">
+                                                {% if supplier.purchases %}
+                                                    {{ supplier.purchases[-1].purchase_date.strftime('%Y-%m-%d') }}
+                                                {% else %}
+                                                    Never
+                                                {% endif %}
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-bank-card-line"></i> Payment Terms</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>{{ supplier.payment_terms or 'Not specified' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-contacts-line"></i> Contact Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-4">Contact Person</dt>
+                                            <dd class="col-sm-8">{{ supplier.contact_person or 'N/A' }}</dd>
+
+                                            <dt class="col-sm-4">Phone</dt>
+                                            <dd class="col-sm-8">{{ supplier.phone or 'N/A' }}</dd>
+
+                                            <dt class="col-sm-4">Email</dt>
+                                            <dd class="col-sm-8">
+                                                {% if supplier.email %}
+                                                    <a href="mailto:{{ supplier.email }}">{{ supplier.email }}</a>
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </dd>
+
+                                            <dt class="col-sm-4">Address</dt>
+                                            <dd class="col-sm-8">{{ supplier.address or 'N/A' }}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-file-text-line"></i> Notes</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>{{ supplier.notes or 'No additional notes' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Supplier Modal -->
+        <div class="modal fade" id="editSupplierModal{{ supplier.id }}" tabindex="-1"
+             aria-labelledby="editSupplierModalLabel{{ supplier.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="editSupplierModalLabel{{ supplier.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Supplier
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + SUPPLIERS_EDIT }}/{{ supplier.id }}">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="name" value="{{ supplier.name }}"
+                                           required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Tax ID</label>
+                                    <input type="text" class="form-control" name="tax_id"
+                                           value="{{ supplier.tax_id or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Contact Person</label>
+                                    <input type="text" class="form-control" name="contact_person"
+                                           value="{{ supplier.contact_person or '' }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="phone"
+                                           value="{{ supplier.phone or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" name="email"
+                                       value="{{ supplier.email or '' }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address"
+                                          rows="2">{{ supplier.address or '' }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Payment Terms</label>
+                                <textarea class="form-control" name="payment_terms"
+                                          rows="2">{{ supplier.payment_terms or '' }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes"
+                                          rows="2">{{ supplier.notes or '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="ri-save-line me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Supplier Modal -->
+        <div class="modal fade" id="deleteSupplierModal{{ supplier.id }}" tabindex="-1"
+             aria-labelledby="deleteSupplierModalLabel{{ supplier.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteSupplierModalLabel{{ supplier.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <i class="ri-alert-line me-2"></i>
+                            You are about to delete <strong>"{{ supplier.name }}"</strong>. This action cannot be
+                            undone.
+                        </div>
+
+                        <div class="card border-danger mb-3">
+                            <div class="card-header bg-danger bg-opacity-10 text-danger">
+                                <h6 class="mb-0"><i class="ri-information-line me-1"></i> Supplier Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-4">Orders Placed</dt>
+                                    <dd class="col-sm-8">{{ supplier.purchases|length }}</dd>
+
+                                    <dt class="col-sm-4">Last Order</dt>
+                                    <dd class="col-sm-8">
+                                        {% if supplier.purchases %}
+                                            {{ supplier.purchases[-1].purchase_date.strftime('%Y-%m-%d') }}
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        {% if supplier.purchases|length > 0 %}
+                            <div class="alert alert-warning">
+                                <i class="ri-alert-line me-2"></i>
+                                This supplier has purchase records and cannot be deleted until all purchases are
+                                reassigned.
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <form action="{{ ADMIN + SUPPLIERS_DELETE }}/{{ supplier.id }}"
+                              method="POST">
+                            <button type="submit" class="btn btn-danger"
+                                    {% if supplier.purchases|length > 0 %}disabled{% endif %}>
+                                <i class="ri-delete-bin-line me-1"></i> Confirm Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Archived Suppliers Modal -->
+    <div class="modal fade" id="archivedSuppliersModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-archive-line me-2"></i>Archived Suppliers
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if archived_suppliers %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Supplier</th>
+                                    <th>Contact Info</th>
+                                    <th>Orders</th>
+                                    <th>Archived On</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for supplier in archived_suppliers %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm me-3">
+                                                    <div class="avatar-title bg-secondary bg-opacity-10 text-secondary rounded-circle">
+                                                        <i class="ri-truck-line"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0">{{ supplier.name }}</h6>
+                                                    <small class="text-muted">{{ supplier.tax_id or 'Tax ID not provided' }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <i class="ri-user-line me-1 text-muted"></i> {{ supplier.contact_person or 'N/A' }}<br>
+                                                <i class="ri-phone-line me-1 text-muted"></i> {{ supplier.phone or 'N/A' }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary rounded-pill">
+                                                {{ supplier.purchases|length }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{ supplier.deleted_at.strftime('%Y-%m-%d %H:%M') if supplier.deleted_at else 'Unknown' }}
+                                        </td>
+                                        <td>
+                                            <form method="POST"
+                                                  action="{{ ADMIN + SUPPLIERS_RESTORE }}/{{ supplier.id }}"
+                                                  class="d-inline">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-success rounded-pill">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="ri-archive-line text-muted" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3">No archived suppliers</h4>
+                            <p class="text-muted">There are currently no archived suppliers to display</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block headLink %}
+    <!-- Data Tables -->
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+    <!-- Custom CSS -->
+    <style>
+        .nav-tabs-custom .nav-link {
+            padding: 0.75rem 1.25rem;
+            font-weight: 500;
+        }
+
+        .card-header h5 {
+            font-weight: 600;
+        }
+
+        .rounded-pill {
+            border-radius: 50rem !important;
+        }
+
+        .avatar-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.2rem;
+        }
+    </style>
+{% endblock %}
+
+{% block footerLink %}
+    <!-- Data Tables -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+    <!-- Export buttons -->
+    <script src="../../../static/assets/vendor/datatables/buttons/dataTables.buttons.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/buttons.html5.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/buttons.print.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/jszip.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/pdfmake.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/vfs_fonts.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#suppliersTable').DataTable({
+                responsive: true,
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search suppliers...",
+                },
+                columnDefs: [
+                    {orderable: false, targets: -1} // Disable sorting on actions column
+                ]
+            });
+        });
+    </script>
+{% endblock %}

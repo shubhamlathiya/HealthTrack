@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock Transactions{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title">
+                        <i class="ri-database-2-line me-2"></i>Stock Transactions
+                    </h4>
+                    <div class="card-tools">
+                        <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#filterModal">
+                            <i class="ri-filter-line me-1"></i> Filter
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Medicine</th>
+                                <th>Batch</th>
+                                <th>Transaction Type</th>
+                                <th class="text-end">Quantity</th>
+                                <th class="text-end">Balance</th>
+                                <th>Reference</th>
+                                <th>Notes</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        <strong>{{ transaction.medicine.name if transaction.medicine else 'N/A' }}</strong>
+                                        <div class="text-muted small">
+                                            {{ transaction.medicine.medicine_number if transaction.medicine else '' }}
+                                        </div>
+                                    </td>
+                                    <td>{{ transaction.batch.batch_no if transaction.batch else 'N/A' }}</td>
+                                    <td>
+                                        {% if transaction.transaction_type == 'purchase' %}
+                                            <span class="badge bg-success">Purchase</span>
+                                        {% elif transaction.transaction_type == 'sale' %}
+                                            <span class="badge bg-danger">Sale</span>
+                                        {% elif transaction.transaction_type == 'adjustment' %}
+                                            <span class="badge bg-warning">Adjustment</span>
+                                        {% else %}
+                                            <span class="badge bg-info">{{ transaction.transaction_type }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end {% if transaction.transaction_type == 'purchase' %}text-success{% elif transaction.transaction_type == 'sale' %}text-danger{% endif %}">
+                                        {% if transaction.transaction_type == 'purchase' %}
+                                            +{% elif transaction.transaction_type == 'sale' %}
+                                            -{% endif %}{{ transaction.quantity }}
+                                    </td>
+                                    <td class="text-end">{{ transaction.balance }}</td>
+                                    <td>{{ transaction.reference or 'N/A' }}</td>
+                                    <td>{{ transaction.notes or 'N/A' }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" class="text-center py-4">No transactions found</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="float-end">
+                        <small class="text-muted">Showing {{ transactions|length }} transactions</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-filter-line me-2"></i>Filter Transactions
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="GET" action="/admin">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Medicine</label>
+                            <select class="form-select" name="medicine_id">
+                                <option value="">All Medicines</option>
+                                {% for medicine in all_medicines %}
+                                    <option value="{{ medicine.id }}"
+                                            {% if medicine.id|string == request.args.get('medicine_id') %}selected{% endif %}>
+                                        {{ medicine.name }} ({{ medicine.medicine_number }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Batch</label>
+                            <select class="form-select" name="batch_id">
+                                <option value="">All Batches</option>
+                                {% for batch in all_batches %}
+                                    <option value="{{ batch.id }}"
+                                            {% if batch.id|string == request.args.get('batch_id') %}selected{% endif %}>
+                                        {{ batch.batch_number }}
+                                        (Exp: {{ batch.expiry_date.strftime('%Y-%m-%d') if batch.expiry_date else 'N/A' }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Transaction Type</label>
+                            <select class="form-select" name="transaction_type">
+                                <option value="">All Types</option>
+                                <option value="purchase"
+                                        {% if request.args.get('transaction_type') == 'purchase' %}selected{% endif %}>
+                                    Purchase
+                                </option>
+                                <option value="sale"
+                                        {% if request.args.get('transaction_type') == 'sale' %}selected{% endif %}>Sale
+                                </option>
+                                <option value="adjustment"
+                                        {% if request.args.get('transaction_type') == 'adjustment' %}selected{% endif %}>
+                                    Adjustment
+                                </option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">From Date</label>
+                                <input type="date" class="form-control" name="from_date"
+                                       value="{{ request.args.get('from_date') }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">To Date</label>
+                                <input type="date" class="form-control" name="to_date"
+                                       value="{{ request.args.get('to_date') }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-filter-line me-1"></i> Apply Filter
+                        </button>
+                        <a href="" class="btn btn-outline-danger">
+                            <i class="ri-eraser-line me-1"></i> Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block headLink %}
+    <style>
+        .card-header {
+            padding: 0.75rem 1.25rem;
+        }
+
+        .table th {
+            white-space: nowrap;
+        }
+
+        .badge {
+            font-size: 0.85em;
+        }
+    </style>
+{% endblock %}
+
+{% block footerLink %}
+    <script>
+        $(document).ready(function () {
+            // Initialize any needed JavaScript here
+            // Example: Enable tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // If you're using select2 for better select controls
+            $('.form-select').select2({
+                theme: 'bootstrap-5',
+                width: '100%'
+            });
+        });
+    </script>
+{% endblock %}

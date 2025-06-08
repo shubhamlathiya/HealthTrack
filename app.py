@@ -16,7 +16,9 @@ from controllers.every_one_controllers import idCard
 from controllers.laboratory_controllers import laboratory
 from controllers.patients_controllers import patients
 from models import User, UserRole
+from models.medicineModel import MedicineUnit, MedicineGroup
 from utils.config import init_app, db
+from utils.create_new_patient import create_new_patient
 
 app = Flask(__name__, static_folder="static")
 load_dotenv()
@@ -54,6 +56,31 @@ with app.app_context():
     db.create_all()
 
     if not User.query.filter_by(role=UserRole.ADMIN).first():
+        units = [
+            {"name": "Tablet", "symbol": "tab"},
+            {"name": "Capsule", "symbol": "cap"},
+            {"name": "Syrup", "symbol": "ml"},
+            {"name": "Injection", "symbol": "inj"},
+            {"name": "Cream", "symbol": "g"},
+        ]
+
+        for unit in units:
+            db.session.add(MedicineUnit(name=unit["name"], symbol=unit["symbol"]))
+
+        db.session.commit()
+
+        groups = [
+            {"name": "Antibiotics", "description": "Used to treat bacterial infections"},
+            {"name": "Analgesics", "description": "Pain relievers"},
+            {"name": "Antipyretics", "description": "Used to reduce fever"},
+            {"name": "Antiseptics", "description": "Prevent the growth of disease-causing microorganisms"},
+            {"name": "Antacids", "description": "Neutralize stomach acidity"},
+        ]
+
+        for group in groups:
+            db.session.add(MedicineGroup(name=group["name"], description=group["description"]))
+
+        db.session.commit()
         for role in UserRole:
             if not User.query.filter_by(role=role).first():
                 user = User(
@@ -66,6 +93,58 @@ with app.app_context():
                 db.session.add(user)
 
         db.session.commit()
+
+        # List of 5 patient dictionaries
+        sample_patients = [
+            {
+                "email": "rahul.sharma@example.com",
+                "first_name": "Rahul",
+                "last_name": "Sharma",
+                "phone": "9876543210",
+                "age": 28,
+                "gender": "Male"
+            },
+            {
+                "email": "priya.verma@example.com",
+                "first_name": "Priya",
+                "last_name": "Verma",
+                "phone": "8765432109",
+                "age": 34,
+                "gender": "Female"
+            },
+            {
+                "email": "amit.patel@example.com",
+                "first_name": "Amit",
+                "last_name": "Patel",
+                "phone": "7654321098",
+                "age": 45,
+                "gender": "Male"
+            },
+            {
+                "email": "sneha.kumar@example.com",
+                "first_name": "Sneha",
+                "last_name": "Kumar",
+                "phone": "6543210987",
+                "age": 23,
+                "gender": "Female"
+            },
+            {
+                "email": "deepak.joshi@example.com",
+                "first_name": "Deepak",
+                "last_name": "Joshi",
+                "phone": "5432109876",
+                "age": 37,
+                "gender": "Male"
+            }
+        ]
+
+        # Insert all sample patients
+        for patient in sample_patients:
+            create_new_patient(patient)
+
+        # Commit all at once
+        db.session.commit()
+
         # admin = User(
         #     email='admin@hospital.com',
         #     password=generate_password_hash('Shubham123'),

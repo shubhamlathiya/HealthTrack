@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block title %}Medicine Sales{% endblock title %}
+
+{% block page %}Medicine Sales{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-shopping-bag-line me-2"></i>Sales Records
+                    </h5>
+                    <div>
+                        <a href="{{ ADMIN + PHARMACY_SALES_ADD }}" class="btn btn-primary">
+                            <i class="ri-add-line me-1"></i>New Sale
+                        </a>
+                        <button type="button" class="btn btn-info ms-1" data-bs-toggle="modal"
+                                data-bs-target="#exportSalesModal">
+                            <i class="ri-import-export-line me-1"></i> Export
+                        </button>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restoreSalesModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted Records
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table id="salesTable" class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Bill No.</th>
+                                <th>Date</th>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Items</th>
+                                <th class="text-end">Total ($)</th>
+                                <th class="text-end">Discount ($)</th>
+                                <th class="text-end">Net Amount ($)</th>
+                                <th class="text-end">Paid ($)</th>
+                                <th class="text-end">Refund ($)</th>
+                                <th class="text-end">Due ($)</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for sale in sales %}
+                                <tr>
+                                    <td>{{ sale.bill_no }}</td>
+                                    <td>{{ sale.sale_date }}</td>
+                                    <td>{{ sale.patient_name }}</td>
+                                    <td>{{ sale.doctor_name or 'N/A' }}</td>
+                                    <td>{{ sale.items_count  }}</td>
+                                    <td class="text-end">
+                                        {% if sale.total_amount is not none %}
+                                            ₹{{ "%.2f"|format(sale.total_amount) }}
+                                        {% else %}
+                                            ₹0.00 {# Or 'N/A' if you prefer #}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">{{ "%.2f"|format(sale.discount_amount) }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(sale.net_amount) }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(sale.paid_amount) }}</td>
+                                    <td class="text-end">
+                                        {% if sale.refund_amount > 0 %}
+                                            <span class="text-info">{{ "%.2f"|format(sale.refund_amount) }}</span>
+                                        {% else %}
+                                            0.00
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if sale.balance_due > 0 %}
+                                            <span class="text-danger">{{ "%.2f"|format(sale.balance_due) }}</span>
+                                        {% else %}
+                                            <span class="text-success">0.00</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if sale.balance_due > 0 %}
+                                            <span class="badge bg-warning">Due</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Paid</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <a href="{{ ADMIN + PHARMACY_SALES_PRINT }}/{{ sale.id }}"
+                                               class="btn btn-sm btn-outline-primary rounded-pill" target="_blank">
+                                                <i class="ri-printer-line me-1"></i> Print
+                                            </a>
+                                            <a href="{{ ADMIN + PHARMACY_SALES_VIEW }}/{{ sale.id }}"
+                                               class="btn btn-sm btn-outline-primary rounded-pill">
+                                                <i class="ri-eye-line me-1"></i> View
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger rounded-pill"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteSaleModal{{ sale.id }}">
+                                                <i class="ri-delete-bin-line me-1"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Delete Sale Modal -->
+                                <div class="modal fade" id="deleteSaleModal{{ sale.id }}" tabindex="-1"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete sale
+                                                    <strong>{{ sale.bill_no }}</strong>?</p>
+                                                <div class="alert alert-warning">
+                                                    <i class="ri-alert-line me-2"></i>
+                                                    This action will reverse all stock transactions associated with this
+                                                    sale.
+                                                </div>
+                                                <div class="card border-danger mb-3">
+                                                    <div class="card-header bg-danger bg-opacity-10 text-danger">
+                                                        <h6 class="mb-0"><i class="ri-information-line me-1"></i>
+                                                            Sale Details</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <dl class="row mb-0">
+                                                            <dt class="col-sm-4">Date</dt>
+                                                            <dd class="col-sm-8">{{ sale.sale_date }}</dd>
+
+                                                            <dt class="col-sm-4">Patient</dt>
+                                                            <dd class="col-sm-8">{{ sale.patient_name }}</dd>
+
+                                                            <dt class="col-sm-4">Items</dt>
+                                                            <dd class="col-sm-8">{{ sale.items_count  }}</dd>
+
+                                                            <dt class="col-sm-4">Total Amount</dt>
+                                                            <dd class="col-sm-8">{{ "%.2f"|format(sale.total_amount) }}</dd>
+
+                                                            <dt class="col-sm-4">Paid Amount</dt>
+                                                            <dd class="col-sm-8">{{ "%.2f"|format(sale.paid_amount) }}</dd>
+
+                                                            <dt class="col-sm-4">Due Amount</dt>
+                                                            <dd class="col-sm-8">{{ "%.2f"|format(sale.balance_due) }}</dd>
+                                                        </dl>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="ri-close-line me-1"></i> Cancel
+                                                </button>
+                                                <form action="{{ ADMIN + PHARMACY_SALES_DELETE }}/{{ sale.id }}"
+                                                      method="POST">
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="ri-delete-bin-line me-1"></i> Confirm Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <tr>
+                                    <td colspan="13" class="text-center py-4">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="ri-shopping-bag-line text-muted" style="font-size: 3rem;"></i>
+                                            <h5 class="mt-3">No sales records found</h5>
+                                            <p class="text-muted">Create your first sale to get started</p>
+                                            <a href="{{ ADMIN + PHARMACY_SALES_ADD }}" class="btn btn-primary">
+                                                <i class="ri-add-line me-1"></i> Create Sale
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportSalesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-import-export-line me-2"></i>Export Sales Records
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="ri-information-line me-2"></i>
+                        Select a date range and export format for sales records.
+                    </div>
+
+                    <!-- Export Form with Date Range -->
+                    <form id="exportSalesForm" method="GET" action="{{ ADMIN + PHARMACY_SALES_EXPORT }}">
+                        <div class="mb-3">
+                            <label for="salesStartDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="salesStartDate" name="start_date" required
+                                   value="{{ datetime.today().replace(day=1).strftime('%Y-%m-%d') }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="salesEndDate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="salesEndDate" name="end_date" required
+                                   value="{{ datetime.today().strftime('%Y-%m-%d') }}">
+                        </div>
+
+                        <label class="form-label d-block mb-2">Select Export Format:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="submit" name="format" value="csv" class="btn btn-outline-primary">
+                                <i class="ri-file-excel-2-line me-1"></i> Export as CSV
+                            </button>
+                            <button type="submit" name="format" value="excel" class="btn btn-outline-success">
+                                <i class="ri-file-excel-line me-1"></i> Export as Excel
+                            </button>
+                            <button type="submit" name="format" value="pdf" class="btn btn-outline-danger">
+                                <i class="ri-file-pdf-line me-1"></i> Export as PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Sales Modal -->
+    <div class="modal fade" id="restoreSalesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-refresh-line me-2"></i>Restore Deleted Sales Records
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if archived_sales %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Bill No.</th>
+                                    <th>Date</th>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Items</th>
+                                    <th class="text-end">Total Amount</th>
+                                    <th class="text-end">Paid Amount</th>
+                                    <th class="text-end">Due Amount</th>
+                                    <th>Deleted On</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for sale in archived_sales %}
+                                    <tr>
+                                        <td>{{ sale.bill_no }}</td>
+                                        <td>{{ sale.sale_date}}</td>
+                                        <td>{{ sale.patient_name }}</td>
+                                        <td>{{ sale.doctor_name or 'N/A' }}</td>
+                                        <td>{{ sale.items_count  }}</td>
+                                        <td class="text-end">${{ "%.2f"|format(sale.total_amount) }}</td>
+                                        <td class="text-end">${{ "%.2f"|format(sale.paid_amount) }}</td>
+                                        <td class="text-end">${{ "%.2f"|format(sale.balance_due) }}</td>
+                                        <td>{{ sale.deleted_at if sale.deleted_at else 'Unknown' }}</td>
+                                        <td>
+                                            <form method="POST"
+                                                  action="{{ ADMIN + PHARMACY_SALES_RESTORE }}/{{ sale.id }}">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>
+                            No archived sales records found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footerLink %}
+    <!-- DataTables JS -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize sales table with similar settings as purchases
+            $('#salesTable').DataTable({
+                responsive: true,
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search sales..."
+                },
+                columnDefs: [
+                    {orderable: false, targets: [12]} // Make actions column non-sortable
+                ]
+            });
+        });
+    </script>
+{% endblock %}

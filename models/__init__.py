@@ -5,7 +5,7 @@ from .departmentModel import *
 from .laboratoryTestReportModel import *
 from .prescriptionModel import *
 from .appointmentModel import *
-
+from .medicineModel import *
 
 # Explicitly list all models to ensure they're loaded
 __all__ = [

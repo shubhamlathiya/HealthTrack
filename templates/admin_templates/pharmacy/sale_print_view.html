@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Invoice - {{ sale.bill_no }}</title>
+    <style>
+        /* --- General Print Styles --- */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #333;
+            margin: 0.5in; /* Standard print margin */
+            -webkit-print-color-adjust: exact; /* For background colors to print */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 7.5in; /* Letter size width (8.5in) - 1in margins */
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            color: #2c3e50;
+        }
+
+        strong, b {
+            font-weight: bold;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 1em 0;
+        }
+
+        /* --- Specific Section Styles --- */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3498db;
+            margin-bottom: 20px;
+        }
+
+        .header-section div {
+            width: 50%;
+            vertical-align: top;
+        }
+
+        .pharmacy-info {
+            text-align: left;
+            font-size: 9pt;
+        }
+
+        .bill-info {
+            text-align: right;
+            font-size: 9pt;
+        }
+
+        .bill-info h1 {
+            font-size: 18pt;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .section-title {
+            font-size: 12pt;
+            color: #2980b9;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .info-table td {
+            padding: 5px 0;
+            vertical-align: top;
+        }
+
+        .info-table td:first-child {
+            width: 20%;
+            font-weight: bold;
+        }
+
+        /* --- Items Table --- */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table th,
+        .items-table td {
+            border: 1px solid #dddddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 9pt;
+        }
+
+        .items-table th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .items-table td:nth-child(1) {
+            text-align: center;
+            width: 3%;
+        } /* # */
+        .items-table td:nth-child(2) {
+            text-align: left;
+            width: 30%;
+        } /* Medicine */
+        .items-table td:nth-child(3) {
+            text-align: center;
+            width: 12%;
+        } /* Batch */
+        .items-table td:nth-child(4) {
+            text-align: center;
+            width: 12%;
+        } /* Expiry */
+        .items-table td:nth-child(5) {
+            text-align: right;
+            width: 8%;
+        } /* Qty */
+        .items-table td:nth-child(6) {
+            text-align: right;
+            width: 10%;
+        } /* Rate (Sale Price) */
+        .items-table td:nth-child(7) {
+            text-align: right;
+            width: 15%;
+        } /* Amount */
+
+        .items-table .medicine-sub-info {
+            font-size: 7pt;
+            color: #666;
+            display: block;
+        }
+
+        /* --- Summary Table --- */
+        .summary-table {
+            width: 50%; /* Adjust as needed */
+            margin-left: auto; /* Align to right */
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .summary-table td {
+            padding: 6px 10px;
+            text-align: right;
+            vertical-align: middle;
+            font-size: 10pt;
+        }
+
+        .summary-table td:first-child {
+            font-weight: bold;
+            width: 60%;
+        }
+
+        .summary-table tr:nth-child(4) td { /* Total Amount row */
+            font-size: 11pt;
+            font-weight: bold;
+            border-top: 1px solid #3498db;
+            border-bottom: 1px solid #3498db;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        /* --- Notes Section --- */
+        .notes-section {
+            margin-top: 30px;
+        }
+
+        .notes-section p {
+            font-size: 9pt;
+        }
+
+        /* --- Footer --- */
+        .footer-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px; /* Space from content */
+            font-size: 9pt;
+        }
+
+        .footer-section div {
+            width: 48%;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Colors for status/due */
+        .status-paid {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* Hide elements not needed for print */
+        @media print {
+            body {
+                margin: 0; /* Remove browser default margins for print */
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="pharmacy-info">
+            <strong>PHARMACY NAME</strong><br/>
+            123 Medical Street<br/>
+            Healthcare City, HC 12345<br/>
+            Phone: (123) 456-7890
+        </div>
+        <div class="bill-info">
+            <h1>SALES INVOICE</h1>
+            <strong>Bill No:</strong> {{ sale.bill_no }}<br/>
+            <strong>Date:</strong> {{ sale.created_at.strftime('%d-%m-%Y %I:%M %p') }}
+        </div>
+    </div>
+
+    <!-- Patient and Doctor Information -->
+    <h2 class="section-title">Patient & Doctor Information</h2>
+    <table class="info-table">
+        <tr>
+            <td>Patient:</td>
+            <td>{{ patients.first_name if patients else 'N/A' }} {{ patients.last_name if patients else '' }}</td>
+        </tr>
+        <tr>
+            <td>Case ID:</td>
+            <td>{{ sale.case_id if sale.case_id else 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Prescription No:</td>
+            <td>{{ sale.prescription_no if sale.prescription_no else 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Doctor:</td>
+            <td>Dr. {{ sale.doctor.first_name if sale.doctor else 'N/A' }} {{ sale.doctor.last_name if sale.doctor else '' }}</td>
+        </tr>
+        <tr>
+            <td>Payment Mode:</td>
+            <td>{{ sale.payment_mode }}</td>
+        </tr>
+        <tr>
+            <td>Status:</td>
+            <td>
+                {% set calculated_due = sale.net_amount - sale.payment_amount %}
+                {% if calculated_due > 0 %}
+                    <span class="status-pending">Pending (₹{{ "%.2f"|format(calculated_due) }})</span>
+                {% else %}
+                    <span class="status-paid">Paid</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Items Table -->
+    <h2 class="section-title">Sold Items</h2>
+    <table class="items-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Medicine</th>
+            <th>Batch</th>
+            <th>Expiry</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>
+                    <strong>{{ item.medicine.name if item.medicine else 'N/A' }}</strong>
+                    {% if item.medicine and item.medicine.medicine_number %}
+                        <span class="medicine-sub-info">{{ item.medicine.medicine_number }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ item.batch_id if item.batch_id else 'N/A' }}</td> {# Assuming SaleItem links to batch by ID #}
+                <td>
+                    {% if item.batch and item.batch.expiry_date %}
+                        {{ item.batch.expiry_date.strftime('%d-%m-%Y') }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">{{ item.quantity }}</td>
+                <td style="text-align: right;">₹{{ "%.2f"|format(item.sale_price) }}</td> {# Use sale_price #}
+                <td style="text-align: right;">₹{{ "%.2f"|format(item.quantity * item.sale_price) }}</td> {# Calculate item amount #}
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7" style="text-align: center;">No items found for this sale.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Summary Section -->
+    <h2 class="section-title">Summary</h2>
+    <table class="summary-table">
+        <tr>
+            <td>Subtotal:</td>
+            <td>₹{{ "%.2f"|format(sale.total_amount) }}</td> {# total_amount might be the pre-discount subtotal #}
+        </tr>
+        <tr>
+            <td>Discount ({{ "%.2f"|format(sale.discount_percent if sale.discount_percent else 0) }}%):</td>
+            <td>-₹{{ "%.2f"|format(sale.discount_amount) }}</td>
+        </tr>
+        <tr>
+            <td>Tax:</td>
+            <td>₹{{ "%.2f"|format(sale.tax_amount) }}</td>
+        </tr>
+        <tr>
+            <td>Total Amount:</td>
+            <td>₹{{ "%.2f"|format(sale.net_amount) }}</td> {# net_amount is typically the final amount after taxes/discounts #}
+        </tr>
+        <tr>
+            <td>Paid Amount:</td>
+            <td>₹{{ "%.2f"|format(sale.payment_amount) }}</td>
+        </tr>
+        <tr>
+            <td>Balance Due:</td>
+            <td>
+                {% set calculated_due = sale.net_amount - sale.payment_amount %}
+                {% if calculated_due > 0 %}
+                    <span class="status-pending">₹{{ "%.2f"|format(calculated_due) }}</span>
+                {% else %}
+                    <span class="status-paid">₹0.00</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    {% if sale.note %}
+        <div class="notes-section">
+            <h2 class="section-title">Notes</h2>
+            <p>{{ sale.note }}</p>
+        </div>
+    {% endif %}
+
+    <!-- Footer Section -->
+    <div class="footer-section">
+        <div>Received by: ___________________</div>
+        <div>Authorized by: ___________________</div>
+    </div>
+</div>
+
+<script>
+    window.onload = function () {
+        // Check if window.matchMedia is supported
+        if (window.matchMedia) {
+            const mediaQueryList = window.matchMedia('print');
+
+            mediaQueryList.addListener(function(mql) {
+                if (!mql.matches) {
+                    // If 'mql.matches' is false, it means we are no longer in print mode.
+                    window.close(); // Close the current window/tab
+                }
+            });
+        }
+        window.print();
+    };
+</script>
+</body>
+</html>

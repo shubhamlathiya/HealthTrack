@@ -382,29 +382,129 @@
                 <li class="treeview {% if request.path.startswith('/admin/pharmacy') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-medicine-bottle-line"></i>
-                        <span class="menu-text">Pharmacy</span>
+                        <span class="menu-text">Pharmacy Management</span>
                     </a>
-                    <ul class="treeview-menu {% if request.path.startswith('/admin/pharmacy/medicine-categories') %}active current-page{% endif %}">
-                        <li>
+                    <ul class="treeview-menu">
+
+                        {# Sales & Returns - Grouped for common workflow #}
+                        <li class="treeview {% if request.path.startswith('/admin/pharmacy/sales') %}active current-page{% endif %}">
                             <a href="#!">
-                                Medicine
+                                <i class="ri-shopping-bag-line"></i>
+                                <span class="menu-text">Sales & Billing</span>
                                 <i class="ri-arrow-right-s-line"></i>
                             </a>
-                            <ul class="treeview-menu {% if request.path.startswith('/admin/pharmacy/medicine-categories') %}active current-page{% endif %}">
+                            <ul class="treeview-menu">
                                 <li>
-                                    <a href="/admin/pharmacy/medicine-categories"
-                                       class="{% if request.path == '/admin/pharmacy/medicine-categories' %}active-sub{% endif %}">Categories</a>
+                                    <a href="/admin/pharmacy/sales/new"
+                                       class="{% if request.path == '/admin/pharmacy/sales/new' %}active-sub{% endif %}">
+                                        <i class="ri-add-circle-line"></i> New Sale
+                                    </a>
                                 </li>
                                 <li>
-                                    <a href="/admin/pharmacy/medicine-companies"
-                                       class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Companies</a>
+                                    <a href="/admin/pharmacy/sales"
+                                            {# Keeping your original sales list route for now #}
+                                       class="{% if request.path == '/admin/pharmacy/sales' %}active-sub{% endif %}">
+                                        <i class="ri-file-list-line"></i> Sales History
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/sales/returns"
+                                            {# Assuming a dedicated sales return list/workflow #}
+                                       class="{% if request.path == '/admin/pharmacy/sales/returns' %}active-sub{% endif %}">
+                                        <i class="ri-arrow-go-back-line"></i> Sales Returns
+                                    </a>
                                 </li>
                             </ul>
                         </li>
-                        <li>
-                            <a href="/admin/pharmacy/medicine-list"
-                               class="{% if request.path == '/admin/pharmacy/medicine-list' %}active-sub{% endif %}">Medicine
-                                List</a>
+
+                        {# Inventory/Stock Management - Crucial and often accessed #}
+                        <li class="treeview {% if request.path.startswith('/admin/pharmacy/inventory') or request.path.startswith('/admin/pharmacy/levels-stock') or request.path.startswith('/admin/pharmacy/medicine-purchases') %}active current-page{% endif %}">
+                            <a href="#!">
+                                <i class="ri-stack-line"></i>
+                                <span class="menu-text">Inventory & Stock</span>
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li>
+                                    <a href="/admin/pharmacy/inventory/medicines" {# Renamed from medicine-list for clarity #}
+                                       class="{% if request.path == '/admin/pharmacy/inventory/medicines' %}active-sub{% endif %}">
+                                        <i class="ri-pill-line"></i> All Medicines
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/inventory/stock-levels"
+                                       class="{% if request.path == '/admin/pharmacy/inventory/stock-levels' %}active-sub{% endif %}">
+                                        <i class="ri-line-chart-line"></i> Stock Levels
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/inventory/batches"
+                                            {# New: Link to manage medicine batches #}
+                                       class="{% if request.path == '/admin/pharmacy/inventory/batches' %}active-sub{% endif %}">
+                                        <i class="ri-folder-open-line"></i> Medicine Batches
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/inventory/purchases"
+                                       class="{% if request.path == '/admin/pharmacy/inventory/purchases' %}active-sub{% endif %}">
+                                        <i class="ri-truck-line"></i> Purchases
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/stock-adjustments" {# New: For stock adjustments #}
+                                       class="{% if request.path == '/admin/pharmacy/stock-adjustments' %}active-sub{% endif %}">
+                                        <i class="ri-swap-box-line"></i> Stock Adjustments
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        {# Master Data / Configuration - Grouped #}
+                        <li class="treeview {% if request.path.startswith('/admin/pharmacy/master-data') or request.path.startswith('/admin/pharmacy/medicine-companies') or request.path.startswith('/admin/pharmacy/suppliers') %}active current-page{% endif %}">
+                            <a href="#!">
+                                <i class="ri-settings-3-line"></i>
+                                <span class="menu-text">Master Data</span>
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li>
+                                    <a href="/admin/pharmacy/master-data/categories"
+                                       class="{% if request.path == '/admin/pharmacy/master-data/categories' %}active-sub{% endif %}">
+                                        <i class="ri-folder-info-line"></i> Categories
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/master-data/companies"
+                                       class="{% if request.path == '/admin/pharmacy/master-data/companies' %}active-sub{% endif %}">
+                                        <i class="ri-building-line"></i> Companies
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/pharmacy/master-data/suppliers"
+                                       class="{% if request.path == '/admin/pharmacy/master-data/suppliers' %}active-sub{% endif %}">
+                                        <i class="ri-user-2-line"></i> Suppliers
+                                    </a>
+                                </li>
+                                {# Add more master data if applicable, e.g., Dosage Forms, Units #}
+                            </ul>
+                        </li>
+
+                        {# Reporting (Optional but good to plan for) #}
+                        <li class="treeview {% if request.path.startswith('/admin/pharmacy/reports') %}active current-page{% endif %}">
+                            <a href="#!">
+                                <i class="ri-bar-chart-box-line"></i>
+                                <span class="menu-text">Reports</span>
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li><a href="/admin/pharmacy/reports/sales-summary"
+                                       class="{% if request.path == '/admin/pharmacy/reports/sales-summary' %}active-sub{% endif %}">Sales
+                                    Summary</a></li>
+                                <li><a href="/admin/pharmacy/reports/stock-movement"
+                                       class="{% if request.path == '/admin/pharmacy/reports/stock-movement' %}active-sub{% endif %}">Stock
+                                    Movement</a></li>
+                                {# More reports #}
+                            </ul>
                         </li>
                     </ul>
                 </li>

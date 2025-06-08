@@ -1,0 +1,774 @@
+{% extends 'base.html' %}
+
+{% block title %}Medicine Purchases{% endblock title %}
+
+{% block page %}Medicine Purchases{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-shopping-cart-line me-2"></i>Purchase Records
+                    </h5>
+                    <div>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPurchaseModal">
+                            <i class="ri-add-line me-1"></i>Add Purchase
+                        </button>
+                        <button type="button" class="btn btn-info ms-1" data-bs-toggle="modal"
+                                data-bs-target="#importExportModal">
+                            <i class="ri-import-export-line me-1"></i> Export
+                        </button>
+                        <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                                data-bs-target="#restorePurchasesModal">
+                            <i class="ri-refresh-line"></i> View & Restore Deleted Records
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table id="purchasesTable" class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Bill No.</th>
+                                <th>Date</th>
+                                <th>Supplier</th>
+                                <th>Items</th>
+                                <th class="text-end">Total Amount ($)</th>
+                                <th class="text-end">Discount ($)</th>
+                                <th class="text-end">Net Amount ($)</th>
+                                <th class="text-end">Paid Amount ($)</th>
+                                <th class="text-end">Balance Due ($)</th>
+                                <th class="text-end">Payment</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for purchase in purchases %}
+                                <tr>
+                                    <td>{{ purchase.bill_no }}</td>
+                                    <td>{{ purchase.purchase_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if purchase.supplier %}
+                                            {{ purchase.supplier.name }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ purchase.items|length }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(purchase.total_amount) }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(purchase.discount_amount) }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(purchase.total_amount - purchase.discount_amount) }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(purchase.paid_amount) }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(purchase.due_amount) }}</td>
+                                    <td>
+                                        {% if purchase.due_amount > 0 %}
+                                            <span class="badge bg-warning">Partial</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Paid</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <a href="{{ ADMIN + PHARMACY_MEDICINE_PURCHASES_PRINT }}/{{ purchase.id }}"
+                                               class="btn btn-sm btn-outline-primary rounded-pill" target="_blank">
+                                                <i class="ri-printer-line me-1"></i> Print
+                                            </a>
+                                            <a href="{{ ADMIN + PHARMACY_PURCHASE_VIEW }}/{{ purchase.id }}"
+                                               class="btn btn-sm btn-outline-primary rounded-pill">
+                                                <i class="ri-eye-line me-1"></i> View
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger rounded-pill"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deletePurchaseModal{{ purchase.id }}">
+                                                <i class="ri-delete-bin-line me-1"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+
+                                <!-- Delete Purchase Modal -->
+                                <div class="modal fade" id="deletePurchaseModal{{ purchase.id }}" tabindex="-1"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete purchase
+                                                    <strong>{{ purchase.bill_no }}</strong>?</p>
+                                                <div class="alert alert-warning">
+                                                    <i class="ri-alert-line me-2"></i>
+                                                    This action will reverse all stock transactions associated with this
+                                                    purchase.
+                                                </div>
+                                                <div class="card border-danger mb-3">
+                                                    <div class="card-header bg-danger bg-opacity-10 text-danger">
+                                                        <h6 class="mb-0"><i class="ri-information-line me-1"></i>
+                                                            Purchase Details</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <dl class="row mb-0">
+                                                            <dt class="col-sm-4">Date</dt>
+                                                            <dd class="col-sm-8">{{ purchase.purchase_date.strftime('%Y-%m-%d') }}</dd>
+
+                                                            <dt class="col-sm-4">Supplier</dt>
+                                                            <dd class="col-sm-8">{{ purchase.supplier.name if purchase.supplier else 'N/A' }}</dd>
+
+                                                            <dt class="col-sm-4">Items</dt>
+                                                            <dd class="col-sm-8">{{ purchase.items|length }}</dd>
+
+                                                            <dt class="col-sm-4">Total Amount</dt>
+                                                            <dd class="col-sm-8">{{ "%.2f"|format(purchase.total_amount) }}</dd>
+                                                        </dl>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="ri-close-line me-1"></i> Cancel
+                                                </button>
+                                                <form action="{{ ADMIN + PHARMACY_PURCHASE_DELETE }}/{{ purchase.id }}"
+                                                      method="POST">
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="ri-delete-bin-line me-1"></i> Confirm Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <tr>
+                                    <td colspan="11" class="text-center py-4">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="ri-shopping-cart-line text-muted" style="font-size: 3rem;"></i>
+                                            <h5 class="mt-3">No purchase records found</h5>
+                                            <p class="text-muted">Add your first purchase to get started</p>
+                                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#addPurchaseModal">
+                                                <i class="ri-add-line me-1"></i> Add Purchase
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="importExportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-import-export-line me-2"></i>Export Purchase Records
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="ri-information-line me-2"></i>
+                        Select a date range and export format for purchase records.
+                    </div>
+
+                    <!-- Export Form with Date Range -->
+                    <form id="exportForm" method="GET" action="{{ ADMIN + PHARMACY_PURCHASE_EXPORT }}">
+                        <div class="mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate" name="start_date" required
+                                   value="{{ datetime.today().replace(day=1).strftime('%Y-%m-%d') }}">
+                            {# Defaults to first day of current month #}
+                        </div>
+                        <div class="mb-3">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="endDate" name="end_date" required
+                                   value="{{ datetime.today().strftime('%Y-%m-%d') }}"> {# Defaults to today #}
+                        </div>
+
+                        <label class="form-label d-block mb-2">Select Export Format:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="submit" name="format" value="csv" class="btn btn-outline-primary">
+                                <i class="ri-file-excel-2-line me-1"></i> Export as CSV
+                            </button>
+                            <button type="submit" name="format" value="excel" class="btn btn-outline-success">
+                                <i class="ri-file-excel-line me-1"></i> Export as Excel
+                            </button>
+                            <button type="submit" name="format" value="pdf" class="btn btn-outline-danger">
+                                <i class="ri-file-pdf-line me-1"></i> Export as PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Purchases Modal -->
+    <div class="modal fade" id="restorePurchasesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-refresh-line me-2"></i>Restore Deleted Purchase Records
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if archived_purchases %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Bill No.</th>
+                                    <th>Date</th>
+                                    <th>Supplier</th>
+                                    <th>Items</th>
+                                    <th class="text-end">Total Amount</th>
+                                    <th class="text-end">Paid Amount</th>
+                                    <th class="text-end">Due Amount</th>
+                                    <th>Deleted On</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for purchase in archived_purchases %}
+                                    <tr>
+                                        <td>{{ purchase.bill_no }}</td>
+                                        <td>{{ purchase.purchase_date.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ purchase.supplier.name if purchase.supplier else 'N/A' }}</td>
+                                        <td>{{ purchase.items|length }}</td>
+                                        <td class="text-end">${{ "%.2f"|format(purchase.total_amount) }}</td>
+                                        <td class="text-end">${{ "%.2f"|format(purchase.paid_amount) }}</td>
+                                        <td class="text-end">${{ "%.2f"|format(purchase.due_amount) }}</td>
+                                        <td>{{ purchase.deleted_at.strftime('%Y-%m-%d %H:%M') if purchase.deleted_at else 'Unknown' }}</td>
+                                        <td>
+                                            <form method="POST"
+                                                  action="{{ ADMIN + PHARMACY_PURCHASE_RESTORE }}/{{ purchase.id }}">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-success">
+                                                    <i class="ri-refresh-line me-1"></i> Restore
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="ri-information-line me-2"></i>
+                            No archived purchase records found
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Add Purchase Modal -->
+    <div class="modal fade" id="addPurchaseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-add-line me-2"></i>Add New Purchase
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form id="purchaseForm" method="POST" action="{{ ADMIN + PHARMACY_PURCHASE_ADD }}">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Purchase Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="purchase_date" id="purchase_date" required
+                                       value="{{ datetime.now().strftime('%Y-%m-%d') }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Supplier <span class="text-danger">*</span></label>
+                                <select class="form-select supplier-select" name="supplier_id" id="supplier_id"
+                                        required>
+                                    <option value="">Select Supplier</option>
+                                    {% for supplier in suppliers %}
+                                        <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+                                <select class="form-select payment-mode-select" name="payment_mode" id="payment_mode"
+                                        required>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Credit">Credit</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="ri-medicine-bottle-line me-1"></i> Purchase Items</h6>
+                                <button type="button" class="btn btn-sm btn-primary" id="addItemBtn">
+                                    <i class="ri-add-line me-1"></i> Add Item
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="itemsTable">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th width="25%">Medicine</th>
+                                            <th width="10%">Batch No.</th>
+                                            <th width="10%">Expiry</th>
+                                            <th width="8%">Qty</th>
+                                            <th width="10%">Purchase Price</th>
+                                            <th width="10%">MRP</th>
+                                            <th width="10%">Selling Price</th>
+                                            <th width="10%">Amount</th>
+                                            <th width="7%"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="itemsBody">
+                                        <!-- Default item row will be added here by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" name="note" rows="2"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="ri-calculator-line me-1"></i> Payment Summary</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label">Subtotal</label>
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <span id="subtotal">0.00</span>
+                                                <input type="hidden" name="subtotal" id="subtotal_input" value="0">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label">Discount (%)</label>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" name="discount_percent"
+                                                           id="discount_percent"
+                                                           min="0" max="100" step="0.01" value="0">
+                                                    <span class="input-group-text">%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label">Discount Amount</label>
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <span id="discount_amount">0.00</span>
+                                                <input type="hidden" name="discount_amount" id="discount_amount_input"
+                                                       value="0">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label">Tax Amount</label>
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <span id="tax_amount">0.00</span>
+                                                <input type="hidden" name="tax_amount" id="tax_amount_input" value="0">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label">Total Amount</label>
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <span id="total_amount">0.00</span>
+                                                <input type="hidden" name="total_amount" id="total_amount_input"
+                                                       value="0">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label">Paid Amount</label>
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="number" class="form-control" name="paid_amount"
+                                                       id="paid_amount"
+                                                       min="0" step="0.01" value="0">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label class="form-label">Due Amount</label>
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <span id="due_amount">0.00</span>
+                                                <input type="hidden" name="due_amount" id="due_amount_input" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Purchase
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block headLink %}
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            border: 1px solid #ced4da;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 36px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+        }
+
+        .item-row td {
+            vertical-align: middle;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .default-row .remove-item {
+            visibility: hidden;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            background: white;
+            z-index: 1000;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .medicine-search-container {
+            position: relative;
+        }
+    </style>
+{% endblock %}
+
+{% block footerLink %}
+    <!-- jQuery -->
+    {#<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize purchases table
+
+            // Initialize all select2 dropdowns when modal opens
+            $('#addPurchaseModal').on('shown.bs.modal', function () {
+                // Initialize main form selects
+                $('.supplier-select, .payment-mode-select').select2({
+                    dropdownParent: $('#addPurchaseModal'),
+                    width: '100%'
+                });
+
+                // Add default item row
+                addItemRow(true);
+            });
+
+            // Reset form when modal closes
+            $('#addPurchaseModal').on('hidden.bs.modal', function () {
+                $('#itemsBody').empty();
+                $('#purchaseForm')[0].reset();
+                $('.amount-display').text('0.00');
+                $('input[name^="items"]').val('');
+                $('.supplier-select, .payment-mode-select').val(null).trigger('change');
+                itemIndex = 0; // Reset item index counter
+            });
+
+            // Add new item row
+            let itemIndex = 0;
+            $('#addItemBtn').on('click', function (e) {
+                e.preventDefault();
+                addItemRow(false);
+            });
+
+            function addItemRow(isDefault) {
+                const rowId = 'itemRow_' + itemIndex;
+
+                const batchNumber = generateBatchNumber(); // Generate batch number
+
+                const newRow = `
+        <tr class="item-row ${isDefault ? 'default-row' : ''}" id="${rowId}">
+            <td>
+                <div class="medicine-search-container">
+                    <input type="text" class="form-control medicine-search"
+                           placeholder="Search medicine..." autocomplete="off">
+                    <div class="autocomplete-results" style="display: none;"></div>
+                    <input type="hidden" class="medicine-id" name="items[${itemIndex}][medicine_id]">
+                    <input type="hidden" class="medicine-name">
+                    <input type="hidden" class="medicine-number">
+                </div>
+            </td>
+               <td>
+                <input type="text" class="form-control batch-no" name="items[${itemIndex}][batch_no]"
+                       value="${batchNumber}" required>
+            </td>
+            <td>
+                <input type="date" class="form-control expiry-date" name="items[${itemIndex}][expiry_date]" required>
+            </td>
+            <td>
+                <input type="number" class="form-control quantity" name="items[${itemIndex}][quantity]"
+                       min="1" value="1" required>
+            </td>
+            <td>
+                <input type="number" class="form-control purchase-price" name="items[${itemIndex}][purchase_price]"
+                       min="0" step="0.01" required>
+            </td>
+            <td>
+                <input type="number" class="form-control mrp" name="items[${itemIndex}][mrp]"
+                       min="0" step="0.01" required>
+            </td>
+            <td>
+                <input type="number" class="form-control sale-price" name="items[${itemIndex}][sale_price]"
+                       min="0" step="0.01" required>
+            </td>
+            <td class="text-end item-amount">0.00</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-danger remove-item" ${isDefault ? 'disabled' : ''}>
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </td>
+        </tr>
+    `;
+
+                // Add this function to generate batch numbers
+                function generateBatchNumber() {
+                    const now = new Date();
+                    const year = now.getFullYear().toString().slice(-2);
+                    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                    const day = now.getDate().toString().padStart(2, '0');
+                    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                    return `BATCH-${year}${month}${day}-${random}`;
+                }
+
+                $('#itemsBody').append(newRow);
+
+                const expiryDate = new Date();
+                expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+                $('#' + rowId + ' .expiry-date').val(expiryDate.toISOString().split('T')[0]);
+
+                initMedicineSearch(
+                    $('#' + rowId + ' .medicine-search'),
+                    $('#' + rowId + ' .autocomplete-results'),
+                    $('#' + rowId + ' .medicine-id'),
+                    $('#' + rowId + ' .medicine-name'),
+                    $('#' + rowId + ' .medicine-number'),
+                    $('#' + rowId + ' .sale-price'),
+                    $('#' + rowId + ' .mrp') // <-- pass MRP input
+                );
+
+                if (isDefault) {
+                    $('#' + rowId + ' .medicine-search').focus();
+                }
+
+                itemIndex++;
+            }
+
+            function initMedicineSearch(searchInput, resultsContainer, idInput, nameInput, numberInput, salePriceInput, mrpInput) {
+                let timeout;
+
+                searchInput.on('input', function () {
+                    clearTimeout(timeout);
+                    const searchTerm = $(this).val().trim();
+
+                    if (searchTerm.length < 2) {
+                        resultsContainer.hide();
+                        return;
+                    }
+
+                    timeout = setTimeout(() => {
+                        fetch(`/admin/api/medicines/search?q=${encodeURIComponent(searchTerm)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    resultsContainer.empty();
+                                    data.forEach(medicine => {
+                                        const item = $('<div class="autocomplete-item"></div>')
+                                            .text(`${medicine.name} (${medicine.medicine_number})`)
+                                            .on('click', function () {
+                                                searchInput.val(medicine.name);
+                                                idInput.val(medicine.id);
+                                                nameInput.val(medicine.name);
+                                                numberInput.val(medicine.medicine_number);
+                                                salePriceInput.val(medicine.default_selling_price || '');
+                                                mrpInput.val(medicine.default_mrp || ''); // <-- set MRP here
+                                                resultsContainer.hide();
+                                            });
+                                        resultsContainer.append(item);
+                                    });
+                                    resultsContainer.show();
+                                } else {
+                                    resultsContainer.html('<div class="autocomplete-item">No results found</div>');
+                                    resultsContainer.show();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching medicine data:', error);
+                                resultsContainer.html('<div class="autocomplete-item">Error loading data</div>');
+                                resultsContainer.show();
+                            });
+                    }, 300);
+                });
+
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.medicine-search-container').length) {
+                        resultsContainer.hide();
+                    }
+                });
+            }
+
+            // Remove item row (except default row)
+            $(document).on('click', '.remove-item:not(:disabled)', function () {
+                $(this).closest('tr').remove();
+                calculateTotals();
+            });
+
+            // Calculate item amount when quantity or price changes
+            $(document).on('input', '.quantity, .purchase-price', function () {
+                const row = $(this).closest('tr');
+                calculateRowAmount(row);
+                calculateTotals();
+            });
+
+            function calculateRowAmount(row) {
+                const quantity = parseFloat(row.find('.quantity').val()) || 0;
+                const price = parseFloat(row.find('.purchase-price').val()) || 0;
+                const amount = quantity * price;
+                row.find('.item-amount').text(amount.toFixed(2));
+                return amount;
+            }
+
+            // Calculate discount when percentage changes
+            $('#discount_percent').on('input', function () {
+                calculateTotals();
+            });
+
+            // Calculate due amount when paid amount changes
+            $('#paid_amount').on('input', function () {
+                calculateTotals();
+            });
+
+            // Calculate all totals
+            function calculateTotals() {
+                let subtotal = 0;
+
+                $('.item-row').each(function () {
+                    subtotal += calculateRowAmount($(this));
+                });
+
+                const discountPercent = parseFloat($('#discount_percent').val()) || 0;
+                const discountAmount = subtotal * discountPercent / 100;
+                const taxAmount = 0; // Can be extended for tax calculation
+                const totalAmount = subtotal - discountAmount + taxAmount;
+                const paidAmount = parseFloat($('#paid_amount').val()) || 0;
+                const dueAmount = Math.max(totalAmount - paidAmount, 0);
+
+                // Update display values
+                $('#subtotal').text(subtotal.toFixed(2));
+                $('#subtotal_input').val(subtotal);
+                $('#discount_amount').text(discountAmount.toFixed(2));
+                $('#discount_amount_input').val(discountAmount);
+                $('#tax_amount').text(taxAmount.toFixed(2));
+                $('#tax_amount_input').val(taxAmount);
+                $('#total_amount').text(totalAmount.toFixed(2));
+                $('#total_amount_input').val(totalAmount);
+                $('#due_amount').text(dueAmount.toFixed(2));
+                $('#due_amount_input').val(dueAmount);
+            }
+        });
+    </script>
+{% endblock %}

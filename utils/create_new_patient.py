@@ -11,6 +11,14 @@ from utils.config import db
 from utils.email_utils import send_email
 
 
+def generate_patient_id():
+    current_date = datetime.utcnow()
+    year = current_date.year
+    month = f"{current_date.month:02d}"
+    day = f"{current_date.day:02d}"
+    random_digits = random.randint(10, 99)
+    return int(f"{year}{month}{day}{random_digits}")
+
 def create_new_patient(patient_data):
     print(patient_data)
     # Generate temporary password
@@ -30,20 +38,9 @@ def create_new_patient(patient_data):
     db.session.add(new_user)
     db.session.flush()
 
-    current_date = datetime.utcnow()
-    year = current_date.year
-    month = f"{current_date.month:02d}"
-    day = f"{current_date.day:02d}"
-
-    # Generate random 2-digit number for uniqueness
-    random_digits = random.randint(10, 99)
-
-    # Create a unique user ID in the format of YYYYMMDDXX
-    new_patient_id = f"{year}{month}{day}{random_digits}"
-
     new_patient = Patient(
         user_id=new_user.id,
-        patient_id=new_patient_id,
+        patient_id=generate_patient_id(),
         first_name=patient_data['first_name'],
         last_name=patient_data['last_name'],
         phone=patient_data['phone'],
@@ -60,7 +57,7 @@ def create_new_patient(patient_data):
                                 temp_password=temp_password,
                                 login_url="http://localhost:5000/")
 
-    send_email('Welcome to Our Hospital', new_user.email, body_html)
+    # send_email('Welcome to Our Hospital', new_user.email, body_html)
 
     verification_token = new_user.generate_verification_token()
     verification_link = f"http://localhost:5000/auth/verify-email/{verification_token}"
@@ -68,5 +65,5 @@ def create_new_patient(patient_data):
                                 verification_link=verification_link,
                                 user_name=f"{new_patient.first_name} {new_patient.last_name}")
 
-    send_email('Verify Your Email', new_user.email, body_html)
+    # send_email('Verify Your Email', new_user.email, body_html)
     return new_patient

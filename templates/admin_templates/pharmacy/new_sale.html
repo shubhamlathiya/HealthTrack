@@ -1,0 +1,586 @@
+{% extends 'base.html' %}
+
+{% block title %}New Medicine Sale{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title">
+                    <i class="ri-medicine-bottle-line me-2"></i>New Medicine Sale
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ ADMIN + PHARMACY_SALES_ADD }}" id="saleForm"> {# Use url_for for better practice #}
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Patient ID <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="patientId" name="patient_id" required>
+                                <button class="btn btn-primary" type="button" id="findPatientBtn">
+                                    <i class="ri-search-line me-1"></i> Find
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" id="patientIdFeedback"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Patient Name</label>
+                            <input type="text" class="form-control" id="patientName" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Bill No</label>
+                            {# Bill no is auto-generated on backend, display placeholder #}
+                            <input type="text" class="form-control" value="Auto-generated" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Date</label>
+                            <input type="text" class="form-control"
+                                   value="{{ datetime.now().strftime('%d/%m/%Y %I:%M %p') }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered" id="itemsTable">
+                            <thead class="table-primary">
+                            <tr>
+                                <th width="30%">Medicine</th>
+                                <th width="15%">Batch No</th>
+                                <th width="10%">Expiry Date</th>
+                                <th width="10%">Quantity</th>
+                                <th width="10%">Sale Price ($)</th>
+                                <th width="10%">Tax %</th>
+                                <th width="10%">Amount ($)</th>
+                                <th width="5%"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="item-row">
+                                <td>
+                                    <div class="medicine-search-container">
+                                        <input type="text" class="form-control medicine-search"
+                                               placeholder="Search medicine..." autocomplete="off">
+                                        <div class="autocomplete-results" style="display: none;"></div>
+                                        {# IMPORTANT: name="medicine_id[]" #}
+                                        <input type="hidden" class="medicine-id" name="medicine_id[]">
+                                    </div>
+                                </td>
+                                <td>
+                                    {# IMPORTANT: name="batch_id[]" #}
+                                    <select class="form-select batch-select" name="batch_id[]" required>
+                                        <option value="">Select Batch</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control expiry-date" readonly>
+                                </td>
+                                <td>
+                                    {# IMPORTANT: name="quantity[]" #}
+                                    <input type="number" class="form-control quantity" name="quantity[]" min="1"
+                                           value="1" required>
+                                    <small class="text-muted stock-info"></small>
+                                </td>
+                                <td>
+                                    {# IMPORTANT: name="sale_price[]" #}
+                                    <input type="number" class="form-control sale-price" name="sale_price[]" step="0.01"
+                                           required readonly> {# Made readonly - price comes from batch #}
+                                </td>
+                                <td>
+                                    {# IMPORTANT: name="tax_rate[]" #}
+                                    <input type="number" class="form-control tax-rate" name="tax_rate[]" value="0"
+                                           step="0.01">
+                                </td>
+                                <td>
+                                    {# IMPORTANT: name="amount[]" #}
+                                    <input type="number" class="form-control amount" name="amount[]" readonly>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm remove-row">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-primary btn-sm" id="addRow">
+                            <i class="ri-add-line me-1"></i> Add Item
+                        </button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Doctor</label>
+                                <select class="form-select" name="doctor_id">
+                                    <option value="">Select Doctor (Optional)</option>
+                                    {% for doctor in doctors %}
+                                        <option value="{{ doctor.id }}">{{ doctor.first_name }} {{ doctor.last_name }}
+                                            {% if doctor.hospital %}- {{ doctor.hospital }}{% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Note</label>
+                                <textarea class="form-control" name="note" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <label>Total (before discount & tax)</label>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <span id="totalAmountDisplay">0.00</span>
+                                            <input type="hidden" name="total_amount" id="totalAmount" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-4">
+                                            <label>Discount ($)</label>
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="number" class="form-control form-control-sm"
+                                                   name="discount_amount" value="0" step="0.01" id="discountAmount">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="number" class="form-control form-control-sm" value="0"
+                                                   step="0.01" id="discountPercent">
+                                            <small>%</small>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <label>Total Tax ($)</label>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <span id="taxAmountDisplay">0.00</span>
+                                            <input type="hidden" name="tax_amount" id="taxAmount" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <label><strong>Net Amount ($)</strong></label>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <strong><span id="netAmountDisplay">0.00</span></strong>
+                                            <input type="hidden" name="net_amount" id="netAmount" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Payment Mode</label>
+                                            <select class="form-select" name="payment_mode" required>
+                                                <option value="Cash">Cash</option>
+                                                <option value="Card">Card</option>
+                                                <option value="Bank Transfer">Bank Transfer</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Payment Amount ($)</label>
+                                            <input type="number" class="form-control" name="payment_amount" step="0.01"
+                                                   required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button type="reset" class="btn btn-secondary me-2">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Sale
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footerLink %}
+    <style>
+        .medicine-search-container {
+            position: relative;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            background: white;
+            z-index: 1000;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            // Patient search functionality
+            $('#findPatientBtn').click(function () {
+                const patientId = $('#patientId').val();
+                const findPatientBtn = $(this);
+                const patientIdInput = $('#patientId');
+                const patientNameInput = $('#patientName');
+                const patientIdFeedback = $('#patientIdFeedback');
+
+                if (!patientId) {
+                    patientIdInput.addClass('is-invalid');
+                    patientIdFeedback.text('Please enter a patient ID.');
+                    return;
+                }
+
+                findPatientBtn.html('<i class="ri-loader-4-line spin"></i> Searching...');
+                findPatientBtn.prop('disabled', true);
+                patientIdInput.removeClass('is-invalid is-valid'); // Clear previous states
+
+                // Make AJAX request to fetch patient details
+                fetch(`/admin/get-patient/${patientId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            // Check if the response is JSON, otherwise default message
+                            return response.json().catch(() => ({message: 'Patient not found or server error.'}))
+                                .then(err => { throw new Error(err.message || 'Patient not found'); });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Populate patient name field
+                        patientNameInput.val(data.name);
+                        patientIdInput.removeClass('is-invalid').addClass('is-valid');
+                        patientIdFeedback.text(''); // Clear any previous feedback
+                    })
+                    .catch(error => {
+                        patientNameInput.val('');
+                        patientIdInput.removeClass('is-valid').addClass('is-invalid');
+                        patientIdFeedback.text(error.message || 'Patient not found.');
+                    })
+                    .finally(() => {
+                        findPatientBtn.html('<i class="ri-search-line"></i> Find');
+                        findPatientBtn.prop('disabled', false);
+                    });
+            });
+
+            // Add new row
+            $('#addRow').click(function () {
+                const newRow = $('.item-row:first').clone();
+                newRow.find('input, select').val(''); // Clear all input/select values
+                newRow.find('.batch-select').empty().append('<option value="">Select Batch</option>'); // Reset batch select
+                newRow.find('.quantity').val('1').attr('max', ''); // Reset quantity to 1, clear max
+                newRow.find('.tax-rate').val('0'); // Reset tax rate to 0
+                newRow.find('.sale-price').prop('readonly', true); // Ensure new row price is readonly
+                newRow.find('.stock-info').text('');
+                newRow.find('.autocomplete-results').empty().hide(); // Clear and hide results for new row
+                $('#itemsTable tbody').append(newRow);
+
+                // Initialize medicine search for the new row
+                initMedicineSearch(newRow);
+                calculateTotals(); // Recalculate totals after adding a new row
+            });
+
+            // Remove row
+            $(document).on('click', '.remove-row', function () {
+                if ($('.item-row').length > 1) {
+                    $(this).closest('tr').remove();
+                    calculateTotals();
+                } else {
+                    alert('At least one item is required.');
+                }
+            });
+
+            // Initialize medicine search for all existing rows on document ready
+            $('.item-row').each(function() {
+                initMedicineSearch($(this));
+                calculateRowAmount($(this)); // Initial calculation for existing rows
+            });
+
+            function initMedicineSearch(row) {
+                const searchInput = row.find('.medicine-search');
+                const resultsContainer = row.find('.autocomplete-results');
+                const medicineIdInput = row.find('.medicine-id');
+                const batchSelect = row.find('.batch-select');
+                const expiryInput = row.find('.expiry-date');
+                const priceInput = row.find('.sale-price');
+                const quantityInput = row.find('.quantity');
+                const stockInfo = row.find('.stock-info');
+                let timeout;
+
+                // Clear previous listeners to prevent duplicates on cloned rows
+                searchInput.off('input');
+                batchSelect.off('change');
+                quantityInput.off('input');
+                priceInput.off('input');
+                row.find('.tax-rate').off('input');
+
+
+                searchInput.on('input', function () {
+                    clearTimeout(timeout);
+                    const searchTerm = $(this).val().trim();
+
+                    // Clear previously selected medicine/batch data
+                    medicineIdInput.val('');
+                    batchSelect.empty().append('<option value="">Select Batch</option>');
+                    expiryInput.val('');
+                    priceInput.val('');
+                    quantityInput.val('1').attr('max', '');
+                    stockInfo.text('');
+                    calculateRowAmount(row);
+
+
+                    if (searchTerm.length < 2) {
+                        resultsContainer.hide();
+                        return;
+                    }
+
+                    timeout = setTimeout(() => {
+                        fetch(`/admin/api/medicines/search?q=${encodeURIComponent(searchTerm)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                resultsContainer.empty();
+                                if (data.length > 0) {
+                                    data.forEach(medicine => {
+                                        const item = $('<div class="autocomplete-item"></div>')
+                                            .text(`${medicine.name} (${medicine.medicine_number})`)
+                                            .on('click', function () {
+                                                searchInput.val(medicine.name);
+                                                medicineIdInput.val(medicine.id);
+                                                resultsContainer.hide();
+
+                                                batchSelect.empty().append('<option value="">Select Batch</option>'); // Reset batch select
+
+                                                // Fetch batches for this medicine
+                                                fetch(`/admin/api/medicine-batches/${medicine.id}`)
+                                                    .then(response => response.json())
+                                                    .then(batches => {
+                                                        if (batches.length > 0) {
+                                                            batches.forEach(batch => {
+                                                                // Use toFixed(2) for display price to ensure 2 decimal places
+                                                                const optionText = `${batch.batch_no} (Exp: ${batch.expiry_date}, Stock: ${batch.current_stock}, Price: $${batch.selling_price.toFixed(2)})`;
+                                                                const option = `<option value="${batch.id}"
+                                                                                data-batch-no="${batch.batch_no}"
+                                                                                data-expiry-date="${batch.expiry_date}"
+                                                                                data-selling-price="${batch.selling_price}"
+                                                                                data-current-stock="${batch.current_stock}">
+                                                                                ${optionText}
+                                                                            </option>`;
+                                                                batchSelect.append(option);
+                                                            });
+                                                            // Auto-select the first batch if only one, or the first available with stock and not expired
+                                                            const availableBatches = batches.filter(b => b.current_stock > 0 && b.days_to_expiry > 0);
+                                                            if (availableBatches.length > 0) {
+                                                                batchSelect.val(availableBatches[0].id).trigger('change');
+                                                            } else {
+                                                                batchSelect.empty().append('<option value="">No stock/Expired batches</option>');
+                                                                expiryInput.val('N/A');
+                                                                priceInput.val('0.00');
+                                                                quantityInput.val('0').attr('max', '0');
+                                                                stockInfo.text('No available batches');
+                                                                calculateRowAmount(row);
+                                                                calculateTotals();
+                                                            }
+                                                        } else {
+                                                            batchSelect.empty().append('<option value="">No Batches</option>');
+                                                            expiryInput.val('N/A');
+                                                            priceInput.val('0.00');
+                                                            quantityInput.val('0').attr('max', '0');
+                                                            stockInfo.text('No available batches');
+                                                            calculateRowAmount(row);
+                                                            calculateTotals();
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        console.error('Error fetching batches:', error);
+                                                        batchSelect.empty().append('<option value="">Error Loading Batches</option>');
+                                                        expiryInput.val('Error');
+                                                        priceInput.val('0.00');
+                                                        quantityInput.val('0').attr('max', '0');
+                                                        stockInfo.text('Error fetching batches');
+                                                        calculateRowAmount(row);
+                                                        calculateTotals();
+                                                    });
+                                            });
+                                        resultsContainer.append(item);
+                                    });
+                                    resultsContainer.show();
+                                } else {
+                                    resultsContainer.html('<div class="autocomplete-item">No results found</div>');
+                                    resultsContainer.show();
+                                }
+                            });
+                    }, 300);
+                });
+
+                // Handle batch selection change
+                batchSelect.on('change', function() {
+                    const selectedOption = $(this).find('option:selected');
+                    if (selectedOption.val()) {
+                        expiryInput.val(selectedOption.data('expiry-date'));
+                        priceInput.val(selectedOption.data('selling-price').toFixed(2)); // Set price from batch
+                        const currentStock = selectedOption.data('current-stock');
+                        quantityInput.attr('max', currentStock);
+                        stockInfo.text(`${currentStock} available`);
+
+                        // Ensure quantity does not exceed available stock
+                        let currentQuantity = parseInt(quantityInput.val());
+                        if (isNaN(currentQuantity) || currentQuantity === 0) {
+                            currentQuantity = 1; // Default to 1 if empty or 0
+                        }
+                        if (currentQuantity > currentStock) {
+                            quantityInput.val(currentStock);
+                        }
+                        if (currentStock === 0) {
+                            stockInfo.text('Out of stock');
+                            quantityInput.val(0); // Set quantity to 0 if out of stock
+                        } else if (parseInt(quantityInput.val()) === 0) {
+                            quantityInput.val(1); // If stock becomes available, set quantity to 1
+                        }
+                    } else {
+                        expiryInput.val('');
+                        priceInput.val('');
+                        quantityInput.val('1').attr('max', '');
+                        stockInfo.text('');
+                    }
+                    calculateRowAmount(row);
+                    calculateTotals();
+                });
+
+                // Enforce quantity max on input
+                quantityInput.on('input', function() {
+                    const max = parseInt($(this).attr('max'));
+                    let currentVal = parseInt($(this).val());
+                    if (isNaN(currentVal) || currentVal < 0) {
+                        currentVal = 0;
+                    }
+                    if (max && currentVal > max) {
+                        $(this).val(max);
+                    }
+                    calculateRowAmount(row);
+                    calculateTotals();
+                });
+
+                // Recalculate if sale price or tax rate manually changed (if not readonly)
+                priceInput.on('input', function() { calculateRowAmount(row); calculateTotals(); });
+                row.find('.tax-rate').on('input', function() { calculateRowAmount(row); calculateTotals(); });
+
+
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.medicine-search-container').length) {
+                        resultsContainer.hide();
+                    }
+                });
+            }
+
+            // Function to calculate amount for a single row
+            function calculateRowAmount(row) {
+                const quantity = parseFloat(row.find('.quantity').val()) || 0;
+                const price = parseFloat(row.find('.sale-price').val()) || 0;
+                const taxRate = parseFloat(row.find('.tax-rate').val()) || 0;
+
+                const itemSubtotal = quantity * price;
+                const itemTax = itemSubtotal * (taxRate / 100);
+                const totalAmountForRow = itemSubtotal + itemTax;
+
+                row.find('.amount').val(totalAmountForRow.toFixed(2));
+            }
+
+            // Discount calculation
+            $('#discountAmount, #discountPercent').on('input', function () {
+                const totalBeforeDiscount = parseFloat($('#totalAmountDisplay').text()) || 0;
+
+                if ($(this).attr('id') === 'discountAmount') {
+                    let discountAmount = parseFloat($(this).val()) || 0;
+                    if (discountAmount < 0) discountAmount = 0;
+                    if (discountAmount > totalBeforeDiscount) discountAmount = totalBeforeDiscount; // Cap discount
+
+                    const discountPercent = (totalBeforeDiscount > 0) ? (discountAmount / totalBeforeDiscount) * 100 : 0;
+                    $('#discountPercent').val(discountPercent.toFixed(2));
+                    $(this).val(discountAmount.toFixed(2)); // Re-set to capped value
+                } else { // discountPercent
+                    let discountPercent = parseFloat($(this).val()) || 0;
+                    if (discountPercent < 0) discountPercent = 0;
+                    if (discountPercent > 100) discountPercent = 100; // Cap percent
+
+                    const discountAmount = totalBeforeDiscount * (discountPercent / 100);
+                    $('#discountAmount').val(discountAmount.toFixed(2));
+                    $(this).val(discountPercent.toFixed(2)); // Re-set to capped value
+                }
+
+                calculateNetAmount();
+            });
+
+            // Calculate all totals
+            function calculateTotals() {
+                let subtotalOfItems = 0; // Sum of (quantity * sale_price)
+                let totalTaxFromItems = 0; // Sum of tax amounts from each item
+
+                $('.item-row').each(function () {
+                    const quantity = parseFloat($(this).find('.quantity').val()) || 0;
+                    const price = parseFloat($(this).find('.sale-price').val()) || 0;
+                    const taxRate = parseFloat($(this).find('.tax-rate').val()) || 0;
+
+                    const itemSubtotal = quantity * price; // Subtotal for this item (before tax)
+                    const itemTax = itemSubtotal * (taxRate / 100); // Tax for this item
+                    const itemTotalWithTax = itemSubtotal + itemTax;
+
+                    $(this).find('.amount').val(itemTotalWithTax.toFixed(2));
+                    subtotalOfItems += itemSubtotal; // This is the total_amount for the sale record
+                    totalTaxFromItems += itemTax; // This is the tax_amount for the sale record
+                });
+
+                $('#totalAmountDisplay').text(subtotalOfItems.toFixed(2));
+                $('#totalAmount').val(subtotalOfItems.toFixed(2)); // Hidden input for total_amount
+
+                $('#taxAmountDisplay').text(totalTaxFromItems.toFixed(2));
+                $('#taxAmount').val(totalTaxFromItems.toFixed(2)); // Hidden input for tax_amount
+
+                calculateNetAmount();
+            }
+
+            // Calculate net amount and synchronize with payment amount
+            function calculateNetAmount() {
+                const totalAmount = parseFloat($('#totalAmount').val()) || 0; // Use value from hidden input
+                const discount = parseFloat($('#discountAmount').val()) || 0;
+                const tax = parseFloat($('#taxAmount').val()) || 0; // Use value from hidden input
+
+                let netAmount = totalAmount - discount + tax;
+                if (netAmount < 0) netAmount = 0; // Prevent negative net amount
+
+                $('#netAmountDisplay').text(netAmount.toFixed(2));
+                $('#netAmount').val(netAmount.toFixed(2)); // Hidden input for net_amount
+
+                // Set payment amount to match net amount by default, user can change
+                $('input[name="payment_amount"]').val(netAmount.toFixed(2));
+            }
+
+            // Listen to changes on quantity, sale-price, tax-rate, discount for total recalculation
+            $(document).on('input', '.quantity, .sale-price, .tax-rate', function() {
+                calculateTotals();
+            });
+
+            // Initial calculation on page load
+            calculateTotals();
+        });
+    </script>
+{% endblock %}
