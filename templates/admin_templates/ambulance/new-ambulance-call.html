@@ -1,0 +1,604 @@
+{% extends 'base.html' %}
+
+{% block title %}New Ambulance Call{% endblock title %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title">
+                    <i class="ri-ambulance-line me-2"></i>New Ambulance Call
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ ADMIN + AMBULANCE_AMBULANCE_ADD_CALL }}" id="ambulanceCallForm">
+                    {# Patient Information Section #}
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Patient Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Patient ID <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="patientSearchInput"
+                                                       placeholder="Search by ID, Name, Phone..." autocomplete="off" required>
+                                                <button class="btn btn-primary" type="button" id="findPatientBtn">
+                                                    <i class="ri-search-line me-1"></i> Find
+                                                </button>
+                                            </div>
+                                            <div class="autocomplete-results list-group mt-1" id="patientSearchResults"
+                                                 style="display: none;"></div>
+                                            <input type="hidden" class="form-control" id="patientId" name="patient_id">
+                                            <div class="invalid-feedback" id="patientSearchFeedback"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Patient Name</label>
+                                            <input type="text" class="form-control" id="patientName" readonly>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Age</label>
+                                            <input type="number" class="form-control" id="patientAge" name="patient_age" min="0"
+                                                   required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Gender</label>
+                                            <select class="form-select" id="patientGender" name="patient_gender" required>
+                                                <option value="">Select</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3" id="newPatientFields" style="display: none;">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="patientEmail" name="patient_email">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Phone</label>
+                                            <input type="text" class="form-control" id="patientPhone" name="patient_phone">
+                                        </div>
+                                    </div>
+                                    <div class="text-end mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-info" id="createNewPatientBtn">
+                                            <i class="ri-user-add-line me-1"></i> New Patient
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Call Details Section #}
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Call Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Vehicle Model <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="ambulanceSelect" name="ambulance_id" required>
+                                                <option value="">Select Ambulance</option>
+                                                {% for ambulance in ambulances %}
+                                                    <option value="{{ ambulance.id }}"
+                                                            data-base-rate="{{ ambulance.base_rate }}"
+                                                            data-per-km-rate="{{ ambulance.per_km_rate }}"
+                                                            data-driver-id="{{ ambulance.driver_id }}">
+                                                        {{ ambulance.vehicle_name }} ({{ ambulance.vehicle_number }})
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Driver Name</label>
+                                            <select class="form-select" id="ambulanceDriverSelect" name="driver_id" required>
+                                                <option value="">Select Driver</option>
+                                                {% for driver in drivers %}
+                                                    <option value="{{ driver.id }}">{{ driver.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Date</label>
+                                            <input type="text" class="form-control"
+                                                   value="{{ datetime.now().strftime('%d/%m/%Y %I:%M %p') }}" readonly>
+                                            <input type="hidden" name="call_time" value="{{ datetime.utcnow().isoformat() }}">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Pickup Location <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="pickup_location" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Destination</label>
+                                            <input type="text" class="form-control" name="destination">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Distance (km)</label>
+                                            <input type="number" class="form-control" id="distance" name="distance" step="0.1"
+                                                   min="0" value="0">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Notes</label>
+                                            <textarea class="form-control" name="notes" rows="1"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Additional Charges Section #}
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Additional Charges</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="additionalChargesTable">
+                                            <thead class="table-primary">
+                                            <tr>
+                                                <th width="30%">Charge Category</th>
+                                                <th width="30%">Charge Name</th>
+                                                <th width="20%">Amount (₹)</th>
+                                                <th width="15%">Notes</th>
+                                                <th width="5%"></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr class="charge-item-row">
+                                                <td>
+                                                    <select class="form-select charge-category-select" name="charge_categories[0][category_id]" required>
+                                                        <option value="">Select Category</option>
+                                                        {% for category in charge_categories %}
+                                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-select charge-item-select" name="charge_categories[0][charge_id]" required>
+                                                        <option value="">Select Charge</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control charge-amount" name="charge_categories[0][amount]" step="0.01" min="0" value="0" required>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control charge-note" name="charge_categories[0][note]">
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger btn-sm remove-charge-row">
+                                                        <i class="ri-delete-bin-line"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" class="btn btn-primary btn-sm mt-2" id="addChargeRow">
+                                        <i class="ri-add-line me-1"></i> Add Additional Charge
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Billing Summary Section #}
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Billing Summary</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 offset-md-6">
+                                            <div class="card bg-light">
+                                                <div class="card-body">
+                                                    <div class="row mb-2">
+                                                        <div class="col-6 text-dark fw-bold">Base Charge</div>
+                                                        <div class="col-6 text-end">
+                                                            <span id="baseChargeDisplay" class="fw-bold">₹0.00</span>
+                                                            <input type="hidden" name="base_charge" id="baseChargeInput" value="0">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-2">
+                                                        <div class="col-6 text-dark fw-bold">Distance Charge</div>
+                                                        <div class="col-6 text-end">
+                                                            <span id="distanceChargeDisplay" class="fw-bold">₹0.00</span>
+                                                            <input type="hidden" name="distance_charge" id="distanceChargeInput" value="0">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-2">
+                                                        <div class="col-6 text-dark fw-bold">Additional Charges Total</div>
+                                                        <div class="col-6 text-end">
+                                                            <span id="additionalChargesTotalDisplay" class="fw-bold">₹0.00</span>
+                                                            <input type="hidden" name="additional_charges_total"
+                                                                   id="additionalChargesTotalInput" value="0">
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="row mb-2">
+                                                        <div class="col-6">
+                                                            <label>Subtotal (₹)</label>
+                                                        </div>
+                                                        <div class="col-6 text-end">
+                                                            <span id="subtotalDisplay">₹0.00</span>
+                                                            <input type="hidden" name="subtotal" id="subtotalInput" value="0">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-2 align-items-center">
+                                                        <div class="col-4">
+                                                            <label>Discount (₹)</label>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <input type="number" class="form-control form-control-sm"
+                                                                   name="discount_amount" value="0" step="0.01"
+                                                                   id="discountAmountInput">
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="number" class="form-control form-control-sm" value="0"
+                                                                       step="0.01" id="discountPercentInput"
+                                                                       aria-label="Discount Percent">
+                                                                <span class="input-group-text">%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-2 align-items-center">
+                                                        <div class="col-4">
+                                                            <label>Tax (%)</label>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <input type="number" class="form-control form-control-sm" value="0"
+                                                                   step="0.01" id="taxPercentInput" name="tax_percent"
+                                                                   aria-label="Tax Percent">
+                                                        </div>
+                                                        <div class="col-4 text-end">
+                                                            <span id="taxAmountDisplay">₹0.00</span>
+                                                            <input type="hidden" name="tax_amount" id="taxAmountInput" value="0">
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-3">
+                                                    <div class="row mb-3">
+                                                        <div class="col-6">
+                                                            <label class="fs-5"><strong>Total Amount (₹)</strong></label>
+                                                        </div>
+                                                        <div class="col-6 text-end">
+                                                            <strong class="fs-5"><span id="totalAmountDisplay">₹0.00</span></strong>
+                                                            <input type="hidden" name="total_amount" id="totalAmountInput" value="0">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Payment Mode <span
+                                                                    class="text-danger">*</span></label>
+                                                            <select class="form-select" name="payment_mode" required>
+                                                                <option value="Cash">Cash</option>
+                                                                <option value="Card">Card</option>
+                                                                <option value="Bank Transfer">Bank Transfer</option>
+                                                                <option value="UPI">UPI</option>
+                                                                <option value="Online">Online</option>
+                                                                <option value="Other">Other</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Payment Amount (₹) <span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="number" class="form-control" name="paid_amount" step="0.01"
+                                                                   min="0" value="0" required>
+                                                            <input type="hidden" name="due_amount" value="0">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button type="reset" class="btn btn-secondary me-2">
+                            <i class="ri-close-line me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Ambulance Call
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footerLink %}
+    <script>
+        $(document).ready(function () {
+            // --- Patient Search and New Patient Logic ---
+            const patientSearchInput = $('#patientSearchInput');
+            const patientSearchResults = $('#patientSearchResults');
+            const patientIdInput = $('#patientId');
+            const patientNameInput = $('#patientName');
+            const patientAgeInput = $('#patientAge');
+            const patientGenderSelect = $('#patientGender');
+            const newPatientFields = $('#newPatientFields');
+            const patientEmailInput = $('#patientEmail');
+            const patientPhoneInput = $('#patientPhone');
+            const createNewPatientBtn = $('#createNewPatientBtn');
+
+            let patientSearchTimeout;
+
+            patientSearchInput.on('keyup', function () {
+                clearTimeout(patientSearchTimeout);
+                const query = $(this).val().trim();
+
+                if (query.length < 2) {
+                    patientSearchResults.empty().hide();
+                    return;
+                }
+
+                patientSearchTimeout = setTimeout(function () {
+                    $.get('/admin/api/patients/search', {q: query}, function (data) {
+                        patientSearchResults.empty();
+                        if (data.length > 0) {
+                            $.each(data, function (index, patient) {
+                                const patientDisplay = `${patient.name} (${patient.phone || patient.email || 'N/A'})`;
+                                const listItem = $('<a href="#" class="list-group-item list-group-item-action"></a>')
+                                    .text(patientDisplay)
+                                    .data('patient', patient);
+                                patientSearchResults.append(listItem);
+                            });
+                            patientSearchResults.show();
+                        } else {
+                            patientSearchResults.hide();
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        console.error("Patient search failed:", textStatus, errorThrown);
+                        patientSearchResults.empty().hide();
+                    });
+                }, 300);
+            });
+
+            patientSearchResults.on('click', '.list-group-item', function (e) {
+                e.preventDefault();
+                const selectedPatient = $(this).data('patient');
+
+                patientIdInput.val(selectedPatient.id);
+                patientNameInput.val(selectedPatient.name);
+                patientAgeInput.val(selectedPatient.age);
+                patientGenderSelect.val(selectedPatient.gender);
+
+                newPatientFields.hide();
+                patientEmailInput.prop('required', false);
+                patientPhoneInput.prop('required', false);
+                patientSearchInput.removeClass('is-invalid');
+                $('#patientSearchFeedback').empty();
+
+                patientSearchResults.hide();
+                patientSearchInput.val(selectedPatient.name);
+            });
+
+            createNewPatientBtn.on('click', function () {
+                patientIdInput.val('');
+                patientNameInput.val('');
+                patientAgeInput.val('');
+                patientGenderSelect.val('');
+
+                newPatientFields.toggle();
+                const isNewPatientVisible = newPatientFields.is(':visible');
+                patientEmailInput.prop('required', isNewPatientVisible);
+                patientPhoneInput.prop('required', isNewPatientVisible);
+
+                patientSearchResults.empty().hide();
+                patientSearchInput.val('');
+                if (isNewPatientVisible) {
+                    patientSearchInput.focus();
+                }
+            });
+
+            // --- Dynamic Additional Charges Table ---
+            const additionalChargesTableBody = $('#additionalChargesTable tbody');
+            const addChargeRowBtn = $('#addChargeRow');
+            const allChargeItems = [
+                {% for item in charge_items %}
+                    {
+                        "id": {{ item.id }},
+                        "name": "{{ item.name }}",
+                        "standard_charge": {{ item.standard_charge }},
+                        "category_id": {{ item.category_id }}
+                    },
+                {% endfor %}
+            ];
+
+            let chargeRowIndex = 1; // Start from 1 since we have one row by default
+
+            addChargeRowBtn.on('click', function () {
+                const newRow = `
+                <tr class="charge-item-row">
+                    <td>
+                        <select class="form-select charge-category-select" name="charge_categories[${chargeRowIndex}][category_id]" required>
+                            <option value="">Select Category</option>
+                            {% for category in charge_categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select charge-item-select" name="charge_categories[${chargeRowIndex}][charge_id]" required>
+                            <option value="">Select Charge</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control charge-amount" name="charge_categories[${chargeRowIndex}][amount]" step="0.01" min="0" value="0" required>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control charge-note" name="charge_categories[${chargeRowIndex}][note]">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm remove-charge-row">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </td>
+                </tr>
+                `;
+                additionalChargesTableBody.append(newRow);
+                chargeRowIndex++;
+                updateCalculations();
+            });
+
+            additionalChargesTableBody.on('click', '.remove-charge-row', function () {
+                if (additionalChargesTableBody.find('.charge-item-row').length > 1) {
+                    $(this).closest('tr').remove();
+                    updateCalculations();
+                } else {
+                    alert("At least one additional charge item is required.");
+                }
+            });
+
+            // Filter Charge Items based on selected Category
+            additionalChargesTableBody.on('change', '.charge-category-select', function () {
+                const selectedCategoryId = $(this).val();
+                const chargeItemSelect = $(this).closest('tr').find('.charge-item-select');
+                chargeItemSelect.empty().append('<option value="">Select Charge</option>');
+
+                if (selectedCategoryId) {
+                    const filteredItems = allChargeItems.filter(item => item.category_id == selectedCategoryId);
+                    $.each(filteredItems, function (index, item) {
+                        chargeItemSelect.append(`<option value="${item.id}" data-standard-charge="${item.standard_charge}">${item.name}</option>`);
+                    });
+                }
+                $(this).closest('tr').find('.charge-amount').val(0);
+                updateCalculations();
+            });
+
+            // Populate Charge Amount when Charge Item is selected
+            additionalChargesTableBody.on('change', '.charge-item-select', function () {
+                const selectedOption = $(this).find('option:selected');
+                const standardCharge = parseFloat(selectedOption.data('standard-charge')) || 0;
+                $(this).closest('tr').find('.charge-amount').val(standardCharge.toFixed(2));
+                updateCalculations();
+            });
+
+            // --- Calculation Logic ---
+            const ambulanceSelect = $('#ambulanceSelect');
+            const distanceInput = $('#distance');
+            const baseChargeDisplay = $('#baseChargeDisplay');
+            const baseChargeInput = $('#baseChargeInput');
+            const distanceChargeDisplay = $('#distanceChargeDisplay');
+            const distanceChargeInput = $('#distanceChargeInput');
+            const additionalChargesTotalDisplay = $('#additionalChargesTotalDisplay');
+            const additionalChargesTotalInput = $('#additionalChargesTotalInput');
+            const subtotalDisplay = $('#subtotalDisplay');
+            const subtotalInput = $('#subtotalInput');
+            const discountAmountInput = $('#discountAmountInput');
+            const discountPercentInput = $('#discountPercentInput');
+            const taxPercentInput = $('#taxPercentInput');
+            const taxAmountDisplay = $('#taxAmountDisplay');
+            const taxAmountInput = $('#taxAmountInput');
+            const totalAmountDisplay = $('#totalAmountDisplay');
+            const totalAmountInput = $('#totalAmountInput');
+            const paidAmountInput = $('[name="paid_amount"]');
+            const dueAmountInput = $('[name="due_amount"]');
+
+            function updateCalculations() {
+                let baseRate = parseFloat(ambulanceSelect.find('option:selected').data('base-rate')) || 0;
+                let perKmRate = parseFloat(ambulanceSelect.find('option:selected').data('per-km-rate')) || 0;
+                let distance = parseFloat(distanceInput.val()) || 0;
+
+                let currentBaseCharge = baseRate;
+                let currentDistanceCharge = distance * perKmRate;
+                let currentAdditionalCharges = 0;
+
+                $('.charge-item-row').each(function () {
+                    const amount = parseFloat($(this).find('.charge-amount').val()) || 0;
+                    currentAdditionalCharges += amount;
+                });
+
+                baseChargeDisplay.text('₹' + currentBaseCharge.toFixed(2));
+                baseChargeInput.val(currentBaseCharge.toFixed(2));
+                distanceChargeDisplay.text('₹' + currentDistanceCharge.toFixed(2));
+                distanceChargeInput.val(currentDistanceCharge.toFixed(2));
+                additionalChargesTotalDisplay.text('₹' + currentAdditionalCharges.toFixed(2));
+                additionalChargesTotalInput.val(currentAdditionalCharges.toFixed(2));
+
+                let subtotal = currentBaseCharge + currentDistanceCharge + currentAdditionalCharges;
+                subtotalDisplay.text('₹' + subtotal.toFixed(2));
+                subtotalInput.val(subtotal.toFixed(2));
+
+                let discountAmount = parseFloat(discountAmountInput.val()) || 0;
+                let discountPercent = parseFloat(discountPercentInput.val()) || 0;
+
+                if (discountPercent > 0) {
+                    discountAmount = subtotal * (discountPercent / 100);
+                    discountAmountInput.val(discountAmount.toFixed(2));
+                } else if (discountAmount > 0 && subtotal > 0) {
+                    discountPercent = (discountAmount / subtotal) * 100;
+                    discountPercentInput.val(discountPercent.toFixed(2));
+                }
+
+                let amountAfterDiscount = subtotal - discountAmount;
+
+                let taxPercent = parseFloat(taxPercentInput.val()) || 0;
+                let taxAmount = amountAfterDiscount * (taxPercent / 100);
+
+                taxAmountDisplay.text('₹' + taxAmount.toFixed(2));
+                taxAmountInput.val(taxAmount.toFixed(2));
+
+                let netAmount = amountAfterDiscount + taxAmount;
+                totalAmountDisplay.text('₹' + netAmount.toFixed(2));
+                totalAmountInput.val(netAmount.toFixed(2));
+
+                // Set Payment Amount and Due Amount
+                paidAmountInput.val(netAmount.toFixed(2));
+                dueAmountInput.val('0');
+            }
+
+            // Event listeners for calculation triggers
+            ambulanceSelect.on('change', updateCalculations);
+            distanceInput.on('input', updateCalculations);
+            additionalChargesTableBody.on('input', '.charge-amount', updateCalculations);
+            discountAmountInput.on('input', function () {
+                discountPercentInput.val(0);
+                updateCalculations();
+            });
+            discountPercentInput.on('input', function () {
+                discountAmountInput.val(0);
+                updateCalculations();
+            });
+            taxPercentInput.on('input', updateCalculations);
+
+            // Auto-select driver when ambulance changes
+            ambulanceSelect.on('change', function () {
+                const selectedAmbulanceOption = $(this).find('option:selected');
+                const driverId = selectedAmbulanceOption.data('driver-id');
+
+                if (driverId) {
+                    ambulanceDriverSelect.val(driverId);
+                } else {
+                    ambulanceDriverSelect.val('');
+                }
+                updateCalculations();
+            });
+
+
+            // Initial calculation on page load
+            updateCalculations();
+            ambulanceSelect.trigger('change');
+        });
+    </script>
+{% endblock footerLink %}

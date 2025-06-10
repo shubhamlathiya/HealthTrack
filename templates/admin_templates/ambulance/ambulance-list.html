@@ -7,18 +7,21 @@
     <div class="row gx-4">
         <div class="col-sm-12">
             <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title">Ambulance List</h5>
-                    <div>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#addAmbulanceModal">
-                            <i class="ri-add-line me-1"></i> Add Ambulance
-                        </button>
-                        <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal"
-                                data-bs-target="#restoreAmbulancesModal">
-                            <i class="ri-refresh-line me-1"></i> Restore Deleted
-                        </button>
-                    </div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-price-tag-3-line me-2"></i>Ambulance Management
+                    </h5>
+                    <button class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addAmbulanceModal">
+                        <i class="ri-add-line me-1"></i>Add Ambulance
+                    </button>
+                    <button type="button" class="btn btn-info ms-1" data-bs-toggle="modal"
+                            data-bs-target="#importExportModal">
+                        <i class="ri-import-line me-1"></i> Import/Export
+                    </button>
+                    <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                            data-bs-target="#restoreAmbulancesModal">
+                        <i class="ri-refresh-line"></i> View & Restore Deleted Records
+                    </button>
                 </div>
                 <div class="card-body">
                     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -33,14 +36,12 @@
                     {% endwith %}
 
                     <div class="table-responsive">
-                        <table id="basicExample" class="table m-0 align-middle">
+                        <table id="ambulanceTable" class="table m-0 align-middle">
                             <thead class="table-light">
                             <tr>
                                 <th>Vehicle No</th>
-                                <th>Vehicle Name</th>
-                                <th>Driver Name</th>
+                                <th>Details</th>
                                 <th>Type</th>
-                                <th>Year</th>
                                 <th>Rates</th>
                                 <th>Driver</th>
                                 <th>Status</th>
@@ -49,56 +50,92 @@
                             </thead>
                             <tbody>
                             {% for ambulance in ambulances %}
-                                <tr>
-                                    <td>{{ ambulance.vehicle_number }}</td>
-                                    <td>{{ ambulance.vehicle_name }}</td>
-                                    <td>{{ ambulance.driver.name }}</td>
-                                    <td>{{ ambulance.vehicle_type }}</td>
-                                    <td>{{ ambulance.year_made }}</td>
-
+                                <tr data-status="{% if ambulance.is_active %}active{% else %}inactive{% endif %}"
+                                    data-type="{{ ambulance.vehicle_type }}"
+                                    data-availability="{% if ambulance.is_available %}available{% else %}unavailable{% endif %}">
                                     <td>
-                                        <small>Base: ₹{{ ambulance.base_rate }}</small><br>
-                                        <small>Per KM: ₹{{ ambulance.per_km_rate }}</small>
+                                        <strong>{{ ambulance.vehicle_number }}</strong>
+                                        <div class="small text-muted">Year: {{ ambulance.year_made }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-2">
+                                                <div class="avatar-title bg-light rounded">
+                                                    <i class="ri-ambulance-line text-primary"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ ambulance.vehicle_name }}</h6>
+                                                <small class="text-muted">{{ ambulance.vehicle_type }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                <span class="badge
+                    {% if ambulance.vehicle_type == 'Basic' %}bg-primary{% endif %}
+                    {% if ambulance.vehicle_type == 'Advanced' %}bg-info{% endif %}
+                    {% if ambulance.vehicle_type == 'Mobile ICU' %}bg-danger{% endif %}">
+                    {{ ambulance.vehicle_type }}
+                </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span>Base: ₹{{ "%.2f"|format(ambulance.base_rate) }}</span>
+                                            {# Per KM Rate display removed as it's no longer in the model #}
+                                        </div>
                                     </td>
                                     <td>
                                         {% if ambulance.driver %}
-                                            {{ ambulance.driver.name }}<br>
-                                            <small>{{ ambulance.driver.contact }}</small>
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-2">
+                                                    <div class="avatar-xs">
+                                                        <div class="avatar-title rounded-circle bg-light text-primary">
+                                                            <i class="ri-user-line"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-0">{{ ambulance.driver.name }}</h6>
+                                                    <small class="text-muted">{{ ambulance.driver.license_number }}</small>
+                                                </div>
+                                            </div>
                                         {% else %}
                                             <span class="text-muted">Not assigned</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if ambulance.is_active %}
-                                            <span class="badge bg-success">Active</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Inactive</span>
-                                        {% endif %}
-                                        <br>
-                                        {% if ambulance.is_available %}
-                                            <span class="badge bg-info">Available</span>
-                                        {% else %}
-                                            <span class="badge bg-warning">On Duty</span>
-                                        {% endif %}
+                                        <div class="d-flex flex-column gap-1">
+                    <span class="badge {% if ambulance.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                        {% if ambulance.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                                            <span class="badge {% if ambulance.is_available %}bg-info{% else %}bg-warning{% endif %}">
+                        {% if ambulance.is_available %}Available{% else %}On Duty{% endif %}
+                    </span>
+                                        </div>
                                     </td>
                                     <td>
-                                        <div class="d-inline-flex gap-1">
+                                        <div class="d-flex gap-1">
                                             <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#viewAmbulanceModal{{ ambulance.id }}">
+                                                    data-bs-target="#viewAmbulanceModal{{ ambulance.id }}"
+                                                    title="View Details">
                                                 <i class="ri-eye-line"></i>
                                             </button>
-                                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#editAmbulanceModal{{ ambulance.id }}">
-                                                <i class="ri-edit-box-line"></i>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#editAmbulanceModal{{ ambulance.id }}"
+                                                    title="Edit">
+                                                <i class="ri-edit-line"></i>
                                             </button>
                                             <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#deleteAmbulanceModal{{ ambulance.id }}">
+                                                    data-bs-target="#deleteAmbulanceModal{{ ambulance.id }}"
+                                                    title="Delete">
                                                 <i class="ri-delete-bin-line"></i>
                                             </button>
                                             <form method="POST"
-                                                  action="{{ ADMIN + AMBULANCE_TOGGLE_STATUS_AMBULANCE }}/{{ ambulance.id }}">
+                                                  action="{{ ADMIN + AMBULANCE_TOGGLE_STATUS }}/{{ ambulance.id }}"
+                                                  class="d-inline">
                                                 <button type="submit"
-                                                        class="btn btn-sm {% if ambulance.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                                        class="btn btn-sm {% if ambulance.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                                                        title="{% if ambulance.is_active %}Deactivate{% else %}Activate{% endif %}">
                                                     {% if ambulance.is_active %}
                                                         <i class="ri-close-circle-line"></i>
                                                     {% else %}
@@ -121,23 +158,23 @@
     <!-- Add Ambulance Modal -->
     <div class="modal fade" id="addAmbulanceModal" tabindex="-1" aria-labelledby="addAmbulanceModalLabel"
          aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="addAmbulanceModalLabel">
-                        <i class="ri-add-line me-2"></i>Add New Ambulance
+                        <i class="ri-ambulance-line me-2"></i>Register New Ambulance
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ ADMIN + AMBULANCE_ADD_AMBULANCE }}">
+                <form method="POST" action="{{ ADMIN + AMBULANCE_ADD }}">
                     <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label class="form-label">Vehicle Number <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="vehicle_number" required>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label class="form-label">Vehicle Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="vehicle_name" required>
                             </div>
@@ -161,13 +198,29 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Base Rate (₹) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
                                 <input type="number" step="0.01" class="form-control" name="base_rate" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Per KM Rate (₹) <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" class="form-control" name="per_km_rate" required>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
+                                <label class="form-label">Registration Number</label>
+                                <input type="text" class="form-control" name="registration_number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Insurance Number</label>
+                                <input type="text" class="form-control" name="insurance_number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Insurance Expiry</label>
+                                <input type="date" class="form-control" name="insurance_expiry">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Facilities</label>
+                                <input type="text" class="form-control" name="facilities"
+                                       placeholder="Equipment, features, etc.">
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Assign Driver</label>
                                 <select class="form-select" name="driver_id">
                                     <option value="">Select Driver</option>
@@ -179,13 +232,13 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <div class="d-flex gap-3">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
                                            checked>
                                     <label class="form-check-label" for="is_active">Active</label>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" name="is_available"
                                            id="is_available" checked>
@@ -194,12 +247,13 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="ri-close-line me-1"></i> Cancel
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i class="ri-save-line me-1"></i> Save Ambulance
+                            <i class="ri-save-line me-1"></i> Register Ambulance
                         </button>
                     </div>
                 </form>
@@ -208,53 +262,274 @@
     </div>
 
 
+    <!-- Import/Export Modal -->
+    <div class="modal fade" id="importExportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-import-export-line me-2"></i>Import/Export Categories
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="importExportTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="export-tab" data-bs-toggle="tab"
+                                    data-bs-target="#export-pane" type="button" role="tab">
+                                <i class="ri-download-line me-1"></i> Export
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="import-tab" data-bs-toggle="tab"
+                                    data-bs-target="#import-pane" type="button" role="tab">
+                                <i class="ri-upload-line me-1"></i> Import
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3 border border-top-0" id="importExportTabsContent">
+                        <!-- Export Tab -->
+                        <div class="tab-pane fade show active" id="export-pane" role="tabpanel">
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-2"></i>
+                                Export categories data in different formats
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{{ ADMIN + AMBULANCE_EXPORT }}/csv"
+                                   class="btn btn-outline-primary">
+                                    <i class="ri-file-excel-2-line me-1"></i> Export as CSV
+                                </a>
+                                <a href="{{ ADMIN + AMBULANCE_EXPORT }}/excel"
+                                   class="btn btn-outline-success">
+                                    <i class="ri-file-excel-line me-1"></i> Export as Excel
+                                </a>
+                                <a href="{{ ADMIN + AMBULANCE_EXPORT }}/pdf"
+                                   class="btn btn-outline-danger">
+                                    <i class="ri-file-pdf-line me-1"></i> Export as PDF
+                                </a>
+                            </div>
+                            <div class="mt-3">
+                                <a href="{{ ADMIN + AMBULANCE_IMPORT_SAMPLE }}" class="btn btn-link">
+                                    <i class="ri-download-line me-1"></i> Download Sample Import File
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Import Tab -->
+                        <div class="tab-pane fade" id="import-pane" role="tabpanel">
+                            <div class="alert alert-warning">
+                                <i class="ri-alert-line me-2"></i>
+                                Please ensure your Excel file follows the required format.
+                                <a href="{{ ADMIN + AMBULANCE_IMPORT_SAMPLE }}" class="alert-link">
+                                    Download sample file
+                                </a>
+                            </div>
+                            <form method="POST" action="{{ ADMIN +  AMBULANCE_IMPORT }}"
+                                  enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="importFile" class="form-label">Select Excel File</label>
+                                    <input class="form-control" type="file" id="importFile" name="file"
+                                           accept=".xlsx,.xls" required>
+                                    <div class="form-text">Only Excel files (.xlsx, .xls) are accepted</div>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="overwriteData" name="overwrite">
+                                    <label class="form-check-label" for="overwriteData">Overwrite existing data</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-upload-line me-1"></i> Import Data
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modals for each ambulance -->
     {% for ambulance in ambulances %}
         <!-- View Ambulance Modal -->
         <div class="modal fade" id="viewAmbulanceModal{{ ambulance.id }}" tabindex="-1"
              aria-labelledby="viewAmbulanceModalLabel{{ ambulance.id }}" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="viewAmbulanceModalLabel{{ ambulance.id }}">
-                            <i class="ri-information-line me-2"></i>Ambulance Details
+                            <i class="ri-ambulance-line me-2"></i>Ambulance Details - {{ ambulance.vehicle_number }}
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p><strong>Vehicle Number:</strong> {{ ambulance.vehicle_number }}</p>
-                                        <p><strong>Vehicle Name:</strong> {{ ambulance.vehicle_name }}</p>
-                                        <p><strong>Vehicle Type:</strong> {{ ambulance.vehicle_type }}</p>
-                                        <p><strong>Year Made:</strong> {{ ambulance.year_made }}</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Vehicle Information</h6>
                                     </div>
-                                    <div class="col-md-6">
-                                        <p><strong>Base Rate:</strong> ₹{{ ambulance.base_rate }}</p>
-                                        <p><strong>Per KM Rate:</strong> ₹{{ ambulance.per_km_rate }}</p>
-                                        <p><strong>Status:</strong>
-                                            {% if ambulance.is_active %}
-                                                <span class="badge bg-success">Active</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Inactive</span>
-                                            {% endif %}
-                                            {% if ambulance.is_available %}
-                                                <span class="badge bg-info">Available</span>
-                                            {% else %}
-                                                <span class="badge bg-warning">On Duty</span>
-                                            {% endif %}
-                                        </p>
-                                        <p><strong>Driver:</strong>
-                                            {% if ambulance.driver %}
-                                                {{ ambulance.driver.name }}<br>
-                                                <small>{{ ambulance.driver.contact }}</small>
-                                            {% else %}
-                                                <span class="text-muted">Not assigned</span>
-                                            {% endif %}
-                                        </p>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-borderless">
+                                                <tr>
+                                                    <th width="40%">Vehicle Number:</th>
+                                                    <td>{{ ambulance.vehicle_number }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Vehicle Name:</th>
+                                                    <td>{{ ambulance.vehicle_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Type:</th>
+                                                    <td>
+                                                <span class="badge
+                                                    {% if ambulance.vehicle_type == 'Basic' %}bg-primary{% endif %}
+                                                    {% if ambulance.vehicle_type == 'Advanced' %}bg-info{% endif %}
+                                                    {% if ambulance.vehicle_type == 'Mobile ICU' %}bg-danger{% endif %}">
+                                                    {{ ambulance.vehicle_type }}
+                                                </span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Year Made:</th>
+                                                    <td>{{ ambulance.year_made }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Registration No:</th>
+                                                    <td>{{ ambulance.registration_number or 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Facilities:</th>
+                                                    <td>{{ ambulance.facilities or 'N/A' }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Insurance Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-borderless">
+                                                <tr>
+                                                    <th width="40%">Insurance Number:</th>
+                                                    <td>{{ ambulance.insurance_number or 'N/A' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Insurance Expiry:</th>
+                                                    <td>
+                                                        {% if ambulance.insurance_expiry %}
+                                                            {{ ambulance.insurance_expiry.strftime('%Y-%m-%d') }}
+                                                            {% if ambulance.insurance_expiry < datetime.now().date() %}
+                                                                {# MODIFIED LINE #}
+                                                                <span class="badge bg-danger ms-2">Expired</span>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            N/A
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Pricing Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-borderless">
+                                                <tr>
+                                                    <th width="40%">Base Rate:</th>
+                                                    <td>₹{{ "%.2f"|format(ambulance.base_rate) }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Driver Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if ambulance.driver %}
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="avatar-lg">
+                                                        <div class="avatar-title bg-light text-primary rounded-circle">
+                                                            <i class="ri-user-line fs-2"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h5 class="mb-1">{{ ambulance.driver.name }}</h5>
+                                                    <p class="mb-1">
+                                                        <i class="ri-phone-line me-1"></i> {{ ambulance.driver.contact }}
+                                                    </p>
+                                                    <p class="mb-0">
+                                                        <i class="ri-id-card-line me-1"></i> {{ ambulance.driver.license_number }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-info mb-0">
+                                                <i class="ri-information-line me-1"></i> No driver assigned to this
+                                                ambulance
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Status Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-borderless">
+                                                <tr>
+                                                    <th width="40%">Active Status:</th>
+                                                    <td>
+                                                <span class="badge {% if ambulance.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                                    {% if ambulance.is_active %}Active{% else %}
+                                                        Inactive{% endif %}
+                                                </span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Availability:</th>
+                                                    <td>
+                                                <span class="badge {% if ambulance.is_available %}bg-info{% else %}bg-warning{% endif %}">
+                                                    {% if ambulance.is_available %}Available{% else %}On
+                                                        Duty{% endif %}
+                                                </span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Created On:</th>
+                                                    <td>{{ ambulance.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Last Updated:</th>
+                                                    <td>{{ ambulance.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -272,24 +547,24 @@
         <!-- Edit Ambulance Modal -->
         <div class="modal fade" id="editAmbulanceModal{{ ambulance.id }}" tabindex="-1"
              aria-labelledby="editAmbulanceModalLabel{{ ambulance.id }}" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header bg-info text-white">
                         <h5 class="modal-title" id="editAmbulanceModalLabel{{ ambulance.id }}">
-                            <i class="ri-edit-line me-2"></i>Edit Ambulance
+                            <i class="ri-edit-line me-2"></i>Edit Ambulance - {{ ambulance.vehicle_number }}
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
-                    <form method="POST" action="{{ ADMIN + AMBULANCE_EDIT_AMBULANCE }}/{{ ambulance.id }}">
+                    <form method="POST" action="{{ ADMIN + AMBULANCE_EDIT }}/{{ ambulance.id }}">
                         <div class="modal-body">
                             <div class="row g-3">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <label class="form-label">Vehicle Number <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="vehicle_number"
                                            value="{{ ambulance.vehicle_number }}" required>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <label class="form-label">Vehicle Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="vehicle_name"
                                            value="{{ ambulance.vehicle_name }}" required>
@@ -322,15 +597,34 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Base Rate (₹) <span class="text-danger">*</span></label>
-                                    <input type="number" step="0.01" class="form-control" name="base_rate"
-                                           value="{{ ambulance.base_rate }}" required>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" step="0.01" class="form-control" name="base_rate"
+                                               value="{{ ambulance.base_rate }}" required>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Per KM Rate (₹) <span class="text-danger">*</span></label>
-                                    <input type="number" step="0.01" class="form-control" name="per_km_rate"
-                                           value="{{ ambulance.per_km_rate }}" required>
+                                    <label class="form-label">Registration Number</label>
+                                    <input type="text" class="form-control" name="registration_number"
+                                           value="{{ ambulance.registration_number or '' }}">
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <label class="form-label">Insurance Number</label>
+                                    <input type="text" class="form-control" name="insurance_number"
+                                           value="{{ ambulance.insurance_number or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Insurance Expiry</label>
+                                    <input type="date" class="form-control" name="insurance_expiry"
+                                           value="{{ ambulance.insurance_expiry.strftime('%Y-%m-%d') if ambulance.insurance_expiry else '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Facilities</label>
+                                    <input type="text" class="form-control" name="facilities"
+                                           value="{{ ambulance.facilities or '' }}"
+                                           placeholder="Equipment, features, etc.">
+                                </div>
+                                <div class="col-md-6">
                                     <label class="form-label">Assign Driver</label>
                                     <select class="form-select" name="driver_id">
                                         <option value="">Select Driver</option>
@@ -343,21 +637,22 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="is_active"
-                                               id="is_active_{{ ambulance.id }}"
-                                               {% if ambulance.is_active %}checked{% endif %}>
-                                        <label class="form-check-label"
-                                               for="is_active_{{ ambulance.id }}">Active</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="is_available"
-                                               id="is_available_{{ ambulance.id }}"
-                                               {% if ambulance.is_available %}checked{% endif %}>
-                                        <label class="form-check-label"
-                                               for="is_available_{{ ambulance.id }}">Available</label>
+                                    <label class="form-label">Status</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="is_active"
+                                                   id="is_active_{{ ambulance.id }}"
+                                                   {% if ambulance.is_active %}checked{% endif %}>
+                                            <label class="form-check-label"
+                                                   for="is_active_{{ ambulance.id }}">Active</label>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="is_available"
+                                                   id="is_available_{{ ambulance.id }}"
+                                                   {% if ambulance.is_available %}checked{% endif %}>
+                                            <label class="form-check-label"
+                                                   for="is_available_{{ ambulance.id }}">Available</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -393,11 +688,20 @@
                             <i class="ri-alert-line me-2"></i>
                             This action will mark the ambulance as deleted but can be restored later.
                         </div>
-                        <p><strong>Vehicle Number:</strong> {{ ambulance.vehicle_number }}</p>
-                        <p><strong>Vehicle Name:</strong> {{ ambulance.vehicle_name }}</p>
+                        <div class="card border-danger mb-0">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ ambulance.vehicle_number }}</h5>
+                                <p class="card-text">{{ ambulance.vehicle_name }} ({{ ambulance.vehicle_type }})</p>
+                                {% if ambulance.driver %}
+                                    <p class="card-text">
+                                        <small class="text-muted">Assigned to: {{ ambulance.driver.name }}</small>
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <form method="POST" action="{{ ADMIN + AMBULANCE_DELETE_AMBULANCE }}/{{ ambulance.id }}">
+                        <form method="POST" action="{{ ADMIN + AMBULANCE_DELETE }}/{{ ambulance.id }}">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="ri-close-line me-1"></i> Cancel
                             </button>
@@ -441,18 +745,23 @@
                                     <tr>
                                         <td>{{ ambulance.vehicle_number }}</td>
                                         <td>{{ ambulance.vehicle_name }}</td>
-                                        <td>{{ ambulance.vehicle_type }}</td>
                                         <td>
-                                            {% if ambulance.is_active %}
-                                                <span class="badge bg-success">Active</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Inactive</span>
-                                            {% endif %}
+                                            <span class="badge
+                                                {% if ambulance.vehicle_type == 'Basic' %}bg-primary{% endif %}
+                                                {% if ambulance.vehicle_type == 'Advanced' %}bg-info{% endif %}
+                                                {% if ambulance.vehicle_type == 'Mobile ICU' %}bg-danger{% endif %}">
+                                                {{ ambulance.vehicle_type }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if ambulance.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if ambulance.is_active %}Active{% else %}Inactive{% endif %}
+                                            </span>
                                         </td>
                                         <td>{{ ambulance.deleted_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                         <td class="text-end">
                                             <form method="POST"
-                                                  action="{{ ADMIN + AMBULANCE_RESTORE_AMBULANCE }}/{{ ambulance.id }}">
+                                                  action="{{ ADMIN + AMBULANCE_RESTORE }}/{{ ambulance.id }}">
                                                 <button type="submit" class="btn btn-sm btn-success">
                                                     <i class="ri-refresh-line me-1"></i> Restore
                                                 </button>
@@ -477,8 +786,6 @@
             </div>
         </div>
     </div>
-
-
 {% endblock %}
 
 {% block heardLink %}
@@ -488,6 +795,41 @@
           href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
     <link rel="stylesheet"
           href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+    <style>
+        .avatar-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline li {
+            position: relative;
+            padding-bottom: 1.5rem;
+            padding-left: 2rem;
+            border-left: 1px solid #dee2e6;
+        }
+
+        .timeline li:last-child {
+            border-left: 0;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: -1rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+    </style>
 {% endblock %}
 
 {% block footerLink %}
@@ -497,12 +839,48 @@
     <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Enable tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
+        $(document).ready(function () {
+            // Initialize DataTable with filtering
+            var table = $('#ambulanceTable').DataTable({
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                order: [[0, 'asc']],
+                columnDefs: [
+                    {orderable: false, targets: [6]} // Disable sorting on actions column
+                ]
             });
+
+            // Filter by status
+            $('#statusFilter').change(function () {
+                var status = $(this).val();
+                if (status === 'all') {
+                    table.column(5).search('').draw();
+                } else {
+                    table.column(5).search(status, true, false).draw();
+                }
+            });
+
+            // Filter by type
+            $('#typeFilter').change(function () {
+                var type = $(this).val();
+                if (type === 'all') {
+                    table.column(2).search('').draw();
+                } else {
+                    table.column(2).search('^' + type + '$', true, false).draw();
+                }
+            });
+
+            // Filter by availability
+            $('#availabilityFilter').change(function () {
+                var availability = $(this).val();
+                if (availability === 'all') {
+                    table.column(5).search('').draw();
+                } else {
+                    table.column(5).search(availability, true, false).draw();
+                }
+            });
+
+            // Enable tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
         });
     </script>
 {% endblock %}

@@ -847,7 +847,7 @@ def chat_ui(current_user):  # Renamed for clarity
             receiver_id = None  # Clear receiver_id if not found, to show empty state
 
     return render_template(
-        "chat_templates/ch.html",
+        "chat_templates/chat.html",
         current_user=current_user_obj,  # Pass the User object
         receiver_id=receiver_id,
         receiver_name=receiver_name,

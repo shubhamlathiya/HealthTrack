@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambulance Bill - {{ call.call_number }}</title>
+    <style>
+        /* --- General Print Styles --- */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #333;
+            margin: 0.5in; /* Standard print margin */
+            -webkit-print-color-adjust: exact; /* For background colors to print */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 7.5in; /* Letter size width (8.5in) - 1in margins */
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            color: #2c3e50;
+        }
+
+        strong, b {
+            font-weight: bold;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 1em 0;
+        }
+
+        /* --- Specific Section Styles --- */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3498db; /* Blue line */
+            margin-bottom: 20px;
+        }
+
+        .header-section > div { /* Target direct children to apply width */
+            width: 50%;
+            vertical-align: top;
+        }
+
+        .service-info {
+            text-align: left;
+            font-size: 9pt;
+        }
+
+        .bill-info {
+            text-align: right;
+            font-size: 9pt;
+        }
+
+        .bill-info h1 {
+            font-size: 18pt;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .section-title {
+            font-size: 12pt;
+            color: #2980b9; /* Blue color for titles */
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .info-table td {
+            padding: 5px 0;
+            vertical-align: top;
+        }
+
+        .info-table td:first-child {
+            width: 25%; /* Adjusted width for labels */
+            font-weight: bold;
+        }
+
+        /* --- Charges Table (similar to Items Table) --- */
+        .charges-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .charges-table th,
+        .charges-table td {
+            border: 1px solid #dddddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 9pt;
+        }
+
+        .charges-table th {
+            background-color: #3498db; /* Blue background for headers */
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .charges-table td:nth-child(1) {
+            text-align: center;
+            width: 3%;
+        } /* # */
+        .charges-table td:nth-child(2) {
+            text-align: left;
+            width: 55%; /* Description */
+        }
+        .charges-table td:nth-child(3) {
+            text-align: right;
+            width: 15%; /* Amount */
+        }
+
+        .charges-table .charge-sub-info {
+            font-size: 7pt;
+            color: #666;
+            display: block;
+        }
+
+        /* --- Summary Table --- */
+        .summary-table {
+            width: 50%; /* Adjust as needed */
+            margin-left: auto; /* Align to right */
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .summary-table td {
+            padding: 6px 10px;
+            text-align: right;
+            vertical-align: middle;
+            font-size: 10pt;
+        }
+
+        .summary-table td:first-child {
+            font-weight: bold;
+            width: 60%;
+        }
+
+        .summary-table tr:nth-child(4) td { /* Total Amount row (assuming 4th row) */
+            font-size: 11pt;
+            font-weight: bold;
+            border-top: 1px solid #3498db;
+            border-bottom: 1px solid #3498db;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        /* --- Notes Section --- */
+        .notes-section {
+            margin-top: 30px;
+        }
+
+        .notes-section p {
+            font-size: 9pt;
+        }
+
+        /* --- Footer --- */
+        .footer-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px; /* Space from content */
+            font-size: 9pt;
+        }
+
+        .footer-section > div { /* Target direct children to apply width */
+            width: 48%;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Colors for status/due */
+        .status-paid {
+            color: #27ae60; /* Green */
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: #e74c3c; /* Red */
+            font-weight: bold;
+        }
+
+        /* Hide elements not needed for print */
+        @media print {
+            body {
+                margin: 0; /* Remove browser default margins for print */
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-section">
+        <div class="service-info">
+            <strong>HEALTH TRACK AMBULANCE SERVICES</strong><br/>
+            123 Main Street<br/>
+            Surat, Gujarat, India 395001<br/>
+            Phone: +91 12345 67890 | Email: info@healthtrack.com
+        </div>
+        <div class="bill-info">
+            <h1>AMBULANCE BILL</h1>
+            <strong>Bill No:</strong> {{ call.call_number }}<br/>
+            <strong>Bill Date:</strong> {{ datetime.now().strftime('%d-%m-%Y %I:%M %p') }}
+        </div>
+    </div>
+
+    <h2 class="section-title">Patient & Transport Information</h2>
+    <table class="info-table">
+        <tr>
+            <td>Patient Name:</td>
+            <td><strong>{{ call.patient_name }}</strong> ({{ call.patient_age }} yrs, {{ call.patient_gender }})</td>
+        </tr>
+        <tr>
+            <td>Pickup Location:</td>
+            <td>{{ call.pickup_location }}</td>
+        </tr>
+        <tr>
+            <td>Destination:</td>
+            <td>{{ call.destination or 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Call Time:</td>
+            <td>{{ call.call_time.strftime('%d-%m-%Y %I:%M %p') }}</td>
+        </tr>
+        <tr>
+            <td>Completion Time:</td>
+            <td>{{ call.completion_time.strftime('%d-%m-%Y %I:%M %p') if call.completion_time else 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Ambulance:</td>
+            <td>
+                {% if call.ambulance %}
+                    <strong>{{ call.ambulance.vehicle_number }}</strong> ({{ call.ambulance.vehicle_name }})
+                    {% if call.ambulance.license_plate %}<span class="charge-sub-info">License: {{ call.ambulance.license_plate }}</span>{% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>Driver:</td>
+            <td>
+                {% if call.driver %}
+                    <strong>{{ call.driver.name }}</strong>
+                    {% if call.driver.contact_number %}<span class="charge-sub-info">Contact: {{ call.driver.contact_number }}</span>{% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>Distance Covered:</td>
+            <td>{{ "%.2f"|format(call.distance) if call.distance is not none else 'N/A' }} km</td>
+        </tr>
+    </table>
+
+    <h2 class="section-title">Charge Breakdown</h2>
+    <table class="charges-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Description</th>
+                <th class="text-end">Amount (₹)</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set item_counter = 1 %}
+        <tr>
+            <td>{{ item_counter }}</td>
+            <td>Base Charge</td>
+            <td class="text-end">{{ "%.2f"|format(call.base_charge) }}</td>
+        </tr>
+        {% set item_counter = item_counter + 1 %}
+
+        {# Iterate through additional charges #}
+        {% if call.additional_charge_entries %}
+            {% for charge in call.additional_charge_entries %}
+                <tr>
+                    <td>{{ item_counter }}</td>
+                    <td>
+                        {{ charge.charge_item.name }}
+                        {% if charge.notes %}<span class="charge-sub-info">{{ charge.notes }}</span>{% endif %}
+                    </td>
+                    <td class="text-end">{{ "%.2f"|format(charge.amount) }}</td>
+                </tr>
+                {% set item_counter = item_counter + 1 %}
+            {% endfor %}
+        {% else %}
+             <tr>
+                <td>{{ item_counter }}</td>
+                <td>No Additional Charges</td>
+                <td class="text-end">0.00</td>
+            </tr>
+            {% set item_counter = item_counter + 1 %}
+        {% endif %}
+
+        </tbody>
+    </table>
+
+    <h2 class="section-title">Summary</h2>
+    <table class="summary-table">
+        <tr>
+            <td>Subtotal:</td>
+            <td>₹{{ "%.2f"|format(call.subtotal) }}</td>
+        </tr>
+        {% if call.discount_amount and call.discount_amount > 0 %}
+        <tr>
+            <td>Discount ({{ "%.2f"|format(call.discount_percent) }}%):</td>
+            <td>-₹{{ "%.2f"|format(call.discount_amount) }}</td>
+        </tr>
+        {% endif %}
+        {% if call.tax_amount and call.tax_amount > 0 %}
+        <tr>
+            <td>Tax ({{ "%.2f"|format(call.tax_percent) }}%):</td>
+            <td>+₹{{ "%.2f"|format(call.tax_amount) }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>Total Amount:</td>
+            <td>₹{{ "%.2f"|format(call.total_amount) }}</td>
+        </tr>
+        <tr>
+            <td>Payment Mode:</td>
+            <td>{{ call.payment_mode }}</td>
+        </tr>
+        <tr>
+            <td>Paid Amount:</td>
+            <td>₹{{ "%.2f"|format(call.payment_amount) }}</td>
+        </tr>
+        <tr>
+            <td>Balance Due:</td>
+            <td>
+                {% set calculated_due = call.total_amount - call.payment_amount %}
+                {% if calculated_due > 0 %}
+                    <span class="status-pending">₹{{ "%.2f"|format(calculated_due) }}</span>
+                {% else %}
+                    <span class="status-paid">₹0.00</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    {% if call.notes %}
+        <div class="notes-section">
+            <h2 class="section-title">Notes</h2>
+            <p>{{ call.notes }}</p>
+        </div>
+    {% endif %}
+
+    <div class="footer-section">
+        <div>Received by: ___________________</div>
+        <div>Authorized by: ___________________</div>
+    </div>
+</div>
+
+<script>
+    window.onload = function () {
+        window.print();
+        // Check if window.matchMedia is supported for closing after print
+        if (window.matchMedia) {
+            const mediaQueryList = window.matchMedia('print');
+            mediaQueryList.addListener(function(mql) {
+                if (!mql.matches) {
+                    // If 'mql.matches' is false, it means we are no longer in print mode.
+                    window.close(); // Close the current window/tab
+                }
+            });
+        }
+    };
+</script>
+</body>
+</html>

@@ -160,6 +160,7 @@ def sales_list(current_user):
 @token_required(allowed_roles=[UserRole.ADMIN.name])
 def new_sale(current_user):
     if request.method == 'POST':
+        print(request.form)
         try:
 
             patient_id = request.form.get('patient_id')

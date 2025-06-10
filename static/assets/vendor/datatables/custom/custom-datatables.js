@@ -20,8 +20,13 @@ $(function () {
         scrollCollapse: true,
         paging: false,
         bInfo: false,
+        responsive: true,
+        dom: '<"top"f>rt<"bottom"lip><"clear">',
+        pageLength: 10,
+        order: [[0, 'desc']] // Sort by claim date descending
     });
 });
+
 
 // Vertical Scroll
 $(function () {

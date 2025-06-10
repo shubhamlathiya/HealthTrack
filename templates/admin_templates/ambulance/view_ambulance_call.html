@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+
+{% block title %}Ambulance Call Details - {{ call.call_number }}{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="ri-phone-line me-2"></i>Ambulance Call Details - {{ call.call_number }}
+                    </h4>
+                    <div class="card-tools">
+                        {# Assuming AMBULANCE_AMBULANCE_CALL_LIST is your new route for the call list #}
+                        <a href="{{ ADMIN + AMBULANCE_AMBULANCE_CALL_LIST }}" class="btn btn-sm btn-light">
+                            <i class="ri-arrow-left-line me-1"></i> Back to Call List
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="ri-information-line me-2"></i>Call Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row mb-0">
+                                        <dt class="col-sm-4">Call Number</dt>
+                                        <dd class="col-sm-8">{{ call.call_number }}</dd>
+
+                                        <dt class="col-sm-4">Call Time</dt>
+                                        <dd class="col-sm-8">{{ call.call_time.strftime('%Y-%m-%d %I:%M %p') }}</dd>
+
+                                        <dt class="col-sm-4">Status</dt>
+                                        <dd class="col-sm-8">
+                                            {% if call.status == 'Completed' %}
+                                                <span class="badge bg-success">{{ call.status }}</span>
+                                            {% elif call.status == 'Dispatched' or call.status == 'In Progress' %}
+                                                <span class="badge bg-warning text-dark">{{ call.status }}</span>
+                                            {% elif call.status == 'Cancelled' %}
+                                                <span class="badge bg-danger">{{ call.status }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ call.status }}</span>
+                                            {% endif %}
+                                        </dd>
+
+                                        <dt class="col-sm-4">Ambulance</dt>
+                                        <dd class="col-sm-8">
+                                            {% if call.ambulance %}
+                                                {{ call.ambulance.vehicle_name }} ({{ call.ambulance.vehicle_number }})
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </dd>
+
+                                        <dt class="col-sm-4">Driver</dt>
+                                        <dd class="col-sm-8">
+                                            {% if call.driver %}
+                                                {{ call.driver.first_name }} {{ call.driver.last_name }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </dd>
+
+                                        <dt class="col-sm-4">Pickup Location</dt>
+                                        <dd class="col-sm-8">{{ call.pickup_location }}</dd>
+
+                                        <dt class="col-sm-4">Destination</dt>
+                                        <dd class="col-sm-8">{{ call.destination if call.destination else 'N/A' }}</dd>
+
+                                        <dt class="col-sm-4">Distance</dt>
+                                        <dd class="col-sm-8">{{ "%.2f km"|format(call.distance) if call.distance is not none else 'N/A' }}</dd>
+
+                                        <dt class="col-sm-4">Dispatch Time</dt>
+                                        <dd class="col-sm-8">{{ call.dispatch_time.strftime('%Y-%m-%d %I:%M %p') if call.dispatch_time else 'N/A' }}</dd>
+
+                                        <dt class="col-sm-4">Arrival Time</dt>
+                                        <dd class="col-sm-8">{{ call.arrival_time.strftime('%Y-%m-%d %I:%M %p') if call.arrival_time else 'N/A' }}</dd>
+
+                                        <dt class="col-sm-4">Completion Time</dt>
+                                        <dd class="col-sm-8">{{ call.completion_time.strftime('%Y-%m-%d %I:%M %p') if call.completion_time else 'N/A' }}</dd>
+
+                                        <dt class="col-sm-4">Last Updated</dt>
+                                        <dd class="col-sm-8">{{ call.updated_at.strftime('%Y-%m-%d %I:%M %p') }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="ri-user-heart-line me-2"></i>Patient Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row mb-0">
+                                        <dt class="col-sm-4">Patient Name</dt>
+                                        <dd class="col-sm-8">{{ call.patient_name }}</dd>
+
+                                        <dt class="col-sm-4">Age</dt>
+                                        <dd class="col-sm-8">{{ call.patient_age }}</dd>
+
+                                        <dt class="col-sm-4">Gender</dt>
+                                        <dd class="col-sm-8">{{ call.patient_gender }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="card mt-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="ri-money-dollar-circle-line me-2"></i>Billing Summary
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row mb-0">
+                                        <dt class="col-sm-6">Base Charge</dt>
+                                        <dd class="col-sm-6 text-end">₹{{ "%.2f"|format(call.base_charge) }}</dd>
+
+                                        <dt class="col-sm-6">Total Additional Charges</dt>
+                                        <dd class="col-sm-6 text-end">
+                                            ₹{{ "%.2f"|format(call.additional_charges_total) }}</dd>
+
+                                        <dt class="col-sm-6">Subtotal</dt>
+                                        <dd class="col-sm-6 text-end">₹{{ "%.2f"|format(call.subtotal) }}</dd>
+
+                                        <dt class="col-sm-6">Discount Amount</dt>
+                                        <dd class="col-sm-6 text-end">₹{{ "%.2f"|format(call.discount_amount) }}</dd>
+
+                                        <dt class="col-sm-6">Tax Amount</dt>
+                                        <dd class="col-sm-6 text-end">₹{{ "%.2f"|format(call.tax_amount) }}</dd>
+
+                                        <dt class="col-sm-6"><strong>Total Amount</strong></dt>
+                                        <dd class="col-sm-6 text-end">
+                                            <strong>₹{{ "%.2f"|format(call.total_amount) }}</strong></dd>
+
+                                        <dt class="col-sm-6">Paid Amount</dt>
+                                        <dd class="col-sm-6 text-end">₹{{ "%.2f"|format(call.payment_amount) }}</dd>
+
+                                        <dt class="col-sm-6">Due Amount</dt>
+                                        <dd class="col-sm-6 text-end">
+                                            {% set due_amount = call.total_amount - call.payment_amount %}
+                                            {% if due_amount > 0.01 %}
+                                                <span class="text-danger">₹{{ "%.2f"|format(due_amount) }}</span>
+                                            {% else %}
+                                                <span class="text-success">₹0.00</span>
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">
+                                <i class="ri-service-line me-2"></i>Additional Charges
+                                ({{ call.additional_charge_entries|length }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover mb-0">
+                                    <thead class="bg-light">
+                                    <tr>
+                                        <th class="text-center" style="width: 5%;">#</th>
+                                        <th style="width: 45%;">Charge Item</th>
+                                        <th class="text-end" style="width: 25%;">Amount</th>
+                                        <th style="width: 25%;">Notes</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for charge in call.additional_charge_entries %}
+                                        <tr>
+                                            <td class="text-center align-middle">{{ loop.index }}</td>
+                                            <td class="align-middle">
+                                                <strong>{{ charge.charge_item.name if charge.charge_item else 'N/A' }}</strong>
+                                            </td>
+                                            <td class="text-end align-middle">₹{{ "%.2f"|format(charge.amount) }}</td>
+                                            <td class="align-middle">{{ charge.notes if charge.notes else 'N/A' }}</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4 text-muted">No additional charges
+                                                for this call.
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    {% if call.additional_charge_entries %}
+                                        <tfoot class="table-group-divider">
+                                        <tr class="table-active">
+                                            <th colspan="2" class="text-end fs-6">Total Additional Charges</th>
+                                            <th class="text-end fs-6">
+                                                ₹{{ "%.2f"|format(call.additional_charges_total) }}</th>
+                                            <th></th>
+                                            {# Empty cell for notes column #}
+                                        </tr>
+                                        </tfoot>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if call.notes %}
+                        <div class="card mt-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="ri-file-text-line me-2"></i>General Notes
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {{ call.notes }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-end">
+                    <div class="btn-group">
+                        {# Assuming AMBULANCE_AMBULANCE_PRINT_CALL is your new route for printing #}
+                        <a href="{{ ADMIN + AMBULANCE_AMBULANCE_PRINT_BILL }}/{{ call.id }}"
+                           class="btn btn-primary" target="_blank">
+                            <i class="ri-printer-line me-1"></i> Print Bill
+                        </a>
+                        {% set due_amount = call.total_amount - call.payment_amount %}
+                        {% if due_amount > 0.01 %}
+                            <button class="btn btn-success" data-bs-toggle="modal"
+                                    data-bs-target="#addPaymentModal">
+                                <i class="ri-money-dollar-circle-line me-1"></i> Add Payment
+                            </button>
+                        {% endif %}
+                        <button class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteCallModal">
+                            <i class="ri-delete-bin-line me-1"></i> Delete Call
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# --- Modals (Adjust actions/methods as needed) --- #}
+
+    {# Delete Call Modal #}
+    <div class="modal fade" id="deleteCallModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this ambulance call record?</p>
+                    <div class="alert alert-warning">
+                        <i class="ri-alert-line me-2"></i>
+                        This action will permanently remove the call.
+                    </div>
+                    <div class="card border-danger mb-3">
+                        <div class="card-header bg-danger bg-opacity-10 text-danger">
+                            <h6 class="mb-0"><i class="ri-information-line me-1"></i> Call Summary</h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Call No.</dt>
+                                <dd class="col-sm-8">{{ call.call_number }}</dd>
+                                <dt class="col-sm-4">Call Date</dt>
+                                <dd class="col-sm-8">{{ call.call_time.strftime('%Y-%m-%d') }}</dd>
+                                <dt class="col-sm-4">Patient</dt>
+                                <dd class="col-sm-8">{{ call.patient_name }}</dd>
+                                <dt class="col-sm-4">Total Amount</dt>
+                                <dd class="col-sm-8">₹{{ "%.2f"|format(call.total_amount) }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Cancel
+                    </button>
+                    {# Assuming AMBULANCE_AMBULANCE_DELETE_CALL is your delete route #}
+                    <form action="{{ ADMIN + AMBULANCE_AMBULANCE_DELETE_CALL }}/{{ call.id }}" method="POST">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="ri-delete-bin-line me-1"></i> Confirm Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Add Payment Modal #}
+    {% set due_amount = call.total_amount - call.payment_amount %}
+    {% if due_amount > 0.01 %}
+        <div class="modal fade" id="addPaymentModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">
+                            <i class="ri-money-dollar-circle-line me-2"></i>Add Payment
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    {# Assuming 'add_payment_to_call' is your endpoint for adding payment to a specific call #}
+                    <form method="POST" action="{{ ADMIN + AMBULANCE_AMBULANCE_ADD_PAYMENT_TO_CALL }}/{{ call.id }}">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Current Due Amount</label>
+                                <input type="text" class="form-control" value="₹{{ "%.2f"|format(due_amount) }}"
+                                       readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Amount <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="amount"
+                                       min="0.01" max="{{ "%.2f"|format(due_amount) }}" step="0.01"
+                                       value="{{ "%.2f"|format(due_amount) }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="payment_date" required
+                                       value="{{ datetime.now().strftime('%Y-%m-%d') }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+                                <select class="form-select" name="payment_mode" required>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Card">Card</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Online">Online Payment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="note" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="ri-check-line me-1"></i> Record Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block headLink %}
+    <style>
+        .card-header {
+            padding: 0.75rem 1.25rem;
+        }
+
+        dl.row dt {
+            font-weight: 500;
+        }
+
+        .table th {
+            white-space: nowrap;
+        }
+    </style>
+{% endblock %}

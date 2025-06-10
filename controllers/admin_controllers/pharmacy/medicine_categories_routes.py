@@ -1,5 +1,6 @@
 # Categories Routes
 import io
+import traceback
 from datetime import datetime
 
 import pandas as pd
@@ -67,7 +68,6 @@ def add_medicine_category(current_user):
         flash('Category added successfully!', 'success')
     except Exception as e:
         db.session.rollback()  # Rollback changes if any error occurs
-        import traceback
         traceback.print_exc()  # Print full traceback to console for debugging
         flash(f'Error adding category: {str(e)}', 'danger')
     return redirect(ADMIN + PHARMACY_CATEGORIES)

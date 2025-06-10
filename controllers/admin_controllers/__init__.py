@@ -29,6 +29,8 @@ from controllers.admin_controllers.room.bad_routes import *
 from controllers.admin_controllers.ambulance.ambulance_routes import *
 from controllers.admin_controllers.ambulance.driver_routes import *
 from controllers.admin_controllers.ambulance.ambulance_call_routes import *
+from controllers.admin_controllers.ambulance.ambulance_category_routes import *
+from controllers.admin_controllers.ambulance.ambulance_charge_item_routes import *
 
 from controllers.admin_controllers.human_resources.human_resources_routes import *
 from controllers.admin_controllers.accounts.accounts_routes import *
