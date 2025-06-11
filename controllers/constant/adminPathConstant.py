@@ -45,23 +45,82 @@ BLOOD_BANK_EDIT_TRANSFUSION = '/blood-bank/transfusions/edit'
 BLOOD_BANK_DELETE_TRANSFUSION = '/blood-bank/transfusions/delete'
 
 # inventory
-INVENTORY = "/inventory"
-INVENTORY_ITEM_STOCK_LIST = f"{INVENTORY}/item-stock-list"
-INVENTORY_ADD_ITEM = f"{INVENTORY}/add-item"
-INVENTORY_EDIT_ITEM = f"{INVENTORY}/edit-item"
-INVENTORY_DELETE_ITEM = f"{INVENTORY}/delete-item"
-INVENTORY_RESTORE_ITEM = f"{INVENTORY}/restore-item"
+# --- Inventory Base Routes ---
+INVENTORY_BASE = "/inventory"
 
-INVENTORY_ISSUED_ITEM = f"{INVENTORY}/issued-item"
-INVENTORY_ADD_ISSUED_ITEM = f"{INVENTORY}/add-issued-item"
-INVENTORY_EDIT_ISSUED_ITEM = f"{INVENTORY}/edit-issued-item"
-INVENTORY_DELETE_ISSUED_ITEM = f"{INVENTORY}/delete-issued-item"
-INVENTORY_RESTORE_ISSUED_ITEM = f"{INVENTORY}/restore-issued-item"
-INVENTORY_RETURN_ISSUED_ITEM = f"{INVENTORY}/return-issued-item"
+# --- Item Categories ---
+ITEM_CATEGORIES_BASE = f"{INVENTORY_BASE}/categories"
+ITEM_CATEGORIES_LIST = ITEM_CATEGORIES_BASE  # Same as base for list view
+ITEM_CATEGORIES_ADD = f"{ITEM_CATEGORIES_BASE}/add"
+ITEM_CATEGORIES_EDIT = f"{ITEM_CATEGORIES_BASE}/edit" # Expects ID: /categories/edit/<int:id>
+ITEM_CATEGORIES_DELETE = f"{ITEM_CATEGORIES_BASE}/delete" # Expects ID: /categories/delete/<int:id>
+ITEM_CATEGORIES_RESTORE = f"{ITEM_CATEGORIES_BASE}/restore" # Expects ID: /categories/restore/<int:id>
+ITEM_CATEGORIES_EXPORT = f"{ITEM_CATEGORIES_BASE}/export"
+ITEM_CATEGORIES_IMPORT = f"{ITEM_CATEGORIES_BASE}/import"
+ITEM_CATEGORIES_IMPORT_SAMPLE = f"{ITEM_CATEGORIES_BASE}/import/sample"
 
-INVENTORY_ITEM_REQUESTS = f"{INVENTORY}/requests"
-INVENTORY_APPROVE_REQUEST = f"{INVENTORY}/approve-request"
-INVENTORY_REJECT_REQUEST = f"{INVENTORY}/reject-request"
+# --- Item Stores ---
+ITEM_STORES_BASE = f"{INVENTORY_BASE}/stores"
+ITEM_STORES_LIST = ITEM_STORES_BASE # Same as base for list view
+ITEM_STORES_ADD = f"{ITEM_STORES_BASE}/add"
+ITEM_STORES_EDIT = f"{ITEM_STORES_BASE}/edit" # Expects ID
+ITEM_STORES_DELETE = f"{ITEM_STORES_BASE}/delete" # Expects ID
+ITEM_STORES_RESTORE = f"{ITEM_STORES_BASE}/restore" # Expects ID
+ITEM_STORES_EXPORT = f"{ITEM_STORES_BASE}/export"
+ITEM_STORES_IMPORT = f"{ITEM_STORES_BASE}/import"
+ITEM_STORES_IMPORT_SAMPLE = f"{ITEM_STORES_BASE}/import/sample"
+
+# --- Item Suppliers ---
+ITEM_SUPPLIERS_BASE = f"{INVENTORY_BASE}/suppliers"
+ITEM_SUPPLIERS_LIST = ITEM_SUPPLIERS_BASE # Same as base for list view
+ITEM_SUPPLIERS_ADD = f"{ITEM_SUPPLIERS_BASE}/add"
+ITEM_SUPPLIERS_EDIT = f"{ITEM_SUPPLIERS_BASE}/edit" # Expects ID
+ITEM_SUPPLIERS_DELETE = f"{ITEM_SUPPLIERS_BASE}/delete" # Expects ID
+ITEM_SUPPLIERS_RESTORE = f"{ITEM_SUPPLIERS_BASE}/restore" # Expects ID
+ITEM_SUPPLIERS_EXPORT = f"{ITEM_SUPPLIERS_BASE}/export"
+ITEM_SUPPLIERS_IMPORT = f"{ITEM_SUPPLIERS_BASE}/import"
+ITEM_SUPPLIERS_IMPORT_SAMPLE = f"{ITEM_SUPPLIERS_BASE}/import/sample"
+
+# --- Inventory Items (Actual Items in Stock) ---
+INVENTORY_ITEMS_BASE = f"{INVENTORY_BASE}/items" # Renamed from INVENTORY_ITEMS for consistency
+INVENTORY_ITEMS_LIST = INVENTORY_ITEMS_BASE # Renamed from INVENTORY_ITEM_STOCK_LIST for consistency
+INVENTORY_ITEMS_ADD = f"{INVENTORY_ITEMS_BASE}/add"
+INVENTORY_ITEMS_EDIT = f"{INVENTORY_ITEMS_BASE}/edit" # Expects ID
+INVENTORY_ITEMS_DELETE = f"{INVENTORY_ITEMS_BASE}/delete" # Expects ID
+INVENTORY_ITEMS_RESTORE = f"{INVENTORY_ITEMS_BASE}/restore" # Expects ID
+INVENTORY_ITEMS_EXPORT = f"{INVENTORY_ITEMS_BASE}/export"
+INVENTORY_ITEMS_IMPORT = f"{INVENTORY_ITEMS_BASE}/import"
+INVENTORY_ITEMS_IMPORT_SAMPLE = f"{INVENTORY_ITEMS_BASE}/import/sample"
+
+# --- Constants for Routes (Matching your provided list) ---
+ITEM_STOCKS = f"{INVENTORY_BASE}/item_stocks"
+ITEM_STOCKS_ADD = f'{INVENTORY_BASE}/item_stocks/add'
+ITEM_STOCKS_EDIT = f'{INVENTORY_BASE}/item_stocks/edit'  # Will append /<int:stock_id>
+ITEM_STOCKS_DELETE = f'{INVENTORY_BASE}/item_stocks/delete'  # Will append /<int:stock_id>
+ITEM_STOCKS_RESTORE = f'{INVENTORY_BASE}/item_stocks/restore'  # Will append /<int:stock_id>
+ITEM_STOCKS_EXPORT = f'{INVENTORY_BASE}/item_stocks/export'  # Will append /<string:file_format>
+ITEM_STOCKS_IMPORT = f'{INVENTORY_BASE}/item_stocks/import'
+ITEM_STOCKS_IMPORT_SAMPLE = f'{INVENTORY_BASE}/item_stocks/import/sample'
+ITEMS_GET_BY_CATEGORY = f'{INVENTORY_BASE}/items/get_by_category'
+
+# --- Issued Items ---
+ISSUED_ITEMS_BASE = f"{INVENTORY_BASE}/issued" # Consistent with other bases
+ISSUED_ITEMS_LIST = ISSUED_ITEMS_BASE
+ISSUED_ITEMS_ADD = f"{ISSUED_ITEMS_BASE}/add"
+ISSUED_ITEMS_EDIT = f"{ISSUED_ITEMS_BASE}/edit" # Expects ID
+ISSUED_ITEMS_DELETE = f"{ISSUED_ITEMS_BASE}/delete" # Expects ID
+ISSUED_ITEMS_RESTORE = f"{ISSUED_ITEMS_BASE}/restore" # Expects ID
+ISSUED_ITEMS_RETURN = f"{ISSUED_ITEMS_BASE}/return" # Expects ID
+ISSUED_ITEMS_EXPORT = f"{ISSUED_ITEMS_BASE}/export"
+
+# --- Item Requests ---
+ITEM_REQUESTS_BASE = f"{INVENTORY_BASE}/requests"
+ITEM_REQUESTS_LIST = ITEM_REQUESTS_BASE
+ITEM_REQUESTS_APPROVE = f"{ITEM_REQUESTS_BASE}/approve" # Expects ID
+ITEM_REQUESTS_REJECT = f"{ITEM_REQUESTS_BASE}/reject" # Expects ID
+
+API_GET_AVAILABLE_STOCK = "/api/item_stock_available" # Used in JS with ADMIN + API_GET_AVAILABLE_STOCK
+API_GET_USERS_BY_ROLE = "/api/users_by_role" # Used in JS with ADMIN + API_GET_USERS_BY_ROLE
 
 # accounts
 ACCOUNTS = "/accounts"

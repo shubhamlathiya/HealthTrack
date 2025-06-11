@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+
+{% block title %}Item Supplier{% endblock title %}
+
+{% block page %}Item Supplier{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-truck-line me-2"></i>Item Suppliers
+                    </h5>
+                    <button class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                        <i class="ri-add-line me-1"></i>Add Supplier
+                    </button>
+                    <button type="button" class="btn btn-info ms-1" data-bs-toggle="modal"
+                            data-bs-target="#importExportModal">
+                        <i class="ri-import-line me-1"></i> Import/Export
+                    </button>
+                    <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                            data-bs-target="#restoreSuppliersModal">
+                        <i class="ri-refresh-line"></i> View & Restore Deleted Records
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Contact Person</th>
+                                <th>Last Updated</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for supplier in suppliers %}
+                                <tr>
+                                    <td>{{ supplier.name }}</td>
+                                    <td>{{ supplier.phone or 'N/A' }}</td>
+                                    <td>{{ supplier.email or 'N/A' }}</td>
+                                    <td>{{ supplier.contact_person_name or 'N/A' }}</td>
+                                    <td>{{ supplier.updated_at }}</td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewSupplierModal{{ supplier.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editSupplierModal{{ supplier.id }}">
+                                                <i class="ri-edit-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteSupplierModal{{ supplier.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">No suppliers found</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-add-line me-2"></i>Add New Supplier
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + ITEM_SUPPLIERS_ADD }}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="text" class="form-control" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contact Person Name</label>
+                            <input type="text" class="form-control" name="contact_person_name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contact Person Phone</label>
+                            <input type="text" class="form-control" name="contact_person_phone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contact Person Email</label>
+                            <input type="email" class="form-control" name="contact_person_email">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" name="address" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line"></i> Save Supplier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="importExportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-import-export-line me-2"></i>Import/Export Suppliers
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="importExportTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="export-tab" data-bs-toggle="tab"
+                                    data-bs-target="#export-pane" type="button" role="tab">
+                                <i class="ri-download-line me-1"></i> Export
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="import-tab" data-bs-toggle="tab"
+                                    data-bs-target="#import-pane" type="button" role="tab">
+                                <i class="ri-upload-line me-1"></i> Import
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3 border border-top-0" id="importExportTabsContent">
+                        <div class="tab-pane fade show active" id="export-pane" role="tabpanel">
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-2"></i>
+                                Export suppliers data in different formats
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{{ ADMIN + ITEM_SUPPLIERS_EXPORT }}/csv"
+                                   class="btn btn-outline-primary">
+                                    <i class="ri-file-excel-2-line me-1"></i> Export as CSV
+                                </a>
+                                <a href="{{ ADMIN + ITEM_SUPPLIERS_EXPORT }}/excel"
+                                   class="btn btn-outline-success">
+                                    <i class="ri-file-excel-line me-1"></i> Export as Excel
+                                </a>
+                                <a href="{{ ADMIN + ITEM_SUPPLIERS_EXPORT }}/pdf"
+                                   class="btn btn-outline-danger">
+                                    <i class="ri-file-pdf-line me-1"></i> Export as PDF
+                                </a>
+                            </div>
+                            <div class="mt-3">
+                                <a href="{{ ADMIN + ITEM_SUPPLIERS_IMPORT_SAMPLE }}" class="btn btn-link">
+                                    <i class="ri-download-line me-1"></i> Download Sample Import File
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="import-pane" role="tabpanel">
+                            <div class="alert alert-warning">
+                                <i class="ri-alert-line me-2"></i>
+                                Please ensure your Excel file follows the required format.
+                                <a href="{{ ADMIN + ITEM_SUPPLIERS_IMPORT_SAMPLE }}" class="alert-link">
+                                    Download sample file
+                                </a>
+                            </div>
+                            <form method="POST" action="{{ ADMIN + ITEM_SUPPLIERS_IMPORT }}"
+                                  enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="importFile" class="form-label">Select Excel File</label>
+                                    <input class="form-control" type="file" id="importFile" name="file"
+                                           accept=".xlsx,.xls" required>
+                                    <div class="form-text">Only Excel files (.xlsx, .xls) are accepted</div>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="overwriteData" name="overwrite">
+                                    <label class="form-check-label" for="overwriteData">Overwrite existing data</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-upload-line me-1"></i> Import Data
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for supplier in suppliers %}
+        <div class="modal fade" id="viewSupplierModal{{ supplier.id }}" tabindex="-1"
+             aria-labelledby="viewSupplierModalLabel{{ supplier.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewSupplierModalLabel{{ supplier.id }}">
+                            <i class="ri-truck-line me-2"></i>Supplier Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-information-line"></i> Basic Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Supplier Name:</strong> {{ supplier.name }}</p>
+                                <p><strong>Phone:</strong> {{ supplier.phone or 'N/A' }}</p>
+                                <p><strong>Email:</strong> {{ supplier.email or 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-user-line"></i> Contact Person Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Contact Person Name:</strong> {{ supplier.contact_person_name or 'N/A' }}</p>
+                                <p><strong>Contact Person Phone:</strong> {{ supplier.contact_person_phone or 'N/A' }}
+                                </p>
+                                <p><strong>Contact Person Email:</strong> {{ supplier.contact_person_email or 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-map-pin-line"></i> Address & Description</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Address:</strong> {{ supplier.address or 'No address provided' }}</p>
+                                <p><strong>Description:</strong> {{ supplier.description or 'No description provided' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editSupplierModal{{ supplier.id }}" tabindex="-1"
+             aria-labelledby="editSupplierModalLabel{{ supplier.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="editSupplierModalLabel{{ supplier.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Supplier
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + ITEM_SUPPLIERS_EDIT }}/{{ supplier.id }}">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" value="{{ supplier.name }}"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" name="phone" value="{{ supplier.phone or '' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email"
+                                       value="{{ supplier.email or '' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contact Person Name</label>
+                                <input type="text" class="form-control" name="contact_person_name"
+                                       value="{{ supplier.contact_person_name or '' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contact Person Phone</label>
+                                <input type="text" class="form-control" name="contact_person_phone"
+                                       value="{{ supplier.contact_person_phone or '' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contact Person Email</label>
+                                <input type="email" class="form-control" name="contact_person_email"
+                                       value="{{ supplier.contact_person_email or '' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address"
+                                          rows="2">{{ supplier.address or '' }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description"
+                                          rows="3">{{ supplier.description or '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="ri-save-line"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteSupplierModal{{ supplier.id }}" tabindex="-1"
+             aria-labelledby="deleteSupplierModalLabel{{ supplier.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteSupplierModalLabel{{ supplier.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <b>{{ supplier.name }}</b>?
+                        {# Add a warning here if the supplier has associated items/purchase orders, similar to how medicine categories were handled #}
+                        {# This would require passing a 'can_delete' flag from the route based on actual related record count #}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Cancel
+                        </button>
+                        <form action="{{ ADMIN + ITEM_SUPPLIERS_DELETE }}/{{ supplier.id }}"
+                              method="POST">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-delete-bin-line"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="modal fade" id="restoreSuppliersModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-refresh-line me-2"></i>Restore Archived Suppliers
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="restoreTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="suppliers-tab" data-bs-toggle="tab"
+                                    data-bs-target="#suppliers" type="button" role="tab">
+                                <i class="ri-truck-line me-1"></i>
+                                Suppliers ({{ archived_suppliers|length }})
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3 border border-top-0" id="restoreTabsContent">
+                        <div class="tab-pane fade show active" id="suppliers" role="tabpanel">
+                            {% if archived_suppliers %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Supplier Name</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                            <th>Contact Person</th>
+                                            <th>Archived On</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for supplier in archived_suppliers %}
+                                            <tr>
+                                                <td>{{ supplier.name }}</td>
+                                                <td>{{ supplier.phone or 'N/A' }}</td>
+                                                <td>{{ supplier.email or 'N/A' }}</td>
+                                                <td>{{ supplier.contact_person_name or 'N/A' }}</td>
+                                                <td>{{ supplier.deleted_at.strftime('%Y-%m-%d %H:%M') if supplier.deleted_at else 'Unknown' }}</td>
+                                                <td>
+                                                    <form method="POST"
+                                                          action="{{ ADMIN + ITEM_SUPPLIERS_RESTORE }}/{{ supplier.id }}">
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-success">
+                                                            <i class="ri-refresh-line me-1"></i> Restore
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="ri-information-line me-2"></i>
+                                    No archived suppliers found
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block heardLink %}
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+    <script src="../../../static/assets/vendor/datatables/buttons/dataTables.buttons.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/buttons.html5.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/buttons.print.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/jszip.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/pdfmake.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/vfs_fonts.js"></script>
+{% endblock footerLink %}

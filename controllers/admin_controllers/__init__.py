@@ -39,6 +39,10 @@ from controllers.admin_controllers.accounts.accounts_routes import *
 from controllers.admin_controllers.noticeboard.noticeboard_routes import *
 
 # inventory
+from controllers.admin_controllers.inventory.item_category_routes import *
+from controllers.admin_controllers.inventory.item_store_routes import *
+from controllers.admin_controllers.inventory.item_suppliers_routes import *
+from controllers.admin_controllers.inventory.item_routes import *
 from controllers.admin_controllers.inventory.inventory_routes import *
 from controllers.admin_controllers.inventory.issued_item_routes import *
 

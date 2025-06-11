@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h2>Confirm Restoration</h2>
+
+        <div class="alert alert-warning" role="alert">
+            <strong>WARNING:</strong> Restoring from a backup will overwrite the current database and/or static files.
+            This action is irreversible and can lead to data loss if not handled carefully.
+            Please ensure you have a recent backup of your current system before proceeding.
+        </div>
+
+        <p>Are you sure you want to restore from the backup file: <strong>{{ filename }}</strong>?</p>
+
+        <form action="{{ url_for('backups.restore_backup', filename=filename) }}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-danger">Yes, Restore Now</button>
+        </form>
+        <a href="{{ url_for('backups.index') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+{% endblock %}

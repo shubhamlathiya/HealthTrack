@@ -17,7 +17,7 @@ from utils.email_utils import send_email
 UPLOAD_FOLDER = 'static/uploads/profile_pictures'  # Base folder
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif','pdf'}
 
 
 def allowed_file(filename):

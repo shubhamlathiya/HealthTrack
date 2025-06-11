@@ -1,0 +1,505 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventory Items{% endblock title %}
+
+{% block page %}Inventory Items{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-box-3-line me-2"></i>Inventory Items
+                    </h5>
+                    <button class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                        <i class="ri-add-line me-1"></i>Add Item
+                    </button>
+                    <button type="button" class="btn btn-info ms-1" data-bs-toggle="modal"
+                            data-bs-target="#importExportModal">
+                        <i class="ri-import-line me-1"></i> Import/Export
+                    </button>
+                    <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                            data-bs-target="#restoreItemModal">
+                        <i class="ri-refresh-line"></i> View & Restore Deleted Records
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <div class="table-responsive">
+                        <table id="scrollVertical" class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Item Name</th>
+                                {# Changed from ID to Item Name #}
+                                <th>Category</th>
+                                <th>Min Quantity</th>
+                                <th>Restricted</th>
+                                <th>Description</th>
+                                {# Added Description column #}
+                                <th>Last Updated</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in active_items %}
+                                <tr>
+                                    <td>{{ item.item_name }}</td>
+                                    {# Display Item Name #}
+                                    <td>{{ item.category.name if item.category else 'N/A' }}</td>
+                                    <td>{{ item.min_quantity }}</td>
+                                    <td>{{ 'Yes' if item.is_restricted else 'No' }}</td>
+                                    <td>{{ item.description|truncate(50) or 'N/A' }}</td>
+                                    {# Display truncated description #}
+                                    <td>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#viewItemModal{{ item.id }}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editItemModal{{ item.id }}">
+                                                <i class="ri-edit-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteItemModal{{ item.id }}">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">No active inventory items found</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addItemModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-add-line me-2"></i>Add New Item
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ ADMIN + INVENTORY_ITEMS_ADD }}">
+                    {# Use url_for for better practice #}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="addItemName" class="form-label">Item Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addItemName" name="item_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addCategory" class="form-label">Category <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="addCategory" name="category_id" required>
+                                <option value="">Select Category</option>
+                                {% for category in item_categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addMinQuantity" class="form-label">Minimum Quantity <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="addMinQuantity" name="min_quantity" min="0"
+                                   value="0" required>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="addIsRestricted" name="is_restricted">
+                            <label class="form-check-label" for="addIsRestricted">
+                                Is Restricted Item?
+                            </label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="addDescription" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line"></i> Save Item
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% for item in active_items %}
+        <div class="modal fade" id="viewItemModal{{ item.id }}" tabindex="-1"
+             aria-labelledby="viewItemModalLabel{{ item.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewItemModalLabel{{ item.id }}">
+                            <i class="ri-box-3-line me-2"></i>Item Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-information-line"></i> Basic Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Item Name:</strong> {{ item.item_name }}</p>
+                                <p><strong>Category:</strong> {{ item.category.name if item.category else 'N/A' }}</p>
+                                <p><strong>Minimum Quantity:</strong> {{ item.min_quantity }}</p>
+                                <p><strong>Is Restricted:</strong> {{ 'Yes' if item.is_restricted else 'No' }}</p>
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-calendar-line"></i> Timestamps</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Created At:</strong> {{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                <p><strong>Last Updated:</strong> {{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-file-text-line"></i> Description</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ item.description or 'No description provided' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editItemModal{{ item.id }}" tabindex="-1"
+             aria-labelledby="editItemModalLabel{{ item.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="editItemModalLabel{{ item.id }}">
+                            <i class="ri-edit-line me-2"></i>Edit Item
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ ADMIN + INVENTORY_ITEMS_EDIT }}/{{ item.id }}">
+                        {# Use url_for #}
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="editItemName{{ item.id }}" class="form-label">Item Name <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editItemName{{ item.id }}" name="item_name"
+                                       value="{{ item.item_name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCategory{{ item.id }}" class="form-label">Category <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="editCategory{{ item.id }}" name="category_id" required>
+                                    <option value="">Select Category</option>
+                                    {% for category in item_categories %}
+                                        <option value="{{ category.id }}"
+                                                {% if item.category_id == category.id %}selected{% endif %}>
+                                            {{ category.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMinQuantity{{ item.id }}" class="form-label">Minimum Quantity <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="editMinQuantity{{ item.id }}"
+                                       name="min_quantity" min="0" value="{{ item.min_quantity }}" required>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="editIsRestricted{{ item.id }}"
+                                       name="is_restricted" {% if item.is_restricted %}checked{% endif %}>
+                                <label class="form-check-label" for="editIsRestricted{{ item.id }}">
+                                    Is Restricted Item?
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDescription{{ item.id }}" class="form-label">Description</label>
+                                <textarea class="form-control" id="editDescription{{ item.id }}" name="description"
+                                          rows="3">{{ item.description or '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="ri-close-line"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="ri-save-line"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteItemModal{{ item.id }}" tabindex="-1"
+             aria-labelledby="deleteItemModalLabel{{ item.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteItemModalLabel{{ item.id }}">
+                            <i class="ri-delete-bin-line me-2"></i>Confirm Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <b>{{ item.item_name }}</b>?
+                        <div class="card bg-light mt-3">
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Associated Stocks:</strong> {{ item.item_stocks.count() }}</p>
+                                <p class="mb-1"><strong>Issued Records:</strong> {{ item.issued_items.count() }}</p>
+                            </div>
+                        </div>
+                        {% if item.item_stocks.count() > 0 or item.issued_items.count() > 0 %}
+                            <div class="alert alert-warning mt-3">
+                                <i class="ri-alert-line me-2"></i>
+                                This item has associated stock or issued records. Deleting it will soft-delete it, but
+                                existing records will remain.
+                            </div>
+                        {% endif %}
+                        <p class="text-danger mt-3"><i class="ri-error-warning-line me-1"></i>This action will
+                            soft-delete the item, and it can be restored later.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Cancel
+                        </button>
+                        <form action="{{ ADMIN + INVENTORY_ITEMS_DELETE }}/{{ item.id }}" method="POST">
+                            {# Use url_for #}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ri-delete-bin-line"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="modal fade" id="importExportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="ri-import-export-line me-2"></i>Import/Export Items
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="importExportTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="export-tab" data-bs-toggle="tab"
+                                    data-bs-target="#export-pane" type="button" role="tab">
+                                <i class="ri-download-line me-1"></i> Export
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="import-tab" data-bs-toggle="tab"
+                                    data-bs-target="#import-pane" type="button" role="tab">
+                                <i class="ri-upload-line me-1"></i> Import
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3 border border-top-0" id="importExportTabsContent">
+                        <div class="tab-pane fade show active" id="export-pane" role="tabpanel">
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-2"></i>
+                                Export inventory items data to CSV.
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{{ ADMIN + INVENTORY_ITEMS_EXPORT }}/csv"
+                                   class="btn btn-outline-primary">
+                                    <i class="ri-file-excel-2-line me-1"></i> Export as CSV
+                                </a>
+                                <a href="{{ ADMIN + INVENTORY_ITEMS_EXPORT }}/excel"
+                                   class="btn btn-outline-success">
+                                    <i class="ri-file-excel-line me-1"></i> Export as Excel
+                                </a>
+                                <a href="{{ ADMIN + INVENTORY_ITEMS_EXPORT }}/pdf"
+                                   class="btn btn-outline-danger">
+                                    <i class="ri-file-pdf-line me-1"></i> Export as PDF
+                                </a>
+                            </div>
+                            <div class="mt-3">
+                                <a href="{{ ADMIN + INVENTORY_ITEMS_IMPORT_SAMPLE }}" class="btn btn-link">
+                                    <i class="ri-download-line me-1"></i> Download Sample Import File
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="import-pane" role="tabpanel">
+                            <div class="alert alert-warning">
+                                <i class="ri-alert-line me-2"></i>
+                                Please ensure your Excel file follows the required format.
+                                <a href="{{ ADMIN + INVENTORY_ITEMS_IMPORT_SAMPLE }}" class="alert-link">
+                                    Download sample file
+                                </a>
+                            </div>
+                            <form method="POST" action="{{ ADMIN +  INVENTORY_ITEMS_IMPORT }}"
+                                  enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="importFile" class="form-label">Select Excel File</label>
+                                    <input class="form-control" type="file" id="importFile" name="file"
+                                           accept=".xlsx,.xls" required>
+                                    <div class="form-text">Only Excel files (.xlsx, .xls) are accepted</div>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="overwriteData" name="overwrite">
+                                    <label class="form-check-label" for="overwriteData">Overwrite existing data</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-upload-line me-1"></i> Import Data
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="restoreItemModal" tabindex="-1" aria-labelledby="restoreItemModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl"> {# Changed to modal-xl for wider table #}
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="restoreItemModalLabel">
+                        <i class="ri-refresh-line me-2"></i>View & Restore Deleted Items
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="restoreTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="items-tab" data-bs-toggle="tab"
+                                    {# Changed ID to items-tab #}
+                                    data-bs-target="#items" type="button" role="tab"> {# Changed target to #items #}
+                                <i class="ri-box-3-line me-1"></i> {# Changed icon #}
+                                Items ({{ deleted_items|length }}) {# Changed variable name #}
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3 border border-top-0" id="restoreTabsContent">
+                        <div class="tab-pane fade show active" id="items" role="tabpanel"> {# Changed ID #}
+                            {% if deleted_items %} {# Changed variable name #}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Item Name</th>
+                                            {# Consistent with main table #}
+                                            <th>Category</th>
+                                            <th>Min Quantity</th>
+                                            <th>Restricted</th>
+                                            <th>Deleted On</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in deleted_items %} {# Changed variable name #}
+                                            <tr>
+                                                <td>{{ item.item_name }}</td>
+                                                <td>{{ item.category.name if item.category else 'N/A' }}</td>
+                                                <td>{{ item.min_quantity }}</td>
+                                                <td>{{ 'Yes' if item.is_restricted else 'No' }}</td>
+                                                <td>{{ item.deleted_at.strftime('%Y-%m-%d %H:%M') if item.deleted_at else 'Unknown' }}</td>
+                                                <td>
+                                                    <form method="POST"
+                                                          action="{{ ADMIN + INVENTORY_ITEMS_RESTORE }}/{{ item.id }}">
+                                                        {# Use url_for #}
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-success">
+                                                            <i class="ri-refresh-line me-1"></i> Restore
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="ri-information-line me-2"></i>
+                                    No deleted items found
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block heardLink %}
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/dataTables.bs5-custom.css">
+    <link rel="stylesheet" href="../../../static/assets/vendor/datatables/buttons/dataTables.bs5-custom.css">
+{% endblock %}
+
+{% block footerLink %}
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
+
+    <script src="../../../static/assets/vendor/datatables/buttons/dataTables.buttons.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/buttons.html5.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/buttons.print.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/jszip.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/pdfmake.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/vfs_fonts.js"></script>
+
+{% endblock footerLink %}

@@ -355,15 +355,40 @@
                     </a>
                     <ul class="treeview-menu">
                         <li>
-                            <a href="/admin/inventory/item-stock-list"
-                               class="{% if request.path == '/admin/inventory/item-stock-list' %}active-sub{% endif %}">Item
-                                Stock
-                                List</a>
+                            <a href="/admin/inventory/item_stocks"
+                               class="{% if request.path == '/admin/inventory/item_stocks' %}active-sub{% endif %}">
+                                Item Stock List
+                            </a>
                         </li>
                         <li>
-                            <a href="/admin/inventory/issued-item"
-                               class="{% if request.path == '/admin/inventory/issued-item' %}active-sub{% endif %}">Issued
-                                Items</a>
+                            <a href="/admin/inventory/issued"
+                               class="{% if request.path == '/admin/inventory/issued' %}active-sub{% endif %}">
+                                Issued Items
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/admin/inventory/categories"
+                               class="{% if request.path == '/admin/inventory/categories' %}active-sub{% endif %}">
+                                Item Categories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/admin/inventory/stores"
+                               class="{% if request.path == '/admin/inventory/stores' %}active-sub{% endif %}">
+                                Item Stores
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/admin/inventory/suppliers"
+                               class="{% if request.path == '/admin/inventory/suppliers' %}active-sub{% endif %}">
+                                Item Suppliers
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/admin/inventory/items"
+                               class="{% if request.path == '/admin/inventory/items' %}active-sub{% endif %}">
+                                Items
+                            </a>
                         </li>
                     </ul>
                 </li>

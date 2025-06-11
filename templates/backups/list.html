@@ -1,0 +1,58 @@
+{% extends "base.html" %} {# Assuming you have a base template #}
+
+{% block body %}
+    <div class="container mt-4">
+        <h2>Backup History</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="mb-3">
+            <form action="{{ url_for('backups.create_backup') }}" method="post">
+                <button type="submit" class="btn btn-primary">Create New Backup</button>
+            </form>
+        </div>
+
+        {% if backup_files %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Size</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for backup in backup_files %}
+                    <tr>
+                        <td>{{ backup.name }}</td>
+                        <td>{{ (backup.size / 1024 / 1024)|round(2) }} MB</td>
+                        <td>{{ backup.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            <a href="{{ url_for('backups.download_backup', filename=backup.name) }}"
+                               class="btn btn-sm btn-info">Download</a>
+                            {% if backup.name.endswith('.sql') or backup.name.startswith('static_backup_') and backup.name.endswith('.zip') %}
+                                <a href="{{ url_for('backups.restore_confirm', filename=backup.name) }}"
+                                   class="btn btn-sm btn-warning">Restore</a>
+                            {% endif %}
+                            <form action="{{ url_for('backups.delete_backup', filename=backup.name) }}" method="post"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Are you sure you want to delete this backup?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No backups found.</p>
+        {% endif %}
+    </div>
+{% endblock %}
