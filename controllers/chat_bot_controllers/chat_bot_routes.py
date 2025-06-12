@@ -533,6 +533,8 @@ STATE_HANDLERS = {
     'medicine_quantity': handle_medicine_quantity,
     'medicine_delivery_address': handle_medicine_delivery_address,
     'medicine_payment_method': handle_medicine_payment_method,
+    'medicine_search_input': handle_medicine_search_input,
+
 
     # --- Ambulance Request Flow ---
     'ambulance_start': handle_ambulance_start,
@@ -540,7 +542,7 @@ STATE_HANDLERS = {
     'ambulance_final_confirm': handle_ambulance_final_confirm_options,  # Ensure this key matches next_state values
 
     # 'ambulance_emergency_input': handle_ambulance_emergency_input,
-    'medicine_search_input': handle_medicine_search_input,
+
     # 'medicine_select_from_search':handle_medicine_select_from_search,
     # Add handlers for all other states as you implement them
     # For example: 'medicine_search_input', 'medicine_other_quantity_input', etc.
