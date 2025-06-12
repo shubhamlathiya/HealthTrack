@@ -3,6 +3,39 @@ ADMIN = "/admin"
 
 ADMIN_DASHBOARD = f"{ADMIN}/dashboard"
 
+# department
+DEPARTMENT = "/department"
+DEPARTMENT_LIST = f"/{DEPARTMENT}/department-list"
+DEPARTMENT_ADD_DEPARTMENT = f"{DEPARTMENT}/add-department"
+DEPARTMENT_EDIT_DEPARTMENT = f"{DEPARTMENT}/edit-department"
+DEPARTMENT_DELETE_DEPARTMENT = f"{DEPARTMENT}/delete-department"
+DEPARTMENT_RESTORE_DEPARTMENT = f"{DEPARTMENT}/restore-department"
+DEPARTMENT_EXPORT = f"/{DEPARTMENT}/export"
+DEPARTMENT_IMPORT = f"/{DEPARTMENT}/import"
+DEPARTMENT_IMPORT_SAMPLE = f"/{DEPARTMENT}/import-sample"
+
+DEPARTMENT_MANAGE_HEADS = f"/{DEPARTMENT}/manage-heads"
+DEPARTMENT_ADD_HEAD = f"/{DEPARTMENT}/add-head"
+DEPARTMENT_REMOVE_HEAD = f"/{DEPARTMENT}/remove-head"
+
+# doctor
+DOCTOR = "/doctor"
+DOCTOR_LIST = f"{DOCTOR}/doctor-list"
+DOCTOR_ADD_DOCTOR = f"{DOCTOR}/add-doctor"
+DOCTOR_EDIT_DOCTOR = f"{DOCTOR}/edit-doctor"
+DOCTOR_DELETE_DOCTOR = f"{DOCTOR}/delete-doctor"
+DOCTOR_RESTORE_DOCTOR = f"{DOCTOR}/restore-doctor"
+DOCTOR_EXPORT = f"{DOCTOR}/export"
+DOCTOR_IMPORT = f"{DOCTOR}/import"
+DOCTOR_IMPORT_SAMPLE = f"{DOCTOR}/import-sample"
+
+DOCTOR_ASSIGN_DEPARTMENT = f"/{DOCTOR}/assign-department"
+DOCTOR_UPDATE_ASSIGN_DEPARTMENT = f"{DOCTOR}/update-assign-department"
+DOCTOR_REMOVE_ASSIGN_DEPARTMENT = f"{DOCTOR}/remove-assign-department"
+DOCTOR_SHIFT_MANAGEMENT = f"{DOCTOR}/shift-management"
+DOCTOR_UPDATE_SHIFT_MANAGEMENT = f"{DOCTOR}/update-shift-management"
+
+
 # blood-bank
 BLOOD_BANK = "/blood-bank"
 BLOOD_BANK_DONOR = f"{BLOOD_BANK}/donor"
@@ -101,6 +134,7 @@ ITEM_STOCKS_RESTORE = f'{INVENTORY_BASE}/item_stocks/restore'  # Will append /<i
 ITEM_STOCKS_EXPORT = f'{INVENTORY_BASE}/item_stocks/export'  # Will append /<string:file_format>
 ITEM_STOCKS_IMPORT = f'{INVENTORY_BASE}/item_stocks/import'
 ITEM_STOCKS_IMPORT_SAMPLE = f'{INVENTORY_BASE}/item_stocks/import/sample'
+ITEMS_GET_BY_CATEGORY = f'{INVENTORY_BASE}/items/get_by_category'
 ITEMS_GET_BY_CATEGORY = f'{INVENTORY_BASE}/items/get_by_category'
 
 # --- Issued Items ---
@@ -206,27 +240,6 @@ AMBULANCE_AMBULANCE_CALL_LIST_PRINT = f"{AMBULANCE_CALLS_BASE}/print"
 AMBULANCE_AMBULANCE_EXPORT_CALLS = f"{AMBULANCE_CALLS_BASE}/export"
 AMBULANCE_AMBULANCE_ADD_PAYMENT_TO_CALL = f"{AMBULANCE_CALLS_BASE}/add-payment"
 
-# department
-DEPARTMENT = "/department"
-DEPARTMENT_LIST = f"/{DEPARTMENT}/department-list"
-DEPARTMENT_ADD_DEPARTMENT = f"{DEPARTMENT}/add-department"
-DEPARTMENT_EDIT_DEPARTMENT = f"{DEPARTMENT}/edit-department"
-DEPARTMENT_DELETE_DEPARTMENT = f"{DEPARTMENT}/delete-department"
-DEPARTMENT_RESTORE_DEPARTMENT = f"{DEPARTMENT}/restore-department"
-
-DEPARTMENT_MANAGE_HEADS = f"/{DEPARTMENT}/manage-heads"
-DEPARTMENT_ADD_HEAD = f"/{DEPARTMENT}/add-head"
-DEPARTMENT_REMOVE_HEAD = f"/{DEPARTMENT}/remove-head"
-
-# doctor
-DOCTOR = "/doctor"
-DOCTOR_LIST = f"{DOCTOR}/doctor-list"
-DOCTOR_ADD_DOCTOR = f"{DOCTOR}/add-doctor"
-DOCTOR_ASSIGN_DEPARTMENT = f"/{DOCTOR}/assign-department"
-DOCTOR_UPDATE_ASSIGN_DEPARTMENT = f"{DOCTOR}/update-assign-department"
-DOCTOR_REMOVE_ASSIGN_DEPARTMENT = f"{DOCTOR}/remove-assign-department"
-DOCTOR_SHIFT_MANAGEMENT = f"{DOCTOR}/shift-management"
-DOCTOR_UPDATE_SHIFT_MANAGEMENT = f"{DOCTOR}/update-shift-management"
 
 # human-resources
 HUMAN_RESOURCES = "/human-resources"
@@ -408,6 +421,8 @@ ROOM_DELETE_BAD = f"{ROOM}/delete-bad"
 ROOM_EDIT_ROOM = f"{ROOM}/edit-room"
 ROOM_DELETE_ROOM = f"{ROOM}/delete-room"
 ROOM_RESTORE_ROOM = f"{ROOM}/restore-room"
+ROOM_IMPORT = f"{ROOM}/import"
+ROOM_EXPORT = f"{ROOM}/export"
 ROOM_DISCHARGE_ROOM = f"{ROOM}/discharge-room"
 ROOM_CLEANING_LOGS = f"{ROOM}/cleaning-logs"
 ROOM_COMPLETE_CLEANING_LOGS = f"{ROOM}/complete-cleaning-logs"

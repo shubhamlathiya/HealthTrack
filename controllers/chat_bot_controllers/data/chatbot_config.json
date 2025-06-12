@@ -1,0 +1,120 @@
+{
+  "main_menu_options": [
+    {
+      "text": "Request Medicine",
+      "value": "request_medicine",
+      "description": "Start a new medicine delivery request."
+    },
+    {
+      "text": "Call Ambulance",
+      "value": "call_ambulance",
+      "description": "Request an emergency ambulance service."
+    },
+    {
+      "text": "View My Appointments",
+      "value": "view_appointments",
+      "description": "See your scheduled doctor appointments."
+    },
+    {
+      "text": "Check Bill Status",
+      "value": "check_bill_status",
+      "description": "Inquire about your outstanding bills."
+    },
+    {
+      "text": "Speak to a Human",
+      "value": "speak_to_human",
+      "description": "Connect with a human agent for further assistance."
+    },
+    {
+      "text": "My Health Profile",
+      "value": "my_health_profile",
+      "description": "View or update your basic health information."
+    }
+  ],
+  "medicine_request_options": [
+    {
+      "text": "Search by Name",
+      "value": "search_by_name"
+    },
+    {
+      "text": "View My Prescriptions",
+      "value": "view_prescriptions"
+    }
+  ],
+  "ambulance_emergency_options": [
+    {
+      "text": "Chest Pain",
+      "value": "chest_pain"
+    },
+    {
+      "text": "Accident",
+      "value": "accident"
+    },
+    {
+      "text": "Breathing Difficulty",
+      "value": "breathing_difficulty"
+    },
+    {
+      "text": "Other Emergency",
+      "value": "other_emergency"
+    }
+  ],
+  "medicine_quantity_options": [
+    {
+      "text": "1",
+      "value": "1"
+    },
+    {
+      "text": "2",
+      "value": "2"
+    },
+    {
+      "text": "5",
+      "value": "5"
+    },
+    {
+      "text": "Other Quantity",
+      "value": "other_quantity"
+    }
+  ],
+  "medicine_address_options": [
+    {
+      "text": "Confirm Address",
+      "value": "confirm_address"
+    },
+    {
+      "text": "Enter New Address",
+      "value": "enter_new_address"
+    }
+  ],
+  "medicine_payment_options": [
+    {
+      "text": "Cash on Delivery",
+      "value": "cash_on_delivery"
+    },
+    {
+      "text": "Online Payment",
+      "value": "online_payment"
+    }
+  ],
+  "medicine_final_confirm_options": [
+    {
+      "text": "Place Order",
+      "value": "place_order"
+    },
+    {
+      "text": "Go Back",
+      "value": "go_back"
+    }
+  ],
+  "ambulance_final_confirm_options": [
+    {
+      "text": "Confirm Dispatch",
+      "value": "confirm_dispatch"
+    },
+    {
+      "text": "Cancel Request",
+      "value": "cancel_ambulance"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 from datetime import datetime, date, timedelta  # Import date and timedelta specifically
+from enum import Enum
 
+from sqlalchemy import Enum as SqlEnum
 from sqlalchemy import Numeric
 
 from utils.config import db
@@ -139,6 +141,7 @@ class Medicine(db.Model):
     batches = db.relationship('MedicineBatch', backref='medicine', lazy=True)
     purchase_items = db.relationship('PurchaseItem', backref='medicine', lazy=True)
     stock_transactions = db.relationship('StockTransaction', back_populates='medicine')
+    requested_items = db.relationship('MedicineRequestItem', back_populates='medicine', lazy=True)
 
     @property
     def current_stock(self):
@@ -357,3 +360,47 @@ class MedicineSaleItem(db.Model):
 
     def __repr__(self):
         return f'<MedicineSaleItem {self.medicine.name} x{self.quantity}>'
+
+
+# --- NEW MODELS FOR CHATBOT FUNCTIONALITY ---
+
+class MedicineRequestStatus(Enum):
+    PENDING = 'Pending'
+    PROCESSING = 'Processing'
+    DELIVERED = 'Delivered'
+    CANCELLED = 'Cancelled'
+    REJECTED = 'Rejected'
+
+
+class MedicineRequest(db.Model):
+    __tablename__ = 'medicine_requests'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    requester_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    request_date = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(SqlEnum(MedicineRequestStatus), nullable=False, default=MedicineRequestStatus.PENDING)
+    delivery_address = db.Column(db.String(255), nullable=False)
+    payment_method = db.Column(db.String(50), nullable=True)
+    total_amount = db.Column(db.Numeric(10, 2), default=0.00)
+    notes = db.Column(db.Text, nullable=True)
+
+    patient = db.relationship('Patient', back_populates='medicine_requests')
+    requester = db.relationship('User', backref='made_medicine_requests')
+    items = db.relationship('MedicineRequestItem', backref='request', lazy=True, cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'<MedicineRequest {self.id} for Patient {self.patient_id} - Status: {self.status.value}>'
+
+
+class MedicineRequestItem(db.Model):
+    __tablename__ = 'medicine_request_items'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    medicine_request_id = db.Column(db.Integer, db.ForeignKey('medicine_requests.id'), nullable=False)
+    medicine_id = db.Column(db.Integer, db.ForeignKey('medicines.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    requested_price_per_unit = db.Column(db.Numeric(10, 2), nullable=True)
+
+    medicine = db.relationship('Medicine', back_populates='requested_items')
+
+    def __repr__(self):
+        return f'<MedicineRequestItem {self.medicine_id} x {self.quantity} for Request {self.medicine_request_id}>'

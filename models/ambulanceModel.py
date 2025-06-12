@@ -1,3 +1,8 @@
+from datetime import datetime
+from enum import Enum
+
+from sqlalchemy import Enum as SqlEnum
+
 from utils.config import db
 
 
@@ -155,3 +160,33 @@ class AdditionalCharge(db.Model):
     def __repr__(self):
         # Corrected repr to reflect AmbulanceChargeItem for name
         return f"<AdditionalCharge {self.charge_item.name} (${self.amount})>"
+
+
+class AmbulanceRequestStatus(Enum):
+    PENDING = 'Pending'
+    DISPATCHED = 'Dispatched'
+    EN_ROUTE = 'En Route'
+    ARRIVED = 'Arrived'
+    COMPLETED = 'Completed'
+    CANCELLED = 'Cancelled'
+    REJECTED = 'Rejected'
+
+
+class AmbulanceRequest(db.Model):
+    __tablename__ = 'ambulance_requests'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    requester_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=True)
+    request_time = db.Column(db.DateTime, default=datetime.utcnow)
+    pickup_location = db.Column(db.String(255), nullable=False)
+    emergency_description = db.Column(db.Text, nullable=True)
+    status = db.Column(SqlEnum(AmbulanceRequestStatus), nullable=False, default=AmbulanceRequestStatus.PENDING)
+    assigned_ambulance_id = db.Column(db.Integer, db.ForeignKey('ambulance.id'), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+
+    requester = db.relationship('User', backref='made_ambulance_requests_as_requester')
+    patient = db.relationship('Patient', back_populates='ambulance_requests')
+    assigned_ambulance = db.relationship('Ambulance', backref='current_requests')
+
+    def __repr__(self):
+        return f'<AmbulanceRequest {self.id} - Status: {self.status.value}>'

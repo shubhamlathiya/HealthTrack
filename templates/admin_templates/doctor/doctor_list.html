@@ -11,6 +11,14 @@
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title">Doctor List</h5>
                     <a href="{{ ADMIN + DOCTOR_ADD_DOCTOR }}" class="btn btn-primary ms-auto">Add New Doctor</a>
+                    <button type="button" class="btn btn-info ms-1" data-bs-toggle="modal"
+                            data-bs-target="#importExportModal">
+                        <i class="ri-import-line me-1"></i> Import/Export
+                    </button>
+                    <button type="button" class="btn btn-warning ms-1" data-bs-toggle="modal"
+                            data-bs-target="#restoreDoctorsModal">
+                        <i class="ri-refresh-line"></i> View & Restore Deleted Records
+                    </button>
                 </div>
                 <div class="card-body">
                     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -81,7 +89,8 @@
                                                     data-bs-target="#delRow{{ doctor.id }}">
                                                 <i class="ri-delete-bin-line"></i>
                                             </button>
-                                            <a href="/" class="btn btn-outline-success btn-sm"
+                                            <a href="{{ ADMIN + DOCTOR_EDIT_DOCTOR }}/{{ doctor.id }}"
+                                               class="btn btn-outline-success btn-sm"
                                                data-bs-toggle="tooltip"
                                                data-bs-placement="top" data-bs-title="Edit Doctor">
                                                 <i class="ri-edit-box-line"></i>
@@ -125,7 +134,8 @@
                                             <button class="btn btn-outline-secondary" data-bs-dismiss="modal"
                                                     aria-label="Close">Cancel
                                             </button>
-                                            <form action="/" method="POST">
+                                            <form action="{{ ADMIN +  DOCTOR_DELETE_DOCTOR }}/{{ doctor.id }}"
+                                                  method="POST">
                                                 <button type="submit" class="btn btn-danger">Delete</button>
                                             </form>
                                         </div>
@@ -204,6 +214,184 @@
                 </div>
             </div>
         </div>
+        <!-- Import/Export Modal -->
+        <div class="modal fade" id="importExportModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">
+                            <i class="ri-import-export-line me-2"></i>Import/Export Categories
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs" id="importExportTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="export-tab" data-bs-toggle="tab"
+                                        data-bs-target="#export-pane" type="button" role="tab">
+                                    <i class="ri-download-line me-1"></i> Export
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="import-tab" data-bs-toggle="tab"
+                                        data-bs-target="#import-pane" type="button" role="tab">
+                                    <i class="ri-upload-line me-1"></i> Import
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content p-3 border border-top-0" id="importExportTabsContent">
+                            <!-- Export Tab -->
+                            <div class="tab-pane fade show active" id="export-pane" role="tabpanel">
+                                <div class="alert alert-info">
+                                    <i class="ri-information-line me-2"></i>
+                                    Export categories data in different formats
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a href="{{ ADMIN + DOCTOR_EXPORT }}/csv"
+                                       class="btn btn-outline-primary">
+                                        <i class="ri-file-excel-2-line me-1"></i> Export as CSV
+                                    </a>
+                                    <a href="{{ ADMIN + DOCTOR_EXPORT }}/excel"
+                                       class="btn btn-outline-success">
+                                        <i class="ri-file-excel-line me-1"></i> Export as Excel
+                                    </a>
+                                    <a href="{{ ADMIN + DOCTOR_EXPORT }}/pdf"
+                                       class="btn btn-outline-danger">
+                                        <i class="ri-file-pdf-line me-1"></i> Export as PDF
+                                    </a>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="{{ ADMIN + DOCTOR_IMPORT_SAMPLE }}" class="btn btn-link">
+                                        <i class="ri-download-line me-1"></i> Download Sample Import File
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Import Tab -->
+                            <div class="tab-pane fade" id="import-pane" role="tabpanel">
+                                <div class="alert alert-warning">
+                                    <i class="ri-alert-line me-2"></i>
+                                    Please ensure your Excel file follows the required format.
+                                    <a href="{{ ADMIN + DOCTOR_IMPORT_SAMPLE }}" class="alert-link">
+                                        Download sample file
+                                    </a>
+                                </div>
+                                <form method="POST" action="{{ ADMIN +  DOCTOR_IMPORT }}"
+                                      enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label for="importFile" class="form-label">Select Excel File</label>
+                                        <input class="form-control" type="file" id="importFile" name="file"
+                                               accept=".xlsx,.xls" required>
+                                        <div class="form-text">Only Excel files (.xlsx, .xls) are accepted</div>
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="overwriteData"
+                                               name="overwrite">
+                                        <label class="form-check-label" for="overwriteData">Overwrite existing
+                                            data</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ri-upload-line me-1"></i> Import Data
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="restoreDoctorsModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">
+                            <i class="ri-refresh-line me-2"></i>Restore Doctors
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs" id="restoreTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="doctors-tab" data-bs-toggle="tab"
+                                        data-bs-target="#doctors" type="button" role="tab" aria-controls="doctors"
+                                        aria-selected="true">
+                                    <i class="ri-user-heart-line me-1"></i> {# Changed icon to a doctor-related one #}
+                                    Doctors ({{ archived_doctors|length }}) {# Changed variable to archived_doctors #}
+                                </button>
+                            </li>
+                            {# Add more tabs here if you want to restore other entities in the same modal #}
+                        </ul>
+
+                        <div class="tab-content p-3 border border-top-0" id="restoreTabsContent">
+                            <div class="tab-pane fade show active" id="doctors" role="tabpanel"
+                                 aria-labelledby="doctors-tab">
+                                {% if archived_doctors %} {# Changed variable to archived_doctors #}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                            <tr>
+                                                <th>Doctor Name</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                                <th>Specialty/Designation</th>
+                                                {# Added more relevant fields #}
+                                                <th>Archived On</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for doctor in archived_doctors %} {# Looping through archived_doctors #}
+                                                <tr>
+                                                    <td>{{ doctor.first_name }} {{ doctor.last_name }}</td>
+                                                    {# Displaying doctor's name #}
+                                                    <td>{{ doctor.email }}</td>
+                                                    {# Assuming doctor object has an email #}
+                                                    <td>{{ doctor.phone }}</td>
+                                                    {# Displaying phone #}
+                                                    <td>{{ doctor.designation or 'N/A' }}</td>
+                                                    {# Displaying designation or 'N/A' #}
+                                                    <td>{{ doctor.deleted_at.strftime('%Y-%m-%d %H:%M') if doctor.deleted_at else 'Unknown' }}</td>
+                                                    <td>
+                                                        <form method="POST"
+                                                              action="{{ ADMIN + DOCTOR_RESTORE_DOCTOR }}/{{ doctor.id }}">
+                                                            {# Updated action URL for doctor restore #}
+                                                            <button type="submit"
+                                                                    class="btn btn-sm btn-success">
+                                                                <i class="ri-refresh-line me-1"></i> Restore
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="ri-information-line me-2"></i>
+                                        No archived doctors found.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- Row ends -->
 {% endblock body %}
@@ -222,14 +410,11 @@
     <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
-
-    <script>
-        $(document).ready(function () {
-            // Initialize tooltips
-            $('[data-bs-toggle="tooltip"]').tooltip();
-
-            // Delete confirmation - now handled by individual modals
-            // View details - now handled by individual modals
-        });
-    </script>
+    <!-- Export buttons -->
+    <script src="../../../static/assets/vendor/datatables/buttons/dataTables.buttons.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/buttons.html5.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/buttons.print.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/jszip.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/pdfmake.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/buttons/vfs_fonts.js"></script>
 {% endblock footerLink %}

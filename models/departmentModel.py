@@ -7,7 +7,7 @@ class Department(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     phone = db.Column(db.String(20), nullable=False)
-    status = db.Column(db.String(10), nullable=False)
+    status = db.Column(db.Boolean, nullable=False)
     message = db.Column(db.Text)
 
     is_deleted = db.Column(db.Boolean, default=False)

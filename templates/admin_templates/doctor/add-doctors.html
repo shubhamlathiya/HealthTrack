@@ -44,11 +44,6 @@
                                             class="ri-calendar-check-line"></i>
                                         Availability</a>
                                 </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="tab-fourA" data-bs-toggle="tab" href="#fourA" role="tab"
-                                       aria-controls="fourA" aria-selected="false"><i class="ri-lock-password-line"></i>
-                                        Account Details</a>
-                                </li>
                             </ul>
                             <!-- Nav tabs ends -->
 
@@ -219,369 +214,52 @@
                                 <div class="tab-pane fade" id="threeA" role="tabpanel">
                                     <!-- Row starts -->
                                     <div class="row gx-4">
-                                        <!-- Looping over 7 days -->
-                                        <!-- Days Array: Sunday to Saturday -->
-                                        <!-- ID & Name: d1 to d7 (and d1X to d7X) -->
-                                        <!-- Label: Sunday to Saturday -->
+                                        {% set days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
+                                        {% set times = [
+        '07:00 AM', '08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM',
+        '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'
+    ] %}
 
-                                        <!-- Sunday -->
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="d1">Sunday</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="d1" name="d1">
-                                                        <option value="0">From</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                    <select class="form-select" id="d1X" name="d1X">
-                                                        <option value="0">To</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
+                                        {% for i in range(7) %}
+                                            {% set day_name = days[i] %}
+                                            {% set day_id = 'd' ~ (i + 1) %}
+                                            {% set day_id_to = 'd' ~ (i + 1) ~ 'X' %}
+
+                                            <div class="col-xxl-3 col-lg-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label" for="{{ day_id }}">{{ day_name }}</label>
+                                                    <div class="input-group">
+                                                        <select class="form-select" id="{{ day_id }}"
+                                                                name="{{ day_id }}">
+                                                            <option value="None">Not working</option>
+                                                            {% for time in times %}
+                                                                <option>{{ time }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <select class="form-select" id="{{ day_id_to }}"
+                                                                name="{{ day_id_to }}">
+                                                            <option value="None">Not working</option>
+                                                            {% for time in times %}
+                                                                <option>{{ time }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        {% endfor %}
 
-                                        <!-- Repeat the same structure for Monday through Saturday -->
-                                        <!-- Use d2 to d7 and d2X to d7X accordingly -->
-
-                                        <!-- Monday -->
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="d2">Monday</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="d2" name="d2">
-                                                        <option value="0">From</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                    <select class="form-select" id="d2X" name="d2X">
-                                                        <option value="0">To</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Tuesday -->
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="d3">Tuesday</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="d3" name="d3">
-                                                        <option value="0">From</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                    <select class="form-select" id="d3X" name="d3X">
-                                                        <option value="0">To</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Repeat for Wednesday (d4), Thursday (d5), Friday (d6), Saturday (d7) similarly -->
-
-                                        <!-- Wednesday -->
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="d4">Wednesday</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="d4" name="d4">
-                                                        <option value="0">From</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                    <select class="form-select" id="d4X" name="d4X">
-                                                        <option value="0">To</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Thursday -->
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="d5">Thursday</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="d5" name="d5">
-                                                        <option value="0">From</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                    <select class="form-select" id="d5X" name="d5X">
-                                                        <option value="0">To</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Friday -->
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="d6">Friday</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="d6" name="d6">
-                                                        <option value="0">From</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                    <select class="form-select" id="d6X" name="d6X">
-                                                        <option value="0">To</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Saturday -->
-                                        <div class="col-xxl-3 col-lg-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="d7">Saturday</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="d7" name="d7">
-                                                        <option value="0">From</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                    <select class="form-select" id="d7X" name="d7X">
-                                                        <option value="0">To</option>
-                                                        <option>07:00 AM</option>
-                                                        <option>08:00 AM</option>
-                                                        <option>09:00 AM</option>
-                                                        <option>10:00 AM</option>
-                                                        <option>11:00 AM</option>
-                                                        <option>12:00 PM</option>
-                                                        <option>01:00 PM</option>
-                                                        <option>02:00 PM</option>
-                                                        <option>03:00 PM</option>
-                                                        <option>04:00 PM</option>
-                                                        <option>05:00 PM</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                        <div class="text-center mt-4">
+                                            <button type="submit" class="btn btn-primary">Register</button>
                                         </div>
                                     </div>
                                     <!-- Row ends -->
                                 </div>
 
-
-                                <div class="tab-pane fade" id="fourA" role="tabpanel">
-                                    <!-- Row starts -->
-                                    <div class="row gx-4 justify-content-center">
-                                        <div class="col-sm-4">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="u1">User Name</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i
-                                                            class="ri-account-pin-circle-line"></i></span>
-                                                    <input type="text" id="u1" name="u1" placeholder="Enter username"
-                                                           class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label" for="u2">Password <span
-                                                        class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="ri-lock-password-line"></i></span>
-                                                    <input type="password" id="u2" name="u2" class="form-control"
-                                                           placeholder="New Password" required>
-                                                    <button class="btn btn-outline-secondary" type="button"
-                                                            id="togglePassword1">
-                                                        <i class="ri-eye-line"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="form-text">
-                                                    Your password must be 8-20 characters long, contain letters and
-                                                    numbers,
-                                                    and must not contain spaces, special characters.
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label" for="u3">Confirm Password <span
-                                                        class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="ri-lock-password-line"></i></span>
-                                                    <input type="password" id="u3" name="u3"
-                                                           placeholder="Confirm new password" class="form-control"
-                                                           required>
-                                                    <button class="btn btn-outline-secondary" type="button"
-                                                            id="togglePassword2">
-                                                        <i class="ri-eye-off-line"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="text-center mt-4">
-                                                <button type="submit" class="btn btn-primary">Register</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Row ends -->
-                                </div>
                             </div>
                             <!-- Tab content ends -->
                         </form>
                         <!-- Form ends -->
                     </div>
-                    <!-- Custom tabs ends -->
-
-                    <!-- JavaScript for password toggle and form handling -->
-                    <script>
-                        // Toggle password visibility
-                        document.getElementById('togglePassword1').addEventListener('click', function () {
-                            const passwordField = document.getElementById('u2');
-                            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                            passwordField.setAttribute('type', type);
-                            this.querySelector('i').classList.toggle('ri-eye-line');
-                            this.querySelector('i').classList.toggle('ri-eye-off-line');
-                        });
-
-                        document.getElementById('togglePassword2').addEventListener('click', function () {
-                            const passwordField = document.getElementById('u3');
-                            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                            passwordField.setAttribute('type', type);
-                            this.querySelector('i').classList.toggle('ri-eye-line');
-                            this.querySelector('i').classList.toggle('ri-eye-off-line');
-                        });
-
-                        // Form validation
-                        document.getElementById('doctorRegistrationForm').addEventListener('submit', function (e) {
-                            const password = document.getElementById('u2').value;
-                            const confirmPassword = document.getElementById('u3').value;
-
-                            if (password !== confirmPassword) {
-                                e.preventDefault();
-                                alert('Passwords do not match!');
-                            }
-                        });
-                    </script>
-
                 </div>
             </div>
         </div>

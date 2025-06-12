@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash
 from controllers.admin_controllers import admin
 from controllers.auth_controllers import auth
 from controllers.backups_controllers.backups import backups_bp
+from controllers.chat_bot_controllers import chatbot
 from controllers.department_controllers import department
 from controllers.doctor_controllers import doctors
 from controllers.every_one_controllers import idCard
@@ -46,6 +47,7 @@ app.register_blueprint(department, url_prefix='/department')
 from controllers.chat_controllers import chat
 
 app.register_blueprint(chat, url_prefix='/chat')
+app.register_blueprint(chatbot , url_prefix='/chatbot')
 app.register_blueprint(backups_bp, url_prefix='/backups')
 app.register_blueprint(patients, url_prefix='/patient')
 app.register_blueprint(doctors, url_prefix='/doctor')

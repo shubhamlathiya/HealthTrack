@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Chatbot</title>
+    <!-- Tailwind CSS CDN for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .chat-header {
+            background: linear-gradient(to right, #6366f1, #8b5cf6); /* Purple gradient */
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            position: relative; /* For avatar/icon positioning */
+        }
+        .chatbot-avatar {
+            position: absolute;
+            bottom: -20px; /* Adjust as needed */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4ade80; /* Green */
+            border-radius: 50%;
+            padding: 0.5rem;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .chatbot-avatar svg {
+            color: white;
+            width: 24px;
+            height: 24px;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background-color: #eef2f7;
+            scroll-behavior: smooth;
+        }
+        .message-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            word-wrap: break-word;
+        }
+        .bot-message {
+            background-color: #ffffff;
+            color: #333;
+            align-self: flex-start;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #cbd5e1;
+        }
+        .user-message {
+            background-color: #6366f1; /* Indigo */
+            color: white;
+            align-self: flex-end;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            background-color: #ffffff;
+        }
+        .chat-input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.75rem;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        .chat-input:focus {
+            border-color: #6366f1;
+        }
+        .send-button {
+            background-color: #6366f1; /* Indigo */
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-left: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .send-button:hover {
+            background-color: #4f46e5; /* Darker indigo */
+            transform: translateY(-1px);
+        }
+        .send-button:active {
+            transform: translateY(0);
+        }
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            justify-content: flex-start; /* Align buttons to start */
+        }
+        .option-button {
+            background-color: #e0e7ff; /* Light indigo */
+            color: #4338ca; /* Darker indigo for text */
+            border: 1px solid #a5b4fc; /* Indigo border */
+            padding: 0.6rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            font-weight: 500;
+            flex-shrink: 0; /* Prevent shrinking on smaller screens */
+            white-space: nowrap; /* Prevent wrapping text within button */
+        }
+        .option-button:hover {
+            background-color: #c7d2fe; /* Lighter hover */
+            transform: translateY(-1px);
+        }
+        .option-button:active {
+            transform: translateY(0);
+        }
+        .hidden {
+            display: none;
+        }
+        /* Custom modal for alerts */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .modal-content p {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+        .modal-button {
+            background-color: #6366f1;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+        .modal-button:hover {
+            background-color: #4f46e5;
+        }
+        .loading-indicator {
+            align-self: flex-start;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            background-color: #e2e8f0;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Hospital Chatbot
+            <div class="chatbot-avatar">
+                <!-- Chatbot icon (SVG) -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.75 9.75 0 01-8.625-4.725M12 21V12m0 0V4.5M12 12h8.25m-4.125 0H12" />
+                </svg>
+            </div>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            <!-- Chat messages will be appended here -->
+        </div>
+        <div id="option-buttons-container" class="option-buttons p-4 bg-white hidden">
+            <!-- Dynamic option buttons will be appended here -->
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Type your message...">
+            <button id="send-button" class="send-button">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Alerts -->
+    <div id="custom-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modal-title"></h3>
+            <p id="modal-message"></p>
+            <button id="modal-ok-button" class="modal-button">OK</button>
+        </div>
+    </div>
+
+
+  <script>
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+    const optionButtonsContainer = document.getElementById('option-buttons-container');
+
+    // Custom Modal Elements
+    const customModalOverlay = document.getElementById('custom-modal-overlay');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalOkButton = document.getElementById('modal-ok-button');
+
+    // --- Global Chatbot State ---
+    let conversationState = 'initial';
+    let currentUserId = null;
+    let currentUserRole = null;
+    let currentPatientAddress = null;
+    let currentPatientAge = null; // New: To store patient's age
+
+    let currentMedicineRequest = {};
+    let currentAmbulanceRequest = {};
+    let availableMedicines = [];
+    let activePrescriptions = [];
+    // mainMenuOptions will now be handled by the backend's `chatbot_interact` response
+
+    // --- Utility Functions ---
+    function displayMessage(message, sender) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message-bubble', sender === 'bot' ? 'bot-message' : 'user-message');
+        messageElement.innerHTML = message;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function displayButtons(buttons) {
+        optionButtonsContainer.innerHTML = '';
+        optionButtonsContainer.classList.remove('hidden');
+
+        buttons.forEach(buttonData => {
+            const button = document.createElement('button');
+            button.classList.add('option-button');
+            button.textContent = buttonData.text;
+            button.dataset.value = buttonData.value;
+            // The handleOptionButtonClick will now be more generic, always calling sendChatInteraction
+            button.addEventListener('click', () => handleOptionButtonClick(buttonData.text, buttonData.value));
+            optionButtonsContainer.appendChild(button);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideButtons() {
+        optionButtonsContainer.classList.add('hidden');
+        optionButtonsContainer.innerHTML = '';
+    }
+
+    function showCustomModal(title, message) {
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        customModalOverlay.classList.remove('hidden');
+    }
+
+    modalOkButton.addEventListener('click', () => {
+        customModalOverlay.classList.add('hidden');
+    });
+
+    async function sendToBackend(url, method, data = null) {
+        try {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-User-Id': currentUserId,
+                    'X-User-Role': currentUserRole
+                },
+            };
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(url, options);
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error('API Error:', result.message || response.statusText);
+                showCustomModal('Error', `An error occurred: ${result.message || 'Please try again.'}`);
+                return null;
+            }
+            return result;
+
+        } catch (error) {
+            console.error('Network or API call error:', error);
+            showCustomModal('Network Error', 'Could not connect to the server. Please check your internet connection.');
+            return null;
+        }
+    }
+
+    function showLoadingIndicator(message = 'Thinking...') {
+        const loadingElement = document.createElement('div');
+        loadingElement.classList.add('loading-indicator');
+        loadingElement.id = 'loading-indicator';
+        loadingElement.textContent = message;
+        chatMessages.appendChild(loadingElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideLoadingIndicator() {
+        const loadingElement = document.getElementById('loading-indicator');
+        if (loadingElement) {
+            loadingElement.remove();
+        }
+    }
+
+    // --- Centralized Chatbot Interaction ---
+    async function sendChatInteraction(type, value = null) {
+        showLoadingIndicator();
+        hideButtons(); // Hide buttons while waiting for response
+
+        const payload = {
+            message: type === 'text' ? chatInput.value.trim() : null,
+            selection_value: type === 'button' ? value : null,
+            conversation_state: conversationState, // Send current state to backend
+            context: { // Send relevant context data
+                currentMedicineRequest: currentMedicineRequest,
+                currentAmbulanceRequest: currentAmbulanceRequest,
+                availableMedicines: availableMedicines,
+                activePrescriptions: activePrescriptions,
+                currentPatientAge: currentPatientAge, // Include age in context
+                // ... any other global state variables needed by the backend
+            }
+        };
+
+        const response = await sendToBackend('/chatbot/api/chatbot_interact', 'POST', payload);
+        hideLoadingIndicator();
+
+        if (response) {
+            displayMessage(response.message, 'bot');
+            console.log(response)
+            conversationState = response.next_state; // Update frontend state
+
+            // Update context data from backend response
+            currentMedicineRequest = response.context.currentMedicineRequest || {};
+            currentAmbulanceRequest = response.context.currentAmbulanceRequest || {};
+            availableMedicines = response.context.availableMedicines || [];
+            activePrescriptions = response.context.activePrescriptions || [];
+            currentPatientAge = response.context.currentPatientAge || null; // Update age from context
+
+            if (response.options && response.options.length > 0) {
+                displayButtons(response.options);
+                chatInput.disabled = true; // Disable input if buttons are displayed
+            } else {
+                hideButtons();
+                chatInput.disabled = false; // Enable input if no buttons
+                chatInput.focus();
+            }
+        } else {
+            // Error already handled by sendToBackend modal
+            chatInput.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+
+    // --- Modified Event Handlers ---
+
+    async function handleOptionButtonClick(buttonText, buttonValue) {
+        displayMessage(buttonText, 'user');
+        sendChatInteraction('button', buttonValue); // Now all button clicks go through sendChatInteraction
+    }
+
+    async function handleTextInput(inputText) {
+        displayMessage(inputText, 'user');
+        chatInput.value = ''; // Clear input immediately
+        sendChatInteraction('text'); // All text inputs go through sendChatInteraction
+    }
+
+    // --- Event Listeners ---
+
+    sendButton.addEventListener('click', () => {
+        const inputText = chatInput.value.trim();
+        if (inputText) {
+            handleTextInput(inputText);
+        }
+    });
+
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const inputText = chatInput.value.trim();
+            if (inputText) {
+                handleTextInput(inputText);
+            }
+        }
+    });
+
+    // --- Initial Chatbot Greeting & User Info Fetch ---
+    window.onload = async () => {
+        displayMessage("Hello! Welcome to the Hospital Chatbot.", 'bot');
+        showLoadingIndicator("Identifying user...");
+        const userInfo = await sendToBackend('/chatbot/api/me', 'GET');
+        hideLoadingIndicator();
+
+        if (userInfo) {
+            currentUserId = userInfo.user_id;
+            currentUserRole = userInfo.user_role;
+            currentPatientAddress = userInfo.patient_address;
+            currentPatientAge = userInfo.patient_age; // Assuming /api/me can also return age
+
+            displayMessage(`Hello ${currentUserRole.toLowerCase()}!`, 'bot');
+            // Initial interaction, passing current patient age if available
+            sendChatInteraction('initial');
+        } else {
+            displayMessage("Could not identify user. Please refresh the page or try again later.", 'bot');
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+        }
+    };
+</script>
+</body>
+</html>
