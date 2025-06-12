@@ -229,7 +229,7 @@
             <!-- Dynamic option buttons will be appended here -->
         </div>
         <div class="chat-input-area">
-            <input type="text" id="chat-input" class="chat-input" placeholder="Type your message...">
+            <input type="text" id="chat-input" name="chat-input" class="chat-input" placeholder="Type your message...">
             <button id="send-button" class="send-button">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
@@ -248,7 +248,7 @@
     </div>
 
 
-  <script>
+    <script>
     const chatMessages = document.getElementById('chat-messages');
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-button');
@@ -265,13 +265,12 @@
     let currentUserId = null;
     let currentUserRole = null;
     let currentPatientAddress = null;
-    let currentPatientAge = null; // New: To store patient's age
+    let currentPatientAge = null;
 
     let currentMedicineRequest = {};
     let currentAmbulanceRequest = {};
     let availableMedicines = [];
     let activePrescriptions = [];
-    // mainMenuOptions will now be handled by the backend's `chatbot_interact` response
 
     // --- Utility Functions ---
     function displayMessage(message, sender) {
@@ -291,8 +290,10 @@
             button.classList.add('option-button');
             button.textContent = buttonData.text;
             button.dataset.value = buttonData.value;
-            // The handleOptionButtonClick will now be more generic, always calling sendChatInteraction
-            button.addEventListener('click', () => handleOptionButtonClick(buttonData.text, buttonData.value));
+            button.addEventListener('click', () => {
+                displayMessage(buttonData.text, 'user'); // Display user's button choice
+                sendChatInteraction('button', buttonData.value);
+            });
             optionButtonsContainer.appendChild(button);
         });
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -362,20 +363,36 @@
 
     // --- Centralized Chatbot Interaction ---
     async function sendChatInteraction(type, value = null) {
+        let messageToSend = null;
+        let selectionValueToSend = null;
+
+        if (type === 'text') {
+            const inputText = chatInput.value.trim();
+            if (!inputText) { // If text input is empty, don't send anything
+                return;
+            }
+            displayMessage(inputText, 'user'); // Display user's text message
+            messageToSend = inputText;
+            chatInput.value = ''; // Clear input immediately
+        } else if (type === 'button') {
+            selectionValueToSend = value;
+            // The displayMessage for button clicks is now handled directly in displayButtons
+        }
+
         showLoadingIndicator();
         hideButtons(); // Hide buttons while waiting for response
 
         const payload = {
-            message: type === 'text' ? chatInput.value.trim() : null,
-            selection_value: type === 'button' ? value : null,
-            conversation_state: conversationState, // Send current state to backend
-            context: { // Send relevant context data
+            message: messageToSend,
+            selection_value: selectionValueToSend,
+            conversation_state: conversationState,
+            context: {
                 currentMedicineRequest: currentMedicineRequest,
                 currentAmbulanceRequest: currentAmbulanceRequest,
                 availableMedicines: availableMedicines,
                 activePrescriptions: activePrescriptions,
-                currentPatientAge: currentPatientAge, // Include age in context
-                // ... any other global state variables needed by the backend
+                currentPatientAge: currentPatientAge,
+                currentPatientAddress: currentPatientAddress,
             }
         };
 
@@ -383,16 +400,17 @@
         hideLoadingIndicator();
 
         if (response) {
-            displayMessage(response.message, 'bot');
             console.log(response)
-            conversationState = response.next_state; // Update frontend state
+            displayMessage(response.message, 'bot');
+            conversationState = response.next_state;
 
             // Update context data from backend response
             currentMedicineRequest = response.context.currentMedicineRequest || {};
             currentAmbulanceRequest = response.context.currentAmbulanceRequest || {};
             availableMedicines = response.context.availableMedicines || [];
             activePrescriptions = response.context.activePrescriptions || [];
-            currentPatientAge = response.context.currentPatientAge || null; // Update age from context
+            currentPatientAge = response.context.currentPatientAge || null;
+            currentPatientAddress = response.context.currentPatientAddress || null;
 
             if (response.options && response.options.length > 0) {
                 displayButtons(response.options);
@@ -409,35 +427,13 @@
         }
     }
 
-
-    // --- Modified Event Handlers ---
-
-    async function handleOptionButtonClick(buttonText, buttonValue) {
-        displayMessage(buttonText, 'user');
-        sendChatInteraction('button', buttonValue); // Now all button clicks go through sendChatInteraction
-    }
-
-    async function handleTextInput(inputText) {
-        displayMessage(inputText, 'user');
-        chatInput.value = ''; // Clear input immediately
-        sendChatInteraction('text'); // All text inputs go through sendChatInteraction
-    }
-
     // --- Event Listeners ---
-
-    sendButton.addEventListener('click', () => {
-        const inputText = chatInput.value.trim();
-        if (inputText) {
-            handleTextInput(inputText);
-        }
-    });
+    sendButton.addEventListener('click', () => sendChatInteraction('text'));
 
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const inputText = chatInput.value.trim();
-            if (inputText) {
-                handleTextInput(inputText);
-            }
+            e.preventDefault(); // Prevent default form submission behavior
+            sendChatInteraction('text');
         }
     });
 
@@ -452,10 +448,9 @@
             currentUserId = userInfo.user_id;
             currentUserRole = userInfo.user_role;
             currentPatientAddress = userInfo.patient_address;
-            currentPatientAge = userInfo.patient_age; // Assuming /api/me can also return age
+            currentPatientAge = userInfo.patient_age;
 
             displayMessage(`Hello ${currentUserRole.toLowerCase()}!`, 'bot');
-            // Initial interaction, passing current patient age if available
             sendChatInteraction('initial');
         } else {
             displayMessage("Could not identify user. Please refresh the page or try again later.", 'bot');

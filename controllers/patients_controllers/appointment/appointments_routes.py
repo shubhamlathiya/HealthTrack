@@ -41,7 +41,8 @@ def view_appointment(current_user):
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def book_appointment(current_user):
     # Get all active departments
-    departments = Department.query.filter_by(is_deleted=False).all()
+    departments = Department.query.filter_by(is_deleted=False, status=True).all()
+
 
     # Get all active treatments
     treatments = Treatment.query.filter_by(active=True, is_deleted=False).all()

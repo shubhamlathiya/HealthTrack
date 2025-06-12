@@ -24,7 +24,7 @@ def department_assignments(current_user):
         # Get all active departments
         departments = Department.query.filter(
             Department.is_deleted == False,
-            Department.status == 'active'
+            Department.status == True
         ).order_by(Department.name).all()
 
         for doc in doctors:

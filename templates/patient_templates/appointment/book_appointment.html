@@ -300,7 +300,7 @@
                 submitBtn.prop('disabled', true).html('<i class="ri-loader-4-line me-1"></i> Booking...');
 
                 $.ajax({
-                    url: '/patient/book-appointment',
+                    url: '/patient/appointment/book-appointment',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
