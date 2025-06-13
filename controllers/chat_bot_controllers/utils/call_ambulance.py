@@ -22,7 +22,9 @@ def handle_ambulance_start(user_obj, data, chat_context):
         }
         current_pickup_location_initial = chat_context['current_ambulance_request']['pickup_location']
         if not current_pickup_location_initial or current_pickup_location_initial.lower() == "unknown address":
-            bot_response_text = "Before we proceed, please provide the pickup location for the ambulance."
+            bot_response_text = (
+                "📍 Before we proceed, please provide the **pickup location** for the ambulance."
+            )
             bot_options = []
             next_state = 'ambulance_new_pickup_location_input'
             return bot_response_text, bot_options, next_state, chat_context
@@ -32,7 +34,9 @@ def handle_ambulance_start(user_obj, data, chat_context):
 
         if emergency_type == 'other_emergency':
             chat_context['current_ambulance_request']['emergency_description'] = 'Other Emergency'
-            bot_response_text = "Please describe your emergency in detail:"
+            bot_response_text = (
+                "📝 Please describe your emergency in detail:"
+            )
             bot_options = []
             next_state = 'ambulance_other_emergency_text_input'
         elif emergency_type == 'check_last_ambulance_call':
@@ -40,11 +44,17 @@ def handle_ambulance_start(user_obj, data, chat_context):
         else:
             chat_context['current_ambulance_request']['emergency_description'] = emergency_type.replace('_',
                                                                                                         ' ').title()
-            bot_response_text = f"You selected: **{chat_context['current_ambulance_request']['emergency_description']}**."
+            bot_response_text = (
+                f"✅ You selected: **{chat_context['current_ambulance_request']['emergency_description']}**."
+            )
             return handle_ambulance_pickup_location_confirm(user_obj, data, chat_context)  # Transition to next step
 
     else:
-        bot_response_text = "What type of emergency is it?"
+        bot_response_text = (
+            "🚨 What type of emergency are you experiencing?\n"
+            "Please select one from the options below 👇"
+        )
+
         bot_options = get_chatbot_options('ambulance_emergency_options')
         next_state = 'ambulance_start'  # Stay in this state until a type is selected
 
@@ -62,10 +72,16 @@ def handle_ambulance_other_emergency_text_input(user_obj, data, chat_context):
         current_ambulance_request['emergency_description'] = user_message.strip()
         chat_context['current_ambulance_request'] = current_ambulance_request
 
-        bot_response_text = f"Emergency described as: **{user_message.strip()}**."
+        bot_response_text = (
+            f"📝 Emergency described as: **{user_message.strip()}**"
+        )
+
         return handle_ambulance_pickup_location_confirm(user_obj, data, chat_context)
     else:
-        bot_response_text = "Please provide a description of your emergency."
+        bot_response_text = (
+            "⚠️ Please provide a description of your emergency so we can assist better."
+        )
+
         bot_options = []
         next_state = 'ambulance_other_emergency_text_input'  # Stay in this state
 
@@ -82,24 +98,33 @@ def handle_ambulance_pickup_location_confirm(user_obj, data, chat_context):
     current_pickup_location = current_ambulance_request.get('pickup_location')
 
     if not current_pickup_location or current_pickup_location.lower() == "unknown address":
-        bot_response_text = "Please provide the pickup location for the ambulance."
+        bot_response_text = (
+            "📍 Pickup address not found. Please type the location where the ambulance should arrive."
+        )
         bot_options = []  # No options if no default address to confirm
         next_state = 'ambulance_new_pickup_location_input'  # Force new input if no address
         return bot_response_text, bot_options, next_state, chat_context
 
     if user_selection_value == 'confirm_current_location':
-        bot_response_text = f"Pickup location confirmed: **{current_pickup_location}**."
-        bot_response_text += f"\n\nEmergency: **{current_ambulance_request.get('emergency_description', 'Not Specified')}**."
-        bot_response_text += "\n\nLooks good? Confirm dispatch or cancel."
+        bot_response_text = (
+            f"📌 Pickup location confirmed: **{current_pickup_location}**\n"
+            f"🆘 Emergency: **{current_ambulance_request.get('emergency_description', 'Not Specified')}**\n\n"
+            "✅ Looks good? Please confirm dispatch or cancel below ⬇️"
+        )
         bot_options = get_chatbot_options('ambulance_final_confirm_options')
         next_state = 'ambulance_final_confirm'
 
     elif user_selection_value == 'enter_new_pickup_address':
-        bot_response_text = "Please type the new pickup location."
+        bot_response_text = (
+            "✍️ Please type the new pickup location."
+        )
         bot_options = []  # Expecting text input
         next_state = 'ambulance_new_pickup_location_input'
     else:
-        bot_response_text = f"The ambulance pickup location is set to: **{current_pickup_location}**. Is this correct?"
+        bot_response_text = (
+            f"📌 The ambulance pickup location is set to: **{current_pickup_location}**\n"
+            "Is this correct? Choose below 👇"
+        )
 
     return bot_response_text, bot_options, next_state, chat_context
 
@@ -116,10 +141,16 @@ def handle_ambulance_new_pickup_location_input(user_obj, data, chat_context):
         current_ambulance_request['pickup_location'] = user_message.strip()
         chat_context['current_ambulance_request'] = current_ambulance_request
 
-        bot_response_text = f"You entered: **{user_message.strip()}**. Is this correct?"
+        bot_response_text = (
+            f"📍 You entered: **{user_message.strip()}**\nIs this correct?"
+        )
+
         bot_options = get_chatbot_options('ambulance_verify_pickup_options')
     else:
-        bot_response_text = "Please type the pickup location."
+        bot_response_text = (
+            "⚠️ Please type the pickup location for the ambulance."
+        )
+
         bot_options = []
         next_state = 'ambulance_new_pickup_location_input'  # Stay in this state
 
@@ -136,22 +167,34 @@ def handle_ambulance_verify_pickup_location(user_obj, data, chat_context):
 
     if user_selection_value == 'pickup_address_correct':
         if confirmed_address:
-            bot_response_text = f"Pickup location confirmed: **{confirmed_address}**."
-            bot_response_text += f"\n\nEmergency: **{current_ambulance_request.get('emergency_description', 'Not Specified')}**."
-            bot_response_text += "\n\nLooks good? Confirm dispatch or cancel."
+            bot_response_text = (
+                f"📍 **Pickup Location Confirmed!**\n"
+                f"✅ Address: {confirmed_address}\n"
+                f"🆘 Emergency: {current_ambulance_request.get('emergency_description', 'Not Specified')}\n\n"
+                f"🚑 Ready to dispatch?\nChoose an option below:"
+            )
             bot_options = get_chatbot_options('ambulance_final_confirm_options')
             next_state = 'ambulance_final_confirm'
         else:
-            bot_response_text = "No address to confirm. Please enter the pickup location."
+            bot_response_text = (
+                "⚠️ No pickup address found to confirm.\n"
+                "📝 Please enter the pickup location again."
+            )
+
             bot_options = []
             next_state = 'ambulance_new_pickup_location_input'
 
     elif user_selection_value == 'pickup_address_reenter':
-        bot_response_text = "Please re-enter the correct pickup location."
+        bot_response_text = (
+            "🔁 Sure! Please type the **correct pickup location** again."
+        )
         bot_options = []
         next_state = 'ambulance_new_pickup_location_input'
     else:
-        bot_response_text = f"You entered: **{confirmed_address}**. Is this correct?"
+        bot_response_text = (
+            f"📌 You entered: **{confirmed_address}**.\n"
+            "Is this correct?\nPlease choose an option below. 👇"
+        )
         bot_options = get_chatbot_options('ambulance_verify_pickup_options')
         next_state = 'ambulance_verify_pickup_location'
 
@@ -183,7 +226,11 @@ def handle_ambulance_final_confirm_options(user_obj, data, chat_context):
                 return bot_response_text, bot_options, next_state, chat_context
 
         if not emergency_description_from_context or not pickup_location_from_context:
-            bot_response_text = "Missing emergency details or pickup location. Please restart the request."
+            bot_response_text = (
+                "⚠️ Missing emergency details or pickup location.\n"
+                "🔁 Please restart your request from the beginning."
+            )
+
             next_state = 'ambulance_start'  # Go back to start of ambulance flow
             bot_options = get_chatbot_options('ambulance_emergency_options')
             return bot_response_text, bot_options, next_state, chat_context
@@ -201,9 +248,11 @@ def handle_ambulance_final_confirm_options(user_obj, data, chat_context):
             db.session.commit()
 
             bot_response_text = (
-                f"Ambulance request placed successfully for: **{new_ambulance_request.emergency_description}** "
-                f"at **{new_ambulance_request.pickup_location}**.\n"
-                f"Your request ID is **{new_ambulance_request.id}**. An ambulance will be dispatched shortly."
+                f"✅ **Ambulance Request Placed Successfully!** 🚑\n\n"
+                f"🆘 **Emergency:** {new_ambulance_request.emergency_description}\n"
+                f"📍 **Pickup Location:** {new_ambulance_request.pickup_location}\n"
+                f"🆔 **Request ID:** {new_ambulance_request.id}\n\n"
+                f"🚨 An ambulance will be dispatched shortly. Stay safe!"
             )
             chat_context.pop('current_ambulance_request', None)
 
@@ -211,13 +260,24 @@ def handle_ambulance_final_confirm_options(user_obj, data, chat_context):
             db.session.rollback()
             traceback.print_exc()
             print(f"Error placing ambulance request: {e}")
-            bot_response_text = "There was an error placing your ambulance request. Please try again later or contact support."
+            bot_response_text = (
+                "⚠️ Oops! Something went wrong while placing your ambulance request.\n"
+                "🛠️ Please try again later or contact support for assistance."
+            )
+
 
     elif user_selection_value == 'cancel_ambulance':
-        bot_response_text = "Your ambulance request has been cancelled. Is there anything else I can help you with?"
+        bot_response_text = (
+            "🚫 Your ambulance request has been cancelled.\n"
+            "🤖 Is there anything else I can help you with?"
+        )
         chat_context.pop('current_ambulance_request', None)  # Clear request from context
     else:
-        bot_response_text = "Invalid option. Please confirm dispatch or cancel the request."
+        bot_response_text = (
+            "❗ Invalid option selected.\n"
+            "✅ Please confirm dispatch or cancel the request below."
+        )
+
         bot_options = get_chatbot_options('ambulance_final_confirm_options')
         next_state = 'ambulance_final_confirm'  # Stay in this state
 
@@ -241,17 +301,23 @@ def handle_check_last_ambulance_call(user_obj, data, chat_context):
 
     if last_request:
         bot_response_text = (
-            f"Your Last Ambulance Request (ID: {last_request.id}):\n"
-            f"Emergency: **{last_request.emergency_description if last_request.emergency_description else 'N/A'}**\n"
-            f"Pickup Location: **{last_request.pickup_location if last_request.pickup_location else 'N/A'}**\n"
-            f"Status: **{last_request.status.value.upper()}**\n"
-            f"Requested On: **{last_request.request_time.strftime('%Y-%m-%d %H:%M:%S')}**"
+            f"🚑 **Your Last Ambulance Request (ID: {last_request.id})**\n\n"
+            f"📍 **Emergency:** {last_request.emergency_description or 'N/A'}\n"
+            f"📌 **Pickup Location:** {last_request.pickup_location or 'N/A'}\n"
+            f"📋 **Status:** {last_request.status.value.upper()}\n"
+            f"🕒 **Requested On:** {last_request.request_time.strftime('%Y-%m-%d %H:%M:%S')}"
         )
         if last_request.assigned_ambulance:
-            bot_response_text += f"\nAssigned Ambulance: {last_request.assigned_ambulance.driver_name} (License: {last_request.assigned_ambulance.license_plate})"
-        bot_response_text += "\n\nWhat would you like to do next?"
+            bot_response_text += (
+                f"\n🚐 **Assigned Ambulance:** {last_request.assigned_ambulance.driver_name} "
+                f"(🪪 License: {last_request.assigned_ambulance.license_plate})"
+            )
+        bot_response_text += "\n\n👉 *What would you like to do next?*"
     else:
-        bot_response_text = "You don't have any past ambulance requests with us. What would you like to do?"
+        bot_response_text = (
+            "😕 You don't have any past ambulance requests on record.\n\n"
+            "🚑 Would you like to request a new ambulance or return to the 🏠 Main Menu?"
+        )
 
     next_state = 'main_menu_options'
 

@@ -1,51 +1,76 @@
 {
   "main_menu_options": [
     {
-      "text": "Request Medicine",
-      "value": "request_medicine",
-      "description": "Start a new medicine delivery request."
+      "text": "🩺 Book Appointment",
+      "value": "book_appointment",
+      "description": "Schedule a visit with a doctor."
     },
     {
-      "text": "Call Ambulance",
-      "value": "call_ambulance",
-      "description": "Request an emergency ambulance service."
-    },
-    {
-      "text": "View My Appointments",
+      "text": "📅 View My Appointments",
       "value": "view_appointments",
-      "description": "See your scheduled doctor appointments."
+      "description": "See upcoming and past appointments."
     },
     {
-      "text": "Check Bill Status",
+      "text": "💊 Request Medicine",
+      "value": "request_medicine",
+      "description": "Order medicine for delivery or pickup."
+    },
+    {
+      "text": "🚑 Call Ambulance",
+      "value": "call_ambulance",
+      "description": "Request emergency ambulance services."
+    },
+    {
+      "text": "📋 My Health Records",
+      "value": "health_records",
+      "description": "View lab reports, prescriptions, and diagnosis history."
+    },
+    {
+      "text": "🧾 Check Bill Status",
       "value": "check_bill_status",
-      "description": "Inquire about your outstanding bills."
+      "description": "Inquire about your medical bills or payments."
     },
     {
-      "text": "Speak to a Human",
-      "value": "speak_to_human",
-      "description": "Connect with a human agent for further assistance."
-    },
-    {
-      "text": "My Health Profile",
+      "text": "👤 My Health Profile",
       "value": "my_health_profile",
-      "description": "View or update your basic health information."
+      "description": "View or update your basic health and contact information."
+    },
+    {
+      "text": "📍 Hospital Services",
+      "value": "hospital_services",
+      "description": "Learn about departments, doctors, and facilities."
+    },
+    {
+      "text": "🔍 Search Doctors",
+      "value": "search_doctor",
+      "description": "Find a specialist by name or department."
+    },
+    {
+      "text": "📞 Speak to a Human",
+      "value": "speak_to_human",
+      "description": "Chat with a live support representative."
+    },
+    {
+      "text": "❓ FAQs / Help",
+      "value": "faq_help",
+      "description": "Find answers to frequently asked questions."
     }
   ],
   "medicine_request_options": [
     {
-      "text": "Search by Name",
+      "text": "🔍 Search by Name",
       "value": "search_by_name"
     },
     {
-      "text": "View My Prescriptions",
+      "text": "📄 View My Prescriptions",
       "value": "view_prescriptions"
     },
     {
-      "text": "Check Status",
+      "text": "📦 Check Order Status",
       "value": "check_status"
     },
     {
-      "text": "Go to Cart",
+      "text": "🛒 Go to Cart",
       "value": "view_cart"
     }
   ],
@@ -69,166 +94,202 @@
   ],
   "medicine_address_options": [
     {
-      "text": "Confirm Address",
+      "text": "✅ Confirm Address",
       "value": "confirm_address"
     },
     {
-      "text": "Enter New Address",
+      "text": "🏠 Enter New Address",
       "value": "enter_new_address"
     }
   ],
   "medicine_verify_address_options": [
     {
-      "text": "This looks correct",
+      "text": "✅ This looks correct",
       "value": "address_correct"
     },
     {
-      "text": "Enter again",
+      "text": "✏️ Enter again",
       "value": "address_re_enter"
     }
   ],
   "medicine_payment_options": [
     {
-      "text": "Cash on Delivery",
+      "text": "💵 Cash on Delivery",
       "value": "cash_on_delivery"
     },
     {
-      "text": "Online Payment",
+      "text": "💳 Online Payment",
       "value": "online_payment"
     }
   ],
   "medicine_cart_options": [
     {
-      "text": "Checkout",
+      "text": "✅ Checkout",
       "value": "checkout"
     },
     {
-      "text": "Clear Cart",
+      "text": "🗑️ Clear Cart",
       "value": "clear_cart"
     },
     {
-      "text": "Back to Medicine Request Start",
+      "text": "🔙 Back to Start",
       "value": "medicine_request_start"
     },
     {
-      "text": "Search for another medicine",
+      "text": "🔎 Search Another Medicine",
       "value": "search_by_name"
     },
     {
-      "text": "View Cart",
+      "text": "🛒 View Cart",
       "value": "view_cart"
     },
     {
-      "text": "View My Prescriptions",
+      "text": "📄 View My Prescriptions",
       "value": "view_prescriptions"
     }
   ],
   "medicine_not_found": [
     {
-      "text": "Search Again",
+      "text": "🔁 Search Again",
       "value": "search_by_name"
     },
     {
-      "text": "Main Menu",
+      "text": "🏠 Main Menu",
       "value": "main_menu"
     }
   ],
   "medicine_final_confirm_options": [
     {
-      "text": "Place Order",
+      "text": "🛍️ Place Order",
       "value": "place_order"
     },
     {
-      "text": "Go Back",
+      "text": "🔙 Go Back",
       "value": "go_back"
     }
   ],
   "medicine_modify_item_options": [
     {
-      "text": "Increase Quantity (+1)",
+      "text": "➕ Increase Quantity (+1)",
       "value": "increase_item_qty"
     },
     {
-      "text": "Decrease Quantity (-1)",
+      "text": "➖ Decrease Quantity (-1)",
       "value": "decrease_item_qty"
     },
     {
-      "text": "Remove Item",
+      "text": "❌ Remove Item",
       "value": "remove_specific_item"
     },
     {
-      "text": "Set Specific Quantity",
+      "text": "🔢 Set Specific Quantity",
       "value": "set_specific_qty"
     },
     {
-      "text": "Back to Cart",
+      "text": "🔙 Back to Cart",
       "value": "view_cart"
     }
   ],
   "medicine_order_status_options": [
     {
-      "text": "View Cart",
+      "text": "🛒 View Cart",
       "value": "view_cart"
     },
     {
-      "text": "Start a New Order",
+      "text": "🆕 Start a New Order",
       "value": "medicine_request_start"
     },
     {
-      "text": "Main Menu",
+      "text": "🏠 Main Menu",
       "value": "main_menu"
     }
   ],
   "ambulance_emergency_options": [
     {
-      "text": "Check Last Ambulance Call",
+      "text": "📞 Check Last Ambulance Call",
       "value": "check_last_ambulance_call"
     },
     {
-      "text": "Chest Pain",
+      "text": "❤️ Chest Pain",
       "value": "chest_pain"
     },
     {
-      "text": "Accident",
+      "text": "🚗💥 Accident",
       "value": "accident"
     },
     {
-      "text": "Breathing Difficulty",
+      "text": "😮‍💨 Breathing Difficulty",
       "value": "breathing_difficulty"
     },
     {
-      "text": "Other Emergency",
+      "text": "⚠️ Other Emergency",
       "value": "other_emergency"
     }
   ],
   "ambulance_pickup_location_options": [
     {
-      "text": "Confirm This Address",
+      "text": "✅ Confirm This Address",
       "value": "confirm_current_location"
     },
     {
-      "text": "Enter New Address",
+      "text": "🏠 Enter New Address",
       "value": "enter_new_pickup_address"
     }
   ],
   "ambulance_verify_pickup_options": [
     {
-      "text": "Yes, this is correct",
+      "text": "✔️ Yes, this is correct",
       "value": "pickup_address_correct"
     },
     {
-      "text": "No, re-enter",
+      "text": "✏️ No, re-enter",
       "value": "pickup_address_reenter"
     }
   ],
   "ambulance_final_confirm_options": [
     {
-      "text": "Confirm Dispatch",
+      "text": "🚑 Confirm Dispatch",
       "value": "confirm_dispatch"
     },
     {
-      "text": "Cancel Request",
+      "text": "❌ Cancel Request",
       "value": "cancel_ambulance"
+    }
+  ],
+  "profile_options": [
+    {
+      "text": "👤 View Profile",
+      "value": "profile_view"
+    },
+    {
+      "text": "📞 Update Contact Info",
+      "value": "profile_update_contact"
+    },
+    {
+      "text": "🩺 Update Health Info",
+      "value": "profile_update_health"
+    },
+    {
+      "text": "🏠 Return to Main Menu",
+      "value": "main_menu"
+    }
+  ],
+  "faq_options": [
+    {
+      "text": "🚑 How do I request an ambulance?",
+      "value": "faq_ambulance_request"
+    },
+    {
+      "text": "💊 How do I order medicine?",
+      "value": "faq_medicine_order"
+    },
+    {
+      "text": "🕒 What are your operating hours?",
+      "value": "faq_operating_hours"
+    },
+    {
+      "text": "🏠 Return to Main Menu",
+      "value": "main_menu"
     }
   ]
 }

@@ -7,7 +7,10 @@ from controllers.chat_bot_controllers.utils.call_ambulance import handle_ambulan
     handle_ambulance_other_emergency_text_input, handle_ambulance_final_confirm_options, \
     handle_ambulance_pickup_location_confirm, handle_ambulance_new_pickup_location_input, \
     handle_ambulance_verify_pickup_location, handle_check_last_ambulance_call
+from controllers.chat_bot_controllers.utils.faq_help import handle_faq_help
 from controllers.chat_bot_controllers.utils.helper_funcation import get_chatbot_options
+from controllers.chat_bot_controllers.utils.my_health_profile import handle_my_health_profile, \
+    handle_profile_update_contact_input, handle_profile_update_health_input
 from controllers.chat_bot_controllers.utils.request_medicine import handle_medicine_search_input, \
     handle_medicine_request_start, handle_medicine_select_prescription, handle_medicine_item_selection, \
     handle_medicine_modify_item, handle_medicine_set_item_quantity, handle_medicine_quantity_input, \
@@ -82,7 +85,11 @@ def handle_main_menu_options(user_obj, data, chat_context):
         bot_options = get_chatbot_options('medicine_request_options')
         next_state = 'medicine_request_start'
     elif user_selection_value == 'call_ambulance':
-        bot_response_text = "I'm dispatching an ambulance for you. Please confirm your current location and the nature of the emergency."
+        bot_response_text = (
+            "🚨 What type of emergency are you experiencing?\n"
+            "Please select one from the options below 👇"
+        )
+
         bot_options = get_chatbot_options('ambulance_emergency_options')
         next_state = 'ambulance_start'
         chat_context['current_ambulance_request'] = {
@@ -108,6 +115,10 @@ def handle_main_menu_options(user_obj, data, chat_context):
 
         bot_options = get_chatbot_options('main_menu_options')
         next_state = 'main_menu_options'
+    elif user_selection_value == 'my_health_profile':
+        return handle_my_health_profile(user_obj, data, chat_context)
+    elif user_selection_value == 'faq_help':
+        return handle_faq_help(user_obj, data, chat_context)
     else:
         bot_response_text = f"You selected '{user_selection_value}'. This feature is currently under development."
         bot_options = get_chatbot_options('main_menu_options')
@@ -142,7 +153,7 @@ STATE_HANDLERS = {
     'medicine_payment_method': handle_medicine_payment_method,
     'medicine_final_confirm': handle_medicine_final_confirm,
     'medicine_check_status': handle_medicine_check_status,  # NEW
-    'medicine_cancel_specific_order': handle_medicine_cancel_specific_order,  # NEW
+    'medicine_cancel_specific_order': handle_medicine_cancel_specific_order,
 
 
     # --- Ambulance Request Flow ---
@@ -152,13 +163,15 @@ STATE_HANDLERS = {
     'ambulance_new_pickup_location_input': handle_ambulance_new_pickup_location_input,
     'ambulance_verify_pickup_location': handle_ambulance_verify_pickup_location,
     'ambulance_final_confirm': handle_ambulance_final_confirm_options,
-    'check_last_ambulance_call': handle_check_last_ambulance_call,  # NEW STATE MAPPING!
+    'check_last_ambulance_call': handle_check_last_ambulance_call,
 
-    # 'ambulance_emergency_input': handle_ambulance_emergency_input,
+    # ---My Health Profile Flow ---
+    'my_health_profile': handle_my_health_profile,
+    'profile_update_contact_input': handle_profile_update_contact_input,
+    'profile_update_health_input': handle_profile_update_health_input,
 
-    # 'medicine_select_from_search':handle_medicine_select_from_search,
-    # Add handlers for all other states as you implement them
-    # For example: 'medicine_search_input', 'medicine_other_quantity_input', etc.
+    # ---FAQs / Help Flow ---
+    'faq_help': handle_faq_help,
 }
 
 

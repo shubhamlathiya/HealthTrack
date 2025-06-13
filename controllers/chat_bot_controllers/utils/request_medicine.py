@@ -12,16 +12,13 @@ from utils.config import db
 # --- Medicine Request Flow ---
 def get_cart_item_options(items):
     item_options = []
-    if not items:
-        return item_options
-
-    for i, item in enumerate(items):
+    for item in items:
+        label = f"{item['medicine_name']} (Qty: {item['quantity_requested']})"
         item_options.append({
-            "text": f"Modify/Remove {item['medicine_name']}",
+            "text": f"🛠️ Modify/Remove {label}",
             "value": f"modify_item_{item['medicine_id']}"
         })
     return item_options
-
 
 def handle_medicine_request_start(user_obj, data, chat_context):
     user_selection_value = data.get('selection_value')
@@ -29,34 +26,32 @@ def handle_medicine_request_start(user_obj, data, chat_context):
     bot_options = []
     next_state = 'medicine_request_start'
 
+    # Step 1: Initialize medicine request context if not already set
     if 'current_medicine_request' not in chat_context or not chat_context['current_medicine_request'].get('items'):
         chat_context['current_medicine_request'] = {
             'patient_id': user_obj.patient.id if user_obj.role == UserRole.PATIENT and user_obj.patient else None,
             'requester_user_id': user_obj.id,
-            'items': [],  # This will store items in the 'cart'
+            'items': [],
             'delivery_address': user_obj.patient.address if user_obj.role == UserRole.PATIENT and user_obj.patient else None,
             'payment_method': None,
-            'status': MedicineRequestStatus.PENDING.value  # Initial status
+            'status': MedicineRequestStatus.PENDING.value
         }
-        # Add user's known address to context if available
-        if user_obj.role == UserRole.PATIENT and user_obj.patient and user_obj.patient.address:
-            chat_context['current_medicine_request']['delivery_address'] = user_obj.patient.address
 
+    # Step 2: Branch based on user selection
     if user_selection_value == 'search_by_name':
-        bot_response_text = "Please type the name or medicine number you are looking for."
+        bot_response_text = "🔍 Please type the medicine name or number you'd like to search for:"
         next_state = 'medicine_search_input'
-        bot_options = []  # No buttons, expects text input
 
     elif user_selection_value == 'view_prescriptions':
         if user_obj.role == UserRole.PATIENT and user_obj.patient:
             patient_id = user_obj.patient.id
             appointments = Appointment.query.filter_by(patient_id=patient_id).all()
-            appointment_ids = [appointment.id for appointment in appointments]
+            appointment_ids = [a.id for a in appointments]
 
             if not appointment_ids:
-                bot_response_text = "No appointments found to base prescriptions on."
+                bot_response_text = "📋 No appointments found to retrieve prescriptions from."
                 bot_options = get_chatbot_options('main_menu_options')
-                next_state = 'main_menu_options'  # Go back to main menu
+                next_state = 'main_menu_options'
             else:
                 prescriptions = Prescription.query.filter(
                     Prescription.appointment_id.in_(appointment_ids),
@@ -65,57 +60,66 @@ def handle_medicine_request_start(user_obj, data, chat_context):
 
                 if prescriptions:
                     prescriptions_data = []
-                    for prescription in prescriptions:
-                        prescription_data = {
-                            'id': prescription.id,
-                            'appointment_date': prescription.appointment.date if prescription.appointment and prescription.appointment.date else None,
-                            # Keep as string for simple comparison, or format for display
-                            'doctor_name': f"{prescription.appointment.doctor.first_name} {prescription.appointment.doctor.last_name}" if prescription.appointment and prescription.appointment.doctor else None,
-                            'notes': prescription.notes,
-                            'status': prescription.status,
+                    for p in prescriptions:
+                        p_data = {
+                            'id': p.id,
+                            'appointment_date': p.appointment.date if p.appointment else None,
+                            'doctor_name': f"{p.appointment.doctor.first_name} {p.appointment.doctor.last_name}" if p.appointment and p.appointment.doctor else "Unknown Doctor",
+                            'notes': p.notes,
+                            'status': p.status,
                             'medications': [
-                                {'name': med.name, 'dosage': med.dosage, 'meal_instructions': med.meal_instructions,
-                                 'timing': [t.timing for t in med.timings] if med.timings else [],
-                                 'medicine_id': med.id,  # Crucial: store medicine ID
-                                 'current_stock': med.current_stock,
-                                 'default_mrp': float(med.default_mrp) if med.default_mrp else 0.0
-                                 } for med in prescription.medications]
+                                {
+                                    'name': med.name,
+                                    'dosage': med.dosage,
+                                    'meal_instructions': med.meal_instructions,
+                                    'timing': [t.timing for t in med.timings] if med.timings else [],
+                                    'medicine_id': med.id,
+                                    'current_stock': med.current_stock,
+                                    'default_mrp': float(med.default_mrp or 0.0)
+                                }
+                                for med in p.medications
+                            ]
                         }
-                        prescriptions_data.append(prescription_data)
+                        prescriptions_data.append(p_data)
 
-                    bot_response_text = "Here are your active prescriptions:"
-                    for p_data in prescriptions_data:
-                        bot_response_text += f"\n\n--- Prescription ID: {p_data['id']} ---"
-                        bot_response_text += f"\nDate: {p_data['appointment_date']} with Dr. {p_data['doctor_name']}"
-                        if p_data['medications']:
-                            bot_response_text += "\nMedications:"
-                            for med in p_data['medications']:
-                                bot_response_text += f"\n  - {med['name']} ({med['dosage']}, {med['meal_instructions']} {', '.join(med['timing'])})"
+                    chat_context['active_prescriptions'] = prescriptions_data
+                    bot_response_text = "📄 Here are your active prescriptions:"
+                    for p in prescriptions_data:
+                        bot_response_text += f"\n\n🆔 Prescription ID: {p['id']}\n🗓️ Date: {p['appointment_date']} | 👨‍⚕️ Dr. {p['doctor_name']}"
+                        if p['medications']:
+                            bot_response_text += "\n💊 Medications:"
+                            for med in p['medications']:
+                                med_line = f"  - {med['name']} ({med['dosage']}, {med['meal_instructions']})"
+                                if med['timing']:
+                                    med_line += f" | Timing: {', '.join(med['timing'])}"
                                 if med['current_stock'] <= 0:
-                                    bot_response_text += " (Out of Stock)"
+                                    med_line += " ⚠️ (Out of stock)"
                                 else:
-                                    bot_response_text += f" (In Stock: {med['current_stock']})"
+                                    med_line += f" (In stock: {med['current_stock']})"
+                                bot_response_text += f"\n{med_line}"
                         else:
                             bot_response_text += "\n  No medications listed."
 
-                    chat_context['active_prescriptions'] = prescriptions_data
                     bot_options = [{"text": f"Select Prescription {p['id']}", "value": str(p['id'])} for p in
                                    prescriptions_data]
                     next_state = 'medicine_select_prescription'
                 else:
-                    bot_response_text = "No active prescriptions found."
+                    bot_response_text = "🧾 No active prescriptions found."
                     bot_options = get_chatbot_options('main_menu_options')
                     next_state = 'main_menu_options'
         else:
-            bot_response_text = "I cannot retrieve prescriptions without a linked patient profile."
+            bot_response_text = "⚠️ Unable to fetch prescriptions. Patient profile not linked."
             bot_options = get_chatbot_options('main_menu_options')
             next_state = 'main_menu_options'
+
     elif user_selection_value == 'view_cart':
         return view_medicine_cart(user_obj, data, chat_context)
+
     elif user_selection_value == 'check_status':
         return handle_medicine_check_status(user_obj, data, chat_context)
+
     else:
-        bot_response_text = "How would you like to request medicine?"
+        bot_response_text = "💊 How would you like to request your medicine?"
         bot_options = get_chatbot_options('medicine_request_options')
         next_state = 'medicine_request_start'
 
@@ -145,7 +149,7 @@ def handle_medicine_select_prescription(user_obj, data, chat_context):
                     "value": f"add_med_{med['medicine_id']}"
                 })
 
-        bot_response_text += "\n\nWhat would you like to do?"
+        bot_response_text += "\n\n✨ What else would you like to do?"
         bot_options.extend([
             {"text": "Go to Cart", "value": "view_cart"},
             {"text": "Search for another medicine", "value": "search_by_name"},
@@ -153,7 +157,7 @@ def handle_medicine_select_prescription(user_obj, data, chat_context):
         ])
         next_state = 'medicine_item_selection'
     else:
-        bot_response_text = "Invalid prescription selected. Please try again or go back to the main menu."
+        bot_response_text = "📋 Hmm... that prescription isn’t valid. Try selecting another or go back to the main menu 🏠."
         bot_options = get_chatbot_options('main_menu_options')  # Provide main menu options
         next_state = 'main_menu_options'
 
@@ -182,7 +186,7 @@ def handle_medicine_item_selection(user_obj, data, chat_context):
                 if item['medicine_id'] == medicine.id:
                     # Check if increasing quantity would exceed stock
                     if item['quantity_requested'] + 1 > medicine.current_stock:
-                        bot_response_text = f"Cannot add more {medicine.name}. Only {medicine.current_stock} units are in stock."
+                        bot_response_text = f"📦 Only {medicine.current_stock} units of *{medicine.name}* are available."
                     else:
                         item['quantity_requested'] += 1
                         bot_response_text = f"Added another unit of {medicine.name} to your cart. Current quantity: {item['quantity_requested']}. "
@@ -197,9 +201,9 @@ def handle_medicine_item_selection(user_obj, data, chat_context):
                     'unit_price': float(medicine.default_mrp) if medicine.default_mrp else 0.0,
                     'stock_available': medicine.current_stock  # Store current stock for local checks
                 })
-                bot_response_text = f"Added {medicine.name} to your cart. "
+                bot_response_text = f"🎉 {medicine.name} has been added to your cart! "
 
-            bot_response_text += "What else would you like to do?"
+            bot_response_text += "✨ What else would you like to do?"
             bot_options = get_chatbot_options('medicine_cart_options')
 
             next_state = 'medicine_item_selection'  # Stay here for more additions or cart actions
@@ -217,7 +221,7 @@ def handle_medicine_item_selection(user_obj, data, chat_context):
 
     elif user_selection_value == 'checkout':
         if not current_medicine_request['items']:
-            bot_response_text = "Your cart is empty. Please add medicines before checking out."
+            bot_response_text = "🧺 Oops! Looks like your cart is empty. Add some medicines to get started!"
             bot_options = get_chatbot_options('medicine_request_options')  # Back to start options
             next_state = 'medicine_request_start'
         else:
@@ -227,12 +231,12 @@ def handle_medicine_item_selection(user_obj, data, chat_context):
         chat_context['current_medicine_request'] = {
             'items': [], 'status': MedicineRequestStatus.CANCELLED.value
         }
-        bot_response_text = "Your current medicine order has been cancelled."
+        bot_response_text = "🚫 The medicine order has been successfully cancelled. You may initiate a new request at any time."
         bot_options = get_chatbot_options('main_menu_options')
         next_state = 'main_menu_options'
 
     elif user_selection_value == 'search_by_name':
-        bot_response_text = "Please type the name or medicine number you are looking for."
+        bot_response_text = "🔍 Please type the name or medicine number you're looking for."
         next_state = 'medicine_search_input'
         bot_options = []
 
@@ -246,7 +250,7 @@ def handle_medicine_item_selection(user_obj, data, chat_context):
 
     elif user_selection_value == 'clear_cart':  # NEW
         chat_context['current_medicine_request']['items'] = []
-        bot_response_text = "Your cart has been cleared. What would you like to do now?"
+        bot_response_text = "🧹 Your cart has been cleared! 🛒\n\nWhat would you like to do next?"
         bot_options = get_chatbot_options('medicine_request_options')  # Back to start options
         next_state = 'medicine_request_start'
 
@@ -261,7 +265,7 @@ def handle_medicine_item_selection(user_obj, data, chat_context):
         if medicine_id:
             return adjust_medicine_quantity(user_obj, chat_context, medicine_id, 1)
         else:
-            bot_response_text = "I'm not sure which item to increase. Please select it from the cart again."
+            bot_response_text = "🔍 I couldn't figure out which item you want to increase. Please pick it again from your 🛒 cart."
             return view_medicine_cart(user_obj, data, chat_context)
 
     elif user_selection_value == 'decrease_item_qty':
@@ -289,7 +293,7 @@ def handle_medicine_item_selection(user_obj, data, chat_context):
                 (item for item in current_medicine_request['items'] if item['medicine_id'] == medicine_id), None)
             medicine_db_obj = Medicine.query.get(medicine_id)  # Fetch latest stock
             stock_info = f" (Current stock: {medicine_db_obj.current_stock})" if medicine_db_obj else ""
-            bot_response_text = f"Please enter the new quantity for {found_item['medicine_name'] if found_item else 'this medicine'}{stock_info}:"
+            bot_response_text = f"📝 Please enter the new quantity for **{found_item['medicine_name'] if found_item else 'this medicine'}**{stock_info}:"
             bot_options = []  # Expect text input
             next_state = 'medicine_quantity_input'
         else:
@@ -309,27 +313,35 @@ def handle_medicine_item_selection(user_obj, data, chat_context):
 def view_medicine_cart(user_obj, data, chat_context):
     current_medicine_request = chat_context.get('current_medicine_request', {'items': []})
     items = current_medicine_request.get('items', [])
-    bot_options = get_chatbot_options('medicine_cart_options')  # Always offer general cart options
+    bot_options = get_chatbot_options('medicine_cart_options')  # Default options
 
     if not items:
-        bot_response_text = "Your cart is empty. Add some medicines first!"
-        next_state = 'medicine_request_start'  # Redirect to add options
+        bot_response_text = (
+            "🛒 Your cart is currently empty.\n"
+            "Let’s add some medicines to it!"
+        )
+        next_state = 'medicine_request_start'
         bot_options = get_chatbot_options('medicine_request_options')
     else:
         total_amount = sum(item['quantity_requested'] * item['unit_price'] for item in items)
-        bot_response_text = "Here's what's in your cart:\n"
+        bot_response_text = "🛍️ **Here's what's in your cart:**\n"
+
         for i, item in enumerate(items):
-            bot_response_text += f"\n{i + 1}. {item['medicine_name']} - Quantity: {item['quantity_requested']} (Rs. {item['unit_price']:.2f} each)"
-            if item['quantity_requested'] > item[
-                'stock_available']:  # Highlight if quantity exceeds available stock (shouldn't happen with proper flow)
-                bot_response_text += " (Quantity exceeds stock!)"
+            name = item['medicine_name']
+            qty = item['quantity_requested']
+            price = item['unit_price']
+            stock = item['stock_available']
+            bot_response_text += f"\n{i + 1}. **{name}** — Qty: {qty} @ ₹{price:.2f}"
+            if qty > stock:
+                bot_response_text += " ⚠️ (Exceeds available stock!)"
 
-        bot_response_text += f"\n\nTotal Estimated Amount: Rs. {total_amount:.2f}"
-        bot_response_text += "\n\nWhat would you like to do?"
-        next_state = 'medicine_item_selection'  # Stay in item selection state
+        bot_response_text += f"\n\n💰 **Total Estimated Amount:** ₹{total_amount:.2f}"
+        bot_response_text += "\n\n🧾 What would you like to do next?"
+        next_state = 'medicine_item_selection'
 
+        # Item-specific options (like edit, remove, etc.)
         item_specific_options = get_cart_item_options(items)
-        bot_options = item_specific_options + bot_options  # Add item-specific options first
+        bot_options = item_specific_options + bot_options
 
     return bot_response_text, bot_options, next_state, chat_context
 
@@ -355,7 +367,7 @@ def handle_medicine_set_item_quantity(user_obj, data, chat_context):
             bot_options = []  # Expects text input
             next_state = 'medicine_quantity_input'
         else:
-            bot_response_text = "That medicine is not in your cart or is invalid. Please select an item from your cart to modify quantity."
+            bot_response_text = "⚠️ That medicine isn't in your cart or seems invalid. Please select a valid item from your 🛒 cart to modify the quantity."
             bot_options = get_chatbot_options('medicine_cart_options')
             next_state = 'medicine_item_selection'
     else:
@@ -379,7 +391,7 @@ def handle_medicine_quantity_input(user_obj, data, chat_context):
     medicine_id_to_set_qty = chat_context.get('setting_quantity_for_medicine_id')
 
     if medicine_id_to_set_qty is None:
-        bot_response_text = "It seems I lost track of which medicine you wanted to set the quantity for. Please try again from the cart."
+        bot_response_text = "🤔 Oops! I lost track of which medicine you wanted to update. Please head back to your 🛒 cart and try again."
         bot_options = get_chatbot_options('medicine_cart_options')
         next_state = 'medicine_item_selection'
         return bot_response_text, bot_options, next_state, chat_context
@@ -399,7 +411,7 @@ def handle_medicine_quantity_input(user_obj, data, chat_context):
     medicine_db_obj = Medicine.query.get(medicine_id_to_set_qty)
 
     if not item_in_cart or not medicine_db_obj:
-        bot_response_text = "The medicine you tried to set the quantity for is no longer in your cart or found. Please try again from the cart."
+        bot_response_text = "⚠️ The medicine you're trying to update isn't in your cart anymore. 🛒 Please go back to your cart and try again."
         bot_options = get_chatbot_options('medicine_cart_options')
         next_state = 'medicine_item_selection'
         chat_context.pop('setting_quantity_for_medicine_id', None)
@@ -494,7 +506,7 @@ def handle_medicine_new_address_input(user_obj, data, chat_context):
         bot_options = get_chatbot_options('medicine_verify_address_options')
         chat_context['current_medicine_request'] = current_medicine_request  # Update context
     else:
-        bot_response_text = "Please type the new delivery address."
+        bot_response_text = "📦 Got it! Just type the new address where you'd like the medicine delivered."
         next_state = 'medicine_new_address_input'  # Stay in this state
         bot_options = []  # Expecting text input
 
@@ -517,7 +529,7 @@ def handle_medicine_verify_new_address(user_obj, data, chat_context):
         next_state = 'medicine_new_address_input'
         bot_options = []  # Expecting text input
     else:
-        bot_response_text = "Please confirm the address or choose to re-enter it."
+        bot_response_text = "📍 Please confirm if this is the correct address, or 🔄 choose to re-enter a new one."
         bot_options = get_chatbot_options('medicine_verify_address_options')
         next_state = 'medicine_verify_new_address'
 
@@ -545,7 +557,11 @@ def handle_medicine_payment_method(user_obj, data, chat_context):
         total_amount = sum(
             item['quantity_requested'] * item['unit_price'] for item in current_medicine_request.get('items', []))
 
-        bot_response_text = f"Payment method selected: {user_selection_value.replace('_', ' ')}. Your order total is Rs. {total_amount:.2f}. Ready to place your order?"
+        bot_response_text = (
+            f"💳 Payment method selected: **{user_selection_value.replace('_', ' ').title()}**\n"
+            f"🧾 Order Total: ₹{total_amount:.2f}\n\n"
+            "✅ Ready to place your order?"
+        )
         bot_options = get_chatbot_options('medicine_final_confirm_options')
         next_state = 'medicine_final_confirm'
     else:
@@ -589,7 +605,11 @@ def handle_medicine_final_confirm(user_obj, data, chat_context):
                 medicine = Medicine.query.get(item_data['medicine_id'])
                 if not medicine or medicine.current_stock < item_data['quantity_requested']:
                     db.session.rollback()  # Rollback the request if stock issues
-                    bot_response_text = f"Order failed: Insufficient stock for {item_data['medicine_name']} (only {medicine.current_stock if medicine else 0} available). Please adjust your cart."
+                    bot_response_text = (
+                        f"🚫 Order failed: Not enough stock for **{item_data['medicine_name']}**. "
+                        f"Only **{medicine.current_stock if medicine else 0}** available in stock.\n"
+                        "🛒 Please update your cart and try again."
+                    )
                     next_state = 'medicine_item_selection'
                     bot_options = get_chatbot_options('medicine_cart_options')
                     return bot_response_text, bot_options, next_state, chat_context
@@ -729,7 +749,7 @@ def handle_medicine_check_status(user_obj, data, chat_context):
     next_state = 'medicine_request_start'  # Default back to main medicine options
 
     if user_obj.role != UserRole.PATIENT or not user_obj.patient:
-        bot_response_text = "I can only check order status for linked patient profiles."
+        bot_response_text = "🔍 Sorry! I can only check your order status if your account is linked to a 👤 patient profile. Please update your profile first."
         bot_options = get_chatbot_options('main_menu_options')
         next_state = 'main_menu_options'
         return bot_response_text, bot_options, next_state, chat_context
@@ -756,22 +776,26 @@ def handle_medicine_check_status(user_obj, data, chat_context):
             items_details = ["- No items found for this order (data might be incomplete)."]
 
         bot_response_text = (
-                f"Your Last Order (ID: {last_request.id}):\n"
-                f"Status: {last_request.status.value.upper()}\n"
-                f"Delivery Address: {last_request.delivery_address}\n"
-                f"Payment Method: {last_request.payment_method}\n"
-                f"Total Amount: Rs. {last_request.total_amount:.2f}\n"
-                f"Items:\n" + "\n".join(items_details)
+                f"📦 **Your Last Order Summary** (🆔 ID: {last_request.id})\n"
+                f"🔄 **Status**: {last_request.status.value.upper()}\n"
+                f"🏠 **Delivery Address**: {last_request.delivery_address}\n"
+                f"💳 **Payment Method**: {last_request.payment_method}\n"
+                f"💰 **Total Amount**: ₹{last_request.total_amount:.2f}\n\n"
+                f"📝 **Items Ordered:**\n" + "\n".join(items_details)
         )
+
         if last_request.status == MedicineRequestStatus.PENDING.value:
-            bot_response_text += "\n\nWe're processing your order. You can cancel it if needed."
-            bot_options.append({"text": "Cancel This Order", "value": f"cancel_specific_order_{last_request.id}"})
+            bot_response_text += "\n\n🕒 Your order is currently being *processed*. You can cancel it if needed."
+            bot_options.append({
+                "text": "❌ Cancel This Order",
+                "value": f"cancel_specific_order_{last_request.id}"
+            })
         elif last_request.status == MedicineRequestStatus.CONFIRMED.value:
-            bot_response_text += "\n\nYour order has been confirmed and is being prepared for dispatch."
+            bot_response_text += "\n\n✅ Your order has been *confirmed* and is being prepared for 🛵 dispatch."
         elif last_request.status == MedicineRequestStatus.DELIVERED.value:
-            bot_response_text += "\n\nYour order has been delivered."
+            bot_response_text += "\n\n📦 Your order has been *delivered*. Hope it reached you safely!"
         elif last_request.status == MedicineRequestStatus.CANCELLED.value:
-            bot_response_text += "\n\nThis order has been cancelled."
+            bot_response_text += "\n\n🚫 This order has been *cancelled*."
 
     bot_response_text += "\n\nWhat would you like to do next?"
     next_state = 'medicine_request_start'
@@ -786,14 +810,14 @@ def handle_medicine_cancel_specific_order(user_obj, data, chat_context):
     next_state = 'main_menu_options'
 
     if not user_selection_value or not user_selection_value.startswith('cancel_specific_order_'):
-        bot_response_text = "Invalid request to cancel order. Please try again from 'Check Status'."
+        bot_response_text = "🚫 Oops! That’s not a valid way to cancel your order. Please go back to 🧾 *Check Status* to try again."
         return handle_medicine_check_status(user_obj, data, chat_context)
 
     order_id = int(user_selection_value.replace('cancel_specific_order_', ''))
     patient_id = user_obj.patient.id if user_obj.role == UserRole.PATIENT and user_obj.patient else None
 
     if not patient_id:
-        bot_response_text = "Cannot cancel order: no patient profile linked."
+        bot_response_text = "⚠️ Unable to cancel the order — we couldn't find a linked 👤 patient profile. Please update your profile to proceed."
         return bot_response_text, bot_options, next_state, chat_context
 
     # Retrieve the order to cancel
@@ -827,7 +851,7 @@ def handle_medicine_search_input(user_obj, data, chat_context):
     next_state = 'medicine_item_selection'  # Next state for selecting search results or cart actions
 
     if not search_term:
-        bot_response_text = "Please enter a valid medicine name or number to search."
+        bot_response_text = "⚠️ Oops! I didn’t catch that. Please enter a valid 💊 medicine name or number to 🔍 search."
         bot_options = []  # Expects text input
         next_state = 'medicine_search_input'  # Stay in search input
         return bot_response_text, bot_options, next_state, chat_context
@@ -846,25 +870,28 @@ def handle_medicine_search_input(user_obj, data, chat_context):
     ).limit(5).all()  # Limit results to avoid overwhelming the user
 
     if not medicines:
-        bot_response_text = f"No medicines found matching '{search_term}'. Would you like to try searching again or go back to the main menu?"
+        bot_response_text = (
+            f"❌ Oops! I couldn’t find any medicines matching **'{search_term}'**.\n\n"
+            "🔍 Would you like to try 🔁 searching again or 🏠 return to the main menu?"
+        )
         bot_options = get_chatbot_options("medicine_not_found")
         next_state = 'medicine_request_start'  # Can go back to start of flow
     else:
-        bot_response_text = f"Found the following medicines matching '{search_term}':"
+        bot_response_text = f"🧾 Found the following medicines matching **'{search_term}'**:"
         for med in medicines:
-            stock_info = f" (In Stock: {med.current_stock})" if med.current_stock > 0 else " (Out of Stock)"
-            bot_response_text += f"\n\n- {med.name} (#{med.medicine_number})"
-            bot_response_text += f"\n  Category: {med.category.name if med.category else 'N/A'}"
-            bot_response_text += f"\n  Price: ₹{float(med.default_mrp) if med.default_mrp else 'N/A'}"
-            bot_response_text += stock_info
+            stock_info = f"✅ In Stock: {med.current_stock}" if med.current_stock > 0 else "❌ Out of Stock"
+            bot_response_text += f"\n\n💊 **{med.name}** (#{med.medicine_number})"
+            bot_response_text += f"\n📂 Category: {med.category.name if med.category else 'N/A'}"
+            bot_response_text += f"\n💰 Price: ₹{float(med.default_mrp) if med.default_mrp else 'N/A'}"
+            bot_response_text += f"\n📦 {stock_info}"
 
             if med.current_stock > 0:
                 bot_options.append({
-                    "text": f"Add {med.name} to Cart",
+                    "text": f"🛒 Add {med.name}",
                     "value": f"add_med_{med.id}"
                 })
 
-        bot_response_text += "\n\nWhat would you like to do next?"
+        bot_response_text += "\n\n🤖 What would you like to do next?"
         bot_options.extend(get_chatbot_options('medicine_cart_options'))
         next_state = 'medicine_item_selection'
 
