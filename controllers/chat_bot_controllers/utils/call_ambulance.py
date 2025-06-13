@@ -253,6 +253,6 @@ def handle_check_last_ambulance_call(user_obj, data, chat_context):
     else:
         bot_response_text = "You don't have any past ambulance requests with us. What would you like to do?"
 
-    next_state = 'main_menu_options'  # After checking, usually back to main menu or related options
+    next_state = 'main_menu_options'
 
     return bot_response_text, bot_options, next_state, chat_context
