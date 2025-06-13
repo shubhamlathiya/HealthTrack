@@ -36,7 +36,7 @@ class User(db.Model):
     notifications = db.relationship('Notification', backref='user', lazy=True)
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
     received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
-
+    chat_context_json = db.Column(db.Text, nullable=True)
     # Relationships
     insurance_records = db.relationship(
         'InsuranceRecord',

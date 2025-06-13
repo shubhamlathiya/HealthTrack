@@ -366,6 +366,7 @@ class MedicineSaleItem(db.Model):
 
 class MedicineRequestStatus(Enum):
     PENDING = 'Pending'
+    CONFIRMED = "confirmed"
     PROCESSING = 'Processing'
     DELIVERED = 'Delivered'
     CANCELLED = 'Cancelled'
@@ -399,7 +400,7 @@ class MedicineRequestItem(db.Model):
     medicine_id = db.Column(db.Integer, db.ForeignKey('medicines.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     requested_price_per_unit = db.Column(db.Numeric(10, 2), nullable=True)
-
+    subtotal = db.Column(db.Numeric(10, 2), nullable=True)
     medicine = db.relationship('Medicine', back_populates='requested_items')
 
     def __repr__(self):

@@ -39,24 +39,14 @@
     {
       "text": "View My Prescriptions",
       "value": "view_prescriptions"
-    }
-  ],
-  "ambulance_emergency_options": [
-    {
-      "text": "Chest Pain",
-      "value": "chest_pain"
     },
     {
-      "text": "Accident",
-      "value": "accident"
+      "text": "Check Status",
+      "value": "check_status"
     },
     {
-      "text": "Breathing Difficulty",
-      "value": "breathing_difficulty"
-    },
-    {
-      "text": "Other Emergency",
-      "value": "other_emergency"
+      "text": "Go to Cart",
+      "value": "view_cart"
     }
   ],
   "medicine_quantity_options": [
@@ -87,6 +77,16 @@
       "value": "enter_new_address"
     }
   ],
+  "medicine_verify_address_options": [
+    {
+      "text": "This looks correct",
+      "value": "address_correct"
+    },
+    {
+      "text": "Enter again",
+      "value": "address_re_enter"
+    }
+  ],
   "medicine_payment_options": [
     {
       "text": "Cash on Delivery",
@@ -97,6 +97,42 @@
       "value": "online_payment"
     }
   ],
+  "medicine_cart_options": [
+    {
+      "text": "Checkout",
+      "value": "checkout"
+    },
+    {
+      "text": "Clear Cart",
+      "value": "clear_cart"
+    },
+    {
+      "text": "Back to Medicine Request Start",
+      "value": "medicine_request_start"
+    },
+    {
+      "text": "Search for another medicine",
+      "value": "search_by_name"
+    },
+    {
+      "text": "View Cart",
+      "value": "view_cart"
+    },
+    {
+      "text": "View My Prescriptions",
+      "value": "view_prescriptions"
+    }
+  ],
+  "medicine_not_found": [
+    {
+      "text": "Search Again",
+      "value": "search_by_name"
+    },
+    {
+      "text": "Main Menu",
+      "value": "main_menu"
+    }
+  ],
   "medicine_final_confirm_options": [
     {
       "text": "Place Order",
@@ -105,6 +141,60 @@
     {
       "text": "Go Back",
       "value": "go_back"
+    }
+  ],
+  "medicine_modify_item_options": [
+    {
+      "text": "Increase Quantity (+1)",
+      "value": "increase_item_qty"
+    },
+    {
+      "text": "Decrease Quantity (-1)",
+      "value": "decrease_item_qty"
+    },
+    {
+      "text": "Remove Item",
+      "value": "remove_specific_item"
+    },
+    {
+      "text": "Set Specific Quantity",
+      "value": "set_specific_qty"
+    },
+    {
+      "text": "Back to Cart",
+      "value": "view_cart"
+    }
+  ],
+  "medicine_order_status_options": [
+    {
+      "text": "View Cart",
+      "value": "view_cart"
+    },
+    {
+      "text": "Start a New Order",
+      "value": "medicine_request_start"
+    },
+    {
+      "text": "Main Menu",
+      "value": "main_menu"
+    }
+  ],
+  "ambulance_emergency_options": [
+    {
+      "text": "Chest Pain",
+      "value": "chest_pain"
+    },
+    {
+      "text": "Accident",
+      "value": "accident"
+    },
+    {
+      "text": "Breathing Difficulty",
+      "value": "breathing_difficulty"
+    },
+    {
+      "text": "Other Emergency",
+      "value": "other_emergency"
     }
   ],
   "ambulance_final_confirm_options": [

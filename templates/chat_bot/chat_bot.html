@@ -276,7 +276,7 @@
     function displayMessage(message, sender) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message-bubble', sender === 'bot' ? 'bot-message' : 'user-message');
-        messageElement.innerHTML = message;
+         messageElement.innerHTML = message.replace(/\n/g, '<br>');
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }

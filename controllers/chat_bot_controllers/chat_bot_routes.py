@@ -1,67 +1,24 @@
-# app.py (main Flask application file)
-
 import json
-import os
 
 from flask import jsonify, session, render_template, request
-from sqlalchemy import or_
-from sqlalchemy.orm import joinedload
 
 from controllers.chat_bot_controllers import chatbot
+from controllers.chat_bot_controllers.utils.helper_funcation import get_chatbot_options
+from controllers.chat_bot_controllers.utils.request_medicine import handle_medicine_search_input, \
+    handle_medicine_request_start, handle_medicine_select_prescription, handle_medicine_item_selection, \
+    handle_medicine_modify_item, handle_medicine_set_item_quantity, handle_medicine_quantity_input, \
+    handle_medicine_check_status, handle_medicine_final_confirm, handle_medicine_payment_method, \
+    handle_medicine_verify_new_address, handle_medicine_new_address_input, handle_medicine_delivery_address, \
+    handle_medicine_cancel_specific_order
 from middleware.auth_middleware import token_required
-from models import UserRole, User, Patient, Appointment, Prescription, Medicine
-
-
-def load_chatbot_config():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    # Correct path: go into 'data' folder from current_dir
-    config_path = os.path.join(current_dir, 'data', 'chatbot_config.json')  # <-- MODIFY THIS LINE
-
-    # config_path = 'data/chatbot_config.json'
-
-    try:
-        with open(config_path, 'r', encoding='utf-8') as f:
-            _cached_chatbot_config = json.load(f)
-        print(f"Chatbot configuration loaded successfully from {config_path}")
-        print(f"Loaded config keys: {_cached_chatbot_config.keys()}")
-        return _cached_chatbot_config
-    except FileNotFoundError:
-        print(
-            f"ERROR: Chatbot config file NOT FOUND at {config_path}. Please ensure the file exists and the path is correct.")
-        _cached_chatbot_config = {}  # Set to empty dict on failure to prevent repeated errors
-        return {}  # Return empty dict so app doesn't crash immediately
-    except json.JSONDecodeError as e:
-        print(f"ERROR: Could not decode JSON from {config_path}. Check file format for errors.")
-        print(f"JSON Decoding Error: {e}")
-        _cached_chatbot_config = {}
-        return {}
-    except Exception as e:
-        print(f"An unexpected error occurred while loading chatbot config: {e}")
-        print(f"Config path attempted: {config_path}")
-        _cached_chatbot_config = {}
-        return {}
-
-
-def get_chatbot_options(key, default_options=None):
-    config = load_chatbot_config()  # Ensures config is loaded
-
-    print(f"Attempting to retrieve options for key: '{key}'")
-    retrieved_options = config.get(key, default_options if default_options is not None else [])
-
-    print(f"Options retrieved for '{key}': {retrieved_options}")
-    return retrieved_options
-
-
-# Helper function for quantity validation (example)
-def is_valid_quantity(qty):
-    return isinstance(qty, int) and qty > 0
+from models import UserRole, User, Patient, Appointment, MedicineRequestStatus
+from utils.config import db
 
 
 @chatbot.route('/', methods=['GET'])
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def chatbot_page(current_user):
     return render_template("chat_bot/chat_bot.html")
-
 
 @chatbot.route('/api/me', methods=['GET'])
 @token_required(allowed_roles=[UserRole.PATIENT.name])
@@ -100,9 +57,7 @@ def get_user_info(current_user):
         'is_authenticated': True
     }), 200
 
-
 # --- State Handler Functions ---
-
 def handle_initial_state(user_obj, data, chat_context):
     """Handles the 'initial' conversation state."""
     bot_response_text = f"Hello {user_obj.role.value}! How can I assist you today?"
@@ -111,6 +66,7 @@ def handle_initial_state(user_obj, data, chat_context):
     return bot_response_text, bot_options, next_state, chat_context
 
 
+# --- Main Menu Options ---
 def handle_main_menu_options(user_obj, data, chat_context):
     """Handles selections from the 'main_menu_options' state."""
     user_selection_value = data.get('selection_value')
@@ -153,187 +109,6 @@ def handle_main_menu_options(user_obj, data, chat_context):
         bot_options = get_chatbot_options('main_menu_options')
         next_state = 'main_menu_options'
 
-    return bot_response_text, bot_options, next_state, chat_context
-
-
-def handle_medicine_request_start(user_obj, data, chat_context):
-    """Handles the 'medicine_request_start' state."""
-    user_selection_value = data.get('selection_value')
-    patient_id = user_obj.patient.id if user_obj.role == UserRole.PATIENT and user_obj.patient else None
-    bot_response_text = ""
-    bot_options = []
-    next_state = 'main_menu_options'  # Set a safe default
-
-    if user_selection_value == 'search_by_name':
-        bot_response_text = "Please type the name of the medicine you are looking for."
-        next_state = 'medicine_search_input'
-
-    elif user_selection_value == 'view_prescriptions':
-        if patient_id:
-            appointments = Appointment.query.filter_by(patient_id=patient_id).all()
-            appointment_ids = [appointment.id for appointment in appointments]
-
-            if not appointment_ids:
-                bot_response_text = "No appointments found to base prescriptions on."
-            else:
-                prescriptions = Prescription.query.filter(
-                    Prescription.appointment_id.in_(appointment_ids),
-                    Prescription.is_deleted == False
-                ).all()
-
-                if prescriptions:
-                    prescriptions_data = []
-                    for prescription in prescriptions:
-                        prescription_data = {
-                            'id': prescription.id,
-                            'appointment_date': prescription.appointment.date.isoformat() if prescription.appointment and prescription.appointment.date else None,
-                            'doctor_name': f"{prescription.appointment.doctor.first_name} {prescription.appointment.doctor.last_name}" if prescription.appointment and prescription.appointment.doctor else None,
-                            'notes': prescription.notes,
-                            'status': prescription.status,
-                            'medications': [
-                                {'name': med.name, 'dosage': med.dosage, 'meal_instructions': med.meal_instructions,
-                                 'timing': [t.timing for t in med.timings] if med.timings else []} for med in
-                                prescription.medications]
-                        }
-                        prescriptions_data.append(prescription_data)
-
-                    bot_response_text = "Here are your active prescriptions:"
-                    for p_data in prescriptions_data:
-                        bot_response_text += f"\n\n--- Prescription ID: {p_data['id']} ---"
-                        bot_response_text += f"\nDate: {p_data['appointment_date']} with Dr. {p_data['doctor_name']}"
-                        if p_data['medications']:
-                            bot_response_text += "\nMedications:"
-                            for med in p_data['medications']:
-                                bot_response_text += f"\n  - {med['name']} ({med['dosage']}, {med['meal_instructions']} {', '.join(med['timing'])})"
-                    chat_context['active_prescriptions'] = prescriptions_data
-                    bot_options = [{"text": f"Select Prescription {p['id']}", "value": str(p['id'])} for p in
-                                   prescriptions_data]
-                    next_state = 'medicine_select_prescription'
-                else:
-                    bot_response_text = "No active prescriptions found."
-        else:
-            bot_response_text = "I cannot retrieve prescriptions without a linked patient profile."
-
-        # Safely assign default options if needed
-        if not chat_context.get('active_prescriptions'):
-            bot_options = get_chatbot_options('main_menu_options')
-            next_state = 'main_menu_options'
-
-    return bot_response_text, bot_options, next_state, chat_context
-
-
-def handle_medicine_select_prescription(user_obj, data, chat_context):
-    """Handles selecting a specific prescription for medicine request."""
-    user_selection_value = data.get('selection_value')
-    patient_id = user_obj.patient.id if user_obj.role == UserRole.PATIENT and user_obj.patient else None
-    patient_address = user_obj.patient.address if user_obj.role == UserRole.PATIENT and user_obj.patient else None
-
-    selected_prescription = next(
-        (p for p in chat_context.get('active_prescriptions', []) if str(p['id']) == user_selection_value), None)
-
-    if selected_prescription:
-        # Simulate items for calculation (you'd fetch actual medicine items from DB here)
-        # For simplicity, let's assume 'medications' in the context are the 'items'
-        items_for_request = []
-        total_prescription_amount = 0.0
-        for med in selected_prescription.get('medications', []):
-            # You'd need to fetch actual medicine details like unit_price from your Medicine model
-            # For this example, let's assume a dummy price
-            dummy_unit_price = 10.0  # Replace with actual logic to get medicine price
-            quantity = 1  # You might infer quantity from dosage or have a default
-            items_for_request.append({
-                'medicine_name': med['name'],
-                'quantity_prescribed': quantity,
-                'unit_price': dummy_unit_price
-            })
-            total_prescription_amount += quantity * dummy_unit_price
-
-        chat_context['current_medicine_request'] = {
-            'patient_id': patient_id,
-            'requester_user_id': user_obj.id,
-            'delivery_address': patient_address or 'Unknown Address',
-            'items': items_for_request
-        }
-        bot_response_text = f"Requesting all medicines from Prescription #{selected_prescription['id']}. Total estimated amount: Rs. {total_prescription_amount:.2f}."
-        bot_options = [
-            {"text": "Confirm Delivery", "value": "confirm_delivery"},
-            {"text": "Modify Items", "value": "modify_items"},
-            {"text": "Cancel Request", "value": "cancel_request"}  # Renamed for clarity
-        ]
-        next_state = 'medicine_delivery_confirm'
-    else:
-        bot_response_text = "Invalid prescription selected. Please try again."
-        bot_options = get_chatbot_options('main_menu_options')
-        next_state = 'main_menu_options'
-
-    return bot_response_text, bot_options, next_state, chat_context
-
-
-def handle_medicine_quantity(user_obj, data, chat_context):
-    """Handles the 'medicine_quantity' state."""
-    user_selection_value = data.get('selection_value')
-    current_medicine_request = chat_context.get('current_medicine_request', {})
-    delivery_address = current_medicine_request.get('delivery_address', 'Unknown Address')
-
-    if user_selection_value == 'other_quantity':
-        bot_response_text = "Please type the exact quantity you need."
-        next_state = 'medicine_other_quantity_input'
-    elif user_selection_value:
-        try:
-            quantity = int(user_selection_value)
-            if quantity > 0 and current_medicine_request and current_medicine_request.get('items'):
-                # Assuming this is for a single item for now, extend for multiple items
-                current_medicine_request['items'][0][
-                    'quantity_requested'] = quantity  # Use a specific key for requested quantity
-                bot_response_text = f"You selected {quantity} units. Confirm delivery address: {delivery_address}?"
-                bot_options = get_chatbot_options('medicine_address_options')
-                next_state = 'medicine_delivery_address'
-            else:
-                bot_response_text = "Invalid quantity or no medicine selected. Please select an option or type a number."
-                bot_options = get_chatbot_options('medicine_quantity_options')
-                next_state = 'medicine_quantity'
-        except ValueError:
-            bot_response_text = "Invalid quantity format. Please enter a number."
-            bot_options = get_chatbot_options('medicine_quantity_options')
-            next_state = 'medicine_quantity'
-    else:
-        bot_response_text = "Please select a quantity or type 'other_quantity'."
-        bot_options = get_chatbot_options('medicine_quantity_options')
-        next_state = 'medicine_quantity'
-
-    chat_context['current_medicine_request'] = current_medicine_request  # Update context
-    return bot_response_text, bot_options, next_state, chat_context
-
-
-def handle_medicine_delivery_address(user_obj, data, chat_context):
-    """Handles the 'medicine_delivery_address' state."""
-    user_selection_value = data.get('selection_value')
-    if user_selection_value == 'confirm_address':
-        bot_response_text = "How would you like to pay?"
-        bot_options = get_chatbot_options('medicine_payment_options')
-        next_state = 'medicine_payment_method'
-    elif user_selection_value == 'enter_new_address':
-        bot_response_text = "Please type the new delivery address."
-        next_state = 'medicine_new_address_input'
-    else:
-        bot_response_text = "Please confirm the address or provide a new one."
-        bot_options = get_chatbot_options('medicine_address_options')
-        next_state = 'medicine_delivery_address'
-    return bot_response_text, bot_options, next_state, chat_context
-
-
-def handle_medicine_payment_method(user_obj, data, chat_context):
-    """Handles the 'medicine_payment_method' state."""
-    user_selection_value = data.get('selection_value')
-    if user_selection_value in [opt['value'] for opt in get_chatbot_options('medicine_payment_options')]:
-        chat_context['current_medicine_request']['payment_method'] = user_selection_value.replace('_', ' ')
-        bot_response_text = f"Okay, payment method: {user_selection_value.replace('_', ' ')}. Ready to place your order?"
-        bot_options = get_chatbot_options('medicine_final_confirm_options')
-        next_state = 'medicine_final_confirm'
-    else:
-        bot_response_text = "Please select a payment method."
-        bot_options = get_chatbot_options('medicine_payment_options')
-        next_state = 'medicine_payment_method'
     return bot_response_text, bot_options, next_state, chat_context
 
 
@@ -466,57 +241,6 @@ def handle_ambulance_final_confirm_options(user_obj, data, chat_context):
     return bot_response_text, bot_options, next_state, updated_context
 
 
-def handle_medicine_search_input(user_obj, data, chat_context):
-    """Handles the 'medicine_search_input' state."""
-
-    search_term = data.get('message')
-    bot_options = []
-    next_state = 'main_menu_options'  # default fallback
-    if not search_term:
-        bot_response_text = "Please enter a valid medicine name or number to search."
-        bot_options = get_chatbot_options('main_menu_options')
-        return bot_response_text, bot_options, next_state, chat_context
-
-    medicines = Medicine.query.filter(
-        or_(
-            Medicine.name.ilike(f'%{search_term}%'),
-            Medicine.medicine_number.ilike(f'%{search_term}%')
-        ),
-        Medicine.is_deleted == False
-    ).options(
-        joinedload(Medicine.category),
-        joinedload(Medicine.company),
-        joinedload(Medicine.group),
-        joinedload(Medicine.unit)
-    ).limit(6).all()
-
-    if not medicines:
-        bot_response_text = f"No medicines found matching '{search_term}'."
-        bot_options = get_chatbot_options('main_menu_options')
-    else:
-        bot_response_text = f"Found the following medicines matching '{search_term}':"
-        medicine_list = []
-
-        for med in medicines:
-            med_text = f"- {med.name} (#{med.medicine_number})"
-            med_text += f"\n  Category: {med.category.name if med.category else 'N/A'}"
-            med_text += f"\n  Company: {med.company.name if med.company else 'N/A'}"
-            med_text += f"\n  Price: ₹{float(med.default_mrp) if med.default_mrp else 'N/A'}"
-            med_text += f"\n  Stock: {med.current_stock}"
-            medicine_list.append(med_text)
-
-            # Prepare selectable options (for example: to order or view more)
-            bot_options.append({
-                "text": f"Select {med.name}",
-                "value": f"select_medicine_{med.id}"
-            })
-
-        bot_response_text += "\n\n" + "\n\n".join(medicine_list)
-        next_state = 'medicine_select_from_search'
-        chat_context['search_results'] = [med.id for med in medicines]  # store for later
-
-    return bot_response_text, bot_options, next_state, chat_context
-
 
 # --- State Handler Mapping ---
 STATE_HANDLERS = {
@@ -527,13 +251,22 @@ STATE_HANDLERS = {
     'main_menu_options': handle_main_menu_options,
 
     # --- Medicine Request Flow ---
-    'request_medicine': handle_medicine_request_start,  # Although you have medicine_request_start, aligning names helps
+    'request_medicine': handle_medicine_request_start,
     'medicine_request_start': handle_medicine_request_start,
     'medicine_select_prescription': handle_medicine_select_prescription,
-    'medicine_quantity': handle_medicine_quantity,
-    'medicine_delivery_address': handle_medicine_delivery_address,
-    'medicine_payment_method': handle_medicine_payment_method,
+    'medicine_item_selection': handle_medicine_item_selection,
+    'medicine_modify_item': handle_medicine_modify_item,  # NEW
+    'medicine_set_item_quantity': handle_medicine_set_item_quantity,
+    # Can be streamlined with handle_medicine_modify_item
+    'medicine_quantity_input': handle_medicine_quantity_input,
     'medicine_search_input': handle_medicine_search_input,
+    'medicine_delivery_address': handle_medicine_delivery_address,
+    'medicine_new_address_input': handle_medicine_new_address_input,
+    'medicine_verify_new_address': handle_medicine_verify_new_address,
+    'medicine_payment_method': handle_medicine_payment_method,
+    'medicine_final_confirm': handle_medicine_final_confirm,
+    'medicine_check_status': handle_medicine_check_status,  # NEW
+    'medicine_cancel_specific_order': handle_medicine_cancel_specific_order,  # NEW
 
 
     # --- Ambulance Request Flow ---
@@ -556,49 +289,97 @@ STATE_HANDLERS = {
 def chatbot_interact(current_user):
     data = request.get_json()
     user_message = data.get('message')
-    current_state = data.get('conversation_state')
-    chat_context = data.get('context', {})
+    conversation_state_from_frontend = data.get('conversation_state')
+    user_selection_value = data.get('selection_value')  # Extract selection_value here for handlers
 
-    user_obj = User.query.filter_by(id=int(current_user)).first()
-    if not user_obj:
-        return jsonify({"message": "User not found or session invalid."}), 404
+    # --- Start Transaction ---
+    try:
+        # 1. Load the User object from the database using the ID from token_required
+        user_obj = User.query.filter_by(id=int(current_user)).first()
+        if not user_obj:
+            return jsonify({"message": "User not found or session invalid."}), 404
 
-    # Patient profile check for patient-specific actions
-    if user_obj.role == UserRole.PATIENT and not user_obj.patient:
-        return jsonify({"message": "Patient profile not found. Cannot proceed with patient-specific actions."}), 400
+        # Patient profile check for patient-specific actions
+        if user_obj.role == UserRole.PATIENT and not user_obj.patient:
+            return jsonify({"message": "Patient profile not found. Cannot proceed with patient-specific actions."}), 400
 
-    bot_response_text = ""
-    bot_options = []
-    next_state = current_state  # Default to current state, will be updated by handlers
-    updated_context = chat_context  # Default to current context, will be updated by handlers
+        # 2. Load persisted chat_context from the user_obj (Database is the source of truth)
+        if user_obj.chat_context_json:
+            chat_context = json.loads(user_obj.chat_context_json)
+        else:
+            chat_context = {}  # Initialize empty if no context exists
 
-    # Handle 'menu' command globally
-    if user_message and user_message.lower() == 'menu':
-        bot_response_text = "Returning to main menu."
-        next_state = 'main_menu_options'
-        bot_options = get_chatbot_options('main_menu_options')
-        updated_context = {}  # Clear context if returning to main menu for a fresh start
+        print(f"DEBUG: Chat context loaded from DB (start of request): {chat_context}")
+
+        # 3. Ensure 'current_medicine_request' is always initialized in the context
+        # This is vital for consistency across all handlers
+        chat_context.setdefault('current_medicine_request', {
+            'items': [],
+            'status': MedicineRequestStatus.PENDING.value,
+            'patient_id': user_obj.patient.id if user_obj.role == UserRole.PATIENT and user_obj.patient else None,
+            'requester_user_id': user_obj.id,
+            'delivery_address': user_obj.patient.address if user_obj.role == UserRole.PATIENT and user_obj.patient else None,
+        })
+
+        # Optionally, update specific context fields from frontend payload if intended
+        # Be careful not to override backend-managed state like 'items'
+        frontend_context_data = data.get('context', {})
+        if frontend_context_data.get('currentPatientAge') is not None:
+            chat_context['currentPatientAge'] = frontend_context_data['currentPatientAge']
+        if frontend_context_data.get('currentPatientAddress') is not None:
+            chat_context['currentPatientAddress'] = frontend_context_data['currentPatientAddress']
+
+        bot_response_text = ""
+        bot_options = []
+        # Determine the effective current state for the handler dispatch
+        # Prioritize frontend state for explicit transitions, otherwise use a default
+        effective_current_state = conversation_state_from_frontend if conversation_state_from_frontend else 'main_menu_options'  # Use main_menu_options as a safe fallback
+
+        # Handle 'menu' command globally before dispatching to specific handlers
+        if user_message and user_message.lower() == 'menu':
+            bot_response_text = "Returning to main menu."
+            next_state = 'main_menu_options'
+            bot_options = get_chatbot_options('main_menu_options')
+            updated_context = {}  # Clear context for a fresh start, including current_medicine_request
+            # Re-initialize current_medicine_request after clearing if needed for the fresh state
+            updated_context.setdefault('current_medicine_request', {
+                'items': [],
+                'status': MedicineRequestStatus.PENDING.value,
+                'patient_id': user_obj.patient.id if user_obj.role == UserRole.PATIENT and user_obj.patient else None,
+                'requester_user_id': user_obj.id,
+                'delivery_address': user_obj.patient.address if user_obj.role == UserRole.PATIENT and user_obj.patient else None,
+            })
+        else:
+            # Dispatch to the appropriate handler
+            handler = STATE_HANDLERS.get(effective_current_state,
+                                         handle_initial_state)  # Fallback to handle_initial_state
+            # Pass the loaded chat_context to the handler
+            bot_response_text, bot_options, next_state, updated_context = handler(user_obj, data, chat_context)
+
+        # 4. Save the updated_context back to the user_obj (Database is the source of truth)
+        user_obj.chat_context_json = json.dumps(updated_context)
+        db.session.add(user_obj)  # Add user_obj to the session
+        db.session.commit()  # Commit changes to the database
+
+        print(f"DEBUG: Chat context committed to DB (end of request): {user_obj.chat_context_json}")
+
         return jsonify({
             "message": bot_response_text,
             "options": bot_options,
             "next_state": next_state,
-            "context": updated_context
+            "context": updated_context  # Send updated context back to frontend
         }), 200
 
-    # Process the current state using the handler mapping
-    handler = STATE_HANDLERS.get(current_state)
-    if handler:
-        bot_response_text, bot_options, next_state, updated_context = handler(user_obj, data, chat_context)
-    else:
-        # Fallback for unhandled states
-        bot_response_text = "I'm sorry, I don't know how to handle this state. Returning to main menu."
-        bot_options = get_chatbot_options('main_menu_options')
-        next_state = 'main_menu_options'
-        updated_context = {}  # Clear context if returning to main menu for a fresh start
+    except Exception as e:
+        # 5. Handle errors gracefully and rollback the transaction
+        db.session.rollback()
+        print(f"ERROR in chatbot_interact: {e}")
+        import traceback
+        traceback.print_exc()  # Print full traceback for debugging
 
-    return jsonify({
-        "message": bot_response_text,
-        "options": bot_options,
-        "next_state": next_state,
-        "context": updated_context
-    }), 200
+        return jsonify({
+            "message": "Oops! Something went wrong on our end. Please try again later.",
+            "options": get_chatbot_options('main_menu_options'),  # Offer main menu options as recovery
+            "next_state": 'main_menu_options',
+            "context": {}  # Clear context on client to prevent lingering bad state
+        }), 500  # Internal Server Error
