@@ -181,6 +181,10 @@
   ],
   "ambulance_emergency_options": [
     {
+      "text": "Check Last Ambulance Call",
+      "value": "check_last_ambulance_call"
+    },
+    {
       "text": "Chest Pain",
       "value": "chest_pain"
     },
@@ -195,6 +199,26 @@
     {
       "text": "Other Emergency",
       "value": "other_emergency"
+    }
+  ],
+  "ambulance_pickup_location_options": [
+    {
+      "text": "Confirm This Address",
+      "value": "confirm_current_location"
+    },
+    {
+      "text": "Enter New Address",
+      "value": "enter_new_pickup_address"
+    }
+  ],
+  "ambulance_verify_pickup_options": [
+    {
+      "text": "Yes, this is correct",
+      "value": "pickup_address_correct"
+    },
+    {
+      "text": "No, re-enter",
+      "value": "pickup_address_reenter"
     }
   ],
   "ambulance_final_confirm_options": [

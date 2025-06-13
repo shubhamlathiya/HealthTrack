@@ -3,6 +3,10 @@ import json
 from flask import jsonify, session, render_template, request
 
 from controllers.chat_bot_controllers import chatbot
+from controllers.chat_bot_controllers.utils.call_ambulance import handle_ambulance_start, \
+    handle_ambulance_other_emergency_text_input, handle_ambulance_final_confirm_options, \
+    handle_ambulance_pickup_location_confirm, handle_ambulance_new_pickup_location_input, \
+    handle_ambulance_verify_pickup_location, handle_check_last_ambulance_call
 from controllers.chat_bot_controllers.utils.helper_funcation import get_chatbot_options
 from controllers.chat_bot_controllers.utils.request_medicine import handle_medicine_search_input, \
     handle_medicine_request_start, handle_medicine_select_prescription, handle_medicine_item_selection, \
@@ -112,134 +116,6 @@ def handle_main_menu_options(user_obj, data, chat_context):
     return bot_response_text, bot_options, next_state, chat_context
 
 
-def handle_ambulance_start(user_obj, data, chat_context):
-    user_selection_value = data.get('selection_value')
-    user_message = data.get('message')  # Get raw typed message
-
-    bot_response_text = ""
-    bot_options = []  # Default options for this state
-    next_state = 'ambulance_start'  # Stay in this state by default if input is unclear
-
-    current_ambulance_request = chat_context.get('current_ambulance_request', {})
-
-    # Prioritize user selection, but fall back to message if no selection
-    if user_selection_value:
-        selected_emergency_text = get_chatbot_options('ambulance_emergency_options', user_selection_value)
-
-        if user_selection_value == 'other_emergency':
-            bot_response_text = "Please describe the emergency in more detail. For example: 'My leg is broken' or 'My child has a high fever'."
-            next_state = 'ambulance_other_emergency_text_input'
-        elif user_selection_value in ['chest_pain', 'accident', 'breathing_difficulty']:
-            current_ambulance_request['emergency_description'] = selected_emergency_text
-            bot_response_text = (
-                f"You've indicated a  emergency. "
-                f"Confirm dispatch to ?"
-            )
-            bot_options = get_chatbot_options('ambulance_final_confirm_options')
-            next_state = 'ambulance_final_confirm'
-        else:
-
-            bot_response_text = "I'm sorry, I don't recognize that emergency type. Please choose from the options or select 'Other Emergency'."
-
-    elif user_message and user_message.strip():
-
-        current_ambulance_request['emergency_description'] = user_message.strip()
-        bot_response_text = (
-            f"You've described the emergency as: '{user_message.strip()}'. "
-            f"Confirm dispatch to {current_ambulance_request['pickup_location']}?"
-        )
-        bot_options = get_chatbot_options('ambulance_final_confirm_options')
-        next_state = 'ambulance_final_confirm'
-    else:
-        bot_response_text = "What is the nature of the emergency? Please select an option below, or type your emergency."
-
-    chat_context['current_ambulance_request'] = current_ambulance_request
-    return bot_response_text, bot_options, next_state, chat_context
-
-
-def handle_ambulance_other_emergency_text_input(user_obj, data, chat_context):
-    """
-    Handles the state where the user provides a free-form text description
-    for an 'Other Emergency'.
-    """
-    user_message = data.get('message')  # This state primarily expects text input
-
-    bot_response_text = ""
-    bot_options = []
-    next_state = 'ambulance_other_emergency_text_input'  # Stay here if input is not received
-
-    current_ambulance_request = chat_context.get('current_ambulance_request', {})
-
-    if user_message and user_message.strip():
-        current_ambulance_request['emergency_description'] = user_message.strip()
-        bot_response_text = (
-            f"You've described the emergency as: '{user_message.strip()}'. "
-            f"Confirm dispatch to {current_ambulance_request.get('pickup_location', 'your address')}?"
-        )
-        bot_options = get_chatbot_options('ambulance_final_confirm_options')
-        next_state = 'ambulance_final_confirm'
-    else:
-        bot_response_text = "Please describe the emergency in detail so I can proceed. If you wish to cancel, type 'cancel'."
-        bot_options = []  # No specific options, but consider a "Cancel" option if you want
-        # next_state remains ambulance_other_emergency_text_input to await valid text
-
-    chat_context['current_ambulance_request'] = current_ambulance_request
-    return bot_response_text, bot_options, next_state, chat_context
-
-
-def handle_ambulance_final_confirm_options(user_obj, data, chat_context):
-    """
-    Handles the final confirmation or cancellation of an ambulance request.
-    """
-    user_selection_value = data.get('selection_value')
-    # Use updated_context here as it's passed from the main chatbot_interact function
-    updated_context = chat_context
-
-    bot_response_text = ""
-    bot_options = []
-    next_state = 'main_menu_options'  # Default next state
-
-    current_ambulance_request = updated_context.get('current_ambulance_request', {})
-
-    if user_selection_value == 'confirm_dispatch':
-        # --- Dispatch Logic Here ---
-        # 1. Log the request: Save current_ambulance_request to your database (e.g., AmbulanceRequest model)
-        #    Example: AmbulanceRequest.create(
-        #        patient_id=current_ambulance_request['patient_id'],
-        #        location=current_ambulance_request['pickup_location'],
-        #        emergency_type=current_ambulance_request['emergency_description'],
-        #        status='Dispatched'
-        #    )
-        # 2. Integrate with external dispatch system (if applicable).
-        # 3. Notify relevant personnel.
-        # ---------------------------
-
-        emergency_description = current_ambulance_request.get('emergency_description', 'an emergency')
-        pickup_location = current_ambulance_request.get('pickup_location', 'your registered address')
-
-        bot_response_text = (
-            f"Ambulance dispatched! An ambulance is on its way to {pickup_location} for {emergency_description}. "
-            "Stay calm. We've notified emergency services. "
-            "Please await further instructions or a call from our team."
-        )
-        bot_options = get_chatbot_options('main_menu_options')
-        next_state = 'initial'  # Go back to the very start of the conversation flow
-        updated_context = {}  # Clear context after successful request completion
-
-    elif user_selection_value == 'cancel_ambulance':
-        bot_response_text = "Ambulance request cancelled. Is there anything else I can help you with?"
-        bot_options = get_chatbot_options('main_menu_options')
-        next_state = 'main_menu_options'  # Go back to main menu
-        updated_context = {}  # Clear context after cancellation
-
-    else:
-        bot_response_text = "I didn't understand your selection. Please choose to confirm or cancel your ambulance request."
-        bot_options = get_chatbot_options('ambulance_final_confirm_options')
-        next_state = 'ambulance_final_confirm'  # Stay in this state to re-prompt
-
-    # Return updated_context which might have been cleared or modified
-    return bot_response_text, bot_options, next_state, updated_context
-
 
 
 # --- State Handler Mapping ---
@@ -271,8 +147,12 @@ STATE_HANDLERS = {
 
     # --- Ambulance Request Flow ---
     'ambulance_start': handle_ambulance_start,
-    'ambulance_other_emergency_text_input': handle_ambulance_other_emergency_text_input,  # NEW!
-    'ambulance_final_confirm': handle_ambulance_final_confirm_options,  # Ensure this key matches next_state values
+    'ambulance_other_emergency_text_input': handle_ambulance_other_emergency_text_input,
+    'ambulance_pickup_location_confirm': handle_ambulance_pickup_location_confirm,
+    'ambulance_new_pickup_location_input': handle_ambulance_new_pickup_location_input,
+    'ambulance_verify_pickup_location': handle_ambulance_verify_pickup_location,
+    'ambulance_final_confirm': handle_ambulance_final_confirm_options,
+    'check_last_ambulance_call': handle_check_last_ambulance_call,  # NEW STATE MAPPING!
 
     # 'ambulance_emergency_input': handle_ambulance_emergency_input,
 
