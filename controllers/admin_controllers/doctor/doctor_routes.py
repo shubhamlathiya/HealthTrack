@@ -606,7 +606,7 @@ def import_doctors(current_user):
         df = pd.read_excel(file)
 
         required_columns = [
-            'First Name', 'Last Name', 'Email', 'Password', 'Age', 'Gender',
+            'First Name', 'Last Name', 'Email', 'Age', 'Gender',
             'Phone', 'Qualification', 'Designation', 'Blood Group', 'Address'
         ]
 
@@ -647,7 +647,6 @@ def import_doctors(current_user):
                     'first_name': str(row.get('First Name', '')).strip(),
                     'last_name': str(row.get('Last Name', '')).strip(),
                     'email': str(row.get('Email', '')).strip().lower(),
-                    'password': str(row.get('Password', '')).strip(),
                     'age': int(row.get('Age')) if pd.notna(row.get('Age')) else None,
                     'gender': str(row.get('Gender', '')).strip(),
                     'phone': str(row.get('Phone', '')).strip(),
@@ -659,8 +658,7 @@ def import_doctors(current_user):
                 }
 
                 # Ensure essential fields are not None after stripping
-                if not all([doctor_data['first_name'], doctor_data['last_name'], doctor_data['email'],
-                            doctor_data['password'], doctor_data['age'], doctor_data['gender'],
+                if not all([doctor_data['first_name'], doctor_data['last_name'], doctor_data['email'], doctor_data['age'], doctor_data['gender'],
                             doctor_data['phone'], doctor_data['qualification'], doctor_data['designation'],
                             doctor_data['address']]):
                     flash(
@@ -688,9 +686,6 @@ def import_doctors(current_user):
                                 f'Row {row_num}: User account for "{doctor_data["email"]}" was inactive and has been restored.',
                                 'info')
 
-                        if doctor_data['password'] and not check_password_hash(existing_user.password,
-                                                                               doctor_data['password']):
-                            existing_user.password = generate_password_hash(doctor_data['password'])
 
                         existing_doctor = Doctor.query.filter_by(user_id=existing_user.id).first()
                         if not existing_doctor:
