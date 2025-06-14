@@ -692,17 +692,63 @@
                         </li>
                     </ul>
                 </li>
-                <li class="{% if request.path == '/admin/view-patients' %}active current-page{% endif %}">
-                    <a href="/admin/view-patients">
-                        <i class="ri-heart-pulse-line"></i>
-                        <span class="menu-text">Patients</span>
+                <!-- Patient Management -->
+                <li class="treeview {% if request.path.startswith('/admin/patients') %}active current-page{% endif %}">
+                    <a href="#">
+                        <i class="ri-user-heart-line"></i>
+                        <span class="menu-text">Patient Management</span>
                     </a>
+                    <ul class="treeview-menu">
+                        <li><a href="/admin/patients/all"><i class="ri-user-line"></i> All Patients</a></li>
+                        <li><a href="/admin/patients/opd"><i class="ri-stethoscope-line"></i> OPD Patients</a></li>
+                        <li><a href="/admin/patients/ipd"><i class="ri-hospital-line"></i> IPD Patients</a></li>
+                        <li><a href="/admin/patients/registration"><i class="ri-user-add-line"></i> New Registration</a>
+                        </li>
+                        <li><a href="/admin/patients/documents"><i class="ri-file-text-line"></i> Patient Documents</a>
+                        </li>
+                    </ul>
                 </li>
+
                 <li class="{% if request.path == '/admin/leave/applications' %}active current-page{% endif %}">
                     <a href="/admin/leave/applications">
                         <i class="ri-calendar-todo-line"></i>
                         <span class="menu-text">Leave Applications</span>
                     </a>
+                </li>
+                <!-- Financial Management -->
+                <li class="treeview {% if request.path.startswith('/admin/finance') %}active current-page{% endif %}">
+                    <a href="#">
+                        <i class="ri-money-dollar-circle-line"></i>
+                        <span class="menu-text">Financial Management</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="/admin/finance/billing"><i class="ri-bill-line"></i> Billing</a></li>
+                        <li><a href="/admin/finance/invoices"><i class="ri-file-list-line"></i> Invoices</a></li>
+                        <li><a href="/admin/finance/payments"><i class="ri-wallet-line"></i> Payments</a></li>
+                        <li><a href="/admin/finance/expenses"><i class="ri-money-cny-circle-line"></i> Expenses</a></li>
+                        <li><a href="/admin/finance/insurance"><i class="ri-shield-check-line"></i> Insurance/TPA</a>
+                        </li>
+                        <li><a href="/admin/finance/reports"><i class="ri-bar-chart-box-line"></i> Financial Reports</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Reports & Analytics -->
+                <li class="treeview {% if request.path.startswith('/admin/reports') %}active current-page{% endif %}">
+                    <a href="#">
+                        <i class="ri-bar-chart-2-line"></i>
+                        <span class="menu-text">Reports & Analytics</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="/admin/reports/clinical"><i class="ri-heart-pulse-line"></i> Clinical Reports</a>
+                        </li>
+                        <li><a href="/admin/reports/financial"><i class="ri-money-dollar-circle-line"></i> Financial
+                            Reports</a>
+                        </li>
+                        <li><a href="/admin/reports/inventory"><i class="ri-store-line"></i> Inventory Reports</a></li>
+                        <li><a href="/admin/reports/staff"><i class="ri-team-line"></i> Staff Reports</a></li>
+                        <li><a href="/admin/reports/custom"><i class="ri-file-chart-line"></i> Custom Reports</a></li>
+                    </ul>
                 </li>
 
             {% elif session['role'] == 'DOCTOR' %}
