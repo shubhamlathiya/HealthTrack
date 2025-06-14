@@ -89,6 +89,8 @@ class AmbulanceChargeItem(db.Model):
 class AmbulanceCall(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     call_number = db.Column(db.String(20), unique=True, nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=True)
+    patient = db.relationship('Patient', backref='ambulance_calls')
     patient_name = db.Column(db.String(100), nullable=False)
     patient_age = db.Column(db.Integer, nullable=False)
     patient_gender = db.Column(db.String(10), nullable=False)

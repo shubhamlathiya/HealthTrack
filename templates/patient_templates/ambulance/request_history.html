@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+
+{% block title %}Ambulance Request Management{% endblock title %}
+{% block page %}Ambulance Request System{% endblock page %}
+
+{% block body %}
+<div class="container-fluid">
+    <!-- Stats Cards Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="ri-ambulance-line"></i>
+                        </div>
+                        <div class="ms-auto">
+                            <h6 class="card-title text-muted mb-1">Total Requests</h6>
+                            <h3 class="mb-0">{{ requests|length }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 6px">
+                        <div class="progress-bar bg-primary" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="ri-checkbox-circle-line"></i>
+                        </div>
+                        <div class="ms-auto">
+                            <h6 class="card-title text-muted mb-1">Completed</h6>
+                            <h3 class="mb-0">{{ requests|selectattr('status', 'equalto', 'Completed')|list|length }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 6px">
+                        <div class="progress-bar bg-success" style="width: {{ (requests|selectattr('status', 'equalto', 'Completed')|list|length / requests|length * 100 if requests else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="ri-time-line"></i>
+                        </div>
+                        <div class="ms-auto">
+                            <h6 class="card-title text-muted mb-1">Pending</h6>
+                            <h3 class="mb-0">{{ requests|selectattr('status', 'equalto', 'Pending')|list|length }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 6px">
+                        <div class="progress-bar bg-warning" style="width: {{ (requests|selectattr('status', 'equalto', 'Pending')|list|length / requests|length * 100 if requests else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                            <i class="ri-close-circle-line"></i>
+                        </div>
+                        <div class="ms-auto">
+                            <h6 class="card-title text-muted mb-1">Cancelled</h6>
+                            <h3 class="mb-0">{{ requests|selectattr('status', 'equalto', 'Cancelled')|list|length }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 6px">
+                        <div class="progress-bar bg-danger" style="width: {{ (requests|selectattr('status', 'equalto', 'Cancelled')|list|length / requests|length * 100 if requests else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row gx-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-list-check-2 me-2"></i>My Ambulance Requests
+                    </h5>
+                    <div>
+                        <a href="{{ url_for('patient_bp.ambulance_request_new') }}" class="btn btn-primary">
+                            <i class="ri-add-line me-1"></i> New Request
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% if requests %}
+                        <div class="table-responsive">
+                            <table id="ambulanceRequestsTable" class="table table-hover" style="width:100%">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Request ID</th>
+                                        <th>Request Time</th>
+                                        <th>Pickup Location</th>
+                                        <th>Status</th>
+                                        <th>Ambulance</th>
+                                        <th class="text-end">Amount</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in requests %}
+                                        <tr>
+                                            <td>{{ req.id }}</td>
+                                            <td>{{ req.request_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                            <td>{{ req.pickup_location|truncate(30) }}</td>
+                                            <td>
+                                                {% if req.status == 'Completed' %}
+                                                    <span class="badge bg-success">{{ req.status }}</span>
+                                                {% elif req.status == 'Cancelled' %}
+                                                    <span class="badge bg-danger">{{ req.status }}</span>
+                                                {% elif req.status == 'Pending' %}
+                                                    <span class="badge bg-info">{{ req.status }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">{{ req.status }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if req.assigned_ambulance %}
+                                                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                                                        {{ req.assigned_ambulance.vehicle_number }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                                        Not assigned
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                {% if req.total_amount %}
+                                                    ${{ "%.2f"|format(req.total_amount) }}
+                                                {% else %}
+                                                    <span class="text-muted">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button class="btn btn-light" data-bs-toggle="modal"
+                                                            data-bs-target="#viewRequestModal{{ req.id }}"
+                                                            data-bs-toggle="tooltip" title="View Details">
+                                                        <i class="ri-eye-line"></i>
+                                                    </button>
+                                                    {% if req.status == 'Pending' %}
+                                                        <button class="btn btn-light text-danger" data-bs-toggle="modal"
+                                                                data-bs-target="#cancelRequestModal{{ req.id }}"
+                                                                data-bs-toggle="tooltip" title="Cancel Request">
+                                                            <i class="ri-close-circle-line"></i>
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="ri-ambulance-line"></i>
+                            </div>
+                            <h4>No Ambulance Requests Found</h4>
+                            <p>You haven't made any ambulance requests yet. Get started by creating your first request.</p>
+                            <a href="{{ url_for('patient_bp.ambulance_request_new') }}" class="btn btn-primary">
+                                <i class="ri-add-line me-2"></i>New Request
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Request Modal -->
+<div class="modal fade" id="newRequestModal" tabindex="-1" aria-labelledby="newRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="newRequestModalLabel">
+                    <i class="ri-ambulance-line me-2"></i>New Ambulance Request
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('patient_bp.ambulance_request_new') }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Pickup Location <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="ri-map-pin-line"></i></span>
+                                    <input type="text" class="form-control" name="pickup_location" required
+                                           placeholder="Enter pickup address">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Destination (Optional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="ri-flag-line"></i></span>
+                                    <input type="text" class="form-control" name="destination"
+                                           placeholder="Enter destination address">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Emergency Description</label>
+                        <textarea class="form-control" name="emergency_description" rows="4"
+                                  placeholder="Describe the emergency situation..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="ri-information-line me-2"></i> Our team will contact you shortly after submission to confirm details.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitRequestBtn">
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        <i class="ri-send-plane-line me-1"></i> Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Request Modals -->
+{% for req in requests %}
+<div class="modal fade" id="viewRequestModal{{ req.id }}" tabindex="-1" aria-labelledby="viewRequestModalLabel{{ req.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewRequestModalLabel{{ req.id }}">
+                    <i class="ri-file-text-line me-2"></i>Request #{{ req.id }} Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-information-line me-2"></i>Request Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Request ID:</strong> {{ req.id }}</p>
+                                <p><strong>Request Time:</strong> {{ req.request_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                <p><strong>Status:</strong>
+                                    {% if req.status == 'Completed' %}
+                                        <span class="badge bg-success">{{ req.status }}</span>
+                                    {% elif req.status == 'Cancelled' %}
+                                        <span class="badge bg-danger">{{ req.status }}</span>
+                                    {% elif req.status == 'Pending' %}
+                                        <span class="badge bg-info">{{ req.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">{{ req.status }}</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Pickup Location:</strong> {{ req.pickup_location }}</p>
+                                <p><strong>Destination:</strong> {{ req.destination or 'Not specified' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="ri-ambulance-line me-2"></i>Ambulance Details</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if req.assigned_ambulance %}
+                                    <p><strong>Ambulance:</strong> {{ req.assigned_ambulance.vehicle_number }}</p>
+                                    <p><strong>Type:</strong> {{ req.assigned_ambulance.vehicle_name }}</p>
+                                    <p><strong>Driver:</strong>
+                                        {% if req.driver %}
+                                            {{ req.driver.name }} ({{ req.driver.contact or 'No contact' }})
+                                        {% else %}
+                                            Not assigned
+                                        {% endif %}
+                                    </p>
+                                {% else %}
+                                    <p class="text-muted">No ambulance assigned yet</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="ri-file-text-line me-2"></i>Additional Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Emergency Description:</strong></p>
+                        <p>{{ req.emergency_description or 'No description provided' }}</p>
+
+                        {% if req.notes %}
+                            <p class="mt-3"><strong>Admin Notes:</strong></p>
+                            <p>{{ req.notes }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if req.total_amount %}
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="ri-money-dollar-circle-line me-2"></i>Billing Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Base Charge:</strong> ${{ "%.2f"|format(req.base_charge) }}</p>
+                                {% if req.additional_charges_total %}
+                                    <p><strong>Additional Charges:</strong> ${{ "%.2f"|format(req.additional_charges_total) }}</p>
+                                {% endif %}
+                                <p><strong>Total Amount:</strong> ${{ "%.2f"|format(req.total_amount) }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Payment Made:</strong> ${{ "%.2f"|format(req.payment_amount) }}</p>
+                                <p><strong>Due Amount:</strong>
+                                    {% if (req.total_amount - req.payment_amount) > 0 %}
+                                        <span class="text-danger">${{ "%.2f"|format(req.total_amount - req.payment_amount) }}</span>
+                                    {% else %}
+                                        <span class="text-success">$0.00</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Payment Mode:</strong> {{ req.payment_mode or 'Not specified' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Request Modals -->
+{% if req.status == 'Pending' %}
+<div class="modal fade" id="cancelRequestModal{{ req.id }}" tabindex="-1" aria-labelledby="cancelRequestModalLabel{{ req.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelRequestModalLabel{{ req.id }}">
+                    <i class="ri-close-circle-line me-2"></i>Confirm Cancellation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel request #<b>{{ req.id }}</b>?</p>
+                <div class="alert alert-warning">
+                    <i class="ri-alert-line me-2"></i>This action cannot be undone. Please provide a reason for cancellation.
+                </div>
+                <form method="POST" action="{{ url_for('patient_bp.cancel_ambulance_request', request_id=req.id) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Cancellation Reason</label>
+                        <textarea class="form-control" name="cancellation_reason" rows="3" required
+                                  placeholder="Please explain why you're cancelling this request..."></textarea>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i> Keep Request
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="ri-check-line me-1"></i> Confirm Cancellation
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+<style>
+.stat-card {
+    transition: transform 0.3s;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    margin: 2rem 0;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+.empty-state-icon {
+    font-size: 3rem;
+    color: #adb5bd;
+    margin-bottom: 1rem;
+}
+.empty-state h4 {
+    margin-bottom: 0.5rem;
+}
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+.provider-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.provider-badge {
+    background-color: rgba(58, 123, 213, 0.1);
+    color: #3a7bd5;
+    border-radius: 20px;
+    padding: 0.35rem 0.75rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(58, 123, 213, 0.2);
+}
+</style>
+{% endblock %}
+
+{% block heardLink %}
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/buttons/dataTables.bs5-custom.css') }}">
+{% endblock %}
+
+{% block footerLink %}
+<script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/vendor/datatables/custom/custom-datatables.js') }}"></script>
+
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#ambulanceRequestsTable').DataTable({
+        responsive: true,
+        order: [[1, 'desc']],
+        dom: '<"top"f>rt<"bottom"lip><"clear">',
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search requests...",
+            lengthMenu: "_MENU_ records per page"
+        }
+    });
+
+    // Form submission loading state
+    $('form').on('submit', function() {
+        $(this).find('.spinner-border').removeClass('d-none');
+        $(this).find('i').addClass('d-none');
+    });
+
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+</script>
+{% endblock %}

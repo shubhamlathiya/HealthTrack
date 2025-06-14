@@ -467,8 +467,8 @@
             currentUserRole = userInfo.user_role;
             currentPatientAddress = userInfo.patient_address;
             currentPatientAge = userInfo.patient_age;
-
-            displayMessage(`Hello ${currentUserRole.toLowerCase()}!`, 'bot');
+            currentUserName = userInfo.name
+            displayMessage(`Hello ${currentUserName.toLowerCase()}!`, 'bot');
             sendChatInteraction('initial');
         } else {
             displayMessage("Could not identify user. Please refresh the page or try again later.", 'bot');

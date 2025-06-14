@@ -32,7 +32,7 @@ def chatbot_page(current_user):
 def get_user_info(current_user):
     user_id_in_session = session.get('user_id')
     user_role_in_session = session.get('role')
-
+    print("shubham",user_id_in_session, user_role_in_session)
     if not user_id_in_session:
         return jsonify({'message': 'Unauthorized: No active session found.'}), 401
 
@@ -67,7 +67,7 @@ def get_user_info(current_user):
 # --- State Handler Functions ---
 def handle_initial_state(user_obj, data, chat_context):
     """Handles the 'initial' conversation state."""
-    bot_response_text = f"Hello {user_obj.role.value}! How can I assist you today?"
+    bot_response_text = f"How can I assist you today?"
     bot_options = get_chatbot_options('main_menu_options')
     next_state = 'main_menu_options'
     return bot_response_text, bot_options, next_state, chat_context

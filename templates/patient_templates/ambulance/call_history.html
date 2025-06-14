@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}My Ambulance Calls{% endblock title %}
+{% block page %}My Ambulance Call History{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-ambulance-line me-2"></i>My Ambulance Call Records
+                    </h5>
+                    <div>
+                        <a href="/admin" class="btn btn-primary">
+                            <i class="ri-add-line me-1"></i> Request New Ambulance
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% if calls %}
+                        <div class="table-responsive">
+                            <table id="myCallsTable" class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Call ID</th>
+                                    <th>Date</th>
+                                    <th>Pickup Location</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Total Amount ($)</th>
+                                    <th class="text-end">Paid Amount ($)</th>
+                                    <th class="text-end">Due Amount ($)</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for call in calls %}
+                                    <tr>
+                                        <td>{{ call.id }}</td> {# Patient might see a simple ID, not call_number #}
+                                        <td>{{ call.call_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>{{ call.pickup_location }}</td>
+                                        <td>
+                                            {# Display status with badges #}
+                                            {% if call.status == 'Pending' %}
+                                                <span class="badge bg-info">Pending</span>
+                                            {% elif call.status == 'Dispatched' %}
+                                                <span class="badge bg-primary">Dispatched</span>
+                                            {% elif call.status == 'In Progress' %}
+                                                <span class="badge bg-warning text-dark">In Progress</span>
+                                            {% elif call.status == 'Completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif call.status == 'Cancelled' %}
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ call.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">${{ "%.2f"|format(call.total_amount) }}</td>
+                                        <td class="text-end">${{ "%.2f"|format(call.payment_amount) }}</td>
+                                        <td class="text-end">
+                                            {% if (call.total_amount - call.payment_amount) > 0 %}
+                                                <span class="text-danger">${{ "%.2f"|format(call.total_amount - call.payment_amount) }}</span>
+                                            {% else %}
+                                                <span class="text-success">$0.00</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-2">
+                                                <button class="btn btn-sm btn-outline-primary rounded-pill"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewCallModal{{ call.id }}">
+                                                    <i class="ri-eye-line me-1"></i> View Details
+                                                </button>
+                                                {# Optional: Add a cancel button for calls that are still pending/in progress #}
+                                                {% if call.status in ['Pending', 'Dispatched', 'In Progress'] %}
+                                                    {# This would require a new Flask route for cancelling a call #}
+                                                    {# <button class="btn btn-sm btn-outline-danger rounded-pill"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#cancelCallModal{{ call.id }}">
+                                                        <i class="ri-close-circle-line me-1"></i> Cancel
+                                                    </button> #}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        {# No Records Found State - similar to admin, but with patient-friendly message #}
+                        <div class="text-center py-5">
+                            <i class="ri-ambulance-line text-muted" style="font-size: 4rem;"></i>
+                            <h4 class="mt-3 text-muted">No Ambulance Call History Yet</h4>
+                            <p class="text-muted">It looks like you haven't completed any ambulance calls through our system.</p>
+                            <a href="/admin" class="btn btn-primary mt-3">
+                                <i class="ri-add-line me-1"></i> Request a New Ambulance
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for call in calls %}
+        <div class="modal fade" id="viewCallModal{{ call.id }}" tabindex="-1"
+             aria-labelledby="viewCallModalLabel{{ call.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewCallModalLabel{{ call.id }}">
+                            <i class="ri-file-list-3-line me-2"></i>Call Details #{{ call.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="ri-information-line me-1"></i>Basic Information</h6>
+                                <p><strong>Call Number:</strong> {{ call.call_number }}</p>
+                                <p><strong>Date & Time:</strong> {{ call.call_time.strftime('%Y-%m-%d %H:%M:%S') if call.call_time else 'N/A' }}</p>
+                                <p><strong>Patient Name:</strong> {{ call.patient_name }}</p>
+                                <p><strong>Age / Gender:</strong> {{ call.patient_age }} yrs / {{ call.patient_gender }}</p>
+                                <p><strong>Pickup Location:</strong> {{ call.pickup_location }}</p>
+                                <p><strong>Destination:</strong> {{ call.destination or 'N/A' }}</p>
+                                <p><strong>Status:</strong>
+                                    {% if call.status == 'Completed' %}
+                                        <span class="badge bg-success">{{ call.status }}</span>
+                                    {% elif call.status == 'Cancelled' %}
+                                        <span class="badge bg-danger">{{ call.status }}</span>
+                                    {% elif call.status == 'Pending' or call.status == 'Dispatched' or call.status == 'In Progress' %}
+                                        <span class="badge bg-warning text-dark">{{ call.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ call.status }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="ri-truck-line me-1"></i>Ambulance & Driver</h6>
+                                <p><strong>Assigned Ambulance:</strong>
+                                    {% if call.ambulance %}
+                                        {{ call.ambulance.vehicle_number }} ({{ call.ambulance.vehicle_name }})
+                                    {% else %}
+                                        <span class="text-muted">Not assigned / N/A</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Driver:</strong>
+                                    {% if call.driver %}
+                                        {{ call.driver.name }}
+                                        {% if call.driver.contact %}<small class="text-muted">({{ call.driver.contact }})</small>{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Distance Covered:</strong> {{ "%.2f km"|format(call.distance) if call.distance is not none else 'N/A' }}</p>
+
+                                <h6 class="text-primary mt-4 mb-3"><i class="ri-bank-card-line me-1"></i>Billing Summary</h6>
+                                <p><strong>Base Charge:</strong> ${{ "%.2f"|format(call.base_charge) }}</p>
+                                <p><strong>Additional Charges:</strong> ${{ "%.2f"|format(call.additional_charges_total) }}</p>
+                                <p><strong>Total Amount:</strong> ${{ "%.2f"|format(call.total_amount) }}</p>
+                                <p><strong>Payment Made:</strong> ${{ "%.2f"|format(call.payment_amount) }}</p>
+                                <p><strong>Due Amount:</strong>
+                                    {% if (call.total_amount - call.payment_amount) > 0 %}
+                                        <span class="text-danger">${{ "%.2f"|format(call.total_amount - call.payment_amount) }}</span>
+                                    {% else %}
+                                        <span class="text-success">$0.00</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Payment Mode:</strong> {{ call.payment_mode or 'N/A' }}</p>
+                            </div>
+                        </div>
+
+                        {% if call.additional_charge_entries %}
+                            <h6 class="text-primary mt-4 mb-3"><i class="ri-bill-line me-1"></i>Additional Charges Breakdown</h6>
+                            <ul class="list-group list-group-flush mb-3">
+                                {% for charge_entry in call.additional_charge_entries %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ charge_entry.charge_item.name if charge_entry.charge_item else 'Unknown Charge Item' }}
+                                        <span class="badge bg-secondary rounded-pill">${{ "%.2f"|format(charge_entry.amount) }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted mt-4">No additional charges were applied to this call.</p>
+                        {% endif %}
+
+                        <p class="text-muted small mt-4"><strong>Notes:</strong> {{ call.notes or 'No specific notes for this call.' }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock body %}
+
+{% block heardLink %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bs5-custom.css') }}">
+    {# No need for buttons specific CSS for patient view export buttons #}
+{% endblock %}
+
+{% block footerLink %}
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/datatables/dataTables.bootstrap.min.js') }}"></script>
+    {# Custom DataTables JS for general settings, not necessarily custom-datatables.js from admin #}
+{% endblock %}
