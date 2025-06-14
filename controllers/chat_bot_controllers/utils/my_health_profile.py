@@ -80,6 +80,16 @@ def handle_profile_update_contact_input(user_obj, data, chat_context):
         elif 'address' in user_message:
             chat_context['contact_update_field'] = 'address'
             bot_response_text = "Please enter your new address:"
+        elif 'no' in user_message:
+            bot_response_text = f"How can I assist you today?"
+            chat_context.pop('contact_update_field', None)
+            bot_options = get_chatbot_options('profile_options')
+            next_state = 'my_health_profile'
+        elif 'back' in user_message:
+            bot_response_text = f"How can I assist you today?"
+            chat_context.pop('contact_update_field', None)
+            bot_options = get_chatbot_options('profile_options')
+            next_state = 'my_health_profile'
         else:
             bot_response_text = (
                 "📇 What would you like to update?\n\n"
