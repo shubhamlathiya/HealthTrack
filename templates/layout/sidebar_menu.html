@@ -34,8 +34,8 @@
     <div class="sidebarMenuScroll">
         <ul class="sidebar-menu">
             {% if session['role'] == 'PATIENT' %}
-                <li class="{% if request.path == '/patients/dashboard' %}active current-page{% endif %}">
-                    <a href="/patients/dashboard">
+                <li class="{% if request.path == '/patient/dashboard' %}active current-page{% endif %}">
+                    <a href="/patient/dashboard">
                         <i class="ri-home-6-line"></i>
                         <span class="menu-text">Dashboard</span>
                     </a>
@@ -47,13 +47,13 @@
                     </a>
                     <ul class="treeview-menu">
                         <li>
-                            <a href="/patient/appointment"
-                               class="{% if request.path == '/patient/appointment' %}active-sub{% endif %}">View
+                            <a href="/patient/appointment/view-appointment"
+                               class="{% if request.path == '/patient/appointment/view-appointment' %}active-sub{% endif %}">View
                                 Appointment</a>
                         </li>
                         <li>
-                            <a href="/patient/book-appointment"
-                               class="{% if request.path == '/patient/book-appointment' %}active-sub{% endif %}">
+                            <a href="/patient/appointment/book-appointment"
+                               class="{% if request.path == '/patient/appointment/book-appointment' %}active-sub{% endif %}">
                                 <span class="menu-text">Book Appointment</span>
                             </a>
                         </li>
@@ -77,8 +77,8 @@
                         <span class="menu-text">Visitors</span>
                     </a>
                 </li>
-                <li class="{% if request.path == '/patient/prescriptions' %}active current-page{% endif %}">
-                    <a href="/patient/prescriptions">
+                <li class="{% if request.path == '/patient/prescriptions/view-prescriptions' %}active current-page{% endif %}">
+                    <a href="/patient/prescriptions/view-prescriptions">
                         <i class="ri-scissors-line"></i>
                         <span class="menu-text">Prescriptions</span>
                     </a>

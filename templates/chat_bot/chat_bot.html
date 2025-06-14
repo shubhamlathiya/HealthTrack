@@ -212,7 +212,19 @@
     </style>
 </head>
 <body>
-    <div class="chat-container">
+
+<!-- Chatbot Toggle Button (bottom-left) -->
+<button id="chat-toggle-button"
+        class="fixed bottom-6  hover:scale-105 transition h-25 bg-blue-600 text-white p-4 rounded-full shadow-lg z-50">
+    <!-- Chatbot icon (SVG) -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+         stroke-width="2" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.75 9.75 0 01-8.625-4.725M12 21V12m0 0V4.5M12 12h8.25m-4.125 0H12"/>
+    </svg>
+</button>
+<div id="chat-container" class="chat-container fixed bottom-20  bg-white border  shadow-lg hidden flex flex-col z-40">
+    <!-- Rest of your chatbot content remains unchanged -->
         <div class="chat-header">
             Hospital Chatbot
             <div class="chatbot-avatar">
@@ -249,6 +261,12 @@
 
 
     <script>
+        const toggleButton = document.getElementById('chat-toggle-button');
+        const chatContainer = document.getElementById('chat-container');
+
+        toggleButton.addEventListener('click', () => {
+            chatContainer.classList.toggle('hidden');
+        });
     const chatMessages = document.getElementById('chat-messages');
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-button');

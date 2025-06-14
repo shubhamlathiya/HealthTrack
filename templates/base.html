@@ -115,6 +115,94 @@
             <!-- App body starts -->
             <div class="app-body">
                 {% block body %} {% endblock body %}
+                {% if session['role'] == 'PATIENT' %}
+                    <button id="chat-toggle-button" class="chat-floating-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="2" stroke="currentColor" class="chat-floating-button-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.75 9.75 0 01-8.625-4.725M12 21V12m0 0V4.5M12 12h8.25m-4.125 0H12"></path>
+                        </svg>
+                    </button>
+                    <div id="chat-container" class="chat-container hidden">
+                        <div class="chat-header">
+                            Hospital Chatbot
+                            <div class="chatbot-avatar">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                     stroke="currentColor" class="chatbot-avatar-icon">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.75 9.75 0 01-8.625-4.725M12 21V12m0 0V4.5M12 12h8.25m-4.125 0H12"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div id="chat-messages" class="chat-messages">
+                        </div>
+                        <div id="option-buttons-container" class="option-buttons-container hidden">
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chat-input" name="chat-input" class="chat-input"
+                                   placeholder="Type your message...">
+                            <button id="send-button" class="send-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor" class="send-button-icon">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="custom-modal-overlay" class="modal-overlay hidden"
+                         style="
+         position: fixed;
+         top: 0;
+         left: 0;
+         right: 0;
+         bottom: 0;
+         background-color: rgba(0, 0, 0, 0.6);
+         display: none; /* hidden class initially sets this to none */
+         justify-content: center;
+         align-items: center;
+         z-index: 1000;
+     ">
+                        <div class="modal-content"
+                             style="
+             background-color: white;
+             padding: 2rem; /* 32px */
+             border-radius: 1rem; /* 16px */
+             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+             text-align: center;
+             max-width: 400px;
+             width: 90%;
+         ">
+                            <h3 id="modal-title"
+                                style="
+                font-size: 1.5rem; /* 24px */
+                font-weight: 600;
+                margin-bottom: 1rem; /* 16px */
+                color: #333;
+            "></h3>
+                            <p id="modal-message"
+                               style="
+               font-size: 1rem; /* 16px */
+               color: #555;
+               margin-bottom: 1.5rem; /* 24px */
+           "></p>
+                            <button id="modal-ok-button" class="modal-button"
+                                    style="
+                    background-color: #6366f1;
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem; /* 12px 24px */
+                    border-radius: 0.75rem; /* 12px */
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                    font-weight: 500;
+                ">OK
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
             <!-- App body ends -->
 
@@ -147,6 +235,235 @@
 {% block footerLink %}{% endblock footerLink %}
 <!-- Custom JS files -->
 <script src="{{ url_for('static', filename='assets/js/custom.js') }}"></script>
+<script>
+    const toggleButton = document.getElementById('chat-toggle-button');
+    const chatContainer = document.getElementById('chat-container');
 
+    toggleButton.addEventListener('click', () => {
+        chatContainer.classList.toggle('hidden');
+    });
+
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+    const optionButtonsContainer = document.getElementById('option-buttons-container');
+
+    // Custom Modal Elements
+    const customModalOverlay = document.getElementById('custom-modal-overlay');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalOkButton = document.getElementById('modal-ok-button');
+
+    // --- Global Chatbot State ---
+    let conversationState = 'initial';
+    let currentUserId = null;
+    let currentUserRole = null;
+    let currentPatientAddress = null;
+    let currentPatientAge = null;
+
+    let currentMedicineRequest = {};
+    let currentAmbulanceRequest = {};
+    let availableMedicines = [];
+    let activePrescriptions = [];
+
+    // --- Utility Functions ---
+    function displayMessage(message, sender) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message-bubble'); // Add base styling for all messages
+
+        if (sender === 'bot') {
+            messageElement.classList.add('message-bot');
+        } else { // user
+            messageElement.classList.add('message-user');
+        }
+
+        messageElement.innerHTML = message.replace(/\n/g, '<br>');
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function displayButtons(buttons) {
+        optionButtonsContainer.innerHTML = '';
+        // Use classList to remove 'hidden'
+        optionButtonsContainer.classList.remove('hidden');
+
+        buttons.forEach(buttonData => {
+            const button = document.createElement('button');
+            button.textContent = buttonData.text;
+            button.dataset.value = buttonData.value;
+            button.classList.add('option-button'); // Apply the new CSS class
+
+            button.addEventListener('click', () => {
+                displayMessage(buttonData.text, 'user'); // Display user's button choice
+                sendChatInteraction('button', buttonData.value);
+            });
+            optionButtonsContainer.appendChild(button);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideButtons() {
+        // Use classList to add 'hidden'
+        optionButtonsContainer.classList.add('hidden');
+        optionButtonsContainer.innerHTML = '';
+    }
+
+    function showCustomModal(title, message) {
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        // Use classList to remove 'hidden'
+        customModalOverlay.classList.remove('hidden');
+    }
+
+    modalOkButton.addEventListener('click', () => {
+        // Use classList to add 'hidden'
+        customModalOverlay.classList.add('hidden');
+    });
+
+    async function sendToBackend(url, method, data = null) {
+        try {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-User-Id': currentUserId,
+                    'X-User-Role': currentUserRole
+                },
+            };
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(url, options);
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error('API Error:', result.message || response.statusText);
+                showCustomModal('Error', `An error occurred: ${result.message || 'Please try again.'}`);
+                return null;
+            }
+            return result;
+
+        } catch (error) {
+            console.error('Network or API call error:', error);
+            showCustomModal('Network Error', 'Could not connect to the server. Please check your internet connection.');
+            return null;
+        }
+    }
+
+    function showLoadingIndicator(message = 'Thinking...') {
+        const loadingElement = document.createElement('div');
+        loadingElement.classList.add('loading-indicator-style'); // Apply the new CSS class
+        loadingElement.id = 'loading-indicator';
+        loadingElement.textContent = message;
+        chatMessages.appendChild(loadingElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideLoadingIndicator() {
+        const loadingElement = document.getElementById('loading-indicator');
+        if (loadingElement) {
+            loadingElement.remove();
+        }
+    }
+
+    // --- Centralized Chatbot Interaction ---
+    async function sendChatInteraction(type, value = null) {
+        let messageToSend = null;
+        let selectionValueToSend = null;
+
+        if (type === 'text') {
+            const inputText = chatInput.value.trim();
+            if (!inputText) { // If text input is empty, don't send anything
+                return;
+            }
+            displayMessage(inputText, 'user'); // Display user's text message
+            messageToSend = inputText;
+            chatInput.value = ''; // Clear input immediately
+        } else if (type === 'button') {
+            selectionValueToSend = value;
+            // The displayMessage for button clicks is now handled directly in displayButtons
+        }
+
+        showLoadingIndicator();
+        hideButtons(); // Hide buttons while waiting for response
+
+        const payload = {
+            message: messageToSend,
+            selection_value: selectionValueToSend,
+            conversation_state: conversationState,
+            context: {
+                currentMedicineRequest: currentMedicineRequest,
+                currentAmbulanceRequest: currentAmbulanceRequest,
+                availableMedicines: availableMedicines,
+                activePrescriptions: activePrescriptions,
+                currentPatientAge: currentPatientAge,
+                currentPatientAddress: currentPatientAddress,
+            }
+        };
+
+        const response = await sendToBackend('/chatbot/api/chatbot_interact', 'POST', payload);
+        hideLoadingIndicator();
+
+        if (response) {
+            console.log(response)
+            displayMessage(response.message, 'bot');
+            conversationState = response.next_state;
+
+            // Update context data from backend response
+            currentMedicineRequest = response.context.currentMedicineRequest || {};
+            currentAmbulanceRequest = response.context.currentAmbulanceRequest || {};
+            availableMedicines = response.context.availableMedicines || [];
+            activePrescriptions = response.context.activePrescriptions || [];
+            currentPatientAge = response.context.currentPatientAge || null;
+            currentPatientAddress = response.context.currentPatientAddress || null;
+
+            if (response.options && response.options.length > 0) {
+                displayButtons(response.options);
+                chatInput.disabled = true; // Disable input if buttons are displayed
+            } else {
+                hideButtons();
+                chatInput.disabled = false; // Enable input if no buttons
+                chatInput.focus();
+            }
+        } else {
+            // Error already handled by sendToBackend modal
+            chatInput.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+    // --- Event Listeners ---
+    sendButton.addEventListener('click', () => sendChatInteraction('text'));
+
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent default form submission behavior
+            sendChatInteraction('text');
+        }
+    });
+
+    // --- Initial Chatbot Greeting & User Info Fetch ---
+    window.onload = async () => {
+        displayMessage("Hello! Welcome to the Hospital Chatbot.", 'bot');
+        showLoadingIndicator("Identifying user...");
+        const userInfo = await sendToBackend('/chatbot/api/me', 'GET');
+        hideLoadingIndicator();
+
+        if (userInfo) {
+            currentUserId = userInfo.user_id;
+            currentUserRole = userInfo.user_role;
+            currentPatientAddress = userInfo.patient_address;
+            currentPatientAge = userInfo.patient_age;
+
+            displayMessage(`Hello ${currentUserRole.toLowerCase()}!`, 'bot');
+            sendChatInteraction('initial');
+        } else {
+            displayMessage("Could not identify user. Please refresh the page or try again later.", 'bot');
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+        }
+    };
+</script>
 </body>
 </html>

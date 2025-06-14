@@ -677,9 +677,10 @@
                     this.receiverName.textContent = this.currentReceiverName;
                     this.receiverRole.textContent = this.currentReceiverRole;
                 } else {
-                    this.receiverAvatar.textContent = '';
-                    this.receiverName.textContent = 'Select a User';
-                    this.receiverRole.textContent = '';
+                    this.receiverAvatar = document.getElementById('receiver-avatar');
+                    this.receiverName = document.getElementById('receiver-name');
+                    this.receiverRole = document.getElementById('receiver-role');
+
                 }
             }
 

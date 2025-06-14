@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import traceback
 from flask import jsonify, render_template, redirect, url_for, request
 from flask_socketio import emit, join_room, leave_room
 
@@ -507,7 +507,6 @@ def send_communication_request(current_user_id):  # Renamed for clarity
             receiver_id=receiver_id,
             message=message,
             status='pending',
-            sender_role=User.query.get(current_user_id).role  # Store sender's role
         )
         db.session.add(new_request)
         db.session.commit()
@@ -542,6 +541,7 @@ def send_communication_request(current_user_id):  # Renamed for clarity
 
     except Exception as e:
         db.session.rollback()
+        traceback.print_exc()
         print(f"Error sending communication request: {e}")
         return jsonify({"error": str(e)}), 500
 
