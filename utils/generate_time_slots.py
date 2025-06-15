@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
 
+from models import Appointment
+from models.doctorModel import Availability
+
 
 def generate_time_slots(start_time, end_time, existing_appointments, duration=30):
     """
@@ -43,3 +46,40 @@ def generate_time_slots(start_time, end_time, existing_appointments, duration=30
         current_time = slot_end
 
     return slots
+
+
+def get_available_slots_for_doctor(doctor_id, appointment_date):
+    """
+    Core logic to get available time slots for a doctor on a specific date.
+    Returns a list of dictionaries, where each dict represents an available slot.
+    """
+    day_of_week_name = appointment_date.strftime('%A')
+
+    days_map = {
+        'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4,
+        'Friday': 5, 'Saturday': 6, 'Sunday': 7
+    }
+    day_of_week = days_map.get(day_of_week_name)
+
+    if day_of_week is None:
+        return {'error': 'Invalid day of week'}, 400
+
+    availability = Availability.query.filter_by(
+        doctor_id=doctor_id,
+        day_of_week=day_of_week
+    ).first()
+
+    if not availability:
+        return {'error': 'Doctor not available on this day'}, 400
+
+    existing_appointments = Appointment.query.filter_by(
+        doctor_id=doctor_id,
+        date=appointment_date
+    ).all()
+
+    slots = generate_time_slots(
+        availability.from_time,
+        availability.to_time,
+        existing_appointments
+    )
+    return {'slots': slots}, 200 # Return data and status code as a tuple

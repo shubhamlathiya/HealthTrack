@@ -51,6 +51,10 @@
       "description": "Chat with a live support representative."
     },
     {
+      "text": "Emergency Assistance 🚨",
+      "value": "emergency_assistance"
+    },
+    {
       "text": "❓ FAQs / Help",
       "value": "faq_help",
       "description": "Find answers to frequently asked questions."
@@ -290,6 +294,66 @@
     {
       "text": "🏠 Return to Main Menu",
       "value": "main_menu"
+    }
+  ],
+  "book_appointment_start_options": [
+    {
+      "text": "Select Department",
+      "value": "select_department"
+    },
+    {
+      "text": "Go Back to Main Menu 🔙",
+      "value": "main_menu"
+    }
+  ],
+  "book_appointment_date_options": [
+    {
+      "text": "Today",
+      "value": "today"
+    },
+    {
+      "text": "Tomorrow",
+      "value": "tomorrow"
+    },
+    {
+      "text": "Pick a Date",
+      "value": "pick_date"
+    },
+    {
+      "text": "Go Back to Department Selection 🔙",
+      "value": "select_department"
+    },
+    {
+      "text": "Go Back to Main Menu 🔙",
+      "value": "main_menu"
+    }
+  ],
+  "book_appointment_confirm_options": [
+    {
+      "text": "✅ Confirm Appointment",
+      "value": "confirm_appointment"
+    },
+    {
+      "text": "📝 Change Details",
+      "value": "change_details"
+    },
+    {
+      "text": "❌ Cancel Booking",
+      "value": "cancel_appointment_booking"
+    },
+    {
+      "text": "🏠 Go to Main Menu",
+      "value": "main_menu"
+    }
+  ],
+  "yes_no_options": [
+    {
+      "text": "Yes ✅",
+      "value": "yes"
+    },
+    {
+      "text": "No ❌",
+      "value": "no"
     }
   ]
 }

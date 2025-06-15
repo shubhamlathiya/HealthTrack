@@ -3,6 +3,9 @@ import json
 from flask import jsonify, session, render_template, request
 
 from controllers.chat_bot_controllers import chatbot
+from controllers.chat_bot_controllers.utils.book_appointment import handle_book_appointment_start, \
+    handle_select_department, handle_select_doctor, handle_select_date, handle_select_time_slot, handle_input_reason, \
+    handle_confirm_appointment, handle_book_appointment_change_details
 from controllers.chat_bot_controllers.utils.call_ambulance import handle_ambulance_start, \
     handle_ambulance_other_emergency_text_input, handle_ambulance_final_confirm_options, \
     handle_ambulance_pickup_location_confirm, handle_ambulance_new_pickup_location_input, \
@@ -100,7 +103,7 @@ def handle_main_menu_options(user_obj, data, chat_context):
         bot_response_text = ""
         if patient_id:
             appointments = Appointment.query.filter_by(patient_id=patient_id).order_by(
-                Appointment.date.desc()).all()
+                Appointment.date.desc()).limit(3).all()
             if appointments:
                 bot_response_text = "Here are your upcoming appointments:"
                 for appt in appointments:
@@ -115,6 +118,8 @@ def handle_main_menu_options(user_obj, data, chat_context):
 
         bot_options = get_chatbot_options('main_menu_options')
         next_state = 'main_menu_options'
+    elif user_selection_value == 'book_appointment':  # NEW: Route to appointment booking
+        return handle_book_appointment_start(user_obj, data, chat_context)
     elif user_selection_value == 'my_health_profile':
         return handle_my_health_profile(user_obj, data, chat_context)
     elif user_selection_value == 'faq_help':
@@ -155,6 +160,16 @@ STATE_HANDLERS = {
     'medicine_check_status': handle_medicine_check_status,  # NEW
     'medicine_cancel_specific_order': handle_medicine_cancel_specific_order,
 
+    # --- Appointment Booking Flow --- # NEW SECTION
+    'book_appointment_start': handle_book_appointment_start,
+    'select_department': handle_select_department,
+    'select_doctor': handle_select_doctor,
+    'select_date': handle_select_date,
+    'input_date': handle_select_date,  # For handling direct date input
+    'select_time_slot': handle_select_time_slot,
+    'input_reason': handle_input_reason,
+    'confirm_appointment': handle_confirm_appointment,
+    'book_appointment_change_details': handle_book_appointment_change_details,
 
     # --- Ambulance Request Flow ---
     'ambulance_start': handle_ambulance_start,
