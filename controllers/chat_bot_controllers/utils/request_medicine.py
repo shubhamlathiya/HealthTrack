@@ -55,31 +55,72 @@ def handle_medicine_request_start(user_obj, data, chat_context):
             else:
                 prescriptions = Prescription.query.filter(
                     Prescription.appointment_id.in_(appointment_ids),
-                    Prescription.is_deleted == False
-                ).all()
+                    Prescription.is_deleted == False,
+                ).order_by(Prescription.created_at).limit(4).all()
 
                 if prescriptions:
+                    print("shubham", prescriptions)  # For debugging purposes
                     prescriptions_data = []
                     for p in prescriptions:
+                        # Convert datetime.date to ISO format string for JSON serialization
+                        appointment_date_str = p.appointment.date.isoformat() if p.appointment and p.appointment.date else None
+
                         p_data = {
                             'id': p.id,
-                            'appointment_date': p.appointment.date if p.appointment else None,
+                            'appointment_date': appointment_date_str,  # Use string representation
                             'doctor_name': f"{p.appointment.doctor.first_name} {p.appointment.doctor.last_name}" if p.appointment and p.appointment.doctor else "Unknown Doctor",
                             'notes': p.notes,
                             'status': p.status,
-                            'medications': [
-                                {
-                                    'name': med.name,
-                                    'dosage': med.dosage,
-                                    'meal_instructions': med.meal_instructions,
-                                    'timing': [t.timing for t in med.timings] if med.timings else [],
-                                    'medicine_id': med.id,
-                                    'current_stock': med.current_stock,
-                                    'default_mrp': float(med.default_mrp or 0.0)
-                                }
-                                for med in p.medications
-                            ]
+                            'medications': []  # Initialize empty list for medications
                         }
+                        print(f"Processing Prescription ID: {p.id}")  # For debugging
+
+                        for med in p.medications:
+                            # Safely get medicine details by searching the Medicine model by name or medicine_number
+                            # This is a query for each medication, optimize if possible (e.g., eager load with PrescriptionMedication relationship)
+                            medicines = Medicine.query.filter(
+                                or_(
+                                    Medicine.name.ilike(f'%{med.name}%'),  # Use med.name directly
+                                    Medicine.medicine_number.ilike(f'%{med.name}%')
+                                    # Assuming medicine_number can match name
+                                ),
+                                Medicine.is_deleted == False
+                            ).options(
+                                joinedload(Medicine.category),
+                                joinedload(Medicine.company),
+                                joinedload(Medicine.group),
+                                joinedload(Medicine.unit)
+                            ).limit(1).first()
+                            print(f"  Searching for medicine '{med.name}': {medicines}")  # For debugging
+
+                            # Initialize values with defaults
+                            current_stock = 0
+                            default_mrp = 0.0
+                            unit_per_day = 1  # Default to 1 if not specified in Medicine model
+                            required_units = 0
+                            timing_count = len(med.timings)  # Get count of timings
+
+                            if medicines:
+                                current_stock = medicines.current_stock
+                                # Use default_selling_price from Medicine model, not default_mrp
+                                default_mrp = float(medicines.default_selling_price or 0.0)
+                                # Ensure 'unit_per_day' exists in your Medicine model
+                                unit_per_day = medicines.unit_per_day if hasattr(medicines,
+                                                                                 'unit_per_day') and medicines.unit_per_day is not None else 1
+
+                                # Calculate required units based on days, unit_per_day, and timing_count
+                                required_units = med.days * unit_per_day * timing_count
+
+                            p_data['medications'].append({
+                                'name': med.name,
+                                'days': med.days,
+                                'meal_instructions': med.meal_instructions,
+                                'timing': [t.timing for t in med.timings] if med.timings else [],
+                                'medicine_id': medicines.id if medicines else None,  # ID of the found Medicine
+                                'current_stock': current_stock,
+                                'default_selling_price': default_mrp,  # Consistent with the field name
+                                'required_units': required_units  # Add calculated required units
+                            })
                         prescriptions_data.append(p_data)
 
                     chat_context['active_prescriptions'] = prescriptions_data
@@ -89,13 +130,21 @@ def handle_medicine_request_start(user_obj, data, chat_context):
                         if p['medications']:
                             bot_response_text += "\n💊 Medications:"
                             for med in p['medications']:
-                                med_line = f"  - {med['name']} ({med['dosage']}, {med['meal_instructions']})"
+                                # Updated display to include days and required units
+                                med_line = f"  - {med['name']} ({med['days']} days, {med['meal_instructions']})"
                                 if med['timing']:
                                     med_line += f" | Timing: {', '.join(med['timing'])}"
+
+                                # Display stock information and required units
                                 if med['current_stock'] <= 0:
                                     med_line += " ⚠️ (Out of stock)"
                                 else:
-                                    med_line += f" (In stock: {med['current_stock']})"
+                                    stock_msg = f" (In stock: {med['current_stock']})"
+                                    if med['current_stock'] < med['required_units']:
+                                        stock_msg += f" ⚠️ (Not enough stock, needed: {med['required_units']})"
+                                    else:
+                                        stock_msg += f" (Needed: {med['required_units']})"
+                                    med_line += stock_msg
                                 bot_response_text += f"\n{med_line}"
                         else:
                             bot_response_text += "\n  No medications listed."
@@ -142,7 +191,7 @@ def handle_medicine_select_prescription(user_obj, data, chat_context):
         # Present each medication with an "Add to Cart" option
         for med in selected_prescription.get('medications', []):
             stock_info = f" (In Stock: {med['current_stock']})" if med['current_stock'] > 0 else " (Out of Stock)"
-            bot_response_text += f"\n- {med['name']} ({med['dosage']}){stock_info}"
+            bot_response_text += f"\n- {med['name']} ({med['days']}){stock_info}"
             if med['current_stock'] > 0:
                 bot_options.append({
                     "text": f"Add {med['name']} to Cart",
