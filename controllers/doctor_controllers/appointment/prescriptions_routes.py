@@ -118,7 +118,7 @@ def forward_appointment(current_user, appointment_id):
 def create_prescription():
     try:
         data = request.get_json()
-        print(data)
+        print("shubham" , data)
         # Validate required fields
         if not all(key in data for key in ['appointment_id', 'medications']):
             return jsonify({'error': 'Missing required fields'}), 400
@@ -137,10 +137,11 @@ def create_prescription():
 
         # Add medications
         for med_data in data['medications']:
+            # Changed 'dosage' to 'days'
             medication = PrescriptionMedication(
                 prescription_id=prescription.id,
                 name=med_data['name'],
-                dosage=med_data['dosage'],
+                days=med_data['days'],  # Updated field name
                 meal_instructions=med_data['meal_instructions']
             )
             db.session.add(medication)
@@ -166,6 +167,7 @@ def create_prescription():
         # Update appointment status
         appointment = Appointment.query.get(data['appointment_id'])
         if not appointment:
+            db.session.rollback()  # Rollback if appointment not found
             return jsonify({'error': 'Appointment not found'}), 404
 
         appointment.status = 'Completed'
@@ -209,7 +211,7 @@ def get_prescription(prescription_id):
         for med in prescription.medications:
             medication = {
                 'name': med.name,
-                'dosage': med.dosage,
+                'days': med.days,  # Updated field name
                 'meal_instructions': med.meal_instructions,
                 'timing': [t.timing for t in med.timings]
             }

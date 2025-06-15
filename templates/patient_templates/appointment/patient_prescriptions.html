@@ -180,7 +180,7 @@
                                             <thead>
                                             <tr>
                                                 <th>Name</th>
-                                                <th>Dosage</th>
+                                                <th>Days</th>
                                                 <th>Instructions</th>
                                                 <th>Timing</th>
                                             </tr>
@@ -189,7 +189,7 @@
                                             {% for med in prescription.medications %}
                                                 <tr>
                                                     <td>{{ med.name }}</td>
-                                                    <td>{{ med.dosage }}</td>
+                                                   <td>{{ med.days }}</td>
                                                     <td>{{ med.meal_instructions }}</td>
                                                     <td>{{ med.timing|join(', ') }}</td>
                                                 </tr>

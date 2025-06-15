@@ -232,7 +232,7 @@
                             doctorSelect.append(
                                 `<option value="${doctor.id}"
                          data-img="${doctor.profile_image || '/static/images/default-doctor.png'}">
-                         Dr. ${doctor.name} - ${doctor.specialty}
+                         Dr. ${doctor.name} - ${doctor.specialties}
                          </option>`
                             );
                         });
@@ -272,7 +272,7 @@
                         }
                     }).fail(function () {
                         $('#timeSlotSelect').empty()
-                            .append('<option value="">Error loading slots</option>')
+                            .append('<option value="">No slots Available</option>')
                             .prop('disabled', true);
                     });
                 } else {
@@ -305,7 +305,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
                     success: function (response) {
-                        $('#viewAppointmentBtn').attr('href', `/patient/appointment`);
+                        $('#viewAppointmentBtn').attr('href', `/patient/appointment/view-appointment`);
                         $('#successModal').modal('show');
                         submitBtn.prop('disabled', false).html('<i class="ri-calendar-check-line me-1"></i> Book Appointment');
                     },

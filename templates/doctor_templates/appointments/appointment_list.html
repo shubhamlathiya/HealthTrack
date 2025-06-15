@@ -558,14 +558,12 @@
                         <form id="prescriptionForm{{ appointment.id }}" class="needs-validation" novalidate>
                             <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
 
-                            <!-- Medications Section -->
                             <div class="row g-3 mb-4">
                                 <div class="col-12">
                                     <h6 class="text-success mb-3">
                                         <i class="ri-medicine-bottle-line me-2"></i>Medications
                                     </h6>
                                     <div id="medicationsContainer{{ appointment.id }}">
-                                        <!-- Initial medication field -->
                                         <div class="card border-0 shadow-sm mb-3 medication-row">
                                             <div class="card-body">
                                                 <div class="row g-3">
@@ -581,11 +579,10 @@
                                                              id="medicine-results-0-{{ appointment.id }}"></div>
                                                     </div>
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Dosage </label>
-                                                        <input type="text" class="form-control medicine-dosage"
-                                                               name="medications[0][dosage]"
-                                                               id="dosage-0-{{ appointment.id }}"
-                                                        >
+                                                        <label class="form-label">Days </label>
+                                                        <input type="number" class="form-control medicine-days"
+                                                               name="medications[0][days]"
+                                                               id="days-0-{{ appointment.id }}">
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label class="form-label">Meal Instructions <span
@@ -634,14 +631,12 @@
                                 </div>
                             </div>
 
-                            <!-- Test Reports Section -->
                             <div class="row g-3 mb-4">
                                 <div class="col-12">
                                     <h6 class="text-success mb-3">
                                         <i class="ri-file-text-line me-2"></i>Test Reports
                                     </h6>
                                     <div id="testReportsContainer{{ appointment.id }}">
-                                        <!-- Initial test report field -->
                                         <div class="card border-0 shadow-sm mb-3 test-report-row">
                                             <div class="card-body">
                                                 <div class="row g-3">
@@ -686,7 +681,6 @@
                                 </div>
                             </div>
 
-                            <!-- Additional Notes -->
                             <div class="row g-3">
                                 <div class="col-12">
                                     <label class="form-label">Additional Notes</label>
@@ -929,65 +923,69 @@
         // Add medication field
         function addMedicationField(appointmentId) {
             const container = document.getElementById(`medicationsContainer${appointmentId}`);
+            // Ensure medicationCounters is initialized, e.g., in a script tag at the top of your page:
+            // var medicationCounters = medicationCounters || {};
+            // medicationCounters[appointmentId] = medicationCounters[appointmentId] || 0;
             const count = medicationCounters[appointmentId]++;
 
             const newItem = document.createElement('div');
             newItem.className = 'card border-0 shadow-sm mb-3 medication-row';
             newItem.innerHTML = `
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-5">
-                            <label class="form-label">Medicine Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control medicine-search"
-                                   name="medications[${count}][name]"
-                                   id="medicine-search-${count}-${appointmentId}"
-                                   data-dosage-field="dosage-${count}-${appointmentId}"
-                                  >
-                            <div class="autocomplete-results" id="medicine-results-${count}-${appointmentId}"></div>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Dosage</label>
-                            <input type="text" class="form-control medicine-dosage"
-                                   name="medications[${count}][dosage]"
-                                   id="dosage-${count}-${appointmentId}"
-                                   >
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Meal Instructions <span class="text-danger">*</span></label>
-                            <select class="form-select" name="medications[${count}][meal_instructions]" required>
-                                <option value="Before Meal">Before Meal</option>
-                                <option value="After Meal">After Meal</option>
-                                <option value="With Meal">With Meal</option>
-                            </select>
-                        </div>
-                        <div class="col-md-1 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger btn-sm remove-btn"
-                                    onclick="removeRow(this, 'medication')">
-                                <i class="ri-close-line"></i>
-                            </button>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Timing <span class="text-danger">*</span></label>
-                            <div class="row">
-                                ${['Morning', 'Afternoon', 'Evening', 'Night'].map(timing => `
-                                    <div class="col-md-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                   name="medications[${count}][timing][]"
-                                                   value="${timing}"
-                                                   id="timing-${count}-${timing.toLowerCase()}-${appointmentId}">
-                                            <label class="form-check-label" for="timing-${count}-${timing.toLowerCase()}-${appointmentId}">
-                                                ${timing}
-                                            </label>
-                                        </div>
-                                    </div>
-                                `).join('')}
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">Medicine Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control medicine-search"
+                           name="medications[${count}][name]"
+                           id="medicine-search-${count}-${appointmentId}"
+                           data-days-field="days-${count}-${appointmentId}" {# Changed data-dosage-field to data-days-field #}
+                           required> {# Added required attribute for consistency with the initial field #}
+                    <div class="autocomplete-results" id="medicine-results-${count}-${appointmentId}"></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Days</label> {# Changed label from 'Dosage' to 'Days' #}
+                    <input type="number" class="form-control medicine-days" {# Changed type to 'number' and class to 'medicine-days' #}
+                           name="medications[${count}][days]" {# Changed name to 'days' #}
+                           id="days-${count}-${appointmentId}" {# Changed id to 'days' #}
+                           >
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Meal Instructions <span class="text-danger">*</span></label>
+                    <select class="form-select" name="medications[${count}][meal_instructions]" required>
+                        <option value="Before Meal">Before Meal</option>
+                        <option value="After Meal">After Meal</option>
+                        <option value="With Meal">With Meal</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger btn-sm remove-btn"
+                            onclick="removeRow(this, 'medication')">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Timing <span class="text-danger">*</span></label>
+                    <div class="row">
+                        ${['Morning', 'Afternoon', 'Evening', 'Night'].map(timing => `
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="medications[${count}][timing][]"
+                                           value="${timing}"
+                                           id="timing-${count}-${timing.toLowerCase()}-${appointmentId}">
+                                    <label class="form-check-label" for="timing-${count}-${timing.toLowerCase()}-${appointmentId}">
+                                        ${timing}
+                                    </label>
+                                </div>
                             </div>
-                        </div>
+                        `).join('')}
                     </div>
                 </div>
-            `;
+            </div>
+        </div>
+    `;
             container.appendChild(newItem);
+            // Ensure setupMedicineSearch is called with the correct field for 'days'
             setupMedicineSearch(document.getElementById(`medicine-search-${count}-${appointmentId}`), appointmentId);
         }
 
@@ -1048,7 +1046,8 @@
         // Setup medicine search
         function setupMedicineSearch(inputElement, appointmentId) {
             const resultsContainer = document.getElementById(`medicine-results-${inputElement.id.split('-')[2]}-${appointmentId}`);
-            const dosageField = document.getElementById(inputElement.dataset.dosageField);
+            // Changed to 'daysField' to match the updated HTML data attribute and input name
+            const daysField = document.getElementById(inputElement.dataset.daysField);
 
             inputElement.addEventListener('input', debounce(function (e) {
                 const searchTerm = e.target.value.trim();
@@ -1070,8 +1069,9 @@
                                 item.textContent = `${medicine.name} (${medicine.medicine_number})`;
                                 item.addEventListener('click', () => {
                                     inputElement.value = medicine.name;
-                                    if (dosageField) {
-                                        dosageField.value = medicine.default_dosage || '';
+                                    // Update 'daysField' with 'default_days' from the API response
+                                    if (daysField) {
+                                        daysField.value = medicine.default_days || ''; // Expecting 'default_days' from your API
                                     }
                                     resultsContainer.innerHTML = '';
                                     resultsContainer.style.display = 'none';
@@ -1164,13 +1164,24 @@
                 const baseName = input.name.replace('[name]', '');
                 const timingInputs = form.querySelectorAll(`input[name="${baseName}[timing][]"]:checked`);
 
-                if (timingInputs.length > 0) {
-                    data.medications.push({
-                        name: input.value,
-                        dosage: formData.get(`${baseName}[dosage]`),
-                        meal_instructions: formData.get(`${baseName}[meal_instructions]`),
-                        timing: Array.from(timingInputs).map(i => i.value)
-                    });
+                // Check if the medication name input has a value
+                // This helps in skipping empty medication rows if they somehow end up in the form
+                if (input.value.trim() !== '') {
+                    if (timingInputs.length > 0) { // Ensure at least one timing is selected for a medication
+                        data.medications.push({
+                            name: input.value,
+                            // --- CHANGE START ---
+                            days: formData.get(`${baseName}[days]`), // Changed 'dosage' to 'days'
+                            // --- CHANGE END ---
+                            meal_instructions: formData.get(`${baseName}[meal_instructions]`),
+                            timing: Array.from(timingInputs).map(i => i.value)
+                        });
+                    } else {
+                        // Optional: Add client-side validation here if timing is mandatory for all meds
+                        // For example, display an error message for the specific medication
+                        console.warn(`Medication "${input.value}" is missing timing instructions.`);
+                        // You might choose to skip this medication or prevent form submission
+                    }
                 }
             });
 
@@ -1178,16 +1189,20 @@
             const reportInputs = form.querySelectorAll('input[name^="test_reports["][name$="][report_name]"]');
             reportInputs.forEach(input => {
                 const baseName = input.name.replace('[report_name]', '');
-                data.test_reports.push({
-                    report_name: input.value,
-                    report_notes: formData.get(`${baseName}[report_notes]`) || '',
-                    price: parseFloat(formData.get(`${baseName}[price]`))
-                });
+                // Check if the report name input has a value
+                if (input.value.trim() !== '') {
+                    data.test_reports.push({
+                        report_name: input.value,
+                        report_notes: formData.get(`${baseName}[report_notes]`) || '',
+                        price: parseFloat(formData.get(`${baseName}[price]`)) || 0 // Default to 0 if price is not a valid number
+                    });
+                }
             });
 
-            // Validate at least one medication
-            if (data.medications.length === 0) {
-                alert('Please add at least one medication');
+            // Validate at least one medication (still relevant as per your initial logic)
+            // This check is after collecting all medications, including the validity check for timings.
+            if (data.medications.length === 0 && data.test_reports.length === 0 && !data.notes.trim()) {
+                alert('Please add at least one medication, one test report, or some notes to generate a prescription.');
                 return;
             }
 
@@ -1196,13 +1211,24 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-
+                    // Add any other headers like authorization tokens if needed
+                    // 'Authorization': 'Bearer YOUR_TOKEN_HERE'
                 },
                 body: JSON.stringify(data)
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        // If response is not OK (e.g., 4xx, 5xx), parse error message
+                        return response.json().then(err => {
+                            throw new Error(err.error || 'Server error');
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
+                        // Using a more robust way to show success message
+                        alert(data.message || 'Prescription created successfully!');
                         window.location.href = data.redirect_url || '/doctor/appointments';
                     } else {
                         alert(data.error || 'Failed to save prescription');
@@ -1210,10 +1236,9 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while saving the prescription');
+                    alert('An error occurred: ' + error.message);
                 });
         }
-
         // Debounce function
         function debounce(func, wait) {
             let timeout;
@@ -1543,38 +1568,38 @@
             if (!Array.isArray(medications) || medications.length === 0) return '';
 
             const medicationRows = medications.map(med => `
-        <tr>
-            <td>${med.name}</td>
-            <td>${med.dosage || '-'}</td>
-            <td>${med.meal_instructions || '-'}</td>
-            <td>${formatTiming(med.timing)}</td>
-        </tr>
-    `).join('');
+    <tr>
+        <td>${med.name}</td>
+        <td>${med.days || '-'}</td>
+        <td>${med.meal_instructions || '-'}</td>
+        <td>${formatTiming(med.timing)}</td>
+    </tr>
+`).join('');
 
             return `
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5><i class="ri-medicine-bottle-line me-2"></i>Medications</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Medication</th>
-                                <th>Dosage</th>
-                                <th>Instructions</th>
-                                <th>Timing</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${medicationRows}
-                        </tbody>
-                    </table>
-                </div>
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5><i class="ri-medicine-bottle-line me-2"></i>Medications</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Medication</th>
+                            <th>Days</th>
+                            <th>Instructions</th>
+                            <th>Timing</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${medicationRows}
+                    </tbody>
+                </table>
             </div>
         </div>
-    `;
+    </div>
+`;
         }
 
         function createTestReportsSection(testReports) {

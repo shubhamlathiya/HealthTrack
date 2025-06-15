@@ -32,7 +32,7 @@ class PrescriptionMedication(db.Model):
     prescription_id = db.Column(db.Integer, db.ForeignKey('prescriptions.id'), nullable=False)
 
     name = db.Column(db.String(100), nullable=False)
-    dosage = db.Column(db.String(50), nullable=False)
+    days = db.Column(db.Integer, nullable=False)
     meal_instructions = db.Column(db.String(50), nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import render_template, request, flash, redirect, jsonify
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 from controllers.constant.laboratoryPathConstant import LAB_REPORTS, LAB_REPORTS_ADD, LAB_REPORTS_EDIT, \
     LAB_REPORTS_TOGGLE, LAB_REPORTS_DELETE, LAB_REPORTS_RESTORE, LABORATORY
@@ -139,10 +140,25 @@ def search_medicines():
             Medicine.name.ilike(f'%{search_term}%'),
             Medicine.medicine_number.ilike(f'%{search_term}%')
         ),
+        Medicine.is_deleted == False
+    ).options(
+        joinedload(Medicine.category),
+        joinedload(Medicine.company),
+        joinedload(Medicine.group),
+        joinedload(Medicine.unit)
     ).limit(10).all()
 
     return jsonify([{
         'id': med.id,
         'name': med.name,
-        'medicine_number': med.medicine_number
+        'medicine_number': med.medicine_number,
+        'default_selling_price': float(med.default_selling_price) if med.default_selling_price else None,
+        'default_mrp': float(med.default_mrp) if med.default_mrp else None,
+        'category': med.category.name if med.category else None,
+        'company': med.company.name if med.company else None,
+        'group': med.group.name if med.group else None,
+        'unit': med.unit.name if med.unit else None,
+        'current_stock': med.current_stock,
+        'status': med.status
     } for med in medicines])
+

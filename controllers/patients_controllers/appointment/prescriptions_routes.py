@@ -12,14 +12,21 @@ from models.userModel import User, UserRole
 from utils.email_utils import send_email
 
 
-@patients.route(VIEW_PRESCRIPTIONS, methods=['GET'],endpoint="view_patient_prescriptions")
+@patients.route(VIEW_PRESCRIPTIONS, methods=['GET'], endpoint="view_patient_prescriptions")
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def view_patient_prescriptions(current_user):
+    """
+    Renders the view for a patient's prescriptions, fetching all
+    prescriptions associated with their appointments.
+    """
     try:
         # Get patient record
+        # Assuming current_user is the User object, not just the ID.
+        # If current_user is just the ID, it should be current_user_id
         patient = Patient.query.filter_by(user_id=current_user).first()
         if not patient:
-            return redirect("/patient/prescriptions")
+            flash('Patient record not found.', 'danger')
+            return redirect("/") # Redirect to a relevant dashboard or error page
 
         # Get all appointments for the patient
         appointments = Appointment.query.filter_by(patient_id=patient.id).all()
@@ -50,7 +57,7 @@ def view_patient_prescriptions(current_user):
             for med in prescription.medications:
                 medication = {
                     'name': med.name,
-                    'dosage': med.dosage,
+                    'days': med.days, # Changed from med.dosage to med.days
                     'meal_instructions': med.meal_instructions,
                     'timing': [t.timing for t in med.timings]
                 }
@@ -75,66 +82,78 @@ def view_patient_prescriptions(current_user):
                                patient_name=f"{patient.first_name} {patient.last_name}")
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        # Log the exception for debugging purposes
+        print(f"Error viewing patient prescriptions: {e}")
+        flash('An error occurred while fetching prescriptions. Please try again later.', 'danger')
+        return redirect("/patient/dashboard") # Redirect to a safe page on error
 
 
-@patients.route(SEND_PRESCRIPTION_EMAIL + '/<int:prescription_id>', methods=['GET'],endpoint="send_prescription_email")
+@patients.route(SEND_PRESCRIPTION_EMAIL + '/<int:prescription_id>', methods=['GET'], endpoint="send_prescription_email")
 @token_required(allowed_roles=[UserRole.PATIENT.name])
 def send_prescription_email(current_user, prescription_id):
-    # try:
-    users = User.query.filter_by(id=current_user).first()
-    if not users:
-        flash('Users not found', 'danger')
-        return redirect("/patient/prescriptions")
+    """
+    Sends a prescription as an email to the current patient.
+    """
+    try:
+        # Assuming current_user is the User object, not just the ID.
+        users_user_obj = User.query.filter_by(id=current_user).first()
+        if not users_user_obj:
+            flash('User account not found.', 'danger')
+            return redirect("/patient/prescriptions")
 
-    # Verify the prescription belongs to the current user
-    patient = Patient.query.filter_by(user_id=current_user).first()
-    if not patient:
-        flash('Patient not found', 'danger')
-        return redirect("/patient/prescriptions")
+        # Verify the prescription belongs to the current user
+        patient = Patient.query.filter_by(user_id=current_user).first()
+        if not patient:
+            flash('Patient record not found.', 'danger')
+            return redirect("/patient/prescriptions")
 
-    prescription = Prescription.query.get(prescription_id)
-    if not prescription or prescription.is_deleted:
-        flash('Prescription not found', 'danger')
-        return redirect("/patient/prescriptions")
+        prescription = Prescription.query.get(prescription_id)
+        if not prescription or prescription.is_deleted:
+            flash('Prescription not found or is deleted.', 'danger')
+            return redirect("/patient/prescriptions")
 
-    # Check if this prescription belongs to the patient
-    appointment = Appointment.query.get(prescription.appointment_id)
-    if not appointment or appointment.patient_id != patient.id:
-        flash('Unauthorized access', 'danger')
-        return redirect("/patient/prescriptions")
+        # Check if this prescription belongs to the patient
+        appointment = Appointment.query.get(prescription.appointment_id)
+        if not appointment or appointment.patient_id != patient.id:
+            flash('Unauthorized access to prescription.', 'danger')
+            return redirect("/patient/prescriptions")
 
-    # Get doctor details
-    doctor = Doctor.query.filter_by(id=appointment.doctor_id).first()
-    if not doctor:
-        flash('Doctor not found', 'danger')
-        return redirect("/patient/prescriptions")
+        # Get doctor details
+        doctor = Doctor.query.filter_by(id=appointment.doctor_id).first()
+        if not doctor:
+            flash('Associated doctor not found.', 'danger')
+            return redirect("/patient/prescriptions")
 
-    # Get clinic information (you might want to store this in a config or database)
-    clinic_info = {
-        'name': 'HealthTrack',
-        'address': '123 Medical Drive, Health City, HC 12345',
-        'phone': '(123) 456-7890',
-        'email': 'contact@healthtrack.com'
-    }
+        # Get clinic information (consider storing this in a config or database)
+        clinic_info = {
+            'name': 'HealthTrack',
+            'address': '123 Medical Drive, Health City, HC 12345',
+            'phone': '(123) 456-7890',
+            'email': 'contact@healthtrack.com'
+        }
 
-    # Prepare email content
-    subject = f"Your Prescription from {clinic_info['name']} - #{prescription.id}"
+        # Prepare email content
+        subject = f"Your Prescription from {clinic_info['name']} - #{prescription.id}"
 
-    # Render the HTML email template
-    html_content = render_template(
-        'email_templates/templates/prescription_mail.html',
-        clinic_name=clinic_info['name'],
-        clinic_address=clinic_info['address'],
-        clinic_phone=clinic_info['phone'],
-        clinic_email=clinic_info['email'],
-        patient_name=f"{patient.first_name} {patient.last_name}",
-        prescription=prescription,
-        doctor_name=f"{doctor.first_name} {doctor.last_name}",
-        current_year=datetime.now().year
-    )
+        # Render the HTML email template
+        html_content = render_template(
+            'email_templates/templates/prescription_mail.html',
+            clinic_name=clinic_info['name'],
+            clinic_address=clinic_info['address'],
+            clinic_phone=clinic_info['phone'],
+            clinic_email=clinic_info['email'],
+            patient_name=f"{patient.first_name} {patient.last_name}",
+            prescription=prescription,
+            doctor_name=f"{doctor.first_name} {doctor.last_name}",
+            current_year=datetime.now().year
+        )
 
-    send_email(subject, users.email, html_content)
+        send_email(subject, users_user_obj.email, html_content) # Use users_user_obj.email for the recipient
 
-    flash('Prescription email sent successfully', 'success')
-    return redirect(VIEW_PRESCRIPTIONS)
+        flash('Prescription email sent successfully.', 'success')
+        return redirect(VIEW_PRESCRIPTIONS)
+
+    except Exception as e:
+        print(f"Error sending prescription email: {e}")
+        flash('An error occurred while sending the prescription email. Please try again later.', 'danger')
+        return redirect(VIEW_PRESCRIPTIONS)
