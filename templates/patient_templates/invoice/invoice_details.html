@@ -1,163 +1,252 @@
 {% extends 'base.html' %}
 
-{% block title %}Invoice Details{% endblock title %}
-{% block page %}Invoice Details{% endblock page %}
+{% block title %}Sale Details - {{ sale.bill_no }}{% endblock %}
+
 {% block body %}
-
-    <!-- Row start -->
     <div class="row">
-        <div class="col-xl-12">
+        <div class="col-12">
             <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="ri-shopping-bag-line me-2"></i>Sale Details - {{ sale.bill_no }}
+                    </h4>
+                    <div class="card-tools">
+                        <a href="{{ PATIENT + PHARMACY_SALES_LIST }}" class="btn btn-sm btn-light">
+                            {# Assuming you have a sales list route #}
+                            <i class="ri-arrow-left-line me-1"></i> Back to Sales
+                        </a>
+                    </div>
+                </div>
                 <div class="card-body">
-                    <!-- Row start -->
-                    <div class="row">
-                        <div class="col-xxl-3 col-sm-3 col-12">
-                            <img src="../../../static/assets/images/logo.svg" alt="Hospital Logo"
-                                 class="img-fluid">
-                        </div>
-                        <div class="col-sm-9 col-12">
-                            <div class="text-end">
-                                <p class="mb-2">
-                                    Invoice - <span class="text-danger">#{{ payment.id }}</span>
-                                </p>
-                                <p class="mb-2">{{ payment.created_at.strftime('%B %d, %Y') }}</p>
-                                <span class="badge bg-{% if payment.status == 'paid' %}success{% elif payment.status == 'pending' %}warning{% else %}danger{% endif %}">
-                                    {{ payment.status|capitalize }}
-                                </span>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="ri-information-line me-2"></i>Sale Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row mb-0">
+                                        <dt class="col-sm-4">Bill Number</dt>
+                                        <dd class="col-sm-8">{{ sale.bill_no }}</dd>
+
+                                        <dt class="col-sm-4">Sale Date</dt>
+                                        <dd class="col-sm-8">{{ sale.created_at.strftime('%Y-%m-%d %I:%M %p') }}</dd>
+
+                                        <dt class="col-sm-4">Patient ID</dt>
+                                        <dd class="col-sm-8">{{ sale.patient_id }}</dd>
+                                        {# If you have a patient relationship, use it here #}
+                                        {# <dd class="col-sm-8">{{ sale.patient.name if sale.patient else 'N/A' }}</dd> #}
+
+                                        <dt class="col-sm-4">Doctor</dt>
+                                        <dd class="col-sm-8">
+                                            {% if sale.doctor %}
+                                                {{ sale.doctor.first_name }} {{ sale.doctor.last_name }}
+                                                {% if sale.doctor.hospital %}
+                                                    <br><small class="text-muted">({{ sale.doctor.hospital }})</small>
+                                                {% endif %}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </dd>
+
+                                        <dt class="col-sm-4">Prescription No.</dt>
+                                        <dd class="col-sm-8">{{ sale.prescription_no if sale.prescription_no else 'N/A' }}</dd>
+
+                                        <dt class="col-sm-4">Payment Mode</dt>
+                                        <dd class="col-sm-8">{{ sale.payment_mode }}</dd>
+
+                                        <dt class="col-sm-4">Created By</dt>
+                                        <dd class="col-sm-8">{{ sale.created_user.username if sale.created_user else 'N/A' }}</dd>
+
+                                        <dt class="col-sm-4">Last Updated</dt>
+                                        <dd class="col-sm-8">{{ sale.updated_at.strftime('%Y-%m-%d %I:%M %p') }}</dd>
+                                    </dl>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-12 mb-5"></div>
-                    </div>
-                    <!-- Row end -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="ri-money-dollar-circle-line me-2"></i>Payment Summary
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row mb-0">
+                                        <dt class="col-sm-6">Total Before Tax</dt>
+                                        {# This is the sum of (quantity * sale_price) for all items #}
+                                        <dd class="col-sm-6 text-end">${{ "%.2f"|format(sale.total_amount) }}</dd>
 
-                    <!-- Row start -->
-                    <div class="row justify-content-between">
-                        <div class="col-lg-6 col-12">
-                            <h6 class="fw-semibold">Billed To :</h6>
-                            <p class="m-0">
-                                {{ patient.full_name }},<br>
-                                {% if patient.address %}{{ patient.address }},<br>{% endif %}
-                                {% if patient.city %}{{ patient.city }}, {% endif %}
-                                {% if patient.state %}{{ patient.state }}, {% endif %}
-                                {% if patient.zip_code %}{{ patient.zip_code }}{% endif %}
-                            </p>
-                        </div>
-                        <div class="col-lg-6 col-12">
-                            <div class="text-end">
-                                <h6 class="fw-semibold">Hospital Address :</h6>
-                                <p class="text-end m-0">
-                                    Your Hospital Name,<br>
-                                    123 Hospital Street,<br>
-                                    City, State, ZIP Code
-                                </p>
+                                        <dt class="col-sm-6">Discount Amount</dt>
+                                        <dd class="col-sm-6 text-end">${{ "%.2f"|format(sale.discount_amount) }}</dd>
+
+                                        <dt class="col-sm-6">Tax Amount</dt>
+                                        <dd class="col-sm-6 text-end">${{ "%.2f"|format(sale.tax_amount) }}</dd>
+
+                                        <dt class="col-sm-6"><strong>Net Amount</strong></dt>
+                                        <dd class="col-sm-6 text-end">
+                                            <strong>${{ "%.2f"|format(sale.net_amount) }}</strong></dd>
+
+                                        <dt class="col-sm-6">Paid Amount</dt>
+                                        <dd class="col-sm-6 text-end">${{ "%.2f"|format(sale.payment_amount) }}</dd>
+
+                                        <dt class="col-sm-6">Due Amount</dt>
+                                        <dd class="col-sm-6 text-end">
+                                            {% if due_amount > 0 %}
+                                                <span class="text-danger">${{ "%.2f"|format(due_amount) }}</span>
+                                            {% else %}
+                                                <span class="text-success">$0.00</span>
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-12 mb-3"></div>
                     </div>
-                    <!-- Row end -->
 
-                    <!-- Row start -->
-                    <div class="row">
-                        <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">
+                                <i class="ri-pill-line me-2"></i>Sold Items ({{ items|length }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
+                                <table class="table table-bordered table-striped table-hover mb-0">
+                                    {# Added table-striped for readability #}
+                                    <thead class="bg-light"> {# Lighter header for a modern feel #}
                                     <tr>
-                                        <th>Description</th>
-                                        <th>Type</th>
-                                        <th>Amount</th>
+                                        <th class="text-center" style="width: 5%;">#</th>
+                                        {# Center align and set width #}
+                                        <th style="width: 30%;">Medicine</th>
+                                        <th class="text-center" style="width: 15%;">Batch No.</th>
+                                        {# Center align #}
+                                        <th class="text-end" style="width: 10%;">Quantity</th>
+                                        <th class="text-end" style="width: 15%;">Sale Price (Unit)</th>
+                                        <th class="text-end" style="width: 10%;">Tax Rate (%)</th>
+                                        <th class="text-end" style="width: 15%;">Amount</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {% if room_charge %}
+                                    {% for item in items %}
                                         <tr>
-                                            <td>
-                                                <h6>Room Charges</h6>
-                                                <p>
-                                                    Room type: {{ room_charge.room_type }}<br>
-                                                    Duration: {{ room_charge.duration_days }} days
-                                                </p>
+                                            <td class="text-center align-middle">{{ loop.index }}</td>
+                                            {# Center and vertically middle align #}
+                                            <td class="align-middle">
+                                                <strong>{{ item.medicine.name if item.medicine else 'N/A' }}</strong>
+                                                <div class="text-muted small">
+                                                    {{ item.medicine.medicine_number if item.medicine else '' }}
+                                                </div>
                                             </td>
-                                            <td>
-                                                <h6>Accommodation</h6>
-                                            </td>
-                                            <td>
-                                                <h6>${{ "%.2f"|format(room_charge.amount) }}</h6>
+                                            <td class="text-center align-middle">{{ item.batch.batch_no if item.batch else 'N/A' }}</td>
+                                            <td class="text-end align-middle">{{ item.quantity }}</td>
+                                            <td class="text-end align-middle">₹{{ "%.2f"|format(item.sale_price) }}</td>
+                                            {# Changed $ to ₹ #}
+                                            <td class="text-end align-middle">{{ "%.2f"|format(item.tax_rate) }}%</td>
+                                            <td class="text-end align-middle">₹{{ "%.2f"|format(item.amount) }}</td>
+                                            {# Changed $ to ₹ #}
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4 text-muted">No items sold in this
+                                                transaction.
                                             </td>
                                         </tr>
-                                    {% endif %}
-                                    <tr>
-                                        <td>
-                                            <h6>Medical Services</h6>
-                                            <p>
-                                                Various medical services and treatments
-                                            </p>
-                                        </td>
-                                        <td>
-                                            <h6>Services</h6>
-                                        </td>
-                                        <td>
-                                            <h6>
-                                                ${{ "%.2f"|format(payment.amount - (room_charge.amount if room_charge else 0)) }}</h6>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="1">&nbsp;</td>
-                                        <td>
-                                            <p>Subtotal</p>
-                                            <p>Tax</p>
-                                            <h5 class="mt-4 text-primary">Total USD</h5>
-                                        </td>
-                                        <td>
-                                            <p>${{ "%.2f"|format(payment.amount) }}</p>
-                                            <p>$0.00</p>
-                                            <h5 class="mt-4 text-primary">${{ "%.2f"|format(payment.amount) }}</h5>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3">
-                                            <h6 class="text-danger">NOTES</h6>
-                                            <p class="small m-0">
-                                                {% if payment.remarks %}
-                                                    {{ payment.remarks }}
-                                                {% else %}
-                                                    Please make payment by the due date. For any questions regarding
-                                                    this invoice, please contact our billing department.
-                                                {% endif %}
-                                            </p>
-                                        </td>
-                                    </tr>
+                                    {% endfor %}
                                     </tbody>
+                                    <tfoot class="table-group-divider">
+                                    {# Adds a visual divider between tbody and tfoot #}
+                                    <tr>
+                                        <th colspan="6" class="text-end">Subtotal (before discount & tax)</th>
+                                        {# Adjusted colspan #}
+                                        <th class="text-end">₹{{ "%.2f"|format(sale.total_amount) }}</th>
+                                        {# Changed $ to ₹ #}
+                                    </tr>
+                                    <tr>
+                                        <th colspan="6" class="text-end">Discount</th>
+                                        {# Adjusted colspan #}
+                                        <th class="text-end">₹{{ "%.2f"|format(sale.discount_amount) }}</th>
+                                        {# Changed $ to ₹ #}
+                                    </tr>
+                                    <tr>
+                                        <th colspan="6" class="text-end">Tax</th>
+                                        {# Adjusted colspan #}
+                                        <th class="text-end">₹{{ "%.2f"|format(sale.tax_amount) }}</th>
+                                        {# Changed $ to ₹ #}
+                                    </tr>
+                                    <tr class="table-active"> {# Highlights this row #}
+                                        <th colspan="6" class="text-end fs-5">Net Amount</th>
+                                        {# Adjusted colspan, increased font size #}
+                                        <th class="text-end fs-5">₹{{ "%.2f"|format(sale.net_amount) }}</th>
+                                        {# Changed $ to ₹ #}
+                                    </tr>
+                                    <tr class="table-info"> {# Highlights this row #}
+                                        <th colspan="6" class="text-end">Paid Amount</th>
+                                        {# Adjusted colspan #}
+                                        <th class="text-end">₹{{ "%.2f"|format(sale.payment_amount) }}</th>
+                                        {# Changed $ to ₹ #}
+                                    </tr>
+                                    <tr class="table-warning"> {# Highlights this row #}
+                                        <th colspan="6" class="text-end">Due Amount</th>
+                                        {# Adjusted colspan #}
+                                        <th class="text-end">
+                                            {% set due_amount = sale.net_amount - sale.payment_amount %}
+                                            {% if due_amount > 0.01 %}
+                                                {# Check for a small positive value to avoid floating point issues #}
+                                                <span class="text-danger"><strong>₹{{ "%.2f"|format(due_amount) }}</strong></span>
+                                                {# Changed $ to ₹ #}
+                                            {% else %}
+                                                <span class="text-success"><strong>₹0.00</strong></span>
+                                                {# Changed $ to ₹ #}
+                                            {% endif %}
+                                        </th>
+                                    </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
                     </div>
-                    <!-- Row end -->
 
-                    <!-- Row start -->
-                    <div class="row">
-                        <div class="col-sm-12 col-12">
-                            <div class="d-flex justify-content-end gap-2">
-                                <button class="btn btn-outline-secondary">
-                                    Download
-                                </button>
-                                <button class="btn btn-outline-secondary" onclick="window.print()">
-                                    Print
-                                </button>
-                                {% if payment.status != 'paid' %}
-                                    <a href="{{ payment.id }}"
-                                       class="btn btn-primary">
-                                        Pay Now
-                                    </a>
-                                {% endif %}
+                    {% if sale.note %}
+                        <div class="card mt-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="ri-file-text-line me-2"></i>Notes
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {{ sale.note }}
                             </div>
                         </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-end">
+                    <div class="btn-group">
+                        <a href="{{ PATIENT + PHARMACY_SALES_PRINT }}/{{ sale.id }}"
+                           class="btn btn-primary" target="_blank">
+                            <i class="ri-printer-line me-1"></i> Print Bill
+                        </a>
                     </div>
-                    <!-- Row end -->
                 </div>
             </div>
         </div>
     </div>
-    <!-- Row end -->
+{% endblock %}
 
-{% endblock body %}
+{% block headLink %}
+    <style>
+        .card-header {
+            padding: 0.75rem 1.25rem;
+        }
+
+        dl.row dt {
+            font-weight: 500;
+        }
+
+        .table th {
+            white-space: nowrap;
+        }
+    </style>
+{% endblock %}

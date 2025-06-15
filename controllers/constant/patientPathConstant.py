@@ -24,3 +24,10 @@ PATIENT_AMBULANCE_CALLS = '/ambulance-calls'
 PATIENT_AMBULANCE_REQUESTS = '/ambulance-requests'
 PATIENT_AMBULANCE_REQUEST_NEW = '/ambulance-request/new'
 PATIENT_AMBULANCE_REQUEST_VIEW = '/ambulance-request/view'  # For a single request detail
+
+
+PHARMACY = "/pharmacy"
+PHARMACY_SALES = f"{PHARMACY}/sales"
+PHARMACY_SALES_LIST = PHARMACY_SALES
+PHARMACY_SALES_PRINT = f"{PHARMACY_SALES}/print" # Use /print/<id> in actual route
+PHARMACY_SALES_VIEW = f"{PHARMACY_SALES}/view"  # Use /view/<id> in actual route

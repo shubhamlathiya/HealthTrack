@@ -1,50 +1,130 @@
 {% extends 'base.html' %}
 
-{% block title %}Invoices{% endblock title %}
-{% block page %}Invoices{% endblock page %}
-{% block body %}
+{% block title %}Medicine Sales{% endblock title %}
 
-<div class="row">
-    <div class="col-xl-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Invoice #</th>
-                                <th>Patient</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for payment in payments %}
-                            <tr>
-                                <td>{{ payment.id }}</td>
-{#                                <td>{{ payment.patient.full_name }}</td>#}
-                                <td>${{ "%.2f"|format(payment.amount) }}</td>
-                                <td>
-                                    <span class="badge bg-{% if payment.status == 'paid' %}success{% elif payment.status == 'pending' %}warning{% else %}danger{% endif %}">
-                                        {{ payment.status|capitalize }}
-                                    </span>
-                                </td>
-                                <td>{{ payment.created_at.strftime('%Y-%m-%d') }}</td>
-                                <td>
-                                    <a href="/patient/invoice/{{ payment.id }}" class="btn btn-sm btn-primary">
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
+{% block page %}Medicine Sales{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-shopping-bag-line me-2"></i>Sales Records
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" id="flash-message">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table id="salesTable" class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Bill No.</th>
+                                <th>Date</th>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Items</th>
+                                <th class="text-end">Total ($)</th>
+                                <th class="text-end">Discount ($)</th>
+                                <th class="text-end">Net Amount ($)</th>
+                                <th class="text-end">Paid ($)</th>
+                                <th class="text-end">Refund ($)</th>
+                                <th class="text-end">Due ($)</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for sale in sales %}
+                                <tr>
+                                    <td>{{ sale.bill_no }}</td>
+                                    <td>{{ sale.sale_date }}</td>
+                                    <td>{{ sale.patient_name }}</td>
+                                    <td>{{ sale.doctor_name or 'N/A' }}</td>
+                                    <td>{{ sale.items_count }}</td>
+                                    <td class="text-end">
+                                        {% if sale.total_amount is not none %}
+                                            ₹{{ "%.2f"|format(sale.total_amount) }}
+                                        {% else %}
+                                            ₹0.00 {# Or 'N/A' if you prefer #}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">{{ "%.2f"|format(sale.discount_amount) }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(sale.net_amount) }}</td>
+                                    <td class="text-end">{{ "%.2f"|format(sale.paid_amount) }}</td>
+                                    <td class="text-end">
+                                        {% if sale.refund_amount > 0 %}
+                                            <span class="text-info">{{ "%.2f"|format(sale.refund_amount) }}</span>
+                                        {% else %}
+                                            0.00
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if sale.balance_due > 0 %}
+                                            <span class="text-danger">{{ "%.2f"|format(sale.balance_due) }}</span>
+                                        {% else %}
+                                            <span class="text-success">0.00</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if sale.balance_due > 0 %}
+                                            <span class="badge bg-warning">Due</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Paid</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <a href="{{ PATIENT + PHARMACY_SALES_PRINT }}/{{ sale.id }}"
+                                               class="btn btn-sm btn-outline-primary rounded-pill" target="_blank">
+                                                <i class="ri-printer-line me-1"></i> Print
+                                            </a>
+                                            <a href="{{ PATIENT + PHARMACY_SALES_VIEW }}/{{ sale.id }}"
+                                               class="btn btn-sm btn-outline-primary rounded-pill">
+                                                <i class="ri-eye-line me-1"></i> View
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+{% endblock %}
 
-{% endblock body %}
+{% block footerLink %}
+    <!-- DataTables JS -->
+    <script src="../../../static/assets/vendor/datatables/dataTables.min.js"></script>
+    <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize sales table with similar settings as purchases
+            $('#salesTable').DataTable({
+                responsive: true,
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search sales..."
+                },
+                columnDefs: [
+                    {orderable: false, targets: [12]} // Make actions column non-sortable
+                ]
+            });
+        });
+    </script>
+{% endblock %}

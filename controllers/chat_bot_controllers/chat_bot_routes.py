@@ -5,7 +5,7 @@ from flask import jsonify, session, render_template, request
 from controllers.chat_bot_controllers import chatbot
 from controllers.chat_bot_controllers.utils.book_appointment import handle_book_appointment_start, \
     handle_select_department, handle_select_doctor, handle_select_date, handle_select_time_slot, handle_input_reason, \
-    handle_confirm_appointment, handle_book_appointment_change_details
+    handle_confirm_appointment
 from controllers.chat_bot_controllers.utils.call_ambulance import handle_ambulance_start, \
     handle_ambulance_other_emergency_text_input, handle_ambulance_final_confirm_options, \
     handle_ambulance_pickup_location_confirm, handle_ambulance_new_pickup_location_input, \
@@ -169,7 +169,6 @@ STATE_HANDLERS = {
     'select_time_slot': handle_select_time_slot,
     'input_reason': handle_input_reason,
     'confirm_appointment': handle_confirm_appointment,
-    'book_appointment_change_details': handle_book_appointment_change_details,
 
     # --- Ambulance Request Flow ---
     'ambulance_start': handle_ambulance_start,

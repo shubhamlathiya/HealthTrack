@@ -10,3 +10,4 @@ from .appointment.prescriptions_routes import *
 from .invoice.invoice import *
 from .blood_donor.donors import *
 from .ambulance_calls import *
+from .sales_view_routes import *

@@ -71,6 +71,12 @@
                         <span class="menu-text">Chat</span>
                     </a>
                 </li>
+                <li class="{% if request.path == '/patient/pharmacy/sales' %}active current-page{% endif %}">
+                    <a href="/patient/pharmacy/sales">
+                        <i class="ri-user-line"></i>
+                        <span class="menu-text">Sales Records</span>
+                    </a>
+                </li>
                 <li class="{% if request.path == '/patients/get-visitors' %}active current-page{% endif %}">
                     <a href="/patients/get-visitors">
                         <i class="ri-user-line"></i>
