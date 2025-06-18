@@ -209,5 +209,9 @@ def logout():
     return response
 
 
+@app.route('/demo')
+def demo():  # put application's code here
+    return render_template('setup_templates/human_resource.html')
+
 if __name__ == '__main__':
     socketio.run(app, debug=True)
