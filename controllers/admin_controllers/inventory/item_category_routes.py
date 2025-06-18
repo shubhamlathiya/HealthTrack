@@ -39,7 +39,7 @@ def item_categories(current_user):
                            ITEM_CATEGORIES_IMPORT_SAMPLE=ITEM_CATEGORIES_IMPORT_SAMPLE)
 
 
-@admin.route(ITEM_CATEGORIES_ADD, methods=['POST'], endpoint='item-categories/add')
+@admin.route(ITEM_CATEGORIES_ADD, methods=['POST'], endpoint='add_item_category')
 @token_required(allowed_roles=[UserRole.ADMIN.name])
 def add_item_category(current_user):
     try:
@@ -70,7 +70,7 @@ def add_item_category(current_user):
 
 
 @admin.route(ITEM_CATEGORIES_EDIT + '/<int:id>', methods=['POST'],
-             endpoint='item-categories/<int:id>/edit')
+             endpoint='edit_item_category')
 @token_required(allowed_roles=[UserRole.ADMIN.name])
 def edit_item_category(current_user, id):
     category = ItemCategory.query.get_or_404(id)
@@ -85,7 +85,7 @@ def edit_item_category(current_user, id):
     return redirect(ADMIN + ITEM_CATEGORIES_LIST)
 
 
-@admin.route(ITEM_CATEGORIES_DELETE + '/<int:id>', methods=['POST'])
+@admin.route(ITEM_CATEGORIES_DELETE + '/<int:id>', methods=['POST'] , endpoint="delete_item_category")
 @token_required(allowed_roles=[UserRole.ADMIN.name])
 def delete_item_category(current_user, id):
     category = ItemCategory.query.get_or_404(id)

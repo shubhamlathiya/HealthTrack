@@ -17,6 +17,7 @@ from controllers.doctor_controllers import doctors
 from controllers.every_one_controllers import idCard
 from controllers.laboratory_controllers import laboratory
 from controllers.patients_controllers import patients
+from controllers.setup_controllers import setup
 from models import User, UserRole
 from models.medicineModel import MedicineUnit, MedicineGroup
 from utils.config import init_app, db
@@ -52,6 +53,7 @@ app.register_blueprint(backups_bp, url_prefix='/backups')
 app.register_blueprint(patients, url_prefix='/patient')
 app.register_blueprint(doctors, url_prefix='/doctor')
 app.register_blueprint(laboratory, url_prefix='/laboratory')
+app.register_blueprint(setup, url_prefix='/setup')
 
 app.register_blueprint(idCard, url_prefix='/id-card')
 
@@ -211,7 +213,7 @@ def logout():
 
 @app.route('/demo')
 def demo():  # put application's code here
-    return render_template('setup_templates/human_resource.html')
+    return render_template('setup_templates/operationtheatre.html')
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

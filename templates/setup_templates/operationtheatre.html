@@ -1,0 +1,367 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Settings{% endblock title %}
+{% block page %}Manage Settings{% endblock page %}
+{% block body %}
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="row">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title">Navigation</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist"
+                                 aria-orientation="vertical">
+                                <a class="nav-link active" id="v-pills-operation-tab" data-bs-toggle="pill"
+                                   href="#v-pills-operation"
+                                   role="tab" aria-controls="v-pills-operation" aria-selected="true">
+                                    <i class="ri-tools-line me-2"></i>Operation
+                                </a>
+                                <a class="nav-link" id="v-pills-operation-category-tab" data-bs-toggle="pill"
+                                   href="#v-pills-operation-category"
+                                   role="tab" aria-controls="v-pills-operation-category" aria-selected="false">
+                                    <i class="ri-folder-line me-2"></i>Operation Category
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-9 col-lg-8 col-md-8 col-sm-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title" id="contentCardTitle">Operation List</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="v-pills-tabContent">
+                                <!-- Operation Tab Content -->
+                                <div class="tab-pane fade show active" id="v-pills-operation" role="tabpanel"
+                                     aria-labelledby="v-pills-operation-tab">
+                                    <div class="p-3 text-center">
+                                        <h1 class="display-6 fw-bold text-primary">Operation List</h1>
+                                        <p class="lead mb-4">
+                                            Manage all operations in your system.
+                                        </p>
+                                        <div class="d-flex justify-content-end mb-3">
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#addOperationModal">
+                                                <i class="ri-add-line me-1"></i>Add Operation
+                                            </button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Operation Name</th>
+                                                    <th>Category</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for operation in operations %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ operation.name }}</td>
+                                                        <td>{{ operation.category.name if operation.category else 'N/A' }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-info me-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editOperationModal"
+                                                                    data-id="{{ operation.id }}"
+                                                                    data-name="{{ operation.name }}"
+                                                                    data-category="{{ operation.category.id if operation.category else '' }}">
+                                                                <i class="ri-edit-line"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger"
+                                                                    onclick="confirmDelete('{{ operation.id }}', 'operation')">
+                                                                <i class="ri-delete-bin-line"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="4">No operations found.</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Operation Category Tab Content -->
+                                <div class="tab-pane fade" id="v-pills-operation-category" role="tabpanel"
+                                     aria-labelledby="v-pills-operation-category-tab">
+                                    <div class="p-3 text-center">
+                                        <h1 class="display-6 fw-bold text-primary">Operation Category List</h1>
+                                        <p class="lead mb-4">
+                                            Manage operation categories to organize your operations.
+                                        </p>
+                                        <div class="d-flex justify-content-end mb-3">
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#addOperationCategoryModal">
+                                                <i class="ri-add-line me-1"></i>Add Category
+                                            </button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Category Name</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for category in operation_categories %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ category.name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-info me-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editOperationCategoryModal"
+                                                                    data-id="{{ category.id }}"
+                                                                    data-name="{{ category.name }}">
+                                                                <i class="ri-edit-line"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger"
+                                                                    onclick="confirmDelete('{{ category.id }}', 'operation_category')">
+                                                                <i class="ri-delete-bin-line"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="3">No categories found.</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Operation Modal -->
+            <div class="modal fade" id="addOperationModal" tabindex="-1" aria-labelledby="addOperationModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addOperationModalLabel">Add New Operation</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addOperationForm" method="POST" action="{{ SETUP + OPERATIONS_ADD }}">
+                                <div class="mb-3">
+                                    <label for="operationName" class="form-label">Operation Name</label>
+                                    <input type="text" class="form-control" id="operationName" name="name" required
+                                           placeholder="e.g., Appendectomy">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="operationCategory" class="form-label">Category</label>
+                                    <select class="form-control" id="operationCategory" name="category_id">
+                                        <option value="">Select Category</option>
+                                        {% for category in operation_categories %}
+                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Save Operation</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Operation Modal -->
+            <div class="modal fade" id="editOperationModal" tabindex="-1" aria-labelledby="editOperationModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editOperationModalLabel">Edit Operation</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editOperationForm" method="POST" action="">
+                                <input type="hidden" id="editOperationId" name="id">
+                                <div class="mb-3">
+                                    <label for="editOperationName" class="form-label">Operation Name</label>
+                                    <input type="text" class="form-control" id="editOperationName" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editOperationCategory" class="form-label">Category</label>
+                                    <select class="form-control" id="editOperationCategory" name="category_id">
+                                        <option value="">Select Category</option>
+                                        {% for category in operation_categories %}
+                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Update Operation</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Operation Category Modal -->
+            <div class="modal fade" id="addOperationCategoryModal" tabindex="-1"
+                 aria-labelledby="addOperationCategoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addOperationCategoryModalLabel">Add New Operation Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addOperationCategoryForm" method="POST"
+                                  action="{{ SETUP +  OPERATION_CATEGORIES_ADD }}">
+                                <div class="mb-3">
+                                    <label for="operationCategoryName" class="form-label">Category Name</label>
+                                    <input type="text" class="form-control" id="operationCategoryName" name="name"
+                                           required
+                                           placeholder="e.g., General Surgery">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Save Category</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Operation Category Modal -->
+            <div class="modal fade" id="editOperationCategoryModal" tabindex="-1"
+                 aria-labelledby="editOperationCategoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editOperationCategoryModalLabel">Edit Operation Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editOperationCategoryForm" method="POST" action="">
+                                <input type="hidden" id="editOperationCategoryId" name="id">
+                                <div class="mb-3">
+                                    <label for="editOperationCategoryName" class="form-label">Category Name</label>
+                                    <input type="text" class="form-control" id="editOperationCategoryName" name="name"
+                                           required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Update Category</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock body %}
+
+{% block footerLink %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Edit Operation Modal
+            const editOperationModal = document.getElementById('editOperationModal');
+            editOperationModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                const categoryId = button.getAttribute('data-category');
+
+                const modalTitle = editOperationModal.querySelector('.modal-title');
+                const form = editOperationModal.querySelector('form');
+                const idInput = editOperationModal.querySelector('#editOperationId');
+                const nameInput = editOperationModal.querySelector('#editOperationName');
+                const categoryInput = editOperationModal.querySelector('#editOperationCategory');
+
+                modalTitle.textContent = `Edit Operation: ${name}`;
+                form.action = `/setup/operations/edit/${id}`;
+                idInput.value = id;
+                nameInput.value = name;
+                categoryInput.value = categoryId || '';
+            });
+
+            // Edit Operation Category Modal
+            const editOperationCategoryModal = document.getElementById('editOperationCategoryModal');
+            editOperationCategoryModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+
+                const modalTitle = editOperationCategoryModal.querySelector('.modal-title');
+                const form = editOperationCategoryModal.querySelector('form');
+                const idInput = editOperationCategoryModal.querySelector('#editOperationCategoryId');
+                const nameInput = editOperationCategoryModal.querySelector('#editOperationCategoryName');
+
+                modalTitle.textContent = `Edit Operation Category: ${name}`;
+                form.action = `/setup/operation_categories/edit/${id}`;
+                idInput.value = id;
+                nameInput.value = name;
+            });
+
+            // Existing edit leave type modal code
+            const editLeaveTypeModal = document.getElementById('editLeaveTypeModal');
+            editLeaveTypeModal.addEventListener('show.bs.modal', function (event) {
+                // Existing leave type modal code
+            });
+
+            // Generic Delete Confirmation
+            window.confirmDelete = function (id, type) {
+                if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                    let url = '';
+                    switch (type) {
+                        case 'operation':
+                            url = `/setup/operations/delete/${id}`;
+                            break;
+                        case 'operation_category':
+                            url = `/setup/operation_categories/delete/${id}`;
+                            break;
+
+                    }
+                    if (url) {
+                        window.location.href = url;
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock footerLink %}
