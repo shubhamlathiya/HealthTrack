@@ -31,13 +31,14 @@
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <h2 class="lh-1">660</h2>
+                                    <h2 class="lh-1">{{ total_patients }}</h2> {# Dynamic Patient Count #}
                                     <p class="m-0">Patients</p>
                                 </div>
                             </div>
                             <div class="d-flex gap-2 flex-wrap align-items-center justify-content-between mt-2">
                                 <div class="text-start">
-                                    <p class="mb-0 text-primary">+40</p>
+                                    <p class="mb-0 text-primary">+{{ patients_this_month }}</p>
+                                    {# Dynamic Patients this month #}
                                     <span class="badge bg-primary-light text-primary small">this month</span>
                                 </div>
                                 <div id="sparkline1"></div>
@@ -55,13 +56,14 @@
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <h2 class="lh-1">230</h2>
+                                    <h2 class="lh-1">{{ total_appointments }}</h2> {# Dynamic Appointment Count #}
                                     <p class="m-0">Appointments</p>
                                 </div>
                             </div>
                             <div class="d-flex gap-2 flex-wrap align-items-center justify-content-between mt-2">
                                 <div class="text-start">
-                                    <p class="mb-0 text-primary">+30</p>
+                                    <p class="mb-0 text-primary">+{{ appointments_this_month }}</p>
+                                    {# Dynamic Appointments this month #}
                                     <span class="badge bg-primary-light text-primary small">this month</span>
                                 </div>
                                 <div id="sparkline2"></div>
@@ -79,13 +81,16 @@
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <h2 class="lh-1">$9900</h2>
+                                    <h2 class="lh-1">${{ "{:,.0f}".format(estimated_total_revenue) }}</h2>
+                                    {# Dynamic Total Revenue, formatted #}
                                     <p class="m-0">Revenue</p>
                                 </div>
                             </div>
                             <div class="d-flex gap-2 flex-wrap align-items-center justify-content-between mt-2">
                                 <div class="text-start">
-                                    <p class="mb-0 text-primary">+20%</p>
+                                    <p class="mb-0 text-primary">
+                                        ${{ "{:,.0f}".format(estimated_revenue_this_month) }}</p>
+                                    {# Dynamic Revenue this month #}
                                     <span class="badge bg-primary-light text-primary small">this month</span>
                                 </div>
                                 <div id="sparkline3"></div>
@@ -105,56 +110,33 @@
                         </div>
                         <div class="card-body pt-0">
 
-                            <!-- Row starts -->
                             <div class="row g-4">
-                                <div class="col-xl-4 col-sm-6 col-12">
-                                    <a href="doctors-profile.html"
-                                       class="d-flex align-items-center gap-3 appointment-card">
-                                        <img src="../../../static/assets/images/doctor1.png" class="img-3x rounded-5"
-                                             alt="Doctor Dashboard">
-                                        <div class="d-flex gap-1 flex-column flex-fill">
-                                            <div class="fw-semibold">Dr. Lillie Kennedy</div>
-                                            <div class="text-muted small">Periodontist - 9 yrs</div>
-                                            <div class="small">
-                                                <i class="ri-star-fill text-primary me-1"></i>5.0
-                                            </div>
-                                        </div>
-                                        <i class="ri-arrow-right-s-line text-primary fs-1 opacity-25"></i>
-                                    </a>
-                                </div>
-                                <div class="col-xl-4 col-sm-6 col-12">
-                                    <a href="doctors-profile.html"
-                                       class="d-flex align-items-center gap-3 appointment-card">
-                                        <img src="../../../static/assets/images/doctor3.png" class="img-3x rounded-5"
-                                             alt="Doctor Dashboard">
-                                        <div class="d-flex gap-1 flex-column flex-fill">
-                                            <div class="fw-semibold">Dr. Kerri Myers</div>
-                                            <div class="text-muted small">Endodontist - 6 yrs</div>
-                                            <div class="small">
-                                                <i class="ri-star-fill text-primary me-1"></i>4.9
-                                            </div>
-                                        </div>
-                                        <i class="ri-arrow-right-s-line text-primary fs-1 opacity-25"></i>
-                                    </a>
-                                </div>
-                                <div class="col-xl-4 col-sm-6 col-12">
-                                    <a href="doctors-profile.html"
-                                       class="d-flex align-items-center gap-3 appointment-card">
-                                        <img src="../../../static/assets/images/doctor4.png" class="img-3x rounded-5"
-                                             alt="Doctor Dashboard">
-                                        <div class="d-flex gap-1 flex-column flex-fill">
-                                            <div class="fw-semibold">Dr. Tobias Wong</div>
-                                            <div class="text-muted small">Orthodontist - 8 yrs</div>
-                                            <div class="small">
-                                                <i class="ri-star-fill text-primary me-1"></i>4.8
-                                            </div>
-                                        </div>
-                                        <i class="ri-arrow-right-s-line text-primary fs-1 opacity-25"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <!-- Row ends -->
+                                {% for doctor in available_doctors %}
+                                    <div class="col-xl-4 col-sm-6 col-12">
+                                        <a href="doctors-profile.html"
+                                                {# Consider making this dynamic if you have doctor profile pages #}
+                                           class="d-flex align-items-center gap-3 appointment-card">
+                                            <img src="{{ url_for('static', filename='assets/images/doctor1.png') }}"
+                                                 class="img-3x rounded-5" {# Update image path if dynamic #}
+                                                 alt="Dr. {{ doctor.first_name }}">
+                                            <div class="d-flex gap-1 flex-column flex-fill">
+                                                <div class="fw-semibold">
+                                                    Dr. {{ doctor.first_name }} {{ doctor.last_name }}</div>
+                                                {# Dynamic Doctor Name #}
+                                                <div class="text-muted small">{{ doctor.specialty }}
+                                                    - {{ doctor.experience_years }} yrs
+                                                </div>
 
+                                            </div>
+                                            <i class="ri-arrow-right-s-line text-primary fs-1 opacity-25"></i>
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <div class="col-12 text-center py-4">
+                                        <p class="text-muted">No doctors found.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>
