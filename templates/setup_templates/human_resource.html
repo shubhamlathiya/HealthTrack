@@ -1,20 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Invoice{% endblock title %}
-{% block page %}Create Invoice{% endblock page %}
+{% block title %}Manage Settings{% endblock title %} {# Changed title for clarity #}
+{% block page %}Manage Settings{% endblock page %} {# Changed page for clarity #}
 {% block body %}
 
-    <!-- Row start -->
     <div class="row">
         <div class="col-xl-12">
-            <div class="col-sm-12">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Custom Vertical Tabs</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="align-items-start">
-                            <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist"
+            <div class="row">
+                <div class="col-xl-3 col-lg-4 col-md-4 col-sm-12 mb-4"> {# Adjusted column sizes for tabs #}
+                    <div class="card h-100"> {# Use h-100 to make card fill height #}
+                        <div class="card-header">
+                            <h5 class="card-title">Navigation</h5>
+                        </div>
+                        <div class="card-body p-0"> {# p-0 to remove padding, nav-pills will add its own #}
+                            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist"
                                  aria-orientation="vertical">
                                 <a class="nav-link active" id="v-pills-leave-type-tab" data-bs-toggle="pill"
                                    href="#v-pills-leave-type"
@@ -29,9 +28,20 @@
                                 <a class="nav-link" id="v-pills-specialist-tab" data-bs-toggle="pill"
                                    href="#v-pills-specialist"
                                    role="tab" aria-controls="v-pills-specialist" aria-selected="false">
-                                    <i class="ri-emoji-sticker-line me-2"></i>Specialist
+                                    <i class="ri-emoji-sticker-line me-2"></i>Specialization
                                 </a>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-9 col-lg-8 col-md-8 col-sm-12 mb-4"> {# Adjusted column sizes for content #}
+                    <div class="card h-100"> {# Use h-100 to make card fill height #}
+                        <div class="card-header">
+                            <h5 class="card-title" id="contentCardTitle">Leave Type List</h5>
+                            {# Dynamic title for content card #}
+                        </div>
+                        <div class="card-body">
                             <div class="tab-content" id="v-pills-tabContent">
                                 <div class="tab-pane fade show active" id="v-pills-leave-type" role="tabpanel"
                                      aria-labelledby="v-pills-leave-type-tab">
@@ -53,33 +63,34 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Leave Type Name</th>
-                                                    <th>Description</th>
                                                     <th>Actions</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Annual Leave</td>
-                                                    <td>Standard paid time off for employees.</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-info me-2"><i
-                                                                class="ri-edit-line"></i></button>
-                                                        <button class="btn btn-sm btn-danger"><i
-                                                                class="ri-delete-bin-line"></i></button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2</td>
-                                                    <td>Sick Leave</td>
-                                                    <td>Time off for illness or medical appointments.</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-info me-2"><i
-                                                                class="ri-edit-line"></i></button>
-                                                        <button class="btn btn-sm btn-danger"><i
-                                                                class="ri-delete-bin-line"></i></button>
-                                                    </td>
-                                                </tr>
+                                                {% for leave_type in leave_types %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ leave_type.name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-info me-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editLeaveTypeModal"
+                                                                    data-id="{{ leave_type.id }}"
+                                                                    data-name="{{ leave_type.name }}"
+                                                                    data-description="{{ leave_type.description if leave_type.description else '' }}">
+                                                                <i class="ri-edit-line"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger"
+                                                                    onclick="confirmDelete('{{ leave_type.id }}', 'leave_type')">
+                                                                <i class="ri-delete-bin-line"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="3">No leave types found.</td>
+                                                    </tr>
+                                                {% endfor %}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -105,33 +116,33 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Designation Name</th>
-                                                    <th>Department</th>
                                                     <th>Actions</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Software Engineer</td>
-                                                    <td>Engineering</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-info me-2"><i
-                                                                class="ri-edit-line"></i></button>
-                                                        <button class="btn btn-sm btn-danger"><i
-                                                                class="ri-delete-bin-line"></i></button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2</td>
-                                                    <td>Marketing Manager</td>
-                                                    <td>Marketing</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-info me-2"><i
-                                                                class="ri-edit-line"></i></button>
-                                                        <button class="btn btn-sm btn-danger"><i
-                                                                class="ri-delete-bin-line"></i></button>
-                                                    </td>
-                                                </tr>
+                                                {% for designation in designations %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ designation.name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-info me-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editDesignationModal"
+                                                                    data-id="{{ designation.id }}"
+                                                                    data-name="{{ designation.name }}">
+                                                                <i class="ri-edit-line"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger"
+                                                                    onclick="confirmDelete('{{ designation.id }}', 'designation')">
+                                                                <i class="ri-delete-bin-line"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="2">No designations found.</td>
+                                                    </tr>
+                                                {% endfor %}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -141,14 +152,14 @@
                                 <div class="tab-pane fade" id="v-pills-specialist" role="tabpanel"
                                      aria-labelledby="v-pills-specialist-tab">
                                     <div class="p-3 text-center">
-                                        <h1 class="display-6 fw-bold text-primary">Specialist List</h1>
+                                        <h1 class="display-6 fw-bold text-primary">Specialization List</h1>
                                         <p class="lead mb-4">
-                                            View and manage your organization's specialists.
+                                            View and manage your organization's specializations.
                                         </p>
                                         <div class="d-flex justify-content-end mb-3">
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                    data-bs-target="#addSpecialistModal">
-                                                <i class="ri-add-line me-1"></i>Add Specialist
+                                                    data-bs-target="#addSpecializationModal">
+                                                <i class="ri-add-line me-1"></i>Add Specialization
                                             </button>
                                         </div>
                                         <div class="table-responsive">
@@ -156,39 +167,42 @@
                                                 <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>Specialist Area</th>
-                                                    <th>Description</th>
+                                                    <th>Specialization Name</th>
                                                     <th>Actions</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Front-end Development</td>
-                                                    <td>Expert in user interface and experience.</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-info me-2"><i
-                                                                class="ri-edit-line"></i></button>
-                                                        <button class="btn btn-sm btn-danger"><i
-                                                                class="ri-delete-bin-line"></i></button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2</td>
-                                                    <td>Cloud Infrastructure</td>
-                                                    <td>Proficient in cloud platform management.</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-info me-2"><i
-                                                                class="ri-edit-line"></i></button>
-                                                        <button class="btn btn-sm btn-danger"><i
-                                                                class="ri-delete-bin-line"></i></button>
-                                                    </td>
-                                                </tr>
+                                                {% for specialization in specializations %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ specialization.name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-info me-2"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editSpecializationModal"
+                                                                    data-id="{{ specialization.id }}"
+                                                                    data-name="{{ specialization.name }}"
+                                                                    data-description="{{ specialization.description if specialization.description else '' }}">
+                                                                <i class="ri-edit-line"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger"
+                                                                    onclick="confirmDelete('{{ specialization.id }}', 'specialization')">
+                                                                <i class="ri-delete-bin-line"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="2">No specializations found.</td>
+                                                    </tr>
+                                                {% endfor %}
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
                                 </div>
+
+
                             </div>
                         </div>
                     </div>
@@ -204,22 +218,55 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form>
+                            <form id="addLeaveTypeForm" method="POST" action="">
                                 <div class="mb-3">
                                     <label for="leaveTypeName" class="form-label">Leave Type Name</label>
-                                    <input type="text" class="form-control" id="leaveTypeName"
+                                    <input type="text" class="form-control" id="leaveTypeName" name="name" required
                                            placeholder="e.g., Casual Leave">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="leaveTypeDescription" class="form-label">Description</label>
-                                    <textarea class="form-control" id="leaveTypeDescription" rows="3"
+                                    <label for="leaveTypeDescription" class="form-label">Description (Optional)</label>
+                                    <textarea class="form-control" id="leaveTypeDescription" name="description" rows="3"
                                               placeholder="Brief description of the leave type"></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Save Leave Type</button>
                                 </div>
                             </form>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save Leave Type</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="editLeaveTypeModal" tabindex="-1" aria-labelledby="editLeaveTypeModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editLeaveTypeModalLabel">Edit Leave Type</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editLeaveTypeForm" method="POST" action=""> {# Action set by JS #}
+                                <input type="hidden" id="editLeaveTypeId" name="id">
+                                <div class="mb-3">
+                                    <label for="editLeaveTypeName" class="form-label">Leave Type Name</label>
+                                    <input type="text" class="form-control" id="editLeaveTypeName" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editLeaveTypeDescription" class="form-label">Description
+                                        (Optional)</label>
+                                    <textarea class="form-control" id="editLeaveTypeDescription" name="description"
+                                              rows="3"></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Update Leave Type</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -234,60 +281,106 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form>
+                            <form id="addDesignationForm" method="POST" action="">
                                 <div class="mb-3">
                                     <label for="designationName" class="form-label">Designation Name</label>
-                                    <input type="text" class="form-control" id="designationName"
+                                    <input type="text" class="form-control" id="designationName" name="name" required
                                            placeholder="e.g., Senior Developer">
                                 </div>
-                                <div class="mb-3">
+                                {# If Designation links to Department, you'd use a select here #}
+                                {# <div class="mb-3">
                                     <label for="designationDepartment" class="form-label">Department</label>
-                                    <input type="text" class="form-control" id="designationDepartment"
-                                           placeholder="e.g., IT Department">
+                                    <select class="form-control" id="designationDepartment" name="department_id">
+                                        {% for dept in departments %}
+                                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div> #}
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Save Designation</button>
                                 </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save Designation</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="modal fade" id="addSpecialistModal" tabindex="-1" aria-labelledby="addSpecialistModalLabel"
+            <div class="modal fade" id="addSpecializationModal" tabindex="-1"
+                 aria-labelledby="addSpecializationModalLabel" {# Consistent name #}
                  aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="addSpecialistModalLabel">Add New Specialist</h5>
+                            <h5 class="modal-title" id="addSpecializationModalLabel">Add New Specialization</h5>
+                            {# Consistent name #}
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form>
+                            <form id="addSpecializationForm" method="POST" action="">
+                                {# Consistent name #}
                                 <div class="mb-3">
-                                    <label for="specialistArea" class="form-label">Specialist Area</label>
-                                    <input type="text" class="form-control" id="specialistArea"
+                                    <label for="specializationName" class="form-label">Specialization Name</label>
+                                    {# Consistent name #}
+                                    <input type="text" class="form-control" id="specializationName" name="name" required
                                            placeholder="e.g., UI/UX Design">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="specialistDescription" class="form-label">Description</label>
-                                    <textarea class="form-control" id="specialistDescription" rows="3"
-                                              placeholder="Brief description of the specialist area"></textarea>
+                                    <label for="specializationDescription" class="form-label">Description
+                                        (Optional)</label> {# Consistent name #}
+                                    <textarea class="form-control" id="specializationDescription" name="description"
+                                              rows="3"
+                                              placeholder="Brief description of the specialization area"></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Save Specialization</button>
                                 </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save Specialist</button>
                         </div>
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
-    <!-- Row end -->
-
 {% endblock body %}
 
-{% block footerLink %}{% endblock footerLink %}
+{% block footerLink %}
+    <script>
+        // JavaScript for handling edit modals and delete confirmation
+        document.addEventListener('DOMContentLoaded', function () {
+            // Edit Leave Type Modal
+            const editLeaveTypeModal = document.getElementById('editLeaveTypeModal');
+            editLeaveTypeModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                const description = button.getAttribute('data-description');
+
+                const modalTitle = editLeaveTypeModal.querySelector('.modal-title');
+                const form = editLeaveTypeModal.querySelector('form');
+                const idInput = editLeaveTypeModal.querySelector('#editLeaveTypeId');
+                const nameInput = editLeaveTypeModal.querySelector('#editLeaveTypeName');
+                const descriptionInput = editLeaveTypeModal.querySelector('#editLeaveTypeDescription');
+
+                modalTitle.textContent = `Edit Leave Type: ${name}`;
+                form.action = `{{ 0 }}`.replace('0', id); // Set action dynamically
+                idInput.value = id;
+                nameInput.value = name;
+                descriptionInput.value = description;
+            });
+
+            // Generic Delete Confirmation
+            window.confirmDelete = function (url) {
+                if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                    // You can perform an AJAX delete or redirect to a delete URL
+                    window.location.href = url;
+                }
+            }
+        });
+    </script>
+{% endblock footerLink %}

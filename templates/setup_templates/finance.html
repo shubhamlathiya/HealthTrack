@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Finance Management{% endblock title %}
+{% block page %}Finance Management{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title" id="financeCardTitle">Income Head</h5> {# Dynamic title for content #}
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-start">
+                        <div class="nav flex-column nav-pills me-3" id="v-pills-finance-tab" role="tablist"
+                             aria-orientation="vertical">
+                            <a class="nav-link active" id="v-pills-income-head-form-tab" data-bs-toggle="pill"
+                               href="#v-pills-income-head-form" role="tab" aria-controls="v-pills-income-head-form"
+                               aria-selected="true">
+                                <i class="ri-money-dollar-circle-line me-2"></i>Income Head
+                            </a>
+                            <a class="nav-link" id="v-pills-expense-head-form-tab" data-bs-toggle="pill"
+                               href="#v-pills-expense-head-form" role="tab" aria-controls="v-pills-expense-head-form"
+                               aria-selected="false">
+                                <i class="ri-wallet-line me-2"></i>Expense Head
+                            </a>
+
+                        </div>
+
+                        <div class="tab-content w-100" id="v-pills-finance-tabContent">
+                            <div class="tab-pane fade show active" id="v-pills-income-head-form" role="tabpanel"
+                                 aria-labelledby="v-pills-income-head-form-tab">
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-expense-head-form" role="tabpanel"
+                                 aria-labelledby="v-pills-expense-head-form-tab">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {# Modals for edit/delete if needed, or define them in the included files #}
+
+{% endblock body %}
+
+{% block footerLink %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const vPillsFinanceTab = document.getElementById('v-pills-finance-tab');
+            const financeCardTitle = document.getElementById('financeCardTitle');
+
+            // Function to update the main card title based on active tab
+            function updateFinanceCardTitle(tabId) {
+                let newTitle = 'Finance Management'; // Default title
+
+                switch (tabId) {
+                    case 'v-pills-income-head-form':
+                        newTitle = 'Add New Income Head';
+                        break;
+                    case 'v-pills-expense-head-form':
+                        newTitle = 'Add New Expense Head';
+                        break;
+                    case 'v-pills-income-head-list':
+                        newTitle = 'Income Head List';
+                        break;
+                    case 'v-pills-expense-head-list': // For optional Expense Head List
+                        newTitle = 'Expense Head List';
+                        break;
+                    // Add cases for any other tabs
+                }
+                financeCardTitle.textContent = newTitle;
+            }
+
+            // Listen for Bootstrap tab shown event
+            vPillsFinanceTab.addEventListener('shown.bs.tab', function (event) {
+                const activeTabHref = event.target.getAttribute('href');
+                if (activeTabHref) {
+                    const activeTabId = activeTabHref.substring(1); // Get href without #
+                    updateFinanceCardTitle(activeTabId);
+                }
+            });
+
+            // Set initial title when page loads
+            const initialActiveLink = vPillsFinanceTab.querySelector('.nav-link.active');
+            if (initialActiveLink) {
+                const initialTabId = initialActiveLink.getAttribute('href').substring(1);
+                updateFinanceCardTitle(initialTabId);
+            }
+
+            
+        });
+    </script>
+{% endblock footerLink %}

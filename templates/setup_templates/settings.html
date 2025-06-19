@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}System Settings{% endblock title %}
+{% block page %}System Settings{% endblock page %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">System Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-start">
+                        <div class="nav flex-column nav-pills me-3" id="v-pills-settings-tab" role="tablist"
+                             aria-orientation="vertical">
+                            <a class="nav-link active" id="v-pills-general-tab" data-bs-toggle="pill"
+                               href="#v-pills-general" role="tab" aria-controls="v-pills-general" aria-selected="true">
+                                <i class="ri-settings-4-line me-2"></i>General Setting
+                            </a>
+                            <a class="nav-link" id="v-pills-attendance-tab" data-bs-toggle="pill"
+                               href="#v-pills-attendance" role="tab" aria-controls="v-pills-attendance"
+                               aria-selected="false">
+                                <i class="ri-time-line me-2"></i>Attendance Setting
+                            </a>
+                            <a class="nav-link" id="v-pills-notification-tab" data-bs-toggle="pill"
+                               href="#v-pills-notification" role="tab" aria-controls="v-pills-notification"
+                               aria-selected="false">
+                                <i class="ri-notification-3-line me-2"></i>Notification Setting
+                            </a>
+                            <a class="nav-link" id="v-pills-system-notification-tab" data-bs-toggle="pill"
+                               href="#v-pills-system-notification" role="tab"
+                               aria-controls="v-pills-system-notification" aria-selected="false">
+                                <i class="ri-alert-line me-2"></i>System Notification Setting
+                            </a>
+                            <a class="nav-link" id="v-pills-sms-tab" data-bs-toggle="pill"
+                               href="#v-pills-sms" role="tab" aria-controls="v-pills-sms" aria-selected="false">
+                                <i class="ri-message-3-line me-2"></i>SMS Setting
+                            </a>
+                            <a class="nav-link" id="v-pills-email-tab" data-bs-toggle="pill"
+                               href="#v-pills-email" role="tab" aria-controls="v-pills-email" aria-selected="false">
+                                <i class="ri-mail-line me-2"></i>Email Setting
+                            </a>
+                            <a class="nav-link" id="v-pills-payment-tab" data-bs-toggle="pill"
+                               href="#v-pills-payment" role="tab" aria-controls="v-pills-payment" aria-selected="false">
+                                <i class="ri-bank-card-line me-2"></i>Payment Methods
+                            </a>
+                            <a class="nav-link" id="v-pills-front-cms-tab" data-bs-toggle="pill"
+                               href="#v-pills-front-cms" role="tab" aria-controls="v-pills-front-cms"
+                               aria-selected="false">
+                                <i class="ri-layout-line me-2"></i>Front CMS Setting
+                            </a>
+                            <a class="nav-link" id="v-pills-prefix-tab" data-bs-toggle="pill"
+                               href="#v-pills-prefix" role="tab" aria-controls="v-pills-prefix" aria-selected="false">
+                                <i class="ri-numbers-line me-2"></i>Prefix Setting
+                            </a>
+                            <a class="nav-link" id="v-pills-roles-tab" data-bs-toggle="pill"
+                               href="#v-pills-roles" role="tab" aria-controls="v-pills-roles" aria-selected="false">
+                                <i class="ri-key-line me-2"></i>Roles Permissions
+                            </a>
+                            <a class="nav-link" id="v-pills-backup-tab" data-bs-toggle="pill"
+                               href="#v-pills-backup" role="tab" aria-controls="v-pills-backup" aria-selected="false">
+                                <i class="ri-database-2-line me-2"></i>Backup / Restore
+                            </a>
+                            <a class="nav-link" id="v-pills-languages-tab" data-bs-toggle="pill"
+                               href="#v-pills-languages" role="tab" aria-controls="v-pills-languages"
+                               aria-selected="false">
+                                <i class="ri-translate-2-line me-2"></i>Languages
+                            </a>
+                            <a class="nav-link" id="v-pills-users-tab" data-bs-toggle="pill"
+                               href="#v-pills-users" role="tab" aria-controls="v-pills-users" aria-selected="false">
+                                <i class="ri-group-line me-2"></i>Users
+                            </a>
+                            <a class="nav-link" id="v-pills-captcha-tab" data-bs-toggle="pill"
+                               href="#v-pills-captcha" role="tab" aria-controls="v-pills-captcha" aria-selected="false">
+                                <i class="ri-robot-line me-2"></i>Captcha Settings
+                            </a>
+                            <a class="nav-link" id="v-pills-modules-tab" data-bs-toggle="pill"
+                               href="#v-pills-modules" role="tab" aria-controls="v-pills-modules" aria-selected="false">
+                                <i class="ri-plug-line me-2"></i>Modules
+                            </a>
+                            <a class="nav-link" id="v-pills-system-update-tab" data-bs-toggle="pill"
+                               href="#v-pills-system-update" role="tab" aria-controls="v-pills-system-update"
+                               aria-selected="false">
+                                <i class="ri-refresh-line me-2"></i>System Update
+                            </a>
+                        </div>
+
+                        <div class="tab-content w-100" id="v-pills-settings-tabContent">
+                            <div class="tab-pane fade show active" id="v-pills-general" role="tabpanel"
+                                 aria-labelledby="v-pills-general-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-attendance" role="tabpanel"
+                                 aria-labelledby="v-pills-attendance-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-notification" role="tabpanel"
+                                 aria-labelledby="v-pills-notification-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-system-notification" role="tabpanel"
+                                 aria-labelledby="v-pills-system-notification-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-sms" role="tabpanel"
+                                 aria-labelledby="v-pills-sms-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-email" role="tabpanel"
+                                 aria-labelledby="v-pills-email-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-payment" role="tabpanel"
+                                 aria-labelledby="v-pills-payment-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-front-cms" role="tabpanel"
+                                 aria-labelledby="v-pills-front-cms-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-prefix" role="tabpanel"
+                                 aria-labelledby="v-pills-prefix-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-roles" role="tabpanel"
+                                 aria-labelledby="v-pills-roles-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-backup" role="tabpanel"
+                                 aria-labelledby="v-pills-backup-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-languages" role="tabpanel"
+                                 aria-labelledby="v-pills-languages-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-users" role="tabpanel"
+                                 aria-labelledby="v-pills-users-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-captcha" role="tabpanel"
+                                 aria-labelledby="v-pills-captcha-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-modules" role="tabpanel"
+                                 aria-labelledby="v-pills-modules-tab">
+
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-system-update" role="tabpanel"
+                                 aria-labelledby="v-pills-system-update-tab">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block footerLink %}
+    <script>
+        // Optional: If you want to change the card-header title based on the active tab
+        document.addEventListener('DOMContentLoaded', function () {
+            const vPillsSettingsTab = document.getElementById('v-pills-settings-tab');
+            const mainCardTitle = document.querySelector('.card-header h5.card-title');
+
+            vPillsSettingsTab.addEventListener('shown.bs.tab', function (event) {
+                const activeNavLink = event.target;
+                mainCardTitle.textContent = activeNavLink.textContent.trim();
+            });
+
+            // Set initial title on page load
+            const initialActiveLink = vPillsSettingsTab.querySelector('.nav-link.active');
+            if (initialActiveLink) {
+                mainCardTitle.textContent = initialActiveLink.textContent.trim();
+            }
+        });
+    </script>
+{% endblock footerLink %}

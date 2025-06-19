@@ -696,6 +696,24 @@
                         <li><a href="/admin/reports/custom"><i class="ri-file-chart-line"></i> Custom Reports</a></li>
                     </ul>
                 </li>
+                <li class="treeview {% if request.path.startswith('/setup') or request.path.startswith('/admin/department') or request.path.startswith('/admin/edit-department') %}active current-page{% endif %}">
+                    <a href="#!">
+                        <i class="ri-building-2-line"></i>
+                        <span class="menu-text">SetUp</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/setup/operations"
+                               class="{% if request.path == '/setup/operations' %}active-sub{% endif %}">Settings</a>
+                        </li>
+                        <li>
+                            <a href="/setup/operations"
+                               class="{% if request.path == '/setup/operations' %}active-sub{% endif %}">Operations</a>
+                        </li>
+                    </ul>
+                </li>
+
+
 
             {% elif session['role'] == 'DOCTOR' %}
                 <li class="{% if request.path == '/doctor/dashboard' %}active current-page{% endif %}">
