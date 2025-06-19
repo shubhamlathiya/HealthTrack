@@ -61,3 +61,33 @@ class AppointmentTreatment(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+import uuid
+
+
+class Survey(db.Model):
+    __tablename__ = 'surveys'  # Explicitly define table name (recommended for clarity)
+
+    id = db.Column(db.Integer, primary_key=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'),
+                               nullable=False)  # Ensure 'appointments.id' matches your Appointment table name
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'),
+                           nullable=False)  # Ensure 'patient.id' matches your Patient table name
+
+    survey_token = db.Column(db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
+
+    is_taken = db.Column(db.Boolean, default=False, nullable=False)  # Added nullable=False for boolean
+    submitted_at = db.Column(db.DateTime, nullable=True)  # Will be NULL until survey is submitted
+
+    overall_experience = db.Column(db.Integer, nullable=True)  # e.g., 1-5 rating
+    doctor_communication = db.Column(db.Integer, nullable=True)
+    staff_friendliness = db.Column(db.Integer, nullable=True)
+    facility_cleanliness = db.Column(db.Integer, nullable=True)
+    comments = db.Column(db.Text, nullable=True)
+
+    appointment = db.relationship('Appointment', backref=db.backref('surveys', lazy=True, cascade="all, delete-orphan"))
+    patient = db.relationship('Patient', backref=db.backref('surveys', lazy=True, cascade="all, delete-orphan"))
+
+    def __repr__(self):
+        return f'<Survey {self.id} for Appointment {self.appointment_id} (Token: {self.survey_token[:8]}...)>'

@@ -7,7 +7,7 @@ from controllers.constant.patientPathConstant import VIEW_APPOINTMENT, PATIENT, 
     RESCHEDULE_APPOINTMENT, CANCEL_APPOINTMENT
 from controllers.patients_controllers import patients
 from middleware.auth_middleware import token_required
-from models.appointmentModel import Appointment, AppointmentTreatment
+from models.appointmentModel import Appointment, AppointmentTreatment, Survey
 from models.departmentModel import Department
 from models.doctorModel import Doctor
 from models.patientModel import Patient
@@ -161,12 +161,12 @@ def reschedule_appointment(current_user, appointment_id):
         # Verify ownership
         if not patient or original_appointment.patient_id != patient.id:
             flash('Unauthorized access to appointment', 'error')
-            return redirect("/patient/appointment")
+            return redirect(PATIENT + VIEW_APPOINTMENT)
 
         # Only allow rescheduling of scheduled appointments
         if original_appointment.status != 'scheduled':
             flash('Only scheduled appointments can be rescheduled', 'error')
-            return redirect("/patient/appointment")
+            return redirect(PATIENT + VIEW_APPOINTMENT)
 
         # Get form data
         new_date_str = request.form.get('date')
@@ -176,14 +176,14 @@ def reschedule_appointment(current_user, appointment_id):
         # Validate inputs
         if not new_date_str or not time_slot_str:
             flash('Please select both date and time slot', 'error')
-            return redirect("/patient/appointment")
+            return redirect(PATIENT + VIEW_APPOINTMENT)
 
         try:
             new_date = datetime.strptime(new_date_str, '%Y-%m-%d').date()
             start_time = datetime.strptime(time_slot_str, '%H:%M:%S').time()
         except ValueError:
             flash('Invalid date or time format', 'error')
-            return redirect("/patient/appointment")
+            return redirect(PATIENT + VIEW_APPOINTMENT)
 
         # Calculate end time (assuming 30-minute slots)
         end_time = (datetime.combine(date.min, start_time) + timedelta(minutes=30)).time()
@@ -214,7 +214,7 @@ def reschedule_appointment(current_user, appointment_id):
 
         if conflicting_appointment:
             flash('The selected time slot is no longer available', 'error')
-            return redirect("/patient/appointment")
+            return redirect(PATIENT + VIEW_APPOINTMENT)
 
         # Update the appointment
         original_appointment.date = new_date
@@ -230,12 +230,12 @@ def reschedule_appointment(current_user, appointment_id):
         # send_reschedule_confirmation(current_user, original_appointment)
 
         flash('Appointment successfully rescheduled', 'success')
-        return redirect("/patient/appointment")
+        return redirect(PATIENT + VIEW_APPOINTMENT)
 
     except Exception as e:
         db.session.rollback()
         flash('An error occurred while rescheduling your appointment', 'error')
-        return redirect("/patient/appointment")
+        return redirect(PATIENT + VIEW_APPOINTMENT)
 
 
 @patients.route(CANCEL_APPOINTMENT + '/<int:appointment_id>', methods=['POST'])
@@ -247,11 +247,11 @@ def cancel_appointment(current_user, appointment_id):
 
     if appointment.patient_id != patient.id:
         flash('Unauthorized to cancel this appointment.', 'danger')
-        return redirect("/patient/appointment")
+        return redirect(PATIENT + VIEW_APPOINTMENT)
 
     if appointment.status != 'scheduled':
         flash('Only scheduled appointments can be canceled.', 'warning')
-        return redirect("/patient/appointment")
+        return redirect(PATIENT + VIEW_APPOINTMENT)
 
     appointment.status = 'canceled'
     appointment.canceled_at = datetime.utcnow()
@@ -266,4 +266,125 @@ def cancel_appointment(current_user, appointment_id):
     send_email(subject, user.email, body_html)
 
     flash('Your appointment has been successfully canceled.', 'success')
-    return redirect("/patient/appointment")
+    return redirect(PATIENT + VIEW_APPOINTMENT)
+
+
+# --- New Survey Routes ---
+
+# Route to display the survey form
+@patients.route('/survey/<int:appointment_id>', methods=['GET'])
+@token_required(allowed_roles=[UserRole.PATIENT.name])
+def take_survey(current_user, appointment_id):
+    # 1. Fetch the Appointment first to ensure it exists and belongs to the patient
+    appointment = Appointment.query.get(appointment_id)
+    patient = Patient.query.filter_by(user_id=current_user).first()
+    if not appointment:
+        flash('Appointment not found.', 'danger')
+        return redirect(PATIENT + VIEW_APPOINTMENT)
+
+    # 2. Ensure the appointment belongs to the current logged-in patient
+    # current_user from token_required should be the patient object or their ID
+    if int(appointment.patient_id) != int(patient.id):  # Assuming current_user has an 'id' attribute
+        flash('You are not authorized to access this survey for this appointment.', 'danger')
+        return redirect(PATIENT + VIEW_APPOINTMENT)
+
+    # 3. Check if the appointment status is 'completed'
+    if appointment.status != 'Completed':
+        flash('Feedback can only be provided for completed appointments.', 'info')
+        return redirect(PATIENT + VIEW_APPOINTMENT)
+
+    # 4. Check if a survey already exists and has been taken for this specific appointment
+    # We should query for a survey linked to THIS appointment ID
+    survey = Survey.query.filter_by(appointment_id=appointment_id).first()
+
+    if survey and survey.is_taken:
+        flash('You have already submitted feedback for this appointment. Thank you!', 'info')
+        # You might want to pass the survey object to the template if you want to show past answers
+        return render_template(
+            'patient_templates/appointment/survey.html',
+            survey_taken=True,
+            survey_data=survey,  # Pass the existing survey data
+            appointment=appointment,
+            PATIENT=PATIENT,
+            VIEW_APPOINTMENT=VIEW_APPOINTMENT            # Pass appointment details if needed
+        )
+
+    # 5. If no survey exists or it's not taken, create a new one (if not already existing and not taken)
+    # This ensures a survey record is created when the patient first attempts to give feedback
+    # It also handles cases where a survey wasn't automatically created upon completion.
+    if not survey:
+        try:
+            survey = Survey(
+                appointment_id=appointment.id,
+                patient_id=patient.id,
+                # survey_token will be auto-generated by the model default
+            )
+            db.session.add(survey)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error initiating survey: {e}', 'danger')
+            return redirect(PATIENT + VIEW_APPOINTMENT)
+
+    # If we reach here, it means we have an untaken survey (either existing or newly created)
+    # Pass the survey's unique token to the template for form submission
+    # The template relies on 'survey_token' for the form action, so we must provide it.
+    return render_template(
+        'patient_templates/appointment/survey.html',
+        survey_taken=False,
+        survey_token=survey.survey_token,  # This is crucial for the POST route
+        appointment=appointment,
+        PATIENT=PATIENT,
+        VIEW_APPOINTMENT=VIEW_APPOINTMENT
+        # Pass appointment details if needed
+    )
+
+
+# Route to handle survey submission
+@patients.route('/survey/<string:survey_token>/submit', methods=['POST'])
+@token_required(allowed_roles=[UserRole.PATIENT.name])
+def submit_survey(current_user, survey_token):
+    survey = Survey.query.filter_by(survey_token=survey_token).first()
+
+    if not survey:
+        flash('Invalid survey link.', 'danger')
+        return redirect(PATIENT + VIEW_APPOINTMENT)
+
+    patient = Patient.query.filter_by(user_id=current_user).first()
+    if survey.patient_id != patient.id:
+        flash('You are not authorized to submit this survey.', 'danger')
+        return redirect(PATIENT + VIEW_APPOINTMENT)
+
+    if survey.is_taken:
+        flash('You have already submitted feedback for this appointment. Thank you!', 'info')
+        return redirect(PATIENT + VIEW_APPOINTMENT)
+
+    try:
+        # Get data from the form
+        overall_experience = request.form.get('overall_experience', type=int)
+        doctor_communication = request.form.get('doctor_communication', type=int)
+        comments = request.form.get('comments')
+
+        # Basic validation (add more robust validation as needed)
+        if overall_experience is None or not (1 <= overall_experience <= 5):
+            flash('Please select an overall experience rating.', 'warning')
+            return redirect(PATIENT + VIEW_APPOINTMENT)
+        if doctor_communication is None or not (1 <= doctor_communication <= 5):
+            flash('Please select a doctor communication rating.', 'warning')
+            return redirect(PATIENT + VIEW_APPOINTMENT)
+
+        # Update the survey record
+        survey.overall_experience = overall_experience
+        survey.doctor_communication = doctor_communication
+        survey.comments = comments
+        survey.is_taken = True
+        survey.submitted_at = datetime.now()
+
+        db.session.commit()
+        flash('Thank you for your valuable feedback!', 'success')
+        return redirect(PATIENT + VIEW_APPOINTMENT)
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred while submitting your feedback: {e}', 'danger')
+        return redirect(PATIENT + VIEW_APPOINTMENT)

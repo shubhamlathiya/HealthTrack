@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Give Feedback{% endblock %}
+{% block page %}Patient Feedback Survey{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="card-title mb-0">
+                        <i class="ri-feedback-line me-2"></i>Share Your Experience
+                    </h4>
+                    <p class="mb-0">Your feedback helps us improve our services.</p>
+                </div>
+                <div class="card-body p-4">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% if survey_taken %}
+                        <div class="alert alert-info text-center" role="alert">
+                            <i class="ri-check-double-line me-2"></i>You have already submitted feedback for this
+                            appointment. Thank you!
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ PATIENT + VIEW_APPOINTMENT }}" class="btn btn-primary">
+                                <i class="ri-arrow-left-line me-1"></i> Back to Appointments
+                            </a>
+                        </div>
+                    {% else %}
+                        <form method="POST" action="{{ url_for('patient.submit_survey', survey_token=survey_token) }}">
+                            <div class="mb-4">
+                                <h6 class="text-primary mb-3">1. Overall Experience</h6>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="overall_experience" id="overall5"
+                                           value="5" required>
+                                    <label class="form-check-label" for="overall5">Excellent (5)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="overall_experience" id="overall4"
+                                           value="4">
+                                    <label class="form-check-label" for="overall4">Good (4)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="overall_experience" id="overall3"
+                                           value="3">
+                                    <label class="form-check-label" for="overall3">Average (3)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="overall_experience" id="overall2"
+                                           value="2">
+                                    <label class="form-check-label" for="overall2">Poor (2)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="overall_experience" id="overall1"
+                                           value="1">
+                                    <label class="form-check-label" for="overall1">Very Poor (1)</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="text-primary mb-3">2. Doctor's Communication</h6>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="doctor_communication"
+                                           id="docComm5" value="5" required>
+                                    <label class="form-check-label" for="docComm5">Excellent (5)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="doctor_communication"
+                                           id="docComm4" value="4">
+                                    <label class="form-check-label" for="docComm4">Good (4)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="doctor_communication"
+                                           id="docComm3" value="3">
+                                    <label class="form-check-label" for="docComm3">Average (3)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="doctor_communication"
+                                           id="docComm2" value="2">
+                                    <label class="form-check-label" for="docComm2">Poor (2)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="doctor_communication"
+                                           id="docComm1" value="1">
+                                    <label class="form-check-label" for="docComm1">Very Poor (1)</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="comments" class="form-label text-primary">3. Any additional comments or
+                                    suggestions?</label>
+                                <textarea class="form-control" id="comments" name="comments" rows="4"
+                                          placeholder="Type your comments here..."></textarea>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="ri-send-plane-line me-2"></i>Submit Feedback
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

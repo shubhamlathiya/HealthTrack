@@ -71,6 +71,15 @@
                                                 <i class="ri-file-text-line me-1"></i> View Prescription
                                             </button>
                                         {% endif %}
+                                        {# NEW CODE FOR SURVEYS #}
+                                        {% if appointment.status == 'Completed' %}
+                                            <a href="{{ PATIENT }}/survey/{{ appointment.id }}"
+                                               class="btn btn-sm btn-success ms-2">
+                                                <i class="ri-feedback-line me-1"></i> Give Feedback
+                                            </a>
+                                        {% endif %}
+
+                                        {# END NEW CODE FOR SURVEYS #}
                                     </td>
                                 </tr>
                             {% else %}
@@ -353,7 +362,7 @@
             const appointmentId = dateInput.id.replace('rescheduleDate', '');
             const timeSlotSelect = document.getElementById(`timeSlotSelect${appointmentId}`);
 
-            dateInput.addEventListener('change', function () {
+            dateInput.addEventListener('ch  ange', function () {
                 const doctorId = document.querySelector(`#rescheduleModal${appointmentId} input[name="doctor_id"]`).value;
                 const date = this.value;
 

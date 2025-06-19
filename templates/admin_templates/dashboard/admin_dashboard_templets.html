@@ -634,7 +634,56 @@
     <script src="../../../static/assets/vendor/datatables/dataTables.bootstrap.min.js"></script>
     <script src="../../../static/assets/vendor/datatables/custom/custom-datatables.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script>
+        // 1. Card Fade-In and Slide-Up Animation
+        anime({
+            targets: '.card',
+            translateY: [50, 0],
+            opacity: [0, 1],
+            duration: 800,
+            delay: anime.stagger(100, {start: 300}),
+            easing: 'easeOutQuad',
+        });
 
+        // 2. Number Counting Animation
+        const patientsCount = document.querySelector('.col-lg-4:nth-child(1) h2');
+        const appointmentsCount = document.querySelector('.col-lg-4:nth-child(2) h2');
+        const revenueCount = document.querySelector('.col-lg-4:nth-child(3) h2');
+
+        function animateNumber(element, startValue, endValue, duration) {
+            anime({
+                targets: element,
+                innerHTML: [startValue, endValue],
+                round: 1,
+                easing: 'easeOutQuad',
+                duration: duration,
+                update: function (anim) {
+                    if (element === revenueCount) {
+                        element.innerHTML = '$' + Math.round(anim.animations[0].currentValue);
+                    } else {
+                        element.innerHTML = Math.round(anim.animations[0].currentValue);
+                    }
+                }
+            });
+        }
+
+        // Delay the number animations slightly after the cards start appearing
+        setTimeout(() => {
+            animateNumber(patientsCount, 0, 660, 1500);
+            animateNumber(appointmentsCount, 0, 230, 1500);
+            animateNumber(revenueCount, 0, 9900, 1500);
+        }, 800); // Start number animations after card animations have progressed
+
+        // 3. Icon Subtle Pop/Bounce Animation
+        anime({
+            targets: '.icon-box i',
+            scale: [0.8, 1.2, 1],
+            duration: 600,
+            easing: 'easeOutElastic(1, .8)',
+            delay: anime.stagger(100, {start: 600}), // Start icons after card animations and slightly before numbers
+        });
+    </script>
 {% endblock footerLink %}
 
 
