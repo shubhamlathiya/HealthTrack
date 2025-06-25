@@ -9,6 +9,7 @@ from models.doctorModel import Doctor
 from models.patientModel import Patient
 from models.userModel import User, UserRole
 from utils.config import db
+from utils.email_utils import send_email
 
 
 def generate_id():
@@ -50,22 +51,12 @@ def create_new_patient(patient_data):
     db.session.add(new_patient)
     db.session.flush()
 
-    # Send welcome and verification emails
-    body_html = render_template("email_templates/templates/welcome.html",
-                                user_name=f"{new_patient.first_name} {new_patient.last_name}",
-                                new_user=new_user,
-                                temp_password=temp_password,
-                                login_url="http://localhost:5000/")
+    # Prepare full name for emails
+    person_full_name = f"{new_patient.first_name} {new_patient.last_name}".strip()
 
-    # send_email('Welcome to Our Hospital', new_user.email, body_html)
+    # 3. Send Emails
+    _send_welcome_and_verification_emails(new_user, person_full_name, temp_password)
 
-    verification_token = new_user.generate_verification_token()
-    verification_link = f"http://localhost:5000/auth/verify-email/{verification_token}"
-    body_html = render_template("email_templates/templates/verification_mail.html",
-                                verification_link=verification_link,
-                                user_name=f"{new_patient.first_name} {new_patient.last_name}")
-
-    # send_email('Verify Your Email', new_user.email, body_html)
     return new_patient
 
 
@@ -115,21 +106,37 @@ def create_new_doctor(doctor_data):
     db.session.add(new_doctor)
     db.session.flush()  # Flush to get new_doctor.id if needed by caller (e.g., for availability)
 
-    # Send welcome and verification emails
-    body_html = render_template("email_templates/templates/welcome.html",
-                                user_name=f"{new_doctor.first_name} {new_doctor.last_name}",
-                                new_user=new_user,
-                                temp_password=temp_password,
-                                login_url="http://localhost:5000/")
+    # Prepare full name for emails
+    person_full_name = f"{new_doctor.first_name} {new_doctor.last_name}".strip()
 
-    # send_email('Welcome to Our Hospital', new_user.email, body_html)
-
-    verification_token = new_user.generate_verification_token()
-    verification_link = f"http://localhost:5000/auth/verify-email/{verification_token}"
-    body_html = render_template("email_templates/templates/verification_mail.html",
-                                verification_link=verification_link,
-                                user_name=f"{new_doctor.first_name} {new_doctor.last_name}")
-
-    # send_email('Verify Your Email', new_user.email, body_html)
+    # 3. Send Emails
+    _send_welcome_and_verification_emails(new_user, person_full_name, temp_password)
 
     return new_doctor
+
+
+def _send_welcome_and_verification_emails(user: User, person_name: str, temp_password: str):
+    """
+    Helper to send both welcome and email verification emails.
+    Requires an active Flask application context for current_app.
+    """
+    # Get base URL from current_app config or default (crucial for deployment)
+    base_url = 'http://localhost:5000'
+
+    # --- Send Welcome Email ---
+    welcome_body_html = render_template("email_templates/templates/welcome.html",
+                                        user_name=person_name,
+                                        new_user=user,
+                                        temp_password=temp_password,
+                                        login_url=f"{base_url}/auth/login")  # Use actual login route
+
+    send_email('Welcome to Our Hospital', user.email, welcome_body_html)
+
+    # --- Send Verification Email ---
+    verification_token = user.generate_verification_token()  # Assuming User model has this method
+    verification_link = f"{base_url}/auth/verify-email/{verification_token}"
+    verification_body_html = render_template("email_templates/templates/verification_mail.html",
+                                             verification_link=verification_link,
+                                             user_name=person_name)
+
+    send_email('Verify Your Email', user.email, verification_body_html)
