@@ -135,7 +135,7 @@ ITEM_STOCKS_EXPORT = f'{INVENTORY_BASE}/item_stocks/export'  # Will append /<str
 ITEM_STOCKS_IMPORT = f'{INVENTORY_BASE}/item_stocks/import'
 ITEM_STOCKS_IMPORT_SAMPLE = f'{INVENTORY_BASE}/item_stocks/import/sample'
 ITEMS_GET_BY_CATEGORY = f'{INVENTORY_BASE}/items/get_by_category'
-ITEMS_GET_BY_CATEGORY = f'{INVENTORY_BASE}/items/get_by_category'
+
 
 # --- Issued Items ---
 ISSUED_ITEMS_BASE = f"{INVENTORY_BASE}/issued" # Consistent with other bases
