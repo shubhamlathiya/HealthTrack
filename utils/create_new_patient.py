@@ -20,6 +20,32 @@ def generate_id():
     random_digits = random.randint(10, 99)
     return int(f"{year}{month}{day}{random_digits}")
 
+
+def _generate_temp_password(length: int = 10) -> str:
+    """
+    Generates a secure temporary password ensuring a mix of character types.
+    """
+    chars = string.ascii_letters + string.digits + '!@#$%^&*'
+    if length < 8:  # Enforce a minimum length for security
+        length = 8
+
+    # Generate initial password string
+    temp_password_list = random.choices(chars, k=length)
+
+    # Ensure at least one of each required character type
+    if not any(char.isdigit() for char in temp_password_list):
+        temp_password_list[random.randint(0, length - 1)] = random.choice(string.digits)
+    if not any(char.islower() for char in temp_password_list):
+        temp_password_list[random.randint(0, length - 1)] = random.choice(string.ascii_lowercase)
+    if not any(char.isupper() for char in temp_password_list):
+        temp_password_list[random.randint(0, length - 1)] = random.choice(string.ascii_uppercase)
+    if not any(char in '!@#$%^&*' for char in temp_password_list):
+        temp_password_list[random.randint(0, length - 1)] = random.choice('!@#$%^&*')
+
+    # Shuffle to randomize character positions
+    random.shuffle(temp_password_list)
+    return "".join(temp_password_list)
+
 def create_new_patient(patient_data):
     print(patient_data)
     # Generate temporary password
