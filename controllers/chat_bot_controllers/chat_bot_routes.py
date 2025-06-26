@@ -23,7 +23,7 @@ from controllers.chat_bot_controllers.utils.request_medicine import handle_medic
 from middleware.auth_middleware import token_required
 from models import UserRole, User, Patient, Appointment, MedicineRequestStatus
 from utils.config import db
-
+import traceback
 
 @chatbot.route('/', methods=['GET'])
 @token_required(allowed_roles=[UserRole.PATIENT.name])
@@ -281,7 +281,7 @@ def chatbot_interact(current_user):
         # 5. Handle errors gracefully and rollback the transaction
         db.session.rollback()
         print(f"ERROR in chatbot_interact: {e}")
-        import traceback
+
         traceback.print_exc()  # Print full traceback for debugging
 
         return jsonify({
