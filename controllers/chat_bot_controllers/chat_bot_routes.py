@@ -1,4 +1,5 @@
 import json
+import traceback
 
 from flask import jsonify, session, render_template, request
 
@@ -23,7 +24,7 @@ from controllers.chat_bot_controllers.utils.request_medicine import handle_medic
 from middleware.auth_middleware import token_required
 from models import UserRole, User, Patient, Appointment, MedicineRequestStatus
 from utils.config import db
-import traceback
+
 
 @chatbot.route('/', methods=['GET'])
 @token_required(allowed_roles=[UserRole.PATIENT.name])
