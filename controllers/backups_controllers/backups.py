@@ -12,7 +12,7 @@ backups_bp = Blueprint('backups', __name__, url_prefix='/backups')
 
 # --- Define ALL static variables here ---
 # These paths are now hardcoded. Remember the 'r' for raw string on Windows paths.
-STATIC_BACKUP_BASE_DIR = r'S:\github projects\HealthTrack\backup'
+STATIC_BACKUP_BASE_DIR = r'S:\github\HealthTrack\backup'
 STATIC_UPLOADS_BASE_DIR = r'\static\uploads'  # Full path is better
 
 # MySQL Credentials - Hardcoded directly. Highly insecure for production!

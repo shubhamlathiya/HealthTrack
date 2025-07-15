@@ -136,7 +136,7 @@ def create_new_doctor(doctor_data):
     person_full_name = f"{new_doctor.first_name} {new_doctor.last_name}".strip()
 
     # 3. Send Emails
-    _send_welcome_and_verification_emails(new_user, person_full_name, temp_password)
+    # _send_welcome_and_verification_emails(new_user, person_full_name, temp_password)
 
     return new_doctor
 
