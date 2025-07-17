@@ -78,6 +78,16 @@ The **HMS** automates **all aspects** of hospital operations, including:
 - **Emergency Assistance** 🚨: Helps patients take immediate action during emergencies.
 - **Secure Communication** 🔐: All conversations are encrypted for confidentiality.
 
+### 14 .Family and Caregiver Portal  
+- **Secure Access** 🔐: Authorized family members and caregivers access patient data safely.  
+- **Real-Time Updates** 📊: Live patient status, treatment progress, and lab results.  
+- **Appointment & Visit Management** 📅: Schedule and manage visits and consultations effortlessly.  
+- **Communication Tools** 💬: Chat directly with healthcare providers and care teams.  
+- **Document Access** 📂: View and download prescriptions, reports, and discharge summaries.  
+- **Emergency Notifications** 🚨: Instant alerts for critical patient events.  
+- **Consent Management** ✅: Control data sharing permissions and approvals.
+
+
 [//]: # ()
 [//]: # (---)
 
