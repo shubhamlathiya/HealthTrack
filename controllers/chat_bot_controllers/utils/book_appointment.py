@@ -66,7 +66,13 @@ def handle_select_department(user_obj, data, chat_context):
             next_state = 'select_doctor'
         else:
             bot_response_text = f"No doctors found in the {Department.query.get(department_id).name} department. Please choose another department."
-            return handle_book_appointment_start(user_obj, data, chat_context)  # Go back to department selection
+            next_state = 'select_department'
+            departments = Department.query.all()
+            bot_options = [
+                {"text": dept.name, "value": f"department_{dept.id}"} for dept in departments
+            ]
+            return bot_response_text, bot_options, next_state, chat_context
+            # return handle_book_appointment_start(user_obj, data, chat_context)  # Go back to department selection
     else:
         bot_response_text = "Please select a valid department."
         return handle_book_appointment_start(user_obj, data, chat_context)

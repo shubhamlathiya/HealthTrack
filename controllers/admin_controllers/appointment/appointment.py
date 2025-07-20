@@ -40,7 +40,7 @@ def list_appointments():
 
 
 # except Excepti
-@admin.route("/appointment/book-appointment", methods=['GET'], endpoint='book-appointment')
+@admin.route("/appointments/book-appointment", methods=['GET'], endpoint='book-appointment')
 def appointment():
     # Get all active departments
     departments = Department.query.filter_by(is_deleted=False).all()

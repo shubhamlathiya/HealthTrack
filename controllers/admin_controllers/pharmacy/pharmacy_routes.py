@@ -450,7 +450,7 @@ def import_medicines(current_user):
                 group = MedicineGroup.query.filter_by(name=row.get('Group', '')).first()
                 unit = MedicineUnit.query.filter_by(name=row.get('Unit', '')).first()
 
-                print(f"category : {category}")
+                # print(f"category : {category}")
                 # Check if medicine exists
                 existing = Medicine.query.filter_by(name=name).first()
 
