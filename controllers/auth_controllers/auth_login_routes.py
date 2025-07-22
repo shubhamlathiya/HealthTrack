@@ -46,7 +46,7 @@ def login():
             session['user_id'] = str(user.id)
             session['email'] = user.email
             session["role"] = user.role.name  # or user.role_id
-            # print(user.role.name)
+            print(user.role.name)
             # Redirect based on user role
             if user.role == UserRole.PATIENT:
                 redirect_url = PATIENT_DASHBOARD
