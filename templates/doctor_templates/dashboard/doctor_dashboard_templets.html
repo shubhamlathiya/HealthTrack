@@ -214,9 +214,9 @@
                                             <span class="badge bg-primary-subtle text-primary">Patient ID: {{ appointment.patient.id }}</span>
                                             <p class="mb-3 mt-1">{{ appointment.reason|truncate(50) }}</p>
                                             <div class="d-flex gap-2">
-                                                <a href="{{ url_for('appointment.approve', appointment_id=appointment.id) }}"
+                                                <a href="{{ appointment.id }}"
                                                    class="btn btn-primary btn-sm">Approve</a>
-                                                <a href="{{ url_for('appointment.decline', appointment_id=appointment.id) }}"
+                                                <a href="{{ appointment.id }}"
                                                    class="btn btn-outline-secondary btn-sm">Decline</a>
                                             </div>
                                         </div>

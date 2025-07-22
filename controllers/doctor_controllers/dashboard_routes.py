@@ -10,7 +10,7 @@ from models.treatmentModel import Treatment
 from models.userModel import UserRole
 
 
-@doctors.route('/dashboard')
+@doctors.route('/dashboard' , methods=['GET'] , endpoint='dashboard')
 @token_required(allowed_roles=[UserRole.DOCTOR.name])
 def dashboard(current_user):
     # Ensure user is logged in
