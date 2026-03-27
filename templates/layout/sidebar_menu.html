@@ -639,21 +639,21 @@
                     </ul>
                 </li>
                 <!-- Patient Management -->
-                <li class="treeview {% if request.path.startswith('/admin/patients') %}active current-page{% endif %}">
-                    <a href="#">
-                        <i class="ri-user-heart-line"></i>
-                        <span class="menu-text">Patient Management</span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a href="/admin/patients/all"><i class="ri-user-line"></i> All Patients</a></li>
-                        <li><a href="/admin/patients/opd"><i class="ri-stethoscope-line"></i> OPD Patients</a></li>
-                        <li><a href="/admin/patients/ipd"><i class="ri-hospital-line"></i> IPD Patients</a></li>
-                        <li><a href="/admin/patients/registration"><i class="ri-user-add-line"></i> New Registration</a>
-                        </li>
-                        <li><a href="/admin/patients/documents"><i class="ri-file-text-line"></i> Patient Documents</a>
-                        </li>
-                    </ul>
-                </li>
+{#                <li class="treeview {% if request.path.startswith('/admin/patients') %}active current-page{% endif %}">#}
+{#                    <a href="#">#}
+{#                        <i class="ri-user-heart-line"></i>#}
+{#                        <span class="menu-text">Patient Management</span>#}
+{#                    </a>#}
+{#                    <ul class="treeview-menu">#}
+{#                        <li><a href="/admin/patients/all"><i class="ri-user-line"></i> All Patients</a></li>#}
+{#                        <li><a href="/admin/patients/opd"><i class="ri-stethoscope-line"></i> OPD Patients</a></li>#}
+{#                        <li><a href="/admin/patients/ipd"><i class="ri-hospital-line"></i> IPD Patients</a></li>#}
+{#                        <li><a href="/admin/patients/registration"><i class="ri-user-add-line"></i> New Registration</a>#}
+{#                        </li>#}
+{#                        <li><a href="/admin/patients/documents"><i class="ri-file-text-line"></i> Patient Documents</a>#}
+{#                        </li>#}
+{#                    </ul>#}
+{#                </li>#}
 
                 <li class="{% if request.path == '/admin/leave/applications' %}active current-page{% endif %}">
                     <a href="/admin/leave/applications">
