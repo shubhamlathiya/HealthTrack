@@ -83,7 +83,7 @@
                                                             data-bs-target="#confirmModalSm-{{ bed.bed_id }}">Confirm
                                                     </button>
                                                 {% elif bed.status.lower() == 'available' %}
-                                                    <a href="{{ bed.bed_id }}"
+                                                    <a href="/admin/room/available-room"
                                                        class="btn btn-primary">Book</a>
                                                 {% else %}
                                                     <button class="btn btn-primary" disabled>Not Available</button>

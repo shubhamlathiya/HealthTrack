@@ -103,12 +103,12 @@
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
-                <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">
-                    <a href="/admin/search">
-                        <i class="ri-search-line"></i>
-                        <span class="menu-text">User Search</span>
-                    </a>
-                </li>
+{#                <li class="{% if request.path == '/admin/search' %}active current-page{% endif %}">#}
+{#                    <a href="/admin/search">#}
+{#                        <i class="ri-search-line"></i>#}
+{#                        <span class="menu-text">User Search</span>#}
+{#                    </a>#}
+{#                </li>#}
                 <li class="treeview {% if request.path.startswith('/admin/department') or request.path.startswith('/admin/department') or request.path.startswith('/admin/edit-department') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-building-2-line"></i>
@@ -231,25 +231,25 @@
                         </li>
 
                         {# Reporting (Optional but good to plan for) #}
-                        <li class="treeview {% if request.path.startswith('/admin/ambulances/reports') %}active current-page{% endif %}">
-                            <a href="#!">
-                                <i class="ri-bar-chart-box-line"></i>
-                                <span class="menu-text">Ambulances Reports</span>
-                                <i class="ri-arrow-right-s-line"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li><a href="/admin/ambulances/reports/performance"
-                                       class="{% if request.path == '/admin/ambulances/reports/performance' %}active-sub{% endif %}">Performance
-                                    Report</a></li>
-                                <li><a href="/admin/ambulances/reports/financial-summary"
-                                       class="{% if request.path == '/admin/ambulances/reports/financial-summary' %}active-sub{% endif %}">Financial
-                                    Summary Report</a></li>
-                                <li><a href="/admin/ambulances/reports/service-utilization"
-                                       class="{% if request.path == '/admin/ambulances/reports/service-utilization' %}active-sub{% endif %}">Service
-                                    Utilization Report</a></li>
+{#                        <li class="treeview {% if request.path.startswith('/admin/ambulances/reports') %}active current-page{% endif %}">#}
+{#                            <a href="#!">#}
+{#                                <i class="ri-bar-chart-box-line"></i>#}
+{#                                <span class="menu-text">Ambulances Reports</span>#}
+{#                                <i class="ri-arrow-right-s-line"></i>#}
+{#                            </a>#}
+{#                            <ul class="treeview-menu">#}
+{#                                <li><a href="/admin/ambulances/reports/performance"#}
+{#                                       class="{% if request.path == '/admin/ambulances/reports/performance' %}active-sub{% endif %}">Performance#}
+{#                                    Report</a></li>#}
+{#                                <li><a href="/admin/ambulances/reports/financial-summary"#}
+{#                                       class="{% if request.path == '/admin/ambulances/reports/financial-summary' %}active-sub{% endif %}">Financial#}
+{#                                    Summary Report</a></li>#}
+{#                                <li><a href="/admin/ambulances/reports/service-utilization"#}
+{#                                       class="{% if request.path == '/admin/ambulances/reports/service-utilization' %}active-sub{% endif %}">Service#}
+{#                                    Utilization Report</a></li>#}
                                 {# Add more ambulance-specific reports here as needed #}
-                            </ul>
-                        </li>
+{#                            </ul>#}
+{#                        </li>#}
                     </ul>
                 </li>
                 <!-- Add this after the Human Resources menu item in the admin section -->
@@ -339,94 +339,94 @@
                     </ul>
                 </li>
 
-                <li class="treeview {% if request.path.startswith('/admin/records') %}active current-page{% endif %}">
-                    <a href="#!">
-                        <i class="ri-folders-line"></i> {# Icon for a collection of folders #}
-                        <span class="menu-text">Manage Records</span> {# Action-oriented top-level #}
-                    </a>
-                    <ul class="treeview-menu">
+{#                <li class="treeview {% if request.path.startswith('/admin/records') %}active current-page{% endif %}">#}
+{#                    <a href="#!">#}
+{#                        <i class="ri-folders-line"></i> {# Icon for a collection of folders #}
+{#                        <span class="menu-text">Manage Records</span> {# Action-oriented top-level #}
+{#                    </a>#}
+{#                    <ul class="treeview-menu">#}
                         {# Patient & Clinical Records #}
-                        <li class="treeview {% if request.path.startswith('/admin/records/clinical') %}active current-page{% endif %}">
-                            <a href="#!">
-                                <i class="ri-user-line"></i>
-                                <span class="menu-text">Patient Records</span>
-                                <i class="ri-arrow-right-s-line"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li>
-                                    <a href="/admin/records/clinical/patients"
-                                       class="{% if request.path == '/admin/records/clinical/patients' %}active-sub{% endif %}">
-                                        <i class="ri-user-search-line"></i> Patient Demographics
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/admin/records/clinical/medical"
-                                       class="{% if request.path == '/admin/records/clinical/medical' %}active-sub{% endif %}">
-                                        <i class="ri-health-book-line"></i> Medical History
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/admin/records/birth" {# Re-categorized birth #}
-                                       class="{% if request.path == '/admin/records/birth' %}active-sub{% endif %}">
-                                        <i class="ri-baby-line"></i> Birth Records
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/admin/records/death" {# Re-categorized death #}
-                                       class="{% if request.path == '/admin/records/death' %}active-sub{% endif %}">
-                                        <i class="ri-cross-line"></i> Death Records
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
+{#                        <li class="treeview {% if request.path.startswith('/admin/records/clinical') %}active current-page{% endif %}">#}
+{#                            <a href="#!">#}
+{#                                <i class="ri-user-line"></i>#}
+{#                                <span class="menu-text">Patient Records</span>#}
+{#                                <i class="ri-arrow-right-s-line"></i>#}
+{#                            </a>#}
+{#                            <ul class="treeview-menu">#}
+{#                                <li>#}
+{#                                    <a href="/admin/records/clinical/patients"#}
+{#                                       class="{% if request.path == '/admin/records/clinical/patients' %}active-sub{% endif %}">#}
+{#                                        <i class="ri-user-search-line"></i> Patient Demographics#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                                <li>#}
+{#                                    <a href="/admin/records/clinical/medical"#}
+{#                                       class="{% if request.path == '/admin/records/clinical/medical' %}active-sub{% endif %}">#}
+{#                                        <i class="ri-health-book-line"></i> Medical History#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                                <li>#}
+{#                                    <a href="/admin/records/birth" {# Re-categorized birth #}
+{#                                       class="{% if request.path == '/admin/records/birth' %}active-sub{% endif %}">#}
+{#                                        <i class="ri-baby-line"></i> Birth Records#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                                <li>#}
+{#                                    <a href="/admin/records/death" {# Re-categorized death #}
+{#                                       class="{% if request.path == '/admin/records/death' %}active-sub{% endif %}">#}
+{#                                        <i class="ri-cross-line"></i> Death Records#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                        </li>#}
+{##}
                         {# Administrative & Operational Records #}
-                        <li class="treeview {% if request.path.startswith('/admin/records/admin') %}active current-page{% endif %}">
-                            <a href="#!">
-                                <i class="ri-building-line"></i>
-                                <span class="menu-text">Administrative</span>
-                                <i class="ri-arrow-right-s-line"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li>
-                                    <a href="/admin/records/admin/staff"
-                                       class="{% if request.path == '/admin/records/admin/staff' %}active-sub{% endif %}">
-                                        <i class="ri-group-line"></i> Staff Records
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/admin/records/admin/billing"
-                                       class="{% if request.path == '/admin/records/admin/billing' %}active-sub{% endif %}">
-                                        <i class="ri-receipt-line"></i> Billing Records
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/admin/records/admin/incidents"
-                                       class="{% if request.path == '/admin/records/admin/incidents' %}active-sub{% endif %}">
-                                        <i class="ri-alert-line"></i> Incident Reports
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
+{#                        <li class="treeview {% if request.path.startswith('/admin/records/admin') %}active current-page{% endif %}">#}
+{#                            <a href="#!">#}
+{#                                <i class="ri-building-line"></i>#}
+{#                                <span class="menu-text">Administrative</span>#}
+{#                                <i class="ri-arrow-right-s-line"></i>#}
+{#                            </a>#}
+{#                            <ul class="treeview-menu">#}
+{#                                <li>#}
+{#                                    <a href="/admin/records/admin/staff"#}
+{#                                       class="{% if request.path == '/admin/records/admin/staff' %}active-sub{% endif %}">#}
+{#                                        <i class="ri-group-line"></i> Staff Records#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                                <li>#}
+{#                                    <a href="/admin/records/admin/billing"#}
+{#                                       class="{% if request.path == '/admin/records/admin/billing' %}active-sub{% endif %}">#}
+{#                                        <i class="ri-receipt-line"></i> Billing Records#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                                <li>#}
+{#                                    <a href="/admin/records/admin/incidents"#}
+{#                                       class="{% if request.path == '/admin/records/admin/incidents' %}active-sub{% endif %}">#}
+{#                                        <i class="ri-alert-line"></i> Incident Reports#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                        </li>#}
+{##}
                         {# Reports/Analytics (if records are tied to reporting) #}
-                        <li class="treeview {% if request.path.startswith('/admin/records/reports') %}active current-page{% endif %}">
-                            <a href="#!">
-                                <i class="ri-bar-chart-box-line"></i>
-                                <span class="menu-text">Record Reports</span>
-                                <i class="ri-arrow-right-s-line"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li>
-                                    <a href="/admin/records/reports/demographic-summary"
-                                       class="{% if request.path == '/admin/records/reports/demographic-summary' %}active-sub{% endif %}">
-                                        <i class="ri-pie-chart-line"></i> Demographic Summary
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
+{#                        <li class="treeview {% if request.path.startswith('/admin/records/reports') %}active current-page{% endif %}">#}
+{#                            <a href="#!">#}
+{#                                <i class="ri-bar-chart-box-line"></i>#}
+{#                                <span class="menu-text">Record Reports</span>#}
+{#                                <i class="ri-arrow-right-s-line"></i>#}
+{#                            </a>#}
+{#                            <ul class="treeview-menu">#}
+{#                                <li>#}
+{#                                    <a href="/admin/records/reports/demographic-summary"#}
+{#                                       class="{% if request.path == '/admin/records/reports/demographic-summary' %}active-sub{% endif %}">#}
+{#                                        <i class="ri-pie-chart-line"></i> Demographic Summary#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                        </li>#}
+{#                    </ul>#}
+{#                </li>#}
 
                 <li class="treeview {% if request.path.startswith('/admin/insurance') %}active menu-open{% endif %}">
                     <a href="/admin/insurance/patient">
@@ -590,42 +590,42 @@
                         </li>
                     </ul>
                 </li>
-                <li class="treeview {% if request.path.startswith('/admin/staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">
-                    <a href="#!">
-                        <i class="ri-scissors-line"></i>
-                        <span class="menu-text">Operations Management</span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li>
-                            <a href="#!">
-                                Operation Resources
-                                <i class="ri-arrow-right-s-line"></i>
-                            </a>
-                            <ul class="treeview-menu {% if request.path.startswith('/admin/pharmacy/medicine-categories') %}active current-page{% endif %}">
-                                <li>
-                                    <a href="/admin/pharmacy/medicine-categories"
-                                       class="{% if request.path == '/admin/pharmacy/medicine-categories' %}active-sub{% endif %}">Operation
-                                        Rooms</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/pharmacy/medicine-companies"
-                                       class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Surgical
-                                        Teams</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/pharmacy/medicine-companies"
-                                       class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Equipment
-                                        Inventory</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="/admin/add-staff"
-                               class="{% if request.path == '/admin/add-staff' %}active-sub{% endif %}">Outcomes &
-                                Reports</a>
-                        </li>
-                    </ul>
-                </li>
+{#                <li class="treeview {% if request.path.startswith('/admin/staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">#}
+{#                    <a href="#!">#}
+{#                        <i class="ri-scissors-line"></i>#}
+{#                        <span class="menu-text">Operations Management</span>#}
+{#                    </a>#}
+{#                    <ul class="treeview-menu">#}
+{#                        <li>#}
+{#                            <a href="#!">#}
+{#                                Operation Resources#}
+{#                                <i class="ri-arrow-right-s-line"></i>#}
+{#                            </a>#}
+{#                            <ul class="treeview-menu {% if request.path.startswith('/admin/pharmacy/medicine-categories') %}active current-page{% endif %}">#}
+{#                                <li>#}
+{#                                    <a href="/admin/pharmacy/medicine-categories"#}
+{#                                       class="{% if request.path == '/admin/pharmacy/medicine-categories' %}active-sub{% endif %}">Operation#}
+{#                                        Rooms</a>#}
+{#                                </li>#}
+{#                                <li>#}
+{#                                    <a href="/admin/pharmacy/medicine-companies"#}
+{#                                       class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Surgical#}
+{#                                        Teams</a>#}
+{#                                </li>#}
+{#                                <li>#}
+{#                                    <a href="/admin/pharmacy/medicine-companies"#}
+{#                                       class="{% if request.path == '/admin/pharmacy/medicine-companies' %}active-sub{% endif %}">Equipment#}
+{#                                        Inventory</a>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                        </li>#}
+{#                        <li>#}
+{#                            <a href="/admin/add-staff"#}
+{#                               class="{% if request.path == '/admin/add-staff' %}active-sub{% endif %}">Outcomes &#}
+{#                                Reports</a>#}
+{#                        </li>#}
+{#                    </ul>#}
+{#                </li>#}
                 <li class="treeview {% if request.path.startswith('/admin/view-staff') or request.path.startswith('/admin/add-staff') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-nurse-line"></i>
@@ -662,40 +662,40 @@
                     </a>
                 </li>
                 <!-- Financial Management -->
-                <li class="treeview {% if request.path.startswith('/admin/finance') %}active current-page{% endif %}">
-                    <a href="#">
-                        <i class="ri-money-dollar-circle-line"></i>
-                        <span class="menu-text">Financial Management</span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a href="/admin/finance/billing"><i class="ri-bill-line"></i> Billing</a></li>
-                        <li><a href="/admin/finance/invoices"><i class="ri-file-list-line"></i> Invoices</a></li>
-                        <li><a href="/admin/finance/payments"><i class="ri-wallet-line"></i> Payments</a></li>
-                        <li><a href="/admin/finance/expenses"><i class="ri-money-cny-circle-line"></i> Expenses</a></li>
-                        <li><a href="/admin/finance/insurance"><i class="ri-shield-check-line"></i> Insurance/TPA</a>
-                        </li>
-                        <li><a href="/admin/finance/reports"><i class="ri-bar-chart-box-line"></i> Financial Reports</a>
-                        </li>
-                    </ul>
-                </li>
+{#                <li class="treeview {% if request.path.startswith('/admin/finance') %}active current-page{% endif %}">#}
+{#                    <a href="#">#}
+{#                        <i class="ri-money-dollar-circle-line"></i>#}
+{#                        <span class="menu-text">Financial Management</span>#}
+{#                    </a>#}
+{#                    <ul class="treeview-menu">#}
+{#                        <li><a href="/admin/finance/billing"><i class="ri-bill-line"></i> Billing</a></li>#}
+{#                        <li><a href="/admin/finance/invoices"><i class="ri-file-list-line"></i> Invoices</a></li>#}
+{#                        <li><a href="/admin/finance/payments"><i class="ri-wallet-line"></i> Payments</a></li>#}
+{#                        <li><a href="/admin/finance/expenses"><i class="ri-money-cny-circle-line"></i> Expenses</a></li>#}
+{#                        <li><a href="/admin/finance/insurance"><i class="ri-shield-check-line"></i> Insurance/TPA</a>#}
+{#                        </li>#}
+{#                        <li><a href="/admin/finance/reports"><i class="ri-bar-chart-box-line"></i> Financial Reports</a>#}
+{#                        </li>#}
+{#                    </ul>#}
+{#                </li>#}
 
                 <!-- Reports & Analytics -->
-                <li class="treeview {% if request.path.startswith('/admin/reports') %}active current-page{% endif %}">
-                    <a href="#">
-                        <i class="ri-bar-chart-2-line"></i>
-                        <span class="menu-text">Reports & Analytics</span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a href="/admin/reports/clinical"><i class="ri-heart-pulse-line"></i> Clinical Reports</a>
-                        </li>
-                        <li><a href="/admin/reports/financial"><i class="ri-money-dollar-circle-line"></i> Financial
-                            Reports</a>
-                        </li>
-                        <li><a href="/admin/reports/inventory"><i class="ri-store-line"></i> Inventory Reports</a></li>
-                        <li><a href="/admin/reports/staff"><i class="ri-team-line"></i> Staff Reports</a></li>
-                        <li><a href="/admin/reports/custom"><i class="ri-file-chart-line"></i> Custom Reports</a></li>
-                    </ul>
-                </li>
+{#                <li class="treeview {% if request.path.startswith('/admin/reports') %}active current-page{% endif %}">#}
+{#                    <a href="#">#}
+{#                        <i class="ri-bar-chart-2-line"></i>#}
+{#                        <span class="menu-text">Reports & Analytics</span>#}
+{#                    </a>#}
+{#                    <ul class="treeview-menu">#}
+{#                        <li><a href="/admin/reports/clinical"><i class="ri-heart-pulse-line"></i> Clinical Reports</a>#}
+{#                        </li>#}
+{#                        <li><a href="/admin/reports/financial"><i class="ri-money-dollar-circle-line"></i> Financial#}
+{#                            Reports</a>#}
+{#                        </li>#}
+{#                        <li><a href="/admin/reports/inventory"><i class="ri-store-line"></i> Inventory Reports</a></li>#}
+{#                        <li><a href="/admin/reports/staff"><i class="ri-team-line"></i> Staff Reports</a></li>#}
+{#                        <li><a href="/admin/reports/custom"><i class="ri-file-chart-line"></i> Custom Reports</a></li>#}
+{#                    </ul>#}
+{#                </li>#}
                 <li class="treeview {% if request.path.startswith('/setup') or request.path.startswith('/admin/department') or request.path.startswith('/admin/edit-department') %}active current-page{% endif %}">
                     <a href="#!">
                         <i class="ri-building-2-line"></i>

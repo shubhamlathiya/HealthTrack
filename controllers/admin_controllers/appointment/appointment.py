@@ -30,9 +30,10 @@ def list_appointments():
             .all()
         # Sort appointments by date and start time
         appointments.sort(key=lambda a: (a.date, a.start_time))
-
+        doctors = Doctor.query.filter_by(is_deleted=False).all();
         return render_template('admin_templates/appointment/appointments.html',
                                appointments=appointments,
+                               doctors=doctors,
                                datetime=datetime)
     except Exception as e:
         flash(f"Error fetching appointments: {str(e)}", "danger")

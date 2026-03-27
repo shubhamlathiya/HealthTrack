@@ -175,8 +175,8 @@
                                                 <i class="ri-eye-line"></i>
                                             </button>
 
-                                            {% if appointment.status == 'scheduled' %}
-                                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
+                                          {% if appointment.status == 'PENDING' or appointment.status == 'scheduled' %}
+                                              <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
                                                         data-bs-target="#prescriptionModal{{ appointment.id }}"
                                                         title="Prescription">
                                                     <i class="ri-file-text-line"></i>

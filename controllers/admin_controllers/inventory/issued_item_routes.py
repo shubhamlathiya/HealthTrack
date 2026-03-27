@@ -211,7 +211,8 @@ def return_issued_item(current_user, issued_item_id):
 
         issued_item.return_date = datetime.now().date()
         issued_item.status = 'Returned'
-        issued_item.returned_by = current_user.email  # Log who returned it
+
+        issued_item.returned_by = current_user  # Log who returned it
 
         db.session.commit()
         flash('Issued item marked as returned successfully!', 'success')

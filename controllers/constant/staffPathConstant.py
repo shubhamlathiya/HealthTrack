@@ -1,3 +1,3 @@
 STAFF = "/staff"
 
-STAFF_DASHBOARD = f"/dashboard"
+STAFF_DASHBOARD = f"{STAFF}/dashboard"
