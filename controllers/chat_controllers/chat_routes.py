@@ -561,10 +561,16 @@ def respond_to_communication_request(current_user_id, request_id):  # Renamed fo
         communication_request = CommunicationRequest.query.get(request_id)
         if not communication_request:
             return jsonify({"error": "Request not found"}), 404
-
+        print("shubham lathiya")
+        print(communication_request.receiver_id)
+        print(current_user_id)
+        print(type(communication_request.receiver_id))
+        print(type(current_user_id))
         # Ensure the current user is the actual receiver of this request
-        if communication_request.receiver_id != current_user_id:
-            return jsonify({"error": "Unauthorized to respond to this request"}), 403
+        if communication_request.receiver_id != int(current_user_id):
+            return jsonify({
+                "error": "You are not authorized to respond to this request"
+            }), 403
 
         # Check if the request is already processed
         if communication_request.status != 'pending':

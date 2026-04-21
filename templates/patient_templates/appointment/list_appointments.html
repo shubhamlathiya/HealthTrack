@@ -269,7 +269,7 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Appointment
                         </button>
                         <form method="POST"
-                              action="{{ appointment.id }}">
+                              action="/patient/appointment/cancel-appointment/{{ appointment.id }}">
 
                             <button type="submit" class="btn btn-danger">
                                 <i class="ri-close-line me-1"></i> Yes, Cancel Appointment
