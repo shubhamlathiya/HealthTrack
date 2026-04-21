@@ -20,7 +20,7 @@ PRESCRIPTIONS = "/prescriptions"
 VIEW_PRESCRIPTIONS = f"{PRESCRIPTIONS}/view-prescriptions"
 SEND_PRESCRIPTION_EMAIL = f"{PRESCRIPTIONS}/send-prescription-email"
 
-PATIENT_AMBULANCE_CALLS = '/ambulance-calls'
+PATIENT_AMBULANCE_CALLS = f'/ambulance-calls'
 PATIENT_AMBULANCE_REQUESTS = '/ambulance-requests'
 PATIENT_AMBULANCE_REQUEST_NEW = '/ambulance-request/new'
 PATIENT_AMBULANCE_REQUEST_VIEW = '/ambulance-request/view'  # For a single request detail

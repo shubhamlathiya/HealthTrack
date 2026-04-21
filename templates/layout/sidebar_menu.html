@@ -71,18 +71,30 @@
                         <span class="menu-text">Chat</span>
                     </a>
                 </li>
+                <li class="{% if request.path == '/patient/ambulance-calls' %}active current-page{% endif %}">
+                    <a href="/patient/ambulance-calls">
+                        <i class="ri-chat-1-line"></i>
+                        <span class="menu-text">Ambulance Call</span>
+                    </a>
+                </li>
+                <li class="{% if request.path == '/patient/ambulance-requests' %}active current-page{% endif %}">
+                    <a href="/patient/ambulance-requests">
+                        <i class="ri-chat-1-line"></i>
+                        <span class="menu-text">Ambulance Requests</span>
+                    </a>
+                </li>
                 <li class="{% if request.path == '/patient/pharmacy/sales' %}active current-page{% endif %}">
                     <a href="/patient/pharmacy/sales">
                         <i class="ri-user-line"></i>
                         <span class="menu-text">Sales Records</span>
                     </a>
                 </li>
-                <li class="{% if request.path == '/patients/get-visitors' %}active current-page{% endif %}">
-                    <a href="/patients/get-visitors">
-                        <i class="ri-user-line"></i>
-                        <span class="menu-text">Visitors</span>
-                    </a>
-                </li>
+{#                <li class="{% if request.path == '/patients/get-visitors' %}active current-page{% endif %}">#}
+{#                    <a href="/patients/get-visitors">#}
+{#                        <i class="ri-user-line"></i>#}
+{#                        <span class="menu-text">Visitors</span>#}
+{#                    </a>#}
+{#                </li>#}
                 <li class="{% if request.path == '/patient/prescriptions/view-prescriptions' %}active current-page{% endif %}">
                     <a href="/patient/prescriptions/view-prescriptions">
                         <i class="ri-scissors-line"></i>

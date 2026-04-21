@@ -7,1000 +7,1175 @@
 
     <div class="row">
         <div class="col-xl-12">
-            <nav class="navbar navbar-expand navbar-light bg-white shadow mb-3 rounded-lg">
+            <!-- Modern Navigation Bar -->
+            <nav class="navbar navbar-expand navbar-light bg-white shadow-sm mb-3 rounded-3">
                 <div class="container-fluid py-2">
                     <a class="navbar-brand fw-bold text-primary" href="#">
                         <i class="fas fa-comments-medical me-2"></i>MediConnect
                     </a>
                     <div class="d-flex align-items-center">
                         <div class="position-relative me-3">
-                            <button class="btn btn-outline-secondary position-relative rounded-pill px-3 py-2"
-                                    id="notificationsBtn">
+                            <button class="btn btn-outline-secondary position-relative rounded-circle p-2"
+                                    id="notificationsBtn" data-bs-toggle="tooltip" title="Notifications">
                                 <i class="fas fa-bell fs-5"></i>
                                 <span class="badge rounded-circle bg-danger position-absolute top-0 start-100 translate-middle p-1 d-none"
-                                      id="notificationCount">0</span>
+                                      id="notificationCount" style="font-size: 0.6rem;">0</span>
                             </button>
                         </div>
-
+                        <div class="dropdown">
+                            <button class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center"
+                                    type="button" data-bs-toggle="dropdown">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                     style="width: 36px; height: 36px;">
+                                    {{ current_user.first_name[0] if current_user.first_name else 'U' }}
+                                </div>
+                                <span class="ms-2 d-none d-md-block">{{ current_user.first_name }} {{ current_user.last_name }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2"></i>Profile</a>
+                                </li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item text-danger" href="/logout"><i
+                                        class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </nav>
 
-            <div class="d-flex bg-light-subtle rounded-lg shadow" style="height: calc(100vh - 120px);">
-                <div class="bg-white border-end d-flex flex-column"
-                     style="width: 320px; transition: all 0.3s; border-top-left-radius: inherit; border-bottom-left-radius: inherit;">
+            <!-- Main Chat Container -->
+            <div class="d-flex bg-light rounded-3 shadow-sm" style="height: calc(100vh - 120px); overflow: hidden;">
+
+                <!-- Sidebar - Conversations List -->
+                <div class="bg-white border-end d-flex flex-column" id="conversationsSidebar"
+                     style="width: 320px; transition: all 0.3s; border-radius: 0.75rem 0 0 0.75rem;">
+
+                    <!-- Sidebar Header -->
                     <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold">Conversations</h5>
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-comments me-2 text-primary"></i>Conversations
+                        </h5>
                         <div>
-                            <button class="btn btn-sm btn-outline-primary me-2" id="requestsBtn"
-                                    data-bs-toggle="tooltip" title="View Requests">
-                                <i class="fas fa-user-plus fs-6"></i> {# Explicitly set icon size #}
+                            <button class="btn btn-sm btn-outline-primary rounded-circle me-2" id="requestsBtn"
+                                    data-bs-toggle="tooltip" title="View Requests" style="width: 34px; height: 34px;">
+                                <i class="fas fa-user-plus fs-6"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-primary d-md-none" id="toggleSidebar">
-                                <i class="fas fa-times fs-6"></i> {# Explicitly set icon size #}
+                            <button class="btn btn-sm btn-outline-secondary rounded-circle d-md-none" id="toggleSidebar"
+                                    style="width: 34px; height: 34px;">
+                                <i class="fas fa-bars fs-6"></i>
                             </button>
                         </div>
                     </div>
 
+                    <!-- Search Bar -->
                     <div class="p-3 border-bottom">
                         <div class="input-group shadow-sm rounded-pill">
-                            <span class="input-group-text bg-light border-0 rounded-start-pill">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
+                        <span class="input-group-text bg-light border-0 rounded-start-pill">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
                             <input type="text" class="form-control border-0 bg-light rounded-end-pill" id="searchInput"
                                    placeholder="Search conversations...">
                         </div>
                     </div>
 
-                    <div class="flex-grow-1 overflow-auto p-2">
-                        <div id="user-list">
-                            {# User list items will be injected by JavaScript, following the card-like design #}
-                        </div>
+                    <!-- User List Container -->
+                    <div class="flex-grow-1 overflow-auto p-2" id="user-list-container">
+                        <div id="user-list" class="d-flex flex-column gap-2"></div>
                     </div>
                 </div>
 
-                <div class="flex-grow-1 d-flex flex-column bg-white rounded-lg"
-                     style="border-top-right-radius: inherit; border-bottom-right-radius: inherit;">
+                <!-- Chat Area -->
+                <div class="flex-grow-1 d-flex flex-column bg-white" id="chatArea"
+                     style="border-radius: 0 0.75rem 0.75rem 0;">
+
                     {% if receiver_id %}
+                        <!-- Chat Header -->
                         <div class="p-3 border-bottom d-flex align-items-center bg-white sticky-top shadow-sm">
                             <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold me-3"
-                                     style="width: 40px; height: 40px;"
-                                     id="receiver-avatar">{{ receiver_name[0] if receiver_name else '' }}</div>
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold me-3 shadow-sm"
+                                     style="width: 44px; height: 44px;" id="receiver-avatar">
+                                    {{ receiver_name[0] if receiver_name else '' }}
+                                </div>
                                 <div>
-                                    <h6 class="mb-0 fw-bold" id="receiver-name">{{ receiver_name if receiver_name else '' }}</h6>
+                                    <h6 class="mb-0 fw-bold"
+                                        id="receiver-name">{{ receiver_name if receiver_name else '' }}</h6>
                                     <small class="text-muted"
-                                           id="receiver-role">{{ receiver_role if receiver_role else '' }} •
-                                        <span id="receiver-status">Offline</span></small>
+                                           id="receiver-role">{{ receiver_role if receiver_role else '' }}</small>
+                                    <small class="text-muted ms-1">•</small>
+                                    <small class="text-success" id="receiver-status">
+                                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i> Online
+                                    </small>
                                 </div>
                             </div>
                             <div class="ms-auto">
-                                <button class="btn btn-sm btn-outline-secondary me-2">
-                                    <i class="fas fa-phone fs-6"></i> {# Explicitly set icon size #}
+                                <button class="btn btn-sm btn-outline-secondary rounded-circle me-2" id="voiceCallBtn"
+                                        data-bs-toggle="tooltip" title="Voice Call" style="width: 36px; height: 36px;">
+                                    <i class="fas fa-phone fs-6"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-video fs-6"></i> {# Explicitly set icon size #}
+                                <button class="btn btn-sm btn-outline-secondary rounded-circle me-2" id="videoCallBtn"
+                                        data-bs-toggle="tooltip" title="Video Call" style="width: 36px; height: 36px;">
+                                    <i class="fas fa-video fs-6"></i>
                                 </button>
+                                <button class="btn btn-sm btn-outline-danger rounded-circle" id="moreOptionsBtn"
+                                        data-bs-toggle="dropdown" style="width: 36px; height: 36px;">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a class="dropdown-item" href="#"><i class="fas fa-info-circle me-2"></i>View
+                                        Profile</a>
+                                    <a class="dropdown-item" href="#"><i class="fas fa-ban me-2"></i>Block User</a>
+                                    <a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt me-2"></i>Delete
+                                        Conversation</a>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="flex-grow-1 p-3 overflow-auto rounded-bottom-end-lg rounded-bottom-start-lg"
-                             id="chat-messages"
-                             style="background-color: #f5f7fb; background-image: url(&quot;data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E&quot;);">
-                            </div>
+                        <!-- Messages Container -->
+                        <div class="flex-grow-1 p-3 overflow-auto" id="chat-messages"
+                             style="background-color: #f8f9fa; background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%239C92AC\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'/%3E%3C/svg%3E');">
+                        </div>
 
-                        <div class="p-3 border-top bg-white rounded-lg shadow-sm">
-                            <div class="d-flex align-items-center bg-light rounded-pill p-2 shadow-sm">
-                                <button class="btn btn-sm btn-link text-muted me-2">
-                                    <i class="fas fa-paperclip fs-6"></i> {# Explicitly set icon size #}
+                        <!-- Message Input Area -->
+                        <div class="p-3 border-top bg-white">
+                            <div class="d-flex align-items-end gap-2">
+                                <button class="btn btn-link text-muted rounded-circle" id="attachFileBtn"
+                                        data-bs-toggle="tooltip" title="Attach file" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-paperclip fs-5"></i>
                                 </button>
-                                <textarea class="form-control border-0 bg-transparent outline-none flex-grow-1"
+                                <div class="flex-grow-1 bg-light rounded-3 p-2">
+                                <textarea class="form-control border-0 bg-transparent shadow-none"
                                           id="message-input" placeholder="Type your message..."
                                           rows="1" style="resize: none; max-height: 120px;"></textarea>
-                                <button class="btn btn-sm btn-link text-muted ms-2">
-                                    <i class="far fa-smile fs-6"></i> {# Explicitly set icon size #}
+                                </div>
+                                <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                        id="send-button" style="width: 44px; height: 44px;">
+                                    <i class="fas fa-paper-plane fs-5"></i>
                                 </button>
                             </div>
-                            <div class="d-flex justify-content-end mt-2">
-                                <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm"
-                                        id="send-button" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-paper-plane fs-5"></i> {# Consistent with previous larger icon size #}
-                                </button>
+                            <div class="mt-2 d-flex justify-content-between">
+                                <div>
+                                    <button class="btn btn-sm btn-link text-muted" id="emojiBtn">
+                                        <i class="far fa-smile"></i> Emoji
+                                    </button>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-lock me-1"></i>End-to-end encrypted
+                                </small>
                             </div>
                         </div>
                     {% else %}
+                        <!-- Empty State - No Conversation Selected -->
                         <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted text-center p-4">
-                            <div class="fs-1 text-light-emphasis mb-3">
+                            <div class="display-1 text-light-emphasis mb-4">
                                 <i class="fas fa-comment-medical"></i>
                             </div>
-                            <h4 class="text-dark">No conversation selected</h4>
-                            <p class="mb-4">Choose a conversation from the sidebar or start a new one</p>
-                            <button class="btn btn-primary" id="startNewChatBtn" data-bs-toggle="modal"
-                                    data-bs-target="#newChatModal">
-                                <i class="fas fa-plus me-2 fs-6"></i>Start New Chat {# Explicitly set icon size #}
+                            <h4 class="text-dark fw-bold">Welcome to MediConnect</h4>
+                            <p class="mb-4">Select a conversation from the sidebar or start a new one</p>
+                            <button class="btn btn-primary rounded-pill px-4 py-2" id="startNewChatBtn"
+                                    data-bs-toggle="modal" data-bs-target="#newChatModal">
+                                <i class="fas fa-plus me-2"></i>Start New Chat
                             </button>
                         </div>
                     {% endif %}
                 </div>
             </div>
-
-            <div class="modal fade" id="newChatModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content rounded-lg shadow">
-                        <div class="modal-header">
-                            <h5 class="modal-title">New Conversation</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">Select Recipient</label>
-                                <select class="form-select" id="recipientSelect" name="recipientSelect">
-                                    <option selected disabled>Choose a doctor or patient</option>
-                                    {# Will be populated by JavaScript #}
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Initial Message</label>
-                                <textarea class="form-control" id="initialMessage" rows="3"
-                                          placeholder="Type your message here..."></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="sendRequestBtn">Send Request</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade" id="requestsModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content rounded-lg shadow">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Communication Requests</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body" id="requestsList">
-                            <div class="text-center py-4" id="noRequestsMessage">
-                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                <p>No pending requests</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade" id="notificationsModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content rounded-lg shadow">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Notifications</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body" id="notificationsList">
-                            <div class="text-center py-4" id="noNotificationsMessage">
-                                <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
-                                <p>No notifications</p>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="markAllAsReadBtn">Mark
-                                all as read
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
-    <div id="call-screen"
-         class="d-none position-fixed top-0 start-0 w-100 h-100 bg-black bg-opacity-90 d-flex flex-column justify-content-center align-items-center p-4"
-         style="z-index: 1000;">
-        <h3 class="text-white mb-4">Incoming Call from Dr. Alice Smith</h3>
-        <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
-            <video id="remoteVideo" autoplay class="bg-dark border border-secondary rounded-lg shadow-lg"
-                   style="width: 640px; height: 480px; object-fit: cover;"></video>
-            <video id="localVideo" muted autoplay class="bg-dark border border-secondary rounded-lg shadow-lg"
-                   style="width: 200px; height: 150px; object-fit: cover;"></video>
-        </div>
-        <div class="d-flex gap-3 mt-4">
-            <button id="answer-call-btn" class="btn btn-success btn-lg shadow-lg"><i class="fas fa-phone me-2"></i>Answer
-            </button>
-            <button id="decline-call-btn" class="btn btn-danger btn-lg shadow-lg"><i
-                    class="fas fa-phone-slash me-2"></i>Decline
-            </button>
-            <button id="hang-up-btn" class="btn btn-danger btn-lg d-none shadow-lg"><i
-                    class="fas fa-phone-slash me-2"></i>Hang Up
-            </button>
+
+    <!-- New Chat Modal -->
+    <div class="modal fade" id="newChatModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-3 shadow-lg border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-comment-plus me-2 text-primary"></i>Start New Conversation
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-2">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-user me-1 text-muted"></i>Select Recipient
+                        </label>
+                        <select class="form-select rounded-3" id="recipientSelect">
+                            <option selected disabled>Choose a doctor or patient...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-pen me-1 text-muted"></i>Initial Message
+                        </label>
+                        <textarea class="form-control rounded-3" id="initialMessage" rows="3"
+                                  placeholder="Type your message here..." style="resize: none;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" id="sendRequestBtn">
+                        <i class="fas fa-paper-plane me-2"></i>Send Request
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Requests Modal -->
+    <div class="modal fade" id="requestsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-3 shadow-lg border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-user-plus me-2 text-primary"></i>Communication Requests
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-2" id="requestsList">
+                    <div class="text-center py-5" id="noRequestsMessage">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3 opacity-50"></i>
+                        <p class="text-muted mb-0">No pending requests</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div class="modal fade" id="notificationsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content rounded-3 shadow-lg border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-bell me-2 text-primary"></i>Notifications
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-2" id="notificationsList">
+                    <div class="text-center py-5" id="noNotificationsMessage">
+                        <i class="fas fa-bell-slash fa-3x text-muted mb-3 opacity-50"></i>
+                        <p class="text-muted mb-0">No notifications</p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-sm btn-link text-muted" id="markAllAsReadBtn">
+                        <i class="fas fa-check-double me-1"></i>Mark all as read
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1056;"></div>
 
 {% endblock body %}
+
 {% block footerLink %}
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 
-    {#<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
-    <script>
-        class ChatApp {
-            constructor() {
-                this.currentUserId = "{{ current_user.id }}"; // Use current_user.id
-                this.currentUserRole = "{{ current_user.role }}";
-                this.currentReceiverId = "{{ receiver_id if receiver_id else '' }}";
-                this.currentReceiverName = "{{ receiver_name if receiver_name else '' }}";
-                this.currentReceiverRole = "{{ receiver_role if receiver_role else '' }}";
-                this.firstUnreadMessageId = null;
-                this.socket = io();
-                this.chatMessagesContainer = document.getElementById('chat-messages'); // More precise naming
-                this.isChatScrolledToBottom = true; // Track scroll state
-                this.pendingReadMark = false; // To prevent multiple read requests
+   <script>
+    class ChatApp {
+        constructor() {
+            this.currentUserId = "{{ current_user.id }}";
+            this.currentUserRole = "{{ current_user.role }}";
+            this.currentReceiverId = "{{ receiver_id if receiver_id else '' }}";
+            this.currentReceiverName = "{{ receiver_name if receiver_name else '' }}";
+            this.currentReceiverRole = "{{ receiver_role if receiver_role else '' }}";
+            this.firstUnreadMessageId = null;
+            this.socket = io();
+            this.chatMessagesContainer = document.getElementById('chat-messages');
+            this.isChatScrolledToBottom = true;
+            this.pendingReadMark = false;
+            this.currentChatUser = null;
+            this.autoScrollEnabled = true; // New flag for auto-scroll control
+            this.lastMessageId = null; // Track last received message ID
+            this.unreadMessagesCount = 0; // Track unread count for current chat
 
-                this.initElements();
-                this.initEventListeners();
-                this.initSocketListeners();
-                this.initializeApp();
-            }
+            this.initElements();
+            this.initEventListeners();
+            this.initSocketListeners();
+            this.initializeApp();
+        }
 
-            initElements() {
-                // DOM Elements
-                this.userList = document.getElementById('user-list');
-                this.chatMessages = document.getElementById('chat-messages'); // This is the scrollable container
-                this.messageInput = document.getElementById('message-input');
-                this.sendButton = document.getElementById('send-button');
-                this.notificationCount = document.getElementById('notificationCount');
-                this.receiverAvatar = document.getElementById('receiver-avatar'); // Add these elements
-                this.receiverName = document.getElementById('receiver-name');
-                this.receiverRole = document.getElementById('receiver-role');
+        initElements() {
+            this.userList = document.getElementById('user-list');
+            this.chatMessages = document.getElementById('chat-messages');
+            this.messageInput = document.getElementById('message-input');
+            this.sendButton = document.getElementById('send-button');
+            this.notificationCount = document.getElementById('notificationCount');
+            this.receiverAvatar = document.getElementById('receiver-avatar');
+            this.receiverName = document.getElementById('receiver-name');
+            this.receiverRole = document.getElementById('receiver-role');
+            this.receiverStatus = document.getElementById('receiver-status');
 
+            // Modals
+            this.newChatModal = new bootstrap.Modal('#newChatModal');
+            this.requestsModal = new bootstrap.Modal('#requestsModal');
+            this.notificationsModal = new bootstrap.Modal('#notificationsModal');
+        }
 
-                // Modals
-                this.newChatModal = new bootstrap.Modal('#newChatModal');
-                this.requestsModal = new bootstrap.Modal('#requestsModal');
-                this.notificationsModal = new bootstrap.Modal('#notificationsModal');
-            }
+        initEventListeners() {
+            document.getElementById('startNewChatBtn')?.addEventListener('click', () => this.loadPotentialRecipients());
+            document.getElementById('requestsBtn').addEventListener('click', () => this.loadCommunicationRequests());
+            document.getElementById('notificationsBtn').addEventListener('click', () => this.loadNotifications());
+            document.getElementById('markAllAsReadBtn').addEventListener('click', () => this.markAllNotificationsAsRead());
+            document.getElementById('sendRequestBtn').addEventListener('click', () => this.sendCommunicationRequest());
 
-            initEventListeners() {
-                // Button click handlers
-                document.getElementById('startNewChatBtn')?.addEventListener('click', () => this.loadPotentialRecipients());
-                document.getElementById('requestsBtn').addEventListener('click', () => this.loadCommunicationRequests());
-                document.getElementById('notificationsBtn').addEventListener('click', () => this.loadNotifications());
-                document.getElementById('markAllAsReadBtn').addEventListener('click', () => this.markAllNotificationsAsRead());
-                document.getElementById('sendRequestBtn').addEventListener('click', () => this.sendCommunicationRequest());
-
-                // Message input handler
-                this.messageInput?.addEventListener('keydown', (e) => {
+            if (this.messageInput) {
+                this.messageInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         this.sendMessage();
                     }
                 });
+                this.messageInput.addEventListener('input', function () {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                });
+            }
 
-                // Send button handler
-                this.sendButton?.addEventListener('click', () => this.sendMessage());
+            this.sendButton?.addEventListener('click', () => this.sendMessage());
 
-                // Chat scroll listener for marking messages as read
-                this.chatMessagesContainer?.addEventListener('scroll', () => {
-                    // Determine if user is scrolled to bottom
-                    this.isChatScrolledToBottom = (this.chatMessagesContainer.scrollHeight - this.chatMessagesContainer.clientHeight <= this.chatMessagesContainer.scrollTop + 1);
+            // Improved scroll detection with user intent tracking
+            this.chatMessagesContainer?.addEventListener('scroll', () => {
+                const container = this.chatMessagesContainer;
+                const wasAtBottom = this.isChatScrolledToBottom;
+                this.isChatScrolledToBottom = (container.scrollHeight - container.clientHeight <= container.scrollTop + 10);
+
+                // If user manually scrolled up, disable auto-scroll temporarily
+                if (!this.isChatScrolledToBottom && wasAtBottom) {
+                    this.autoScrollEnabled = false;
+                    this.showScrollToBottomButton();
+                }
+                // If user scrolled back to bottom, re-enable auto-scroll
+                if (this.isChatScrolledToBottom && !wasAtBottom) {
+                    this.autoScrollEnabled = true;
+                    this.hideScrollToBottomButton();
                     this.checkAndMarkMessagesAsRead();
-                });
+                }
+
+                this.checkAndMarkMessagesAsRead();
+            });
+
+            document.getElementById('searchInput')?.addEventListener('input', (e) => this.filterConversations(e.target.value));
+        }
+
+        // Create and manage "scroll to bottom" button
+        showScrollToBottomButton() {
+            if (document.getElementById('scrollToBottomBtn')) return;
+
+            const btn = document.createElement('button');
+            btn.id = 'scrollToBottomBtn';
+            btn.className = 'btn btn-primary rounded-circle shadow-lg position-fixed';
+            btn.innerHTML = '<i class="fas fa-arrow-down"></i>';
+            btn.style.bottom = '100px';
+            btn.style.right = '30px';
+            btn.style.zIndex = '1000';
+            btn.style.width = '44px';
+            btn.style.height = '44px';
+            btn.setAttribute('data-bs-toggle', 'tooltip');
+            btn.setAttribute('title', 'Scroll to bottom');
+            btn.addEventListener('click', () => {
+                this.scrollToBottom();
+                this.autoScrollEnabled = true;
+                this.hideScrollToBottomButton();
+                this.checkAndMarkMessagesAsRead();
+            });
+
+            this.chatMessagesContainer?.parentElement?.appendChild(btn);
+            new bootstrap.Tooltip(btn);
+        }
+
+        hideScrollToBottomButton() {
+            const btn = document.getElementById('scrollToBottomBtn');
+            if (btn) btn.remove();
+        }
+
+        initSocketListeners() {
+            this.socket.on('connect', () => this.handleSocketConnect());
+            this.socket.on('receive_message', (data) => this.handleReceivedMessage(data));
+            this.socket.on('new_notification', (data) => this.handleNewNotification(data));
+            this.socket.on('new_communication_request', (data) => this.handleNewRequest(data));
+            this.socket.on('communication_request_response', (data) => this.handleRequestResponse(data));
+            this.socket.on('communication_request_cancelled', (data) => this.handleRequestCancelled(data));
+            this.socket.on('messages_marked_as_read', (data) => this.handleMessagesMarkedAsRead(data));
+            this.socket.on('user_status', (data) => this.handleUserStatus(data));
+        }
+
+        initializeApp() {
+            this.loadUsers();
+            this.loadMessages();
+            this.updateNotificationCount();
+            this.setupPeriodicUpdates();
+
+            // Focus on message input when chat loads
+            if (this.messageInput && this.currentReceiverId) {
+                setTimeout(() => this.messageInput.focus(), 500);
             }
+        }
 
-            initSocketListeners() {
-                this.socket.on('connect', () => this.handleSocketConnect());
-                this.socket.on('receive_message', (data) => this.handleReceivedMessage(data));
-                this.socket.on('new_notification', (data) => this.handleNewNotification(data));
-                this.socket.on('new_communication_request', (data) => this.handleNewRequest(data));
-                this.socket.on('communication_request_response', (data) => this.handleRequestResponse(data));
-                this.socket.on('communication_request_cancelled', (data) => this.handleRequestCancelled(data));
-                this.socket.on('messages_marked_as_read', (data) => this.handleMessagesMarkedAsRead(data)); // New listener for read receipts
-            }
-
-            initializeApp() {
-                console.log('Initializing MediConnect Chat App');
-
-                this.initTooltips();
-
-                // Load initial data
+        setupPeriodicUpdates() {
+            setInterval(() => {
                 this.loadUsers();
-                this.loadMessages(); // This will trigger scroll logic after rendering
                 this.updateNotificationCount();
+            }, 15000);
+        }
 
-                // Set up periodic updates for general user/message list updates (less frequent than real-time)
-                this.setupPeriodicUpdates();
+        handleSocketConnect() {
+            this.socket.emit('join', {user_id: this.currentUserId, room: this.currentUserId});
+            if (this.currentReceiverId) {
+                const conversationRoom = this.getConversationRoom(this.currentUserId, this.currentReceiverId);
+                this.socket.emit('join', {user_id: this.currentUserId, room: conversationRoom});
             }
+        }
 
-            initTooltips() {
-                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
-                console.log('Tooltips initialized');
-            }
-
-            setupPeriodicUpdates() {
-                // Adjust interval as needed, as many updates are real-time now
-                setInterval(() => {
-                    this.loadUsers();
-                    this.updateNotificationCount();
-                }, 15000); // More frequent for user list and notification count
-            }
-
-            // Socket.IO Handlers
-            handleSocketConnect() {
-                console.log('Connected to WebSocket server');
-                this.socket.emit('join', {user_id: this.currentUserId, room: this.currentUserId}); // Join personal room
-
-                if (this.currentReceiverId) {
-                    const conversationRoom = this.getConversationRoom(this.currentUserId, this.currentReceiverId);
-                    this.socket.emit('join', {user_id: this.currentUserId, room: conversationRoom}); // Join conversation room
-                    console.log(`Joined conversation room: ${conversationRoom}`);
-                }
-            }
-
-            handleReceivedMessage(data) {
-                console.log('Received message:', data);
-
-                // Only append message if it's from the currently active chat partner
-                if (data.sender_id == this.currentReceiverId) {
-                    this.appendMessage(data.sender_id, data.message, data.sent_at, data.sender_name, data.id, data.read_status);
-                    // Mark messages as read immediately if the user is already at the bottom of the chat
-                    if (this.isChatScrolledToBottom) {
-                        this.markMessagesAsRead();
+        handleUserStatus(data) {
+            if (data.user_id == this.currentReceiverId) {
+                if (this.receiverStatus) {
+                    if (data.status === 'online') {
+                        this.receiverStatus.innerHTML = '<i class="fas fa-circle" style="font-size: 0.5rem;"></i> Online';
+                        this.receiverStatus.classList.remove('text-secondary');
+                        this.receiverStatus.classList.add('text-success');
                     } else {
-                        // If not at bottom, messages will be marked when user scrolls to them
-                        // This is handled by renderMessages and checkAndMarkMessagesAsRead
-                        // A visual indicator that new messages arrived might be good here (e.g., "New Messages" button)
+                        this.receiverStatus.innerHTML = '<i class="far fa-circle" style="font-size: 0.5rem;"></i> Offline';
+                        this.receiverStatus.classList.remove('text-success');
+                        this.receiverStatus.classList.add('text-secondary');
                     }
-                } else {
-                    // If message is from a different user, update their unread count in the user list
-                    this.loadUsers(); // Reload user list to show updated unread counts
-                    this.showToast(`New message from ${data.sender_name}`, 'info'); // Show toast for messages from others
-                }
-            }
-
-            // NEW: Handler for messages marked as read by the receiver
-            handleMessagesMarkedAsRead(data) {
-                console.log('Messages marked as read by receiver:', data);
-                // This event is sent *to the sender* when the receiver reads their messages
-                // You can use this to update read receipts (e.g., checkmarks) in the sender's UI
-                if (data.reader_id == this.currentReceiverId && data.sender_id == this.currentUserId) {
-                    // Update your UI to show messages sent by current user to current receiver are read
-                    document.querySelectorAll('.message.sent').forEach(msgDiv => {
-                        // Assuming you have a way to track read status on sent messages visually
-                        // E.g., add a checkmark icon, or change color
-                        let readStatusIndicator = msgDiv.querySelector('.read-status-indicator');
-                        if (!readStatusIndicator) {
-                            readStatusIndicator = document.createElement('span');
-                            readStatusIndicator.className = 'read-status-indicator ms-1';
-                            msgDiv.querySelector('.message-time').appendChild(readStatusIndicator);
-                        }
-                        readStatusIndicator.innerHTML = '<i class="ri-check-double-line" data-bs-toggle="tooltip" title="Seen"></i>'; // Double checkmark icon
-                        new bootstrap.Tooltip(readStatusIndicator.querySelector('[data-bs-toggle="tooltip"]')); // Re-init tooltip
-                    });
-                    console.log('Updated sent messages to "read" status visually.');
-                }
-            }
-
-            handleNewNotification(data) {
-                console.log('Received new notification:', data);
-                this.showToast(data.message, 'info'); // Use info for general notifications
-                this.updateNotificationCount();
-            }
-
-            handleNewRequest(data) {
-                console.log('Received new communication request:', data);
-                this.showToast(`New communication request from ${data.sender_name}`, 'warning'); // Use warning for requests
-                // You might want to update a separate request count if you have one
-            }
-
-            handleRequestResponse(data) {
-                console.log('Received communication request response:', data);
-                if (data.status === 'accepted') {
-                    this.showToast('Your communication request was accepted!', 'success');
-                    // Redirect only if not already in that chat
-                    if (this.currentReceiverId !== data.sender_id) { // Fix: compare with sender_id as it's the new chat partner
-                        window.location.href = `/chat/chat?receiver_id=${data.sender_id}`;
-                    }
-                } else {
-                    this.showToast('Your communication request was rejected', 'warning');
-                }
-            }
-
-            handleRequestCancelled(data) {
-                console.log('Communication request cancelled:', data);
-                this.showToast('Communication request was cancelled', 'info');
-            }
-
-            // Core Functions
-            async loadUsers() {
-                // console.log('Loading users for communication...');
-                try {
-                    const response = await fetch('/chat/get-users-for-communication');
-                    const users = await response.json();
-                    this.renderUserList(users);
-                } catch (error) {
-                    console.error('Error loading users:', error);
-                }
-            }
-
-            renderUserList(users) {
-                this.userList.innerHTML = '';
-                users.forEach(user => {
-                    const userItem = document.createElement('div');
-                    userItem.className = `user-item ${user.id == this.currentReceiverId ? 'active' : ''}`;
-                    userItem.innerHTML = `
-                <div class="bg-white rounded-lg p-3 mb-2 shadow-sm d-flex align-items-center">
-    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold me-3" style="width: 40px; height: 40px;">
-        ${user.name.charAt(0)}
-    </div>
-    <div class="flex-grow-1">
-        <div class="fw-bold mb-0">${user.name}</div>
-        <small class="text-muted">${user.role}</small>
-        <div class="text-muted text-truncate" style="font-size: 0.875rem;">${user.last_message || 'No messages yet'}</div>
-    </div>
-</div>
-                    ${user.unread_count > 0 ? `<span class="badge rounded-pill bg-danger ms-auto px-2 py-1 fw-bold">
-    ${user.unread_count}
-</span>` : ''}
-                `;
-                    userItem.addEventListener('click', () => {
-                        console.log(`User clicked: ${user.name} (ID: ${user.id})`);
-                        if (user.id != this.currentReceiverId) { // Only navigate if different user
-                            window.location.href = `/chat/chat?receiver_id=${user.id}`;
-                        }
-                    });
-                    this.userList.appendChild(userItem);
-                });
-            }
-
-            async loadMessages() {
-                if (!this.currentReceiverId) {
-                    console.log('No receiver selected, skipping message load');
-                    // Clear chat display if no receiver is selected
-                    this.chatMessages.innerHTML = '<div class="text-center text-muted mt-5">Select a user to start chatting</div>';
-                    this.updateReceiverInfo(); // Clear receiver info
-                    return;
-                }
-
-                console.log(`Loading messages for conversation with ${this.currentReceiverId}`);
-                try {
-                    // Pass current_user_id and receiver_id for the server to fetch conversation
-                    const response = await fetch(`/chat/get-conversation?user1_id=${this.currentUserId}&user2_id=${this.currentReceiverId}`);
-                    const data = await response.json();
-                    this.renderMessages(data.conversation);
-                    this.updateReceiverInfo();
-                    this.checkAndMarkMessagesAsRead(); // Check and mark messages after initial load
-                } catch (error) {
-                    console.error('Error loading messages:', error);
-                    this.chatMessages.innerHTML = '<div class="text-center text-danger mt-5">Error loading messages.</div>';
-                }
-            }
-
-            renderMessages(messages) {
-                const oldScrollHeight = this.chatMessages.scrollHeight;
-                const oldScrollTop = this.chatMessages.scrollTop;
-                const isAtBottom = (oldScrollHeight - oldScrollTop <= this.chatMessages.clientHeight + 1); // Check if near bottom
-
-                this.chatMessages.innerHTML = '';
-                this.firstUnreadMessageId = null;
-                let unreadSeparatorInserted = false;
-
-                messages.forEach(msg => {
-                    // If message is from receiver AND is unread, and separator hasn't been inserted
-                    if (msg.sender_id != this.currentUserId && !msg.read_status && !unreadSeparatorInserted) {
-                        this.createUnreadSeparator();
-                        unreadSeparatorInserted = true;
-                        // Store the ID of the first unread message to scroll to it
-                        this.firstUnreadMessageId = `message-${msg.id}`;
-                    }
-                    this.appendMessage(msg.sender_id, msg.message, msg.sent_at, msg.sender_name, msg.id, msg.read_status);
-                });
-
-                // Only scroll to bottom or first unread if initial load or new messages arrived at bottom
-                if (isAtBottom && !this.firstUnreadMessageId) {
-                    this.scrollToBottom(); // Scroll to bottom if user was already at bottom
-                } else if (this.firstUnreadMessageId) {
-                    this.scrollToFirstUnread(); // Scroll to first unread if new unread messages
-                } else {
-                    // If not at bottom and no new unread messages, maintain current scroll position
-                    this.chatMessages.scrollTop = oldScrollTop;
-                }
-            }
-
-            createUnreadSeparator() {
-                const unreadSeparator = document.createElement('div');
-                unreadSeparator.id = 'unread-separator';
-                unreadSeparator.classList.add('text-center', 'text-muted', 'my-2', 'position-relative');
-                unreadSeparator.innerHTML = `<span class="badge bg-info text-dark rounded-pill py-2 px-3 fs-6 fw-bold">Unread Messages</span>`;
-                this.chatMessages.appendChild(unreadSeparator);
-            }
-
-            appendMessage(senderId, message, sentAt, senderName, messageId = null, readStatus = false) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${senderId == this.currentUserId ? 'sent' : 'received'} ${!readStatus && senderId != this.currentUserId ? 'unread-message' : ''}`; // Add 'unread-message' class
-
-                if (messageId) {
-                    messageDiv.id = `message-${messageId}`;
-                }
-
-                let messageContentHTML = '';
-                if (senderId != this.currentUserId) {
-                    messageContentHTML = `
-          <div class="p-3 rounded-lg mb-3 shadow-sm bg-light text-dark me-auto" style="max-width: 70%;">
-    <div class="small fw-semibold mb-1 text-primary">${senderName}</div>
-    <div class="message-content">${message}</div>
-    <div class="text-muted text-end" style="font-size: 0.7rem;">${this.formatTime(sentAt)}</div>
-</div>
-                `;
-                } else {
-                    messageContentHTML = `
-               <div class="p-3 rounded-lg mb-3 shadow-sm bg-primary text-white ms-auto" style="max-width: 70%;">
-    <div class="message-content">${message}</div>
-    <div class="text-white-50 text-end" style="font-size: 0.7rem;">
-        ${this.formatTime(sentAt)}
-        ${readStatus ? '<span class="ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Seen"><i class="ri-check-double-line"></i></span>' : ''}
-    </div>
-</div>
-
-                `;
-                }
-
-                messageDiv.innerHTML = messageContentHTML;
-                this.chatMessages.appendChild(messageDiv);
-
-                // Re-initialize tooltips for newly added content
-                if (messageDiv.querySelector('[data-bs-toggle="tooltip"]')) {
-                    new bootstrap.Tooltip(messageDiv.querySelector('[data-bs-toggle="tooltip"]'));
-                }
-            }
-
-            scrollToBottom() {
-                if (this.chatMessages) {
-                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-                    console.log('Scrolled to bottom');
-                }
-            }
-
-            scrollToFirstUnread() {
-                if (this.firstUnreadMessageId) {
-                    const unreadElement = document.getElementById(this.firstUnreadMessageId);
-                    if (unreadElement) {
-                        unreadElement.scrollIntoView({behavior: 'smooth', block: 'center'});
-                        console.log('Scrolled to first unread message');
-                        return;
-                    }
-                }
-                this.scrollToBottom(); // Fallback to bottom if unread not found
-            }
-
-
-            // NEW: Combined check and mark logic
-            checkAndMarkMessagesAsRead() {
-                if (!this.chatMessagesContainer || !this.currentReceiverId || this.pendingReadMark) {
-                    return;
-                }
-
-                const unreadMessages = this.chatMessagesContainer.querySelectorAll('.message.received.unread-message');
-                if (unreadMessages.length === 0) {
-                    // No unread messages from the current receiver, nothing to do
-                    return;
-                }
-
-                let allUnreadVisible = true;
-                let messagesToMark = [];
-
-                // Check if all unread messages from the current receiver are visible
-                unreadMessages.forEach(msgDiv => {
-                    const rect = msgDiv.getBoundingClientRect();
-                    const containerRect = this.chatMessagesContainer.getBoundingClientRect();
-
-                    // Check if message is within the visible viewport of the chat container
-                    const isVisible = (
-                        rect.top >= containerRect.top &&
-                        rect.bottom <= containerRect.bottom + 5 // Add a small buffer
-                    );
-
-                    if (isVisible) {
-                        messagesToMark.push(msgDiv);
-                    } else {
-                        allUnreadVisible = false; // At least one unread message is not fully visible
-                    }
-                });
-
-                // Mark messages as read if all unread messages from the receiver are visible
-                // OR if the user is at the bottom of the chat (implying they've seen latest)
-                if (allUnreadVisible || this.isChatScrolledToBottom) {
-                    this.pendingReadMark = true; // Set flag to prevent re-triggering
-                    console.log('Marking messages as read...');
-                    this.markMessagesAsRead(this.currentReceiverId)
-                        .then(() => {
-                            messagesToMark.forEach(msgDiv => {
-                                msgDiv.classList.remove('unread-message'); // Remove unread class
-                                // Remove unread separator if it exists and all messages are read
-                                const separator = document.getElementById('unread-separator');
-                                if (separator && this.chatMessagesContainer.querySelectorAll('.message.received.unread-message').length === 0) {
-                                    separator.remove();
-                                    this.firstUnreadMessageId = null;
-                                }
-                            });
-                            this.pendingReadMark = false; // Reset flag
-                        })
-                        .catch(() => {
-                            this.pendingReadMark = false; // Reset flag even on error
-                        });
-                }
-            }
-
-            async markMessagesAsRead(senderId) { // Pass senderId (the receiver in the context of chat)
-                if (!senderId) return;
-                try {
-                    const response = await fetch(`/chat/mark-messages-read?sender_id=${senderId}&receiver_id=${this.currentUserId}`, {
-                        method: 'POST'
-                    });
-                    const data = await response.json();
-                    if (data.message) {
-                        console.log('Messages marked as read successfully.');
-                        // Reload user list to update unread counts
-                        this.loadUsers();
-                        this.updateNotificationCount();
-                    } else {
-                        console.error('Failed to mark messages as read:', data.error);
-                    }
-                } catch (error) {
-                    console.error('Error marking messages as read:', error);
-                }
-            }
-
-
-            sendMessage() {
-                const message = this.messageInput.value.trim();
-                if (message && this.currentReceiverId) {
-                    console.log(`Sending message to ${this.currentReceiverId}: ${message}`);
-                    this.socket.emit('send_message', {
-                        sender_id: this.currentUserId,
-                        receiver_id: this.currentReceiverId,
-                        message: message
-                    });
-
-                    // Append message immediately (client-side prediction)
-                    this.appendMessage(this.currentUserId, message, new Date().toISOString(), "You", null, false); // Initial sent messages are not "read" yet
-                    this.messageInput.value = '';
-                    this.messageInput.style.height = 'auto'; // Reset textarea height
-                    this.scrollToBottom(); // Scroll to bottom after sending
-                }
-            }
-
-            updateReceiverInfo() {
-                if (this.currentReceiverId) {
-                    this.receiverAvatar.textContent = this.currentReceiverName.charAt(0);
-                    this.receiverName.textContent = this.currentReceiverName;
-                    this.receiverRole.textContent = this.currentReceiverRole;
-                } else {
-                    this.receiverAvatar = document.getElementById('receiver-avatar');
-                    this.receiverName = document.getElementById('receiver-name');
-                    this.receiverRole = document.getElementById('receiver-role');
-
-                }
-            }
-
-            // Utility Functions
-            formatTime(timestamp) {
-                const date = new Date(timestamp);
-                return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-            }
-
-            getConversationRoom(user1, user2) {
-                const ids = [String(user1), String(user2)].sort(); // Ensure strings for consistent sorting
-                return `conversation_${ids.join('_')}`;
-            }
-
-            showToast(message, type = 'success') {
-                const toastContainer = document.querySelector('.toast-container');
-                if (!toastContainer) {
-                    const newToastContainer = document.createElement('div');
-                    newToastContainer.className = `toast-container position-fixed bottom-0 end-0 p-3`;
-                    document.body.appendChild(newToastContainer);
-                }
-
-                const toast = document.createElement('div');
-                toast.className = `toast align-items-center text-white bg-${type} border-0`;
-                toast.setAttribute('role', 'alert');
-                toast.setAttribute('aria-live', 'assertive');
-                toast.setAttribute('aria-atomic', 'true');
-                toast.setAttribute('data-bs-delay', '3000'); // Auto-hide after 3 seconds
-
-                toast.innerHTML = `
-                <div class="toast align-items-center text-white bg-primary border-0 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex p-2">
-        <div class="toast-body fw-bold">
-            ${message}
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-</div>
-            `;
-
-                document.querySelector('.toast-container').appendChild(toast);
-                const bsToast = new bootstrap.Toast(toast);
-                bsToast.show();
-
-                toast.addEventListener('hidden.bs.toast', () => {
-                    toast.remove(); // Remove toast element after it hides
-                });
-            }
-
-
-            // Request and Notification Functions (Keeping largely similar, but check fetch URLs)
-            async loadPotentialRecipients() {
-                try {
-                    const response = await fetch('/chat/get-potential-recipients');
-                    const users = await response.json();
-                    this.renderRecipientSelect(users);
-                    this.newChatModal.show();
-                } catch (error) {
-                    console.error('Error loading recipients:', error);
-                    this.showToast('Failed to load potential recipients', 'danger');
-                }
-            }
-
-            renderRecipientSelect(users) {
-                const select = document.getElementById('recipientSelect');
-                select.innerHTML = '<option selected disabled>Choose a doctor or patient</option>';
-                if (users.length === 0) {
-                    select.innerHTML += '<option disabled>No users available</option>';
-                }
-                users.forEach(user => {
-                    const option = document.createElement('option');
-                    option.value = user.id;
-                    option.textContent = `${user.first_name} ${user.last_name} (${user.role})`;
-                    select.appendChild(option);
-                });
-            }
-
-            async loadCommunicationRequests() {
-                try {
-                    const response = await fetch('/chat/get-pending-requests');
-                    const requests = await response.json();
-                    this.renderRequestsList(requests);
-                    this.requestsModal.show();
-                } catch (error) {
-                    console.error('Error loading requests:', error);
-                    this.showToast('Failed to load communication requests', 'danger');
-                }
-            }
-
-            renderRequestsList(requests) {
-                const requestsList = document.getElementById('requestsList');
-                const noRequestsMessage = document.getElementById('noRequestsMessage');
-
-                if (requests.length === 0) {
-                    if (noRequestsMessage) noRequestsMessage.classList.remove('d-none');
-                    requestsList.innerHTML = '';
-                    if (noRequestsMessage) requestsList.appendChild(noRequestsMessage);
-                    return;
-                }
-
-                if (noRequestsMessage) noRequestsMessage.classList.add('d-none');
-                requestsList.innerHTML = '';
-
-                requests.forEach(request => {
-                    const requestItem = document.createElement('div');
-                    requestItem.className = 'request-item border p-3 mb-2 rounded';
-                    requestItem.innerHTML = `
-                   <div class="bg-white rounded-lg p-3 mb-3 shadow-sm border border-secondary"> {# Added a subtle border for requests #}
-    <div class="d-flex align-items-center mb-2">
-        <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center fw-bold me-3" style="width: 40px; height: 40px;">
-            ${request.sender_name.charAt(0)}
-        </div>
-        <div>
-            <h6 class="mb-0 fw-bold">${request.sender_name}</h6>
-            <small class="text-muted">${request.sender_role}</small>
-        </div>
-    </div>
-    <p class="mb-3 text-break">${request.message || '<span class="text-muted fst-italic">No message provided</span>'}</p> {# Added text-break and italic for no message #}
-    <small class="text-muted d-block mb-3">${new Date(request.created_at).toLocaleString()}</small>
-    <div class="d-flex gap-2"> {# Use gap for button spacing #}
-        <button class="btn btn-sm btn-success accept-request shadow-sm" data-request-id="${request.request_id}">
-            <i class="ri-check-line me-1"></i>Accept
-        </button>
-        <button class="btn btn-sm btn-danger reject-request shadow-sm" data-request-id="${request.request_id}">
-            <i class="ri-close-line me-1"></i>Reject
-        </button>
-    </div>
-</div>
-                `;
-                    requestsList.appendChild(requestItem);
-                });
-
-                document.querySelectorAll('.accept-request').forEach(btn => {
-                    btn.addEventListener('click', () => this.respondToRequest(btn.dataset.requestId, 'accept'));
-                });
-
-                document.querySelectorAll('.reject-request').forEach(btn => {
-                    btn.addEventListener('click', () => this.respondToRequest(btn.dataset.requestId, 'reject'));
-                });
-            }
-
-            async loadNotifications() {
-                try {
-                    const response = await fetch('/chat/get-notifications');
-                    const notifications = await response.json();
-                    this.renderNotificationsList(notifications);
-                    this.notificationsModal.show();
-                } catch (error) {
-                    console.error('Error loading notifications:', error);
-                    this.showToast('Failed to load notifications', 'danger');
-                }
-            }
-
-            renderNotificationsList(notifications) {
-                const notificationsList = document.getElementById('notificationsList');
-                const noNotificationsMessage = document.getElementById('noNotificationsMessage');
-
-                if (notifications.length === 0) {
-                    if (noNotificationsMessage) noNotificationsMessage.classList.remove('d-none');
-                    notificationsList.innerHTML = '';
-                    if (noNotificationsMessage) notificationsList.appendChild(noNotificationsMessage);
-                    return;
-                }
-
-                if (noNotificationsMessage) noNotificationsMessage.classList.add('d-none');
-                notificationsList.innerHTML = '';
-
-                notifications.forEach(notification => {
-                    const notificationItem = document.createElement('div');
-                    notificationItem.className = `notification-item border p-3 mb-2 rounded ${notification.read_status ? 'bg-light' : 'bg-white'}`;
-                    notificationItem.innerHTML = `<div class="bg-white rounded-lg p-3 mb-3 shadow-sm ${!notification.read_status ? 'border-start border-primary border-3' : 'text-muted'}">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h6 class="mb-0 ${!notification.read_status ? 'fw-bold text-dark' : 'text-muted'}">${notification.message}</h6>
-        ${!notification.read_status ? '<span class="badge bg-primary rounded-pill">New</span>' : ''}
-    </div>
-    <small class="text-muted d-block mb-3">${new Date(notification.created_at).toLocaleString()}</small>
-    <div class="d-flex flex-wrap gap-2"> {# Use flex-wrap and gap for button layout #}
-        ${notification.redirect_url ? `
-        <a href="${notification.redirect_url}" class="btn btn-sm btn-outline-primary shadow-sm">
-            <i class="ri-external-link-line me-1"></i>View Details
-        </a>` : ''}
-        ${!notification.read_status ? `
-        <button class="btn btn-sm btn-outline-secondary mark-as-read shadow-sm" data-notification-id="${notification.id}">
-            <i class="ri-check-line me-1"></i>Mark as Read
-        </button>` : ''}
-    </div>
-</div>`;
-                    notificationsList.appendChild(notificationItem);
-                });
-
-                document.querySelectorAll('.mark-as-read').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        this.markNotificationAsRead(btn.dataset.notificationId);
-                    });
-                });
-            }
-
-            async markNotificationAsRead(notificationId) {
-                try {
-                    const response = await fetch(`/chat/mark-notification-as-read/${notificationId}`, {
-                        method: 'PUT'
-                    });
-                    const data = await response.json();
-                    if (data.message) {
-                        this.loadNotifications();
-                        this.updateNotificationCount();
-                        this.showToast('Notification marked as read', 'success');
-                    } else {
-                        this.showToast(data.error || 'Failed to mark notification as read', 'danger');
-                    }
-                } catch (error) {
-                    console.error('Error marking notification as read:', error);
-                    this.showToast('Failed to mark notification as read', 'danger');
-                }
-            }
-
-            async markAllNotificationsAsRead() {
-                try {
-                    const response = await fetch('/chat/mark-all-notifications-as-read', {
-                        method: 'PUT'
-                    });
-                    const data = await response.json();
-                    if (data.message) {
-                        this.loadNotifications();
-                        this.updateNotificationCount();
-                        this.showToast('All notifications marked as read', 'success');
-                    } else {
-                        this.showToast(data.error || 'Failed to mark all notifications as read', 'danger');
-                    }
-                } catch (error) {
-                    console.error('Error marking all notifications as read:', error);
-                    this.showToast('Failed to mark all notifications as read', 'danger');
-                }
-            }
-
-            async updateNotificationCount() {
-                try {
-                    const response = await fetch('/chat/get-unread-notification-count');
-                    const data = await response.json();
-                    if (data.count > 0) {
-                        this.notificationCount.textContent = data.count;
-                        this.notificationCount.classList.remove('d-none');
-                    } else {
-                        this.notificationCount.classList.add('d-none');
-                    }
-                } catch (error) {
-                    console.error('Error updating notification count:', error);
-                }
-            }
-
-            async sendCommunicationRequest() {
-                const recipientSelect = document.getElementById('recipientSelect');
-                const recipientId = recipientSelect.value;
-                const message = document.getElementById('initialMessage').value;
-
-                if (!recipientId || recipientSelect.selectedIndex === 0) { // Check if default option is selected
-                    this.showToast('Please select a recipient', 'danger');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/chat/send-communication-request', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            receiver_id: recipientId,
-                            message: message
-                        })
-                    });
-                    const data = await response.json();
-
-                    if (response.ok && data.message) { // Check response.ok for 2xx status
-                        this.newChatModal.hide();
-                        this.showToast('Request sent successfully. Waiting for acceptance.', 'success');
-                    } else {
-                        this.showToast(data.error || 'Failed to send request', 'danger');
-                    }
-                } catch (error) {
-                    console.error('Error sending communication request:', error);
-                    this.showToast('Failed to send request due to network error', 'danger');
-                }
-            }
-
-            async respondToRequest(requestId, action) {
-                try {
-                    const response = await fetch(`/chat/respond-to-request/${requestId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            action: action
-                        })
-                    });
-                    const data = await response.json();
-
-                    if (response.ok && data.message) {
-                        this.showToast(`Request ${action}ed`, 'success');
-                        if (action === 'accept') {
-                            // Assuming data.sender_id is the ID of the user who sent the request
-                            window.location.href = `/chat/chat?receiver_id=${data.sender_id}`;
-                        } else {
-                            this.loadCommunicationRequests(); // Reload requests if rejected
-                        }
-                    } else {
-                        this.showToast(data.error || `Failed to ${action} request`, 'danger');
-                    }
-                } catch (error) {
-                    console.error('Error responding to request:', error);
-                    this.showToast('Failed to process request due to network error', 'danger');
                 }
             }
         }
 
-        // Initialize the application when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            new ChatApp();
-        });
-    </script>
+        handleReceivedMessage(data) {
+            // Play notification sound for new messages (optional)
+            if (data.sender_id != this.currentUserId) {
+                this.playNotificationSound();
+            }
+
+            if (data.sender_id == this.currentReceiverId) {
+                // Message from current chat partner
+                this.appendMessage(data.sender_id, data.message, data.sent_at, data.sender_name, data.id, data.read_status);
+                this.lastMessageId = data.id;
+
+                // Auto-scroll if enabled
+                if (this.autoScrollEnabled) {
+                    this.scrollToBottom();
+                } else {
+                    this.showScrollToBottomButton();
+                    this.updateUnreadIndicator();
+                }
+
+                // Auto-mark as read if chat is open and user is at bottom or has auto-scroll enabled
+                if (this.isChatScrolledToBottom || this.autoScrollEnabled) {
+                    this.markMessagesAsRead();
+                }
+            } else {
+                // Message from different user - update sidebar and show notification
+                this.loadUsers();
+                this.showToast(`New message from ${data.sender_name}`, 'info');
+
+                // Update browser tab title with notification
+                this.updateTabTitleNotification(true);
+            }
+        }
+
+        playNotificationSound() {
+            try {
+                // Create a subtle beep sound using Web Audio API
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.frequency.value = 880;
+                gainNode.gain.value = 0.1;
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
+                oscillator.stop(audioContext.currentTime + 0.5);
+                audioContext.resume();
+            } catch(e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        updateTabTitleNotification(hasNotification) {
+            const originalTitle = document.title;
+            if (hasNotification && !originalTitle.startsWith('● ')) {
+                document.title = '● New message - ' + originalTitle;
+            } else if (!hasNotification && originalTitle.startsWith('● ')) {
+                document.title = originalTitle.substring(2);
+            }
+        }
+
+        updateUnreadIndicator() {
+            // Update the unread count in the sidebar for the current conversation
+            const userItems = document.querySelectorAll('.user-item');
+            userItems.forEach(item => {
+                const userId = item.getAttribute('data-user-id');
+                if (userId == this.currentReceiverId) {
+                    const badge = item.querySelector('.badge');
+                    if (badge) {
+                        let count = parseInt(badge.textContent) || 0;
+                        badge.textContent = count + 1;
+                        badge.classList.remove('d-none');
+                    }
+                }
+            });
+        }
+
+        handleMessagesMarkedAsRead(data) {
+            if (data.reader_id == this.currentReceiverId && data.sender_id == this.currentUserId) {
+                // Update read status indicators for sent messages
+                document.querySelectorAll('.message.sent .read-status').forEach(el => {
+                    el.innerHTML = '<i class="fas fa-check-double text-primary" data-bs-toggle="tooltip" title="Seen"></i>';
+                });
+            }
+
+            // Also update the sidebar to clear unread count for this conversation
+            if (data.reader_id == this.currentUserId) {
+                this.loadUsers(); // Refresh user list to update unread counts
+            }
+        }
+
+        handleNewNotification(data) {
+            this.showToast(data.message, 'info');
+            this.updateNotificationCount();
+        }
+
+        handleNewRequest(data) {
+            this.showToast(`New communication request from ${data.sender_name}`, 'warning');
+            this.loadUsers(); // Refresh to show new user in list
+        }
+
+        handleRequestResponse(data) {
+            if (data.status === 'accepted') {
+                this.showToast('Your communication request was accepted!', 'success');
+                if (this.currentReceiverId !== data.sender_id) {
+                    window.location.href = `/chat/chat?receiver_id=${data.sender_id}`;
+                }
+            } else {
+                this.showToast('Your communication request was rejected', 'warning');
+            }
+        }
+
+        handleRequestCancelled(data) {
+            this.showToast('Communication request was cancelled', 'info');
+        }
+
+        async loadUsers() {
+            try {
+                const response = await fetch('/chat/get-users-for-communication');
+                const users = await response.json();
+                this.renderUserList(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        renderUserList(users) {
+            if (!this.userList) return;
+            this.userList.innerHTML = '';
+
+            users.forEach(user => {
+                const isActive = user.id == this.currentReceiverId;
+                const userDiv = document.createElement('div');
+                userDiv.className = `user-item p-2 rounded-3 cursor-pointer transition ${isActive ? 'bg-primary bg-opacity-10 border-start border-primary border-3' : 'hover-bg-light'}`;
+                userDiv.style.cursor = 'pointer';
+                userDiv.setAttribute('data-user-id', user.id);
+
+                userDiv.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <div class="position-relative">
+                            <div class="rounded-circle bg-secondary bg-gradient text-white d-flex align-items-center justify-content-center fw-bold"
+                                 style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span class="position-absolute bottom-0 end-0 ${user.status === 'online' ? 'bg-success' : 'bg-secondary'} rounded-circle border border-white"
+                                  style="width: 12px; height: 12px;"></span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="fw-semibold">${this.escapeHtml(user.name)}</div>
+                                <small class="text-muted">${user.last_message_time || ''}</small>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">${user.role}</small>
+                                ${user.unread_count > 0 ? `<span class="badge bg-danger rounded-pill">${user.unread_count}</span>` : ''}
+                            </div>
+                            <small class="text-muted text-truncate d-block" style="max-width: 180px;">
+                                <i class="fas fa-reply me-1" style="font-size: 0.7rem;"></i>${this.escapeHtml(user.last_message || 'No messages yet')}
+                            </small>
+                        </div>
+                    </div>
+                `;
+
+                userDiv.addEventListener('click', () => {
+                    if (user.id != this.currentReceiverId) {
+                        // Reset tab title before navigating
+                        this.updateTabTitleNotification(false);
+                        window.location.href = `/chat/chat?receiver_id=${user.id}`;
+                    }
+                });
+                this.userList.appendChild(userDiv);
+            });
+        }
+
+        filterConversations(searchTerm) {
+            const users = document.querySelectorAll('.user-item');
+            const term = searchTerm.toLowerCase();
+            users.forEach(user => {
+                const name = user.querySelector('.fw-semibold')?.textContent.toLowerCase() || '';
+                const role = user.querySelector('.text-muted')?.textContent.toLowerCase() || '';
+                user.style.display = name.includes(term) || role.includes(term) ? '' : 'none';
+            });
+        }
+
+        async loadMessages() {
+            if (!this.currentReceiverId) {
+                if (this.chatMessages) {
+                    this.chatMessages.innerHTML = `
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                            <i class="fas fa-comment-dots fa-4x mb-3 opacity-50"></i>
+                            <p class="mb-0">Select a user to start chatting</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch(`/chat/get-conversation?user1_id=${this.currentUserId}&user2_id=${this.currentReceiverId}`);
+                const data = await response.json();
+                this.renderMessages(data.conversation);
+                this.updateReceiverInfo();
+
+                // Auto-mark messages as read when chat loads
+                this.markMessagesAsRead();
+
+                // Reset auto-scroll and scroll to bottom
+                this.autoScrollEnabled = true;
+                this.scrollToBottom();
+                this.hideScrollToBottomButton();
+
+                // Reset tab title
+                this.updateTabTitleNotification(false);
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                if (this.chatMessages) {
+                    this.chatMessages.innerHTML = '<div class="text-center text-danger mt-5"><i class="fas fa-exclamation-triangle me-2"></i>Error loading messages.</div>';
+                }
+            }
+        }
+
+        renderMessages(messages) {
+            if (!this.chatMessages) return;
+
+            const wasAtBottom = this.isChatScrolledToBottom;
+            this.chatMessages.innerHTML = '';
+            this.firstUnreadMessageId = null;
+            let unreadSeparatorInserted = false;
+
+            messages.forEach(msg => {
+                if (msg.sender_id != this.currentUserId && !msg.read_status && !unreadSeparatorInserted) {
+                    this.createUnreadSeparator();
+                    unreadSeparatorInserted = true;
+                    this.firstUnreadMessageId = `message-${msg.id}`;
+                }
+                this.appendMessage(msg.sender_id, msg.message, msg.sent_at, msg.sender_name, msg.id, msg.read_status);
+                this.lastMessageId = msg.id;
+            });
+
+            // If there are unread messages and we're not at bottom, show scroll button
+            if (unreadSeparatorInserted && !wasAtBottom) {
+                this.showScrollToBottomButton();
+            }
+
+            if (wasAtBottom && !this.firstUnreadMessageId) {
+                this.scrollToBottom();
+            } else if (this.firstUnreadMessageId && wasAtBottom) {
+                this.scrollToFirstUnread();
+            }
+        }
+
+        createUnreadSeparator() {
+            const separator = document.createElement('div');
+            separator.className = 'text-center my-3';
+            separator.id = 'unreadSeparator';
+            separator.innerHTML = `
+                <span class="badge bg-light text-muted rounded-pill px-3 py-2">
+                    <i class="fas fa-envelope me-1"></i> New Messages
+                </span>
+            `;
+            this.chatMessages.appendChild(separator);
+        }
+
+        appendMessage(senderId, message, sentAt, senderName, messageId = null, readStatus = false) {
+            const messageDiv = document.createElement('div');
+            const isSent = senderId == this.currentUserId;
+            messageDiv.className = `message d-flex mb-3 ${isSent ? 'justify-content-end' : 'justify-content-start'}`;
+
+            if (messageId) messageDiv.id = `message-${messageId}`;
+            if (!isSent && !readStatus) messageDiv.classList.add('unread-message');
+
+            const time = this.formatTime(sentAt);
+
+            messageDiv.innerHTML = isSent ? `
+                <div class="d-flex flex-column align-items-end" style="max-width: 70%;">
+                    <div class="bg-primary text-white rounded-3 p-3 shadow-sm">
+                        <div class="message-content">${this.escapeHtml(message)}</div>
+                    </div>
+                    <div class="d-flex align-items-center mt-1">
+                        <small class="text-muted me-1">${time}</small>
+                        <span class="read-status">${readStatus ? '<i class="fas fa-check-double text-primary" data-bs-toggle="tooltip" title="Seen"></i>' : '<i class="fas fa-check text-muted" data-bs-toggle="tooltip" title="Delivered"></i>'}</span>
+                    </div>
+                </div>
+            ` : `
+                <div class="d-flex flex-column" style="max-width: 70%;">
+                    <div class="bg-white rounded-3 p-3 shadow-sm border">
+                        <small class="text-primary fw-semibold d-block mb-1">${this.escapeHtml(senderName)}</small>
+                        <div class="message-content">${this.escapeHtml(message)}</div>
+                    </div>
+                    <small class="text-muted mt-1">${time}</small>
+                </div>
+            `;
+
+            this.chatMessages.appendChild(messageDiv);
+
+            // Re-initialize tooltips
+            messageDiv.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                new bootstrap.Tooltip(el);
+            });
+        }
+
+        scrollToBottom() {
+            if (this.chatMessages) {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                this.isChatScrolledToBottom = true;
+            }
+        }
+
+        scrollToFirstUnread() {
+            if (this.firstUnreadMessageId) {
+                const element = document.getElementById(this.firstUnreadMessageId);
+                if (element) {
+                    element.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    return;
+                }
+            }
+            this.scrollToBottom();
+        }
+
+        checkAndMarkMessagesAsRead() {
+            if (!this.chatMessages || !this.currentReceiverId || this.pendingReadMark) return;
+
+            const unreadMessages = this.chatMessages.querySelectorAll('.message.unread-message');
+            if (unreadMessages.length === 0) return;
+
+            let allVisible = true;
+            const containerRect = this.chatMessages.getBoundingClientRect();
+
+            unreadMessages.forEach(msg => {
+                const rect = msg.getBoundingClientRect();
+                if (!(rect.top >= containerRect.top - 50 && rect.bottom <= containerRect.bottom + 50)) {
+                    allVisible = false;
+                }
+            });
+
+            // Mark as read if all unread messages are visible OR user is at bottom
+            if (allVisible || this.isChatScrolledToBottom) {
+                this.pendingReadMark = true;
+                this.markMessagesAsRead().finally(() => {
+                    this.pendingReadMark = false;
+                    unreadMessages.forEach(msg => msg.classList.remove('unread-message'));
+                    const separator = document.getElementById('unreadSeparator');
+                    if (separator) separator.remove();
+                    this.firstUnreadMessageId = null;
+                });
+            }
+        }
+
+        async markMessagesAsRead() {
+            if (!this.currentReceiverId) return;
+
+            try {
+                const response = await fetch(`/chat/mark-messages-read?sender_id=${this.currentReceiverId}&receiver_id=${this.currentUserId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                if (data.message) {
+                    console.log('Messages marked as read');
+                    this.loadUsers(); // Refresh sidebar to clear unread badge
+                    this.updateNotificationCount();
+                }
+            } catch (error) {
+                console.error('Error marking messages as read:', error);
+            }
+        }
+
+        sendMessage() {
+            const message = this.messageInput?.value.trim();
+            if (message && this.currentReceiverId) {
+                // Emit message via socket
+                this.socket.emit('send_message', {
+                    sender_id: this.currentUserId,
+                    receiver_id: this.currentReceiverId,
+                    message: message
+                });
+
+                // Optimistically append message to UI
+                this.appendMessage(this.currentUserId, message, new Date().toISOString(), "You", null, false);
+
+                // Clear input and reset height
+                if (this.messageInput) {
+                    this.messageInput.value = '';
+                    this.messageInput.style.height = 'auto';
+                }
+
+                // Auto-scroll to bottom after sending
+                this.autoScrollEnabled = true;
+                this.scrollToBottom();
+                this.hideScrollToBottomButton();
+
+                // Focus back on input
+                this.messageInput?.focus();
+            }
+        }
+
+        updateReceiverInfo() {
+            if (this.receiverAvatar && this.currentReceiverName) {
+                this.receiverAvatar.textContent = this.currentReceiverName.charAt(0).toUpperCase();
+                this.receiverName.textContent = this.currentReceiverName;
+                this.receiverRole.textContent = this.currentReceiverRole;
+            }
+        }
+
+        formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            if (date.toDateString() === now.toDateString()) {
+                return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+            }
+            return date.toLocaleDateString([], {month: 'short', day: 'numeric'});
+        }
+
+        getConversationRoom(user1, user2) {
+            return `conversation_${[String(user1), String(user2)].sort().join('_')}`;
+        }
+
+        showToast(message, type = 'success') {
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                toastContainer.style.zIndex = '1056';
+                document.body.appendChild(toastContainer);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'danger' ? 'danger' : type === 'warning' ? 'warning' : 'primary'} border-0 fade show`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('data-bs-delay', '3000');
+
+            let icon = type === 'success' ? 'fa-check-circle' : type === 'danger' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+
+            toast.innerHTML = `
+                <div class="d-flex align-items-center p-2">
+                    <i class="fas ${icon} me-2"></i>
+                    <div class="toast-body fw-semibold">${message}</div>
+                    <button type="button" class="btn-close btn-close-white ms-auto me-1" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, {autohide: true, delay: 3000});
+            bsToast.show();
+            toast.addEventListener('hidden.bs.toast', () => toast.remove());
+        }
+
+        async loadPotentialRecipients() {
+            try {
+                const response = await fetch('/chat/get-potential-recipients');
+                const users = await response.json();
+                const select = document.getElementById('recipientSelect');
+                if (select) {
+                    select.innerHTML = '<option selected disabled>Choose a doctor or patient...</option>';
+                    users.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = `${user.first_name} ${user.last_name} (${user.role})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading recipients:', error);
+                this.showToast('Failed to load potential recipients', 'danger');
+            }
+        }
+
+        async loadCommunicationRequests() {
+            try {
+                const response = await fetch('/chat/get-pending-requests');
+                const requests = await response.json();
+                this.renderRequestsList(requests);
+                this.requestsModal.show();
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                this.showToast('Failed to load communication requests', 'danger');
+            }
+        }
+
+        renderRequestsList(requests) {
+            const container = document.getElementById('requestsList');
+            const noMsg = document.getElementById('noRequestsMessage');
+
+            if (!container) return;
+
+            if (requests.length === 0) {
+                if (noMsg) noMsg.classList.remove('d-none');
+                container.innerHTML = '';
+                if (noMsg) container.appendChild(noMsg);
+                return;
+            }
+
+            if (noMsg) noMsg.classList.add('d-none');
+            container.innerHTML = '';
+
+            requests.forEach(req => {
+                const div = document.createElement('div');
+                div.className = 'border rounded-3 p-3 mb-3';
+                div.innerHTML = `
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center fw-bold me-3" style="width: 44px; height: 44px;">
+                            ${req.sender_name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">${this.escapeHtml(req.sender_name)}</h6>
+                            <small class="text-muted">${req.sender_role}</small>
+                        </div>
+                    </div>
+                    <p class="mb-2 text-muted">${this.escapeHtml(req.message || 'No message provided')}</p>
+                    <small class="text-muted d-block mb-3">${new Date(req.created_at).toLocaleString()}</small>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-success rounded-pill accept-request px-3" data-request-id="${req.request_id}">
+                            <i class="fas fa-check me-1"></i>Accept
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger rounded-pill reject-request px-3" data-request-id="${req.request_id}">
+                            <i class="fas fa-times me-1"></i>Reject
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.querySelectorAll('.accept-request').forEach(btn => {
+                btn.addEventListener('click', () => this.respondToRequest(btn.dataset.requestId, 'accept'));
+            });
+            document.querySelectorAll('.reject-request').forEach(btn => {
+                btn.addEventListener('click', () => this.respondToRequest(btn.dataset.requestId, 'reject'));
+            });
+        }
+
+        async loadNotifications() {
+            try {
+                const response = await fetch('/chat/get-notifications');
+                const notifications = await response.json();
+                this.renderNotificationsList(notifications);
+                this.notificationsModal.show();
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                this.showToast('Failed to load notifications', 'danger');
+            }
+        }
+
+        renderNotificationsList(notifications) {
+            const container = document.getElementById('notificationsList');
+            const noMsg = document.getElementById('noNotificationsMessage');
+
+            if (!container) return;
+
+            if (notifications.length === 0) {
+                if (noMsg) noMsg.classList.remove('d-none');
+                container.innerHTML = '';
+                if (noMsg) container.appendChild(noMsg);
+                return;
+            }
+
+            if (noMsg) noMsg.classList.add('d-none');
+            container.innerHTML = '';
+
+            notifications.forEach(notif => {
+                const div = document.createElement('div');
+                div.className = `border-bottom p-3 ${!notif.read_status ? 'bg-light' : ''}`;
+                div.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <p class="mb-1 ${!notif.read_status ? 'fw-semibold' : ''}">${this.escapeHtml(notif.message)}</p>
+                            <small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small>
+                        </div>
+                        ${!notif.read_status ? `
+                        <button class="btn btn-sm btn-link text-primary mark-as-read p-0" data-notification-id="${notif.id}">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.querySelectorAll('.mark-as-read').forEach(btn => {
+                btn.addEventListener('click', () => this.markNotificationAsRead(btn.dataset.notificationId));
+            });
+        }
+
+        async markNotificationAsRead(id) {
+            try {
+                await fetch(`/chat/mark-notification-as-read/${id}`, {method: 'PUT'});
+                this.loadNotifications();
+                this.updateNotificationCount();
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        }
+
+        async markAllNotificationsAsRead() {
+            try {
+                await fetch('/chat/mark-all-notifications-as-read', {method: 'PUT'});
+                this.loadNotifications();
+                this.updateNotificationCount();
+                this.showToast('All notifications marked as read', 'success');
+            } catch (error) {
+                console.error('Error marking all notifications as read:', error);
+            }
+        }
+
+        async updateNotificationCount() {
+            try {
+                const response = await fetch('/chat/get-unread-notification-count');
+                const data = await response.json();
+                if (data.count > 0 && this.notificationCount) {
+                    this.notificationCount.textContent = data.count > 9 ? '9+' : data.count;
+                    this.notificationCount.classList.remove('d-none');
+                } else if (this.notificationCount) {
+                    this.notificationCount.classList.add('d-none');
+                }
+            } catch (error) {
+                console.error('Error updating notification count:', error);
+            }
+        }
+
+        async sendCommunicationRequest() {
+            const select = document.getElementById('recipientSelect');
+            const recipientId = select?.value;
+            const message = document.getElementById('initialMessage')?.value;
+
+            if (!recipientId || select.selectedIndex === 0) {
+                this.showToast('Please select a recipient', 'danger');
+                return;
+            }
+
+            try {
+                const response = await fetch('/chat/send-communication-request', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({receiver_id: recipientId, message: message})
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    this.newChatModal.hide();
+                    this.showToast('Request sent successfully', 'success');
+                    if (document.getElementById('initialMessage')) {
+                        document.getElementById('initialMessage').value = '';
+                    }
+                } else {
+                    this.showToast(data.error || 'Failed to send request', 'danger');
+                }
+            } catch (error) {
+                console.error('Error sending request:', error);
+                this.showToast('Network error', 'danger');
+            }
+        }
+
+        async respondToRequest(requestId, action) {
+            try {
+                const response = await fetch(`/chat/respond-to-request/${requestId}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({action: action})
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    this.showToast(`Request ${action}ed`, 'success');
+                    if (action === 'accept') {
+                        window.location.href = `/chat/chat?receiver_id=${data.sender_id}`;
+                    } else {
+                        this.loadCommunicationRequests();
+                    }
+                } else {
+                    this.showToast(data.error || `Failed to ${action} request`, 'danger');
+                }
+            } catch (error) {
+                console.error('Error responding to request:', error);
+                this.showToast('Network error', 'danger');
+            }
+        }
+
+        escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        new ChatApp();
+    });
+</script>
+
+    <style>
+        .transition {
+            transition: all 0.2s ease;
+        }
+
+        .hover-bg-light:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .user-item.active {
+            background-color: rgba(13, 110, 253, 0.08);
+            border-left: 3px solid #0d6efd;
+        }
+
+        .message-content {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        #chat-messages::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        #chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
 {% endblock footerLink %}
