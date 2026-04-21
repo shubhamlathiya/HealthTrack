@@ -43,7 +43,6 @@ def book_appointment(current_user):
     # Get all active departments
     departments = Department.query.filter_by(is_deleted=False, status=True).all()
 
-
     # Get all active treatments
     treatments = Treatment.query.filter_by(active=True, is_deleted=False).all()
 
@@ -306,7 +305,7 @@ def take_survey(current_user, appointment_id):
             survey_data=survey,  # Pass the existing survey data
             appointment=appointment,
             PATIENT=PATIENT,
-            VIEW_APPOINTMENT=VIEW_APPOINTMENT            # Pass appointment details if needed
+            VIEW_APPOINTMENT=VIEW_APPOINTMENT  # Pass appointment details if needed
         )
 
     # 5. If no survey exists or it's not taken, create a new one (if not already existing and not taken)
